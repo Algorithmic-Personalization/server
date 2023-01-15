@@ -1,0 +1,27 @@
+{
+	"compilerOptions": {
+		"strict": true,
+		"noImplicitAny": true,
+		"noImplicitThis": true,
+		"alwaysStrict": true,
+		"strictNullChecks": true,
+		"strictFunctionTypes": true,
+		"noImplicitReturns": true,
+		"noFallthroughCasesInSwitch": true,
+		"noUnusedLocals": true,
+		"noUnusedParameters": true,
+		"jsx": "react",
+		"esModuleInterop": true,
+		"downlevelIteration": true,
+		"emitDecoratorMetadata": true,
+		"experimentalDecorators": true,
+		"typeRoots": ["node_modules/@types", "src/types"],
+		"outDir": "build",
+		"skipLibCheck": true
+	},
+	"include": ["."],
+	"exclude": ["node_modules", "build", "dist"],
+	"ts-node": {
+		"files": true,
+	}
+}

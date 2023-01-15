@@ -1,0 +1,10 @@
+production-server-port: 12857
+development-server-port: 12858
+
+smtp:
+  host: smtp.gmail.com
+  port: 465
+  secure: true
+  auth:
+    user: fm.de.jouvencel@gmail.com
+    pass: application password if you have 2-FA or e-mail password otherwise (discouraged)
