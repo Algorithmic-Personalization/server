@@ -3,7 +3,7 @@
 import {Entity, Column} from 'typeorm';
 import {IsInt, IsNotEmpty, IsString, IsPositive} from 'class-validator';
 
-import Model from '../lib/model';
+import Model from '../../common/lib/model';
 import {uuidv4} from '../../common/util';
 
 export enum EventType {
