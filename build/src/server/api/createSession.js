@@ -40,7 +40,7 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
 };
 exports.__esModule = true;
 exports.createCreateSessionRoute = void 0;
-var session_1 = __importDefault(require("../models/session"));
+var session_1 = __importDefault(require("../../common/models/session"));
 var createCreateSessionRoute = function (_a) {
     var createLogger = _a.createLogger, dataSource = _a.dataSource;
     return function (req, res) { return __awaiter(void 0, void 0, void 0, function () {

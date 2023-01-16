@@ -1,6 +1,6 @@
 import {type RouteCreator} from '../lib/routeContext';
 
-import Session from '../models/session';
+import Session from '../../common/models/session';
 
 export const createCreateSessionRoute: RouteCreator = ({createLogger, dataSource}) => async (req, res) => {
 	const log = createLogger(req.requestId);

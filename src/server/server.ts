@@ -27,7 +27,7 @@ import Admin from './models/admin';
 import Token from './models/token';
 import Participant from '../common/models/participant';
 import ExperimentConfig from '../common/models/experimentConfig';
-import Session from './models/session';
+import Session from '../common/models/session';
 import Event from './models/event';
 import Video from './models/video';
 import VideoListItem from './models/videoListItem';
