@@ -1,6 +1,6 @@
 import React, {useEffect, useState} from 'react';
 
-import MessageC from './MessageC';
+import MessageC from '../../common/components/MessageC';
 
 export const RedirectMessageC: React.FC<{ignore?: boolean}> = ({ignore}) => {
 	const [message, setMessage] = useState<string | undefined>();

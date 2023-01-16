@@ -3,7 +3,7 @@
 import {Entity, Column, OneToMany} from 'typeorm';
 import {IsNotEmpty, MinLength, IsString, Length} from 'class-validator';
 
-import Model from '../lib/model';
+import Model from '../../common/lib/model';
 import ExperimentConfig from '../../common/models/experimentConfig';
 
 @Entity()

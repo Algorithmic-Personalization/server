@@ -31,7 +31,7 @@ exports.__esModule = true;
 exports.Session = void 0;
 var typeorm_1 = require("typeorm");
 var class_validator_1 = require("class-validator");
-var model_1 = __importDefault(require("../lib/model"));
+var model_1 = __importDefault(require("../../common/lib/model"));
 var Session = /** @class */ (function (_super) {
     __extends(Session, _super);
     function Session() {

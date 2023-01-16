@@ -12,7 +12,7 @@ import {Link} from 'react-router-dom';
 
 import Admin from '../../server/models/admin';
 
-import MessageC from './MessageC';
+import MessageC from '../../common/components/MessageC';
 import ErrorsC from './ErrorsC';
 
 import {bind} from './helpers';

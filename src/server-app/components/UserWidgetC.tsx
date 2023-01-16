@@ -6,7 +6,7 @@ import {useAdminApi} from '../adminApiProvider';
 
 import type Admin from '../../server/models/admin';
 
-import MessageC from './MessageC';
+import MessageC from '../../common/components/MessageC';
 
 export const UserWidgetC: React.FC = () => {
 	const api = useAdminApi();

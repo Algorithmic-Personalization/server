@@ -31,7 +31,7 @@ exports.Video = void 0;
 /* eslint-disable @typescript-eslint/no-inferrable-types */
 var typeorm_1 = require("typeorm");
 var class_validator_1 = require("class-validator");
-var model_1 = __importDefault(require("../lib/model"));
+var model_1 = __importDefault(require("../../common/lib/model"));
 var Video = /** @class */ (function (_super) {
     __extends(Video, _super);
     function Video() {

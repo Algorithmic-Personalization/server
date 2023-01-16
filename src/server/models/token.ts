@@ -3,7 +3,7 @@
 import {Entity, Column} from 'typeorm';
 import {IsNotEmpty, IsBoolean, IsString, IsInt, IsPositive} from 'class-validator';
 
-import Model from '../lib/model';
+import Model from '../../common/lib/model';
 
 @Entity()
 export class Token extends Model {

@@ -31,7 +31,7 @@ exports.__esModule = true;
 exports.Event = exports.EventType = void 0;
 var typeorm_1 = require("typeorm");
 var class_validator_1 = require("class-validator");
-var model_1 = __importDefault(require("../../server/lib/model"));
+var model_1 = __importDefault(require("../lib/model"));
 var util_1 = require("../util");
 var EventType;
 (function (EventType) {

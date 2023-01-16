@@ -12,7 +12,7 @@ import {
 import FileIcon from '@mui/icons-material/FileUpload';
 
 import DLinkC from './DownloadLinkC';
-import MessageC, {StatusMessageC} from './MessageC';
+import MessageC, {StatusMessageC} from '../../common/components/MessageC';
 
 import {useAdminApi} from '../adminApiProvider';
 

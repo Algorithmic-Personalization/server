@@ -2,7 +2,7 @@
 import {Entity, Column} from 'typeorm';
 import {IsInt} from 'class-validator';
 
-import Model from '../lib/model';
+import Model from '../../common/lib/model';
 
 export enum ListType {
 	PERSONALIZED = 'PERSONALIZED',

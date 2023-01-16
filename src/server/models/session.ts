@@ -3,7 +3,7 @@
 import {Entity, Column, Generated} from 'typeorm';
 import {IsNotEmpty, IsString} from 'class-validator';
 
-import Model from '../lib/model';
+import Model from '../../common/lib/model';
 
 @Entity()
 export class Session extends Model {

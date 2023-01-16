@@ -44,7 +44,7 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
 exports.__esModule = true;
 exports.RedirectMessageC = void 0;
 var react_1 = __importStar(require("react"));
-var MessageC_1 = __importDefault(require("./MessageC"));
+var MessageC_1 = __importDefault(require("../../common/components/MessageC"));
 var RedirectMessageC = function (_a) {
     var ignore = _a.ignore;
     var _b = __read((0, react_1.useState)(), 2), message = _b[0], setMessage = _b[1];

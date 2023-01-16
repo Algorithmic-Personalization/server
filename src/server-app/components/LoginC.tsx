@@ -13,7 +13,7 @@ import {
 import {useAdminApi} from '../adminApiProvider';
 
 import RedirectMessageC from './RedirectMessageC';
-import MessageC from './MessageC';
+import MessageC from '../../common/components/MessageC';
 
 import {bind} from './helpers';
 
