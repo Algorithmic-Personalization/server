@@ -1,6 +1,12 @@
 node_modules
 logs
 
+public
+!public/index.html
+!public/bundle.js
+!public/bundle.js.map
+!public/participants.sample.csv
+
 .yarn/*
 !.yarn/cache
 !.yarn/patches
