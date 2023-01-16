@@ -2,7 +2,7 @@ import {ValidateNested} from 'class-validator';
 
 import {type RouteCreator} from '../lib/routeContext';
 
-import Admin from '../models/admin';
+import Admin from '../../common/models/admin';
 import Token from '../models/token';
 
 import {checkPassword} from '../lib/crypto';

@@ -1,6 +1,6 @@
 import {type RouteCreator} from '../lib/routeContext';
 
-import Admin from '../models/admin';
+import Admin from '../../common/models/admin';
 import {validateExcept, type Maybe, getMessage, has} from '../../common/util';
 
 import {getVerifyEmailToken} from '../../common/routes';

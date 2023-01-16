@@ -1,6 +1,6 @@
 import type {Page} from '../server/lib/pagination';
 
-import {type Admin} from '../server/models/admin';
+import {type Admin} from '../common/models/admin';
 import {type Token} from '../server/models/token';
 import {type Participant} from '../common/models/participant';
 import {type LoginResponse} from '../server/api/login';

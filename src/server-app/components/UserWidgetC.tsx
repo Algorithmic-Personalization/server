@@ -4,7 +4,7 @@ import {Typography} from '@mui/material';
 
 import {useAdminApi} from '../adminApiProvider';
 
-import type Admin from '../../server/models/admin';
+import type Admin from '../../common/models/admin';
 
 import MessageC from '../../common/components/MessageC';
 

@@ -1,5 +1,5 @@
 import {type RouteCreator} from '../lib/routeContext';
-import Admin from '../models/admin';
+import Admin from '../../common/models/admin';
 
 export const createAuthTestRoute: RouteCreator = ({createLogger, dataSource}) => async (req, res) => {
 	const log = createLogger(req.requestId);

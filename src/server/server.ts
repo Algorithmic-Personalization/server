@@ -23,7 +23,7 @@ import nodemailer from 'nodemailer';
 
 import {getInteger, getString, has, findPackageJsonDir} from '../common/util';
 
-import Admin from './models/admin';
+import Admin from '../common/models/admin';
 import Token from './models/token';
 import Participant from '../common/models/participant';
 import ExperimentConfig from '../common/models/experimentConfig';

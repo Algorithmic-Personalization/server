@@ -28,51 +28,59 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
     return (mod && mod.__esModule) ? mod : { "default": mod };
 };
 exports.__esModule = true;
-exports.ExperimentConfig = void 0;
+exports.Admin = void 0;
 var typeorm_1 = require("typeorm");
 var class_validator_1 = require("class-validator");
-var model_1 = __importDefault(require("../../common/lib/model"));
-var admin_1 = __importDefault(require("./admin"));
-var ExperimentConfig = /** @class */ (function (_super) {
-    __extends(ExperimentConfig, _super);
-    function ExperimentConfig() {
+var model_1 = __importDefault(require("../lib/model"));
+var experimentConfig_1 = __importDefault(require("./experimentConfig"));
+var Admin = /** @class */ (function (_super) {
+    __extends(Admin, _super);
+    function Admin() {
         var _this = _super !== null && _super.apply(this, arguments) || this;
-        _this.nonPersonalizedProbability = 0.5;
-        _this.comment = '';
-        _this.isCurrent = true;
-        _this.adminId = 0;
+        _this.name = '';
+        _this.email = '';
+        _this.password = '';
+        _this.verificationToken = '';
+        _this.emailVerified = false;
         return _this;
     }
     __decorate([
-        (0, typeorm_1.Column)({ type: 'double precision' }),
-        (0, class_validator_1.IsNumber)(),
-        (0, class_validator_1.Min)(0),
-        (0, class_validator_1.Max)(1),
-        __metadata("design:type", Number)
-    ], ExperimentConfig.prototype, "nonPersonalizedProbability");
-    __decorate([
+        (0, class_validator_1.IsNotEmpty)(),
         (0, typeorm_1.Column)(),
         (0, class_validator_1.IsString)(),
         __metadata("design:type", String)
-    ], ExperimentConfig.prototype, "comment");
+    ], Admin.prototype, "name");
+    __decorate([
+        (0, class_validator_1.IsNotEmpty)(),
+        (0, typeorm_1.Column)(),
+        (0, class_validator_1.IsString)(),
+        __metadata("design:type", String)
+    ], Admin.prototype, "email");
+    __decorate([
+        (0, class_validator_1.IsNotEmpty)(),
+        (0, class_validator_1.MinLength)(8),
+        (0, typeorm_1.Column)(),
+        (0, class_validator_1.IsString)(),
+        __metadata("design:type", String)
+    ], Admin.prototype, "password");
+    __decorate([
+        (0, typeorm_1.Column)(),
+        (0, class_validator_1.IsString)(),
+        (0, class_validator_1.Length)(128, 128),
+        __metadata("design:type", String)
+    ], Admin.prototype, "verificationToken");
     __decorate([
         (0, typeorm_1.Column)(),
         __metadata("design:type", Boolean)
-    ], ExperimentConfig.prototype, "isCurrent");
+    ], Admin.prototype, "emailVerified");
     __decorate([
-        (0, typeorm_1.Column)(),
-        (0, class_validator_1.IsInt)(),
-        __metadata("design:type", Number)
-    ], ExperimentConfig.prototype, "adminId");
-    __decorate([
-        (0, typeorm_1.ManyToOne)(function () { return admin_1["default"]; }, function (admin) { return admin.experimentConfigs; }),
-        (0, typeorm_1.JoinColumn)({ name: 'admin_id' }),
-        __metadata("design:type", admin_1["default"])
-    ], ExperimentConfig.prototype, "admin");
-    ExperimentConfig = __decorate([
+        (0, typeorm_1.OneToMany)(function () { return experimentConfig_1["default"]; }, function (experimentConfig) { return experimentConfig.admin; }),
+        __metadata("design:type", Array)
+    ], Admin.prototype, "experimentConfigs");
+    Admin = __decorate([
         (0, typeorm_1.Entity)()
-    ], ExperimentConfig);
-    return ExperimentConfig;
+    ], Admin);
+    return Admin;
 }(model_1["default"]));
-exports.ExperimentConfig = ExperimentConfig;
-exports["default"] = ExperimentConfig;
+exports.Admin = Admin;
+exports["default"] = Admin;

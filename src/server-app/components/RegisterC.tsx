@@ -10,7 +10,7 @@ import {
 
 import {Link} from 'react-router-dom';
 
-import Admin from '../../server/models/admin';
+import Admin from '../../common/models/admin';
 
 import MessageC from '../../common/components/MessageC';
 import ErrorsC from './ErrorsC';

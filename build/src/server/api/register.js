@@ -40,7 +40,7 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
 };
 exports.__esModule = true;
 exports.createRegisterRoute = void 0;
-var admin_1 = __importDefault(require("../models/admin"));
+var admin_1 = __importDefault(require("../../common/models/admin"));
 var util_1 = require("../../common/util");
 var routes_1 = require("../../common/routes");
 var crypto_1 = require("../lib/crypto");

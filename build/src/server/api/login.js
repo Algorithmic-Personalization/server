@@ -50,7 +50,7 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
 exports.__esModule = true;
 exports.createLoginRoute = exports.LoginResponse = void 0;
 var class_validator_1 = require("class-validator");
-var admin_1 = __importDefault(require("../models/admin"));
+var admin_1 = __importDefault(require("../../common/models/admin"));
 var token_1 = __importDefault(require("../models/token"));
 var crypto_1 = require("../lib/crypto");
 var LoginResponse = /** @class */ (function () {
