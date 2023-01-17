@@ -61,7 +61,7 @@ var createGetEventsRoute = function (_a) {
                             skip: page * pageSize,
                             take: pageSize,
                             order: {
-                                createdAt: 'DESC'
+                                id: 'DESC'
                             }
                         })];
                 case 2:

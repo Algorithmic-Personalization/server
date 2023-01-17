@@ -19,7 +19,7 @@ export const createGetEventsRoute: RouteCreator = ({createLogger, dataSource}) =
 				skip: page * pageSize,
 				take: pageSize,
 				order: {
-					createdAt: 'DESC',
+					id: 'DESC',
 				},
 			});
 
