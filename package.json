@@ -9,8 +9,9 @@
   "private": true,
   "packageManager": "yarn@3.3.0",
   "scripts": {
-    "build": "NODE_ENV=production tsc",
+    "build:server": "NODE_ENV=production tsc",
     "build:app": "NODE_ENV=production webpack",
+    "build": "yarn build:server && yarn build:app",
     "watch:ext": "NODE_ENV=development webpack --watch",
     "test": "jest",
     "tdd": "jest --watch",
