@@ -4,11 +4,13 @@ import {type RouteCreator} from '../lib/routeContext';
 import {type LogFunction} from '../lib/logger';
 
 import Participant from '../../common/models/participant';
-import Event, {EventType} from '../models/event';
+import Event, {EventType} from '../../common/models/event';
 import {type RecommendationsEvent} from '../models/recommendationsEvent';
+import {type WatchTimeEvent} from '../../common/models/watchTimeEvent';
 import ExperimentConfig from '../../common/models/experimentConfig';
 import Video from '../models/video';
 import VideoListItem, {ListType, VideoType} from '../models/videoListItem';
+import WatchTime from '../models/watchTime';
 
 import type Recommendation from '../../common/types/Recommendation';
 
@@ -115,6 +117,23 @@ const storeRecommendationsShown = async (
 	}
 };
 
+const storeWatchTime = async (
+	log: LogFunction,
+	dataSource: DataSource,
+	event: WatchTimeEvent,
+) => {
+	const eventRepo = dataSource.getRepository(WatchTime);
+	const watchTime = new WatchTime();
+	watchTime.eventId = event.id;
+	watchTime.secondsWatched = event.secondsWatched;
+	try {
+		await validateNew(watchTime);
+		await eventRepo.save(watchTime);
+	} catch (err) {
+		log('Error storing watch time event meta-data', err);
+	}
+};
+
 const isLocalUuidAlreadyExistsError = (e: unknown): boolean =>
 	has('code')(e) && has('constraint')(e)
 	&& e.code === '23505'
@@ -191,6 +210,8 @@ export const createPostEventRoute: RouteCreator = ({createLogger, dataSource}) =
 
 		if (event.type === EventType.RECOMMENDATIONS_SHOWN) {
 			await storeRecommendationsShown(log, dataSource, event as RecommendationsEvent);
+		} else if (event.type === EventType.WATCH_TIME) {
+			await storeWatchTime(log, dataSource, event as WatchTimeEvent);
 		}
 	} catch (e) {
 		log('event save failed', e);

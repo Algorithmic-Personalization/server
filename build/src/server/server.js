@@ -98,8 +98,9 @@ var token_1 = __importDefault(require("./models/token"));
 var participant_1 = __importDefault(require("../common/models/participant"));
 var experimentConfig_1 = __importDefault(require("../common/models/experimentConfig"));
 var session_1 = __importDefault(require("../common/models/session"));
-var event_1 = __importDefault(require("./models/event"));
+var event_1 = __importDefault(require("../common/models/event"));
 var video_1 = __importDefault(require("./models/video"));
+var watchTime_1 = __importDefault(require("./models/watchTime"));
 var videoListItem_1 = __importDefault(require("./models/videoListItem"));
 var smtpConfig_1 = __importDefault(require("./lib/smtpConfig"));
 var webpack_config_1 = __importDefault(require("../../webpack.config"));
@@ -133,6 +134,7 @@ var entities = [
     event_1["default"],
     video_1["default"],
     videoListItem_1["default"],
+    watchTime_1["default"],
 ];
 var env = process.env.NODE_ENV;
 if (env !== 'production' && env !== 'development') {

@@ -1,6 +1,6 @@
 import {type RouteCreator} from '../lib/routeContext';
 
-import Event from '../models/event';
+import Event from '../../common/models/event';
 
 import {type Page, extractPaginationRequest} from '../lib/pagination';
 

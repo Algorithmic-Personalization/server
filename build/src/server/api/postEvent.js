@@ -75,10 +75,11 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
 exports.__esModule = true;
 exports.createPostEventRoute = void 0;
 var participant_1 = __importDefault(require("../../common/models/participant"));
-var event_1 = __importStar(require("../models/event"));
+var event_1 = __importStar(require("../../common/models/event"));
 var experimentConfig_1 = __importDefault(require("../../common/models/experimentConfig"));
 var video_1 = __importDefault(require("../models/video"));
 var videoListItem_1 = __importStar(require("../models/videoListItem"));
+var watchTime_1 = __importDefault(require("../models/watchTime"));
 var util_1 = require("../../common/util");
 var storeVideos = function (repo, videos) { return __awaiter(void 0, void 0, void 0, function () {
     var ids, videos_1, videos_1_1, video, existing, newVideo, saved, e_1_1;
@@ -232,6 +233,33 @@ var storeRecommendationsShown = function (log, dataSource, event) { return __awa
         }
     });
 }); };
+var storeWatchTime = function (log, dataSource, event) { return __awaiter(void 0, void 0, void 0, function () {
+    var eventRepo, watchTime, err_2;
+    return __generator(this, function (_a) {
+        switch (_a.label) {
+            case 0:
+                eventRepo = dataSource.getRepository(watchTime_1["default"]);
+                watchTime = new watchTime_1["default"]();
+                watchTime.eventId = event.id;
+                watchTime.secondsWatched = event.secondsWatched;
+                _a.label = 1;
+            case 1:
+                _a.trys.push([1, 4, , 5]);
+                return [4 /*yield*/, (0, util_1.validateNew)(watchTime)];
+            case 2:
+                _a.sent();
+                return [4 /*yield*/, eventRepo.save(watchTime)];
+            case 3:
+                _a.sent();
+                return [3 /*break*/, 5];
+            case 4:
+                err_2 = _a.sent();
+                log('Error storing watch time event meta-data', err_2);
+                return [3 /*break*/, 5];
+            case 5: return [2 /*return*/];
+        }
+    });
+}); };
 var isLocalUuidAlreadyExistsError = function (e) {
     return (0, util_1.has)('code')(e) && (0, util_1.has)('constraint')(e)
         && e.code === '23505'
@@ -300,7 +328,7 @@ var createPostEventRoute = function (_a) {
                     }
                     _a.label = 6;
                 case 6:
-                    _a.trys.push([6, 10, , 11]);
+                    _a.trys.push([6, 12, , 13]);
                     eventRepo = dataSource.getRepository(event_1["default"]);
                     return [4 /*yield*/, eventRepo.save(event)];
                 case 7:
@@ -311,9 +339,15 @@ var createPostEventRoute = function (_a) {
                     return [4 /*yield*/, storeRecommendationsShown(log, dataSource, event)];
                 case 8:
                     _a.sent();
-                    _a.label = 9;
-                case 9: return [3 /*break*/, 11];
+                    return [3 /*break*/, 11];
+                case 9:
+                    if (!(event.type === event_1.EventType.WATCH_TIME)) return [3 /*break*/, 11];
+                    return [4 /*yield*/, storeWatchTime(log, dataSource, event)];
                 case 10:
+                    _a.sent();
+                    _a.label = 11;
+                case 11: return [3 /*break*/, 13];
+                case 12:
                     e_2 = _a.sent();
                     log('event save failed', e_2);
                     if (isLocalUuidAlreadyExistsError(e_2)) {
@@ -321,8 +355,8 @@ var createPostEventRoute = function (_a) {
                         return [2 /*return*/];
                     }
                     res.status(500).json({ kind: 'Failure', message: 'Event save failed' });
-                    return [3 /*break*/, 11];
-                case 11: return [2 /*return*/];
+                    return [3 /*break*/, 13];
+                case 13: return [2 /*return*/];
             }
         });
     }); };

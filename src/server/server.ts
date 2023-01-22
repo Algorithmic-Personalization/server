@@ -28,8 +28,9 @@ import Token from './models/token';
 import Participant from '../common/models/participant';
 import ExperimentConfig from '../common/models/experimentConfig';
 import Session from '../common/models/session';
-import Event from './models/event';
+import Event from '../common/models/event';
 import Video from './models/video';
+import WatchTime from './models/watchTime';
 import VideoListItem from './models/videoListItem';
 
 import SmtpConfig from './lib/smtpConfig';
@@ -85,6 +86,7 @@ const entities = [
 	Event,
 	Video,
 	VideoListItem,
+	WatchTime,
 ];
 
 const env = process.env.NODE_ENV;

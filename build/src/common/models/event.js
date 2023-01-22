@@ -40,6 +40,7 @@ var EventType;
     EventType["PERSONALIZED_CLICKED"] = "PERSONALIZED_CLICKED";
     EventType["NON_PERSONALIZED_CLICKED"] = "NON_PERSONALIZED_CLICKED";
     EventType["MIXED_CLICKED"] = "MIXED_CLICKED";
+    EventType["WATCH_TIME"] = "WATCH_TIME";
 })(EventType = exports.EventType || (exports.EventType = {}));
 var participant_1 = require("./participant");
 var Event = /** @class */ (function (_super) {

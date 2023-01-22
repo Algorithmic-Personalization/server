@@ -40,7 +40,7 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
 };
 exports.__esModule = true;
 exports.createGetEventsRoute = void 0;
-var event_1 = __importDefault(require("../models/event"));
+var event_1 = __importDefault(require("../../common/models/event"));
 var pagination_1 = require("../lib/pagination");
 var createGetEventsRoute = function (_a) {
     var createLogger = _a.createLogger, dataSource = _a.dataSource;

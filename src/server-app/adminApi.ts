@@ -5,7 +5,7 @@ import {type Token} from '../server/models/token';
 import {type Participant} from '../common/models/participant';
 import {type LoginResponse} from '../server/api/login';
 import {type ExperimentConfig} from '../common/models/experimentConfig';
-import {type Event} from '../server/models/event';
+import {type Event} from '../common/models/event';
 
 import {
 	postRegister,

@@ -12,6 +12,7 @@
     "build:server": "NODE_ENV=production tsc",
     "build:app": "NODE_ENV=production webpack",
     "build": "yarn build:server && yarn build:app",
+    "build:dev": "NODE_ENV=development tsc && NODE_ENV=development webpack",
     "watch:ext": "NODE_ENV=development webpack --watch",
     "test": "jest",
     "tdd": "jest --watch",

@@ -38,19 +38,17 @@ var __importStar = (this && this.__importStar) || function (mod) {
     return result;
 };
 exports.__esModule = true;
-exports.RecommendationsEvent = void 0;
-var event_1 = __importStar(require("../../common/models/event"));
-var RecommendationsEvent = /** @class */ (function (_super) {
-    __extends(RecommendationsEvent, _super);
-    function RecommendationsEvent(nonPersonalized, personalized, shown) {
+exports.WatchTimeEvent = void 0;
+var event_1 = __importStar(require("./event"));
+var WatchTimeEvent = /** @class */ (function (_super) {
+    __extends(WatchTimeEvent, _super);
+    function WatchTimeEvent(secondsWatched) {
         var _this = _super.call(this) || this;
-        _this.nonPersonalized = nonPersonalized;
-        _this.personalized = personalized;
-        _this.shown = shown;
-        _this.type = event_1.EventType.RECOMMENDATIONS_SHOWN;
+        _this.secondsWatched = secondsWatched;
+        _this.type = event_1.EventType.WATCH_TIME;
         return _this;
     }
-    return RecommendationsEvent;
+    return WatchTimeEvent;
 }(event_1["default"]));
-exports.RecommendationsEvent = RecommendationsEvent;
-exports["default"] = RecommendationsEvent;
+exports.WatchTimeEvent = WatchTimeEvent;
+exports["default"] = WatchTimeEvent;

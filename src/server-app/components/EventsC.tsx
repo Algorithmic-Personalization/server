@@ -7,7 +7,7 @@ import {
 } from '@mui/material';
 
 import {useAdminApi} from '../adminApiProvider';
-import type Event from '../../server/models/event';
+import type Event from '../../common/models/event';
 
 import CardC from './CardC';
 

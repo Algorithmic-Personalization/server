@@ -1,4 +1,4 @@
-import Event, {EventType} from './event';
+import Event, {EventType} from '../../common/models/event';
 import type Recommendation from '../../common/types/Recommendation';
 
 export class RecommendationsEvent extends Event {
