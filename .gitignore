@@ -1,6 +1,5 @@
 node_modules
 logs
-.gitmodules
 
 public
 !public/index.html
