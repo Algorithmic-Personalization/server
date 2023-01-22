@@ -1,0 +1,3 @@
+#!/usr/bin/env bash
+yarn build:dev
+NODE_ENV=development yarn pm2-runtime build/src/server/server.js --watch --ignore-watch="src" --ignore-watch="build/server-app"
