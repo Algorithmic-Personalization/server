@@ -83,6 +83,11 @@ var Event = /** @class */ (function (_super) {
     ], Event.prototype, "url");
     __decorate([
         (0, typeorm_1.Column)(),
+        (0, class_validator_1.IsString)(),
+        __metadata("design:type", String)
+    ], Event.prototype, "context");
+    __decorate([
+        (0, typeorm_1.Column)(),
         (0, class_validator_1.IsNotEmpty)(),
         (0, class_validator_1.IsString)(),
         __metadata("design:type", String)
