@@ -3,7 +3,6 @@ import {useParams} from 'react-router';
 
 import type ParticipantOverview from '../../server/projections/ParticipantOverview';
 import type EventOverview from '../../server/projections/EventOverview';
-import {EventType} from '../../common/models/event';
 
 import {
 	Box,
@@ -13,6 +12,9 @@ import {
 
 import {useAdminApi} from '../adminApiProvider';
 import type SessionOverview from '../../server/projections/SessionOverview';
+import type RecommendationsList from '../../server/projections/RecommendationsList';
+import type {VideoItem} from '../../server/projections/RecommendationsList';
+import {VideoType} from '../../server/models/videoListItem';
 
 const showDate = (d: Date | string): string => {
 	const date = new Date(d);
@@ -53,28 +55,70 @@ const UrlC: React.FC<{url: string}> = ({url}) => {
 	}
 };
 
-const EventC: React.FC<{data: EventOverview}> = ({data}) => {
-	if (data.type === EventType.RECOMMENDATIONS_SHOWN) {
-		return (<Typography variant='body1' sx={{mb: 4}}>Recommendations shown NIY</Typography>);
-	}
+const RecommendationsListC: React.FC<{data: VideoItem[]; details?: boolean}> = ({data, details}) => {
+	const getDetails = (item: VideoItem) => {
+		if (!details) {
+			return '';
+		}
+
+		if (item.source === VideoType.NON_PERSONALIZED) {
+			return 'np: ';
+		}
+
+		if (item.source === VideoType.PERSONALIZED) {
+			return 'p: ';
+		}
+
+		return 'm: ';
+	};
 
 	return (
-		<Grid container sx={{pl: 4}}>
-			<Grid item xs={3}>
-				<Typography variant='body1' sx={{mb: 2}}>{showDate(data.createdAt)}</Typography>
-			</Grid>
-			<Grid item xs={2}>
-				<Typography variant='body1' sx={{mb: 2}}>{data.type}</Typography>
-			</Grid>
-			<Grid item xs={4}>
-				<Typography variant='body1' sx={{mb: 2}}><UrlC url={showWatchtimeOrContextUrl(data)}/></Typography>
-			</Grid>
-			<Grid item xs={3}>
-				<Typography variant='body1' sx={{mb: 2}}><UrlC url={data.url}/></Typography>
-			</Grid>
-		</Grid>
+		<ul>
+			{data.map(item => (
+				<li key={item.id}>
+					{getDetails(item)}<UrlC url={item.url} />
+				</li>
+			))}
+		</ul>
 	);
 };
+
+const RecommendationsC: React.FC<{data: RecommendationsList}> = ({data}) => (
+	<Grid container sx={{pl: 8, mb: 2}}>
+		<Grid item xs={3}>
+			Non-Personalized
+			<RecommendationsListC data={data.nonPersonalized}/>
+		</Grid>
+		<Grid item xs={3}>
+			Personalized
+			<RecommendationsListC data={data.personalized}/>
+		</Grid>
+		<Grid item xs={3}>
+			Shown
+			<RecommendationsListC data={data.shown} details={true}/>
+		</Grid>
+	</Grid>
+);
+
+const EventC: React.FC<{data: EventOverview; position: number}> = ({data: overview, position}) => (
+	<>
+		<Grid container sx={{pl: 4}}>
+			<Grid item xs={3}>
+				<Typography variant='body1' sx={{mb: 2}}><strong>{position}</strong>&#41; {showDate(overview.createdAt)}</Typography>
+			</Grid>
+			<Grid item xs={2}>
+				<Typography variant='body1' sx={{mb: 2}}>{overview.type}</Typography>
+			</Grid>
+			<Grid item xs={4}>
+				<Typography variant='body1' sx={{mb: 2}}><UrlC url={showWatchtimeOrContextUrl(overview)}/></Typography>
+			</Grid>
+			<Grid item xs={3}>
+				<Typography variant='body1' sx={{mb: 2}}><UrlC url={overview.url}/></Typography>
+			</Grid>
+		</Grid>
+		{overview?.data?.kind === 'recommendations' && <RecommendationsC data={overview.data.recommendations} />}
+	</>
+);
 
 const SessionC: React.FC<{data: SessionOverview}> = ({data}) => (
 	<Box component='section' sx={{mb: 4, pl: 2}}>
@@ -84,7 +128,7 @@ const SessionC: React.FC<{data: SessionOverview}> = ({data}) => (
 		{data.events.length === 0 ? 'No events' : (
 			<>
 				<Typography variant='h4' component='h5' sx={{mb: 1}}>Events (chronological order):</Typography>
-				{data.events.map(e => <EventC key={e.id} data={e} />)}
+				{data.events.map((e, p) => <EventC key={e.id} data={e} position={p + 1}/>)}
 			</>
 		)}
 	</Box>
