@@ -23,4 +23,11 @@ theme.typography.h3 = {
 	},
 };
 
+theme.typography.h4 = {
+	fontSize: '1rem',
+	[theme.breakpoints.up('sm')]: {
+		fontSize: '1.2rem',
+	},
+};
+
 export default theme;

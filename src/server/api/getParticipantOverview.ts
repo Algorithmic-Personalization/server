@@ -1,8 +1,62 @@
+import {type DataSource} from 'typeorm';
+
 import {type RouteCreator} from '../lib/routeContext';
 
 import Participant from '../../common/models/participant';
 import type ParticipantOverview from '../projections/ParticipantOverview';
+import type SessionOverview from '../projections/SessionOverview';
+
+import Event from '../../common/models/event';
 import Session from '../../common/models/session';
+
+const firstDate = <T extends {createdAt: Date}>(a: T[]): Date => {
+	if (a.length === 0) {
+		return new Date(0);
+	}
+
+	return a[0].createdAt;
+};
+
+const lastDate = <T extends {createdAt: Date}>(a: T[]): Date => {
+	if (a.length === 0) {
+		return new Date(0);
+	}
+
+	return a[a.length - 1].createdAt;
+};
+
+const asyncMap = <T, U>(array: T[]) => async (fn: (value: T) => Promise<U>): Promise<U[]> => {
+	const result = [];
+
+	// Voluntarily not doing it in parallel for now
+	// in order to minimize server load
+	for (const value of array) {
+		// eslint-disable-next-line no-await-in-loop
+		result.push(await fn(value));
+	}
+
+	return result;
+};
+
+const createSessionOverview = (dataSource: DataSource) => async (session: Session): Promise<SessionOverview> => {
+	const eventRepo = dataSource.getRepository(Event);
+
+	const events = await eventRepo.find({
+		where: {
+			sessionUuid: session.uuid,
+		},
+		order: {
+			createdAt: 'ASC',
+		},
+	});
+
+	return {
+		...session,
+		startedAt: firstDate(events),
+		endedAt: lastDate(events),
+		events: [],
+	};
+};
 
 export const createGetParticipantOverviewRoute: RouteCreator = ({createLogger, dataSource}) => async (req, res) => {
 	const log = createLogger(req.requestId);
@@ -40,8 +94,9 @@ export const createGetParticipantOverviewRoute: RouteCreator = ({createLogger, d
 	const participantOverview: ParticipantOverview = {
 		...participant,
 		sessionCount: sessions.length,
-		firstSessionDate: sessions.length > 0 ? sessions[sessions.length - 1].createdAt : new Date(0),
-		latestSessionDate: sessions.length > 0 ? sessions[0].createdAt : new Date(0),
+		firstSessionDate: firstDate(sessions),
+		latestSessionDate: lastDate(sessions),
+		sessions: await asyncMap<Session, SessionOverview>(sessions)(createSessionOverview(dataSource)),
 	};
 
 	res.status(200).json({kind: 'Success', value: participantOverview});
