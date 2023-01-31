@@ -93,6 +93,8 @@ exports.ParticipantsC = void 0;
 var react_1 = __importStar(require("react"));
 var material_1 = require("@mui/material");
 var FileUpload_1 = __importDefault(require("@mui/icons-material/FileUpload"));
+var Search_1 = __importDefault(require("@mui/icons-material/Search"));
+var react_router_dom_1 = require("react-router-dom");
 var DownloadLinkC_1 = __importDefault(require("./DownloadLinkC"));
 var MessageC_1 = __importStar(require("../../common/components/MessageC"));
 var adminApiProvider_1 = require("../adminApiProvider");
@@ -168,7 +170,8 @@ var ParticipantRowC = function (_a) {
     var participant = _a.participant;
     var ui = (react_1["default"].createElement(material_1.Grid, { container: true, item: true, xs: 12 },
         react_1["default"].createElement(material_1.Grid, { item: true, sm: 4, xs: 12 },
-            react_1["default"].createElement(material_1.Typography, null, participant.email)),
+            react_1["default"].createElement(material_1.Typography, null,
+                react_1["default"].createElement(react_router_dom_1.Link, { to: "/participants/".concat(participant.email) }, participant.email))),
         react_1["default"].createElement(material_1.Grid, { item: true, sm: 4, xs: 12 },
             react_1["default"].createElement(material_1.Typography, { sx: { wordBreak: 'break-word' } }, participant.code)),
         react_1["default"].createElement(material_1.Grid, { item: true, sm: 4, xs: 12 },
@@ -183,13 +186,14 @@ var ListC = function () {
     var pageInputOk = Number.isInteger(pTmp);
     var page = pageInputOk ? pTmp : 1;
     var _d = __read((0, react_1.useState)(), 2), error = _d[0], setError = _d[1];
+    var _e = __read((0, react_1.useState)(''), 2), emailLike = _e[0], setEmailLike = _e[1];
     var api = (0, adminApiProvider_1.useAdminApi)();
     (0, react_1.useEffect)(function () {
         (function () { return __awaiter(void 0, void 0, void 0, function () {
             var res;
             return __generator(this, function (_a) {
                 switch (_a.label) {
-                    case 0: return [4 /*yield*/, api.getParticipants(page - 1)];
+                    case 0: return [4 /*yield*/, api.getParticipants(page - 1, emailLike)];
                     case 1:
                         res = _a.sent();
                         if (res.kind === 'Success') {
@@ -203,29 +207,43 @@ var ListC = function () {
                 }
             });
         }); })();
-    }, [page]);
+    }, [page, emailLike]);
     var handlePageChange = function (e) {
         setPageInput(e.target.value);
     };
-    var list = participants === undefined ? react_1["default"].createElement(material_1.Typography, null, "Loading...")
-        : participants.results.length === 0 ? (react_1["default"].createElement(material_1.Typography, null, "No participants yet.")) : (react_1["default"].createElement(material_1.Grid, { container: true, spacing: 2 },
-            react_1["default"].createElement(material_1.Grid, { container: true, item: true, xs: 12 },
-                react_1["default"].createElement(material_1.Grid, { item: true, sm: 4, xs: 12 },
-                    react_1["default"].createElement(material_1.Typography, null,
-                        react_1["default"].createElement("strong", null, "Email"))),
-                react_1["default"].createElement(material_1.Grid, { item: true, sm: 4, xs: 12 },
-                    react_1["default"].createElement(material_1.Typography, null,
-                        react_1["default"].createElement("strong", null, "Code"))),
-                react_1["default"].createElement(material_1.Grid, { item: true, sm: 4, xs: 12 },
-                    react_1["default"].createElement(material_1.Typography, null,
-                        react_1["default"].createElement("strong", null, "Experiment arm")))),
-            react_1["default"].createElement(material_1.Grid, { container: true, item: true, xs: 12 },
-                react_1["default"].createElement(material_1.Typography, { sx: { display: 'flex', alignItems: 'center' } },
-                    react_1["default"].createElement("span", null, "Page\u00A0"),
-                    react_1["default"].createElement("input", { type: 'number', value: pageInputOk ? page : pageInput, min: 1, max: participants.pageCount, step: 1, onChange: handlePageChange }),
-                    react_1["default"].createElement("span", null, "\u00A0/\u00A0"),
-                    react_1["default"].createElement("span", null, participants.pageCount))),
-            participants.results.map(function (participant) { return (react_1["default"].createElement(ParticipantRowC, { key: participant.id, participant: participant })); })));
+    if (participants === undefined) {
+        return react_1["default"].createElement(material_1.Typography, null, "Loading...");
+    }
+    if (emailLike === '' && participants.results.length === 0) {
+        return react_1["default"].createElement(material_1.Typography, null, "No participants yet.");
+    }
+    var list = (react_1["default"].createElement(material_1.Grid, { container: true, spacing: 2 },
+        react_1["default"].createElement(material_1.Grid, { item: true, xs: 12 },
+            react_1["default"].createElement(material_1.TextField, { value: emailLike, onChange: function (e) {
+                    setEmailLike(e.target.value);
+                }, sx: { display: 'block' }, label: 'Search participant by email', InputProps: {
+                    endAdornment: (react_1["default"].createElement(material_1.InputAdornment, { position: 'end' },
+                        react_1["default"].createElement(Search_1["default"], null)))
+                } })),
+        react_1["default"].createElement(material_1.Grid, { container: true, item: true, xs: 12 },
+            react_1["default"].createElement(material_1.Grid, { item: true, sm: 4, xs: 12 },
+                react_1["default"].createElement(material_1.Typography, null,
+                    react_1["default"].createElement("strong", null, "Email"))),
+            react_1["default"].createElement(material_1.Grid, { item: true, sm: 4, xs: 12 },
+                react_1["default"].createElement(material_1.Typography, null,
+                    react_1["default"].createElement("strong", null, "Code"))),
+            react_1["default"].createElement(material_1.Grid, { item: true, sm: 4, xs: 12 },
+                react_1["default"].createElement(material_1.Typography, null,
+                    react_1["default"].createElement("strong", null, "Experiment arm")))),
+        react_1["default"].createElement(material_1.Grid, { container: true, item: true, xs: 12 },
+            react_1["default"].createElement(material_1.Typography, { sx: { display: 'flex', alignItems: 'center' } },
+                react_1["default"].createElement("span", null, "Page\u00A0"),
+                react_1["default"].createElement("input", { type: 'number', value: pageInputOk ? page : pageInput, min: 1, max: participants.pageCount, step: 1, onChange: handlePageChange }),
+                react_1["default"].createElement("span", null, "\u00A0/\u00A0"),
+                react_1["default"].createElement("span", null, participants.pageCount))),
+        participants.results.length > 0 && participants.results.map(function (participant) { return (react_1["default"].createElement(ParticipantRowC, { key: participant.id, participant: participant })); }),
+        participants.results.length === 0 && (react_1["default"].createElement(material_1.Grid, { item: true, xs: 12 },
+            react_1["default"].createElement("strong", null, "No participant matching")))));
     return (react_1["default"].createElement(material_1.Box, { component: 'section', sx: { mb: 4 } },
         react_1["default"].createElement(material_1.Typography, { variant: 'h2', sx: { mb: 2 } }, "Participants list"),
         react_1["default"].createElement(MessageC_1["default"], { message: error, type: 'error' }),

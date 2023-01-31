@@ -50,6 +50,7 @@ import {
 	getAuthTest,
 	postUploadParticipants,
 	getParticipants,
+	getParticipantOverview,
 	getExperimentConfig,
 	postExperimentConfig,
 	getExperimentConfigHistory,
@@ -66,6 +67,7 @@ import createLoginRoute from './api/login';
 import createAuthTestRoute from './api/authTest';
 import createUploadParticipantsRoute from './api/uploadParticipants';
 import createGetParticipantsRoute from './api/getParticipants';
+import createGetParticipantOverviewRoute from './api/getParticipantOverview';
 import createGetExperimentConfigRoute from './api/getExperimentConfig';
 import createPostExperimentConfigRoute from './api/postExperimentConfig';
 import createGetExperimentConfigHistoryRoute from './api/getExperimentConfigHistory';
@@ -264,6 +266,7 @@ const start = async () => {
 	app.get(getAuthTest, authMiddleware, createAuthTestRoute(routeContext));
 	app.post(postUploadParticipants, authMiddleware, upload.single('participants'), createUploadParticipantsRoute(routeContext));
 	app.get(`${getParticipants}/:page?`, authMiddleware, createGetParticipantsRoute(routeContext));
+	app.get(`${getParticipantOverview}/:email`, authMiddleware, createGetParticipantOverviewRoute(routeContext));
 	app.get(getExperimentConfig, authMiddleware, createGetExperimentConfigRoute(routeContext));
 	app.post(postExperimentConfig, authMiddleware, createPostExperimentConfigRoute(routeContext));
 	app.get(getExperimentConfigHistory, authMiddleware, createGetExperimentConfigHistoryRoute(routeContext));

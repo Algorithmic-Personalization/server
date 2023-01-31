@@ -1,4 +1,15 @@
 "use strict";
+var __assign = (this && this.__assign) || function () {
+    __assign = Object.assign || function(t) {
+        for (var s, i = 1, n = arguments.length; i < n; i++) {
+            s = arguments[i];
+            for (var p in s) if (Object.prototype.hasOwnProperty.call(s, p))
+                t[p] = s[p];
+        }
+        return t;
+    };
+    return __assign.apply(this, arguments);
+};
 var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, generator) {
     function adopt(value) { return value instanceof P ? value : new P(function (resolve) { resolve(value); }); }
     return new (P || (P = Promise))(function (resolve, reject) {
@@ -39,58 +50,36 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
     return (mod && mod.__esModule) ? mod : { "default": mod };
 };
 exports.__esModule = true;
-exports.createGetParticipantsRoute = void 0;
-var pagination_1 = require("../lib/pagination");
+exports.createGetParticipantOverviewRoute = void 0;
 var participant_1 = __importDefault(require("../../common/models/participant"));
-var typeorm_1 = require("typeorm");
-var createGetParticipantsRoute = function (_a) {
+var createGetParticipantOverviewRoute = function (_a) {
     var createLogger = _a.createLogger, dataSource = _a.dataSource;
     return function (req, res) { return __awaiter(void 0, void 0, void 0, function () {
-        var log, _a, page, pageSize, emailLike, participantRepo, participants, count, data, error_1;
-        return __generator(this, function (_b) {
-            switch (_b.label) {
+        var log, participantRepo, email, participant, participantOverview;
+        return __generator(this, function (_a) {
+            switch (_a.label) {
                 case 0:
                     log = createLogger(req.requestId);
-                    log('Received participants request');
-                    _a = (0, pagination_1.extractPaginationRequest)(req), page = _a.page, pageSize = _a.pageSize;
-                    emailLike = req.query.emailLike;
+                    log('Received participant overview request');
                     participantRepo = dataSource.getRepository(participant_1["default"]);
-                    _b.label = 1;
+                    email = req.params.email;
+                    if (!email) {
+                        res.status(400).json({ kind: 'Error', message: 'Missing email' });
+                        return [2 /*return*/];
+                    }
+                    return [4 /*yield*/, participantRepo.findOneBy({ email: email })];
                 case 1:
-                    _b.trys.push([1, 4, , 5]);
-                    return [4 /*yield*/, participantRepo
-                            .find({
-                            skip: page * pageSize,
-                            take: pageSize,
-                            order: {
-                                createdAt: 'DESC'
-                            },
-                            where: {
-                                email: (typeof emailLike === 'string') ? (0, typeorm_1.Like)("%".concat(emailLike, "%")) : undefined
-                            }
-                        })];
-                case 2:
-                    participants = _b.sent();
-                    return [4 /*yield*/, participantRepo.count()];
-                case 3:
-                    count = _b.sent();
-                    data = {
-                        results: participants,
-                        page: page,
-                        pageSize: pageSize,
-                        pageCount: Math.ceil(count / pageSize)
-                    };
-                    res.status(200).json({ kind: 'Success', value: data });
-                    return [3 /*break*/, 5];
-                case 4:
-                    error_1 = _b.sent();
-                    log('Error getting participants', error_1);
-                    res.status(500).json({ kind: 'Error', message: 'Error getting participants' });
-                    return [3 /*break*/, 5];
-                case 5: return [2 /*return*/];
+                    participant = _a.sent();
+                    if (!participant) {
+                        res.status(404).json({ kind: 'Error', message: 'Participant not found' });
+                        return [2 /*return*/];
+                    }
+                    participantOverview = __assign(__assign({}, participant), { sessionCount: 0 });
+                    res.status(200).json({ kind: 'Success', value: participantOverview });
+                    return [2 /*return*/];
             }
         });
     }); };
 };
-exports.createGetParticipantsRoute = createGetParticipantsRoute;
-exports["default"] = exports.createGetParticipantsRoute;
+exports.createGetParticipantOverviewRoute = createGetParticipantOverviewRoute;
+exports["default"] = exports.createGetParticipantOverviewRoute;

@@ -49,6 +49,7 @@ var Menu_1 = __importDefault(require("@mui/icons-material/Menu"));
 var react_router_dom_1 = require("react-router-dom");
 var HomeC_1 = __importDefault(require("./HomeC"));
 var ParticipantsC_1 = __importDefault(require("./ParticipantsC"));
+var ParticipantPageC_1 = __importDefault(require("./ParticipantPageC"));
 var ExperimentConfigC_1 = __importDefault(require("./ExperimentConfigC"));
 var EventsC_1 = __importDefault(require("./EventsC"));
 var NotFoundC_1 = __importDefault(require("./NotFoundC"));
@@ -121,7 +122,8 @@ var LayoutC = function () {
         react_1["default"].createElement(material_1.Box, { component: 'main', sx: { p: 3, mt: 6, width: '100%' } },
             react_1["default"].createElement(react_router_dom_1.Routes, null,
                 navItems.map(function (item) { return (react_1["default"].createElement(react_router_dom_1.Route, { element: react_1["default"].createElement(item.component, null), key: item.link, path: item.link })); }),
-                react_1["default"].createElement(react_router_dom_1.Route, { element: react_1["default"].createElement(NotFoundC_1["default"], null), path: '*' })))));
+                react_1["default"].createElement(react_router_dom_1.Route, { element: react_1["default"].createElement(NotFoundC_1["default"], null), path: '*' }),
+                react_1["default"].createElement(react_router_dom_1.Route, { element: react_1["default"].createElement(ParticipantPageC_1["default"], null), path: '/participants/:email' })))));
 };
 exports.LayoutC = LayoutC;
 exports["default"] = exports.LayoutC;

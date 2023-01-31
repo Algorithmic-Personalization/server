@@ -115,6 +115,7 @@ var login_1 = __importDefault(require("./api/login"));
 var authTest_1 = __importDefault(require("./api/authTest"));
 var uploadParticipants_1 = __importDefault(require("./api/uploadParticipants"));
 var getParticipants_1 = __importDefault(require("./api/getParticipants"));
+var getParticipantOverview_1 = __importDefault(require("./api/getParticipantOverview"));
 var getExperimentConfig_1 = __importDefault(require("./api/getExperimentConfig"));
 var postExperimentConfig_1 = __importDefault(require("./api/postExperimentConfig"));
 var getExperimentConfigHistory_1 = __importDefault(require("./api/getExperimentConfigHistory"));
@@ -288,6 +289,7 @@ var start = function () { return __awaiter(void 0, void 0, void 0, function () {
                 app.get(routes_1.getAuthTest, authMiddleware, (0, authTest_1["default"])(routeContext));
                 app.post(routes_1.postUploadParticipants, authMiddleware, upload.single('participants'), (0, uploadParticipants_1["default"])(routeContext));
                 app.get("".concat(routes_1.getParticipants, "/:page?"), authMiddleware, (0, getParticipants_1["default"])(routeContext));
+                app.get("".concat(routes_1.getParticipantOverview, "/:email"), authMiddleware, (0, getParticipantOverview_1["default"])(routeContext));
                 app.get(routes_1.getExperimentConfig, authMiddleware, (0, getExperimentConfig_1["default"])(routeContext));
                 app.post(routes_1.postExperimentConfig, authMiddleware, (0, postExperimentConfig_1["default"])(routeContext));
                 app.get(routes_1.getExperimentConfigHistory, authMiddleware, (0, getExperimentConfigHistory_1["default"])(routeContext));

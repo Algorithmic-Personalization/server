@@ -40,7 +40,7 @@ export const createGetParticipantsRoute: RouteCreator = ({createLogger, dataSour
 	} catch (error) {
 		log('Error getting participants', error);
 
-		res.status(500).json({kind: 'Error', value: 'Error getting participants'});
+		res.status(500).json({kind: 'Error', message: 'Error getting participants'});
 	}
 };
 

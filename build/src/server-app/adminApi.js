@@ -167,12 +167,18 @@ var createAdminApi = function (serverUrl, showLoginModal) {
                 });
             });
         },
-        getParticipants: function (page, pageSize) {
-            if (page === void 0) { page = 0; }
+        getParticipants: function (page, emailLike, pageSize) {
             if (pageSize === void 0) { pageSize = 15; }
             return __awaiter(this, void 0, void 0, function () {
                 return __generator(this, function (_a) {
-                    return [2 /*return*/, get("".concat(routes_1.getParticipants, "/").concat(page, "?pageSize=").concat(pageSize), {}, headers())];
+                    return [2 /*return*/, get("".concat(routes_1.getParticipants, "/").concat(page, "?pageSize=").concat(pageSize, "&emailLike=").concat(encodeURIComponent(emailLike)), {}, headers())];
+                });
+            });
+        },
+        getParticipantOverview: function (participantEmail) {
+            return __awaiter(this, void 0, void 0, function () {
+                return __generator(this, function (_a) {
+                    return [2 /*return*/, get("".concat(routes_1.getParticipantOverview, "/").concat(participantEmail), {}, headers())];
                 });
             });
         },
