@@ -2,9 +2,12 @@ import React, {useEffect, useState} from 'react';
 import {useParams} from 'react-router';
 
 import type ParticipantOverview from '../../server/projections/ParticipantOverview';
+import type EventOverview from '../../server/projections/EventOverview';
+import {EventType} from '../../common/models/event';
 
 import {
 	Box,
+	Grid,
 	Typography,
 } from '@mui/material';
 
@@ -16,11 +19,48 @@ const showDate = (d: Date | string): string => {
 	return `${date.toLocaleDateString()} ${date.toLocaleTimeString()}`;
 };
 
+const showWatchtimeOrContextUrl = (e: EventOverview): string => {
+	if (e.data?.kind === 'watchtime') {
+		return `${e.data.watchtime} seconds`;
+	}
+
+	return e.context ?? '';
+};
+
+const EventC: React.FC<{data: EventOverview}> = ({data}) => {
+	if (data.type === EventType.RECOMMENDATIONS_SHOWN) {
+		return (<Typography variant='body1' sx={{mb: 4}}>Recommendations shown NIY</Typography>);
+	}
+
+	return (
+		<Grid container sx={{pl: 4}}>
+			<Grid item xs={3}>
+				<Typography variant='body1' sx={{mb: 2}}>{showDate(data.createdAt)}</Typography>
+			</Grid>
+			<Grid item xs={2}>
+				<Typography variant='body1' sx={{mb: 2}}>{data.type}</Typography>
+			</Grid>
+			<Grid item xs={4}>
+				<Typography variant='body1' sx={{mb: 2}}>{showWatchtimeOrContextUrl(data)}</Typography>
+			</Grid>
+			<Grid item xs={3}>
+				<Typography variant='body1' sx={{mb: 2}}>{data.url}</Typography>
+			</Grid>
+		</Grid>
+	);
+};
+
 const SessionC: React.FC<{data: SessionOverview}> = ({data}) => (
-	<Box component='section' sx={{mb: 4}}>
+	<Box component='section' sx={{mb: 4, pl: 2}}>
 		<Typography variant='h4' sx={{mb: 2}}>Session #{data.id}</Typography>
 		<Typography variant='body1' sx={{mb: 2}}>Started on: {showDate(data.startedAt)}</Typography>
 		<Typography variant='body1' sx={{mb: 2}}>Ended on: {showDate(data.endedAt)}</Typography>
+		{data.events.length === 0 ? 'No events' : (
+			<>
+				<Typography variant='h4' component='h5' sx={{mb: 1}}>Events (chronological order):</Typography>
+				{data.events.map(e => <EventC key={e.id} data={e} />)}
+			</>
+		)}
 	</Box>
 );
 

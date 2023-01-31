@@ -5,8 +5,10 @@ import {type RouteCreator} from '../lib/routeContext';
 import Participant from '../../common/models/participant';
 import type ParticipantOverview from '../projections/ParticipantOverview';
 import type SessionOverview from '../projections/SessionOverview';
+import type EventOverview from '../projections/EventOverview';
 
-import Event from '../../common/models/event';
+import Event, {EventType} from '../../common/models/event';
+import WatchTime from '../models/watchTime';
 import Session from '../../common/models/session';
 
 const firstDate = <T extends {createdAt: Date}>(a: T[]): Date => {
@@ -38,6 +40,25 @@ const asyncMap = <T, U>(array: T[]) => async (fn: (value: T) => Promise<U>): Pro
 	return result;
 };
 
+const createEventOverview = (dataSource: DataSource) => async (event: Event): Promise<EventOverview> => {
+	const overview: EventOverview = {...event};
+
+	if (event.type === EventType.WATCH_TIME) {
+		const watchtimeRepo = dataSource.getRepository(WatchTime);
+
+		const watchtime = await watchtimeRepo.findOneBy({eventId: event.id});
+
+		if (watchtime) {
+			overview.data = {
+				kind: 'watchtime',
+				watchtime: watchtime.secondsWatched,
+			};
+		}
+	}
+
+	return overview;
+};
+
 const createSessionOverview = (dataSource: DataSource) => async (session: Session): Promise<SessionOverview> => {
 	const eventRepo = dataSource.getRepository(Event);
 
@@ -54,7 +75,7 @@ const createSessionOverview = (dataSource: DataSource) => async (session: Sessio
 		...session,
 		startedAt: firstDate(events),
 		endedAt: lastDate(events),
-		events: [],
+		events: await asyncMap<Event, EventOverview>(events)(createEventOverview(dataSource)),
 	};
 };
 
