@@ -27,6 +27,32 @@ const showWatchtimeOrContextUrl = (e: EventOverview): string => {
 	return e.context ?? '';
 };
 
+const UrlC: React.FC<{url: string}> = ({url}) => {
+	const link = url.startsWith('/') ? `https://youtube.com${url}` : url;
+
+	try {
+		const u = new URL(link);
+
+		if (u.pathname === '/results') {
+			return <a style={{textDecoration: 'none'}} href={url} target='_blank' rel='noreferrer'>
+				search: {u.searchParams.get('search_query')}
+			</a>;
+		}
+
+		if (u.pathname === '/watch') {
+			return <a style={{textDecoration: 'none'}} href={url} target='_blank' rel='noreferrer'>
+				video: {u.searchParams.get('v')}
+			</a>;
+		}
+
+		return <a style={{textDecoration: 'none'}} href={url} target='_blank' rel='noreferrer'>
+			{u.pathname} {u.search}
+		</a>;
+	} catch (e) {
+		return <>{url}</>;
+	}
+};
+
 const EventC: React.FC<{data: EventOverview}> = ({data}) => {
 	if (data.type === EventType.RECOMMENDATIONS_SHOWN) {
 		return (<Typography variant='body1' sx={{mb: 4}}>Recommendations shown NIY</Typography>);
@@ -41,10 +67,10 @@ const EventC: React.FC<{data: EventOverview}> = ({data}) => {
 				<Typography variant='body1' sx={{mb: 2}}>{data.type}</Typography>
 			</Grid>
 			<Grid item xs={4}>
-				<Typography variant='body1' sx={{mb: 2}}>{showWatchtimeOrContextUrl(data)}</Typography>
+				<Typography variant='body1' sx={{mb: 2}}><UrlC url={showWatchtimeOrContextUrl(data)}/></Typography>
 			</Grid>
 			<Grid item xs={3}>
-				<Typography variant='body1' sx={{mb: 2}}>{data.url}</Typography>
+				<Typography variant='body1' sx={{mb: 2}}><UrlC url={data.url}/></Typography>
 			</Grid>
 		</Grid>
 	);
