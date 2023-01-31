@@ -150,7 +150,7 @@ const createSessionOverview = (dataSource: DataSource) => async (session: Sessio
 			sessionUuid: session.uuid,
 		},
 		order: {
-			createdAt: 'ASC',
+			createdAt: 'DESC',
 		},
 	});
 

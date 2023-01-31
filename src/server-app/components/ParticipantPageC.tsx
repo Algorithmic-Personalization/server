@@ -7,6 +7,7 @@ import type EventOverview from '../../server/projections/EventOverview';
 import {
 	Box,
 	Grid,
+	Paper,
 	Typography,
 } from '@mui/material';
 
@@ -15,6 +16,7 @@ import type SessionOverview from '../../server/projections/SessionOverview';
 import type RecommendationsList from '../../server/projections/RecommendationsList';
 import type {VideoItem} from '../../server/projections/RecommendationsList';
 import {VideoType} from '../../server/models/videoListItem';
+import {EventType} from '../../common/models/event';
 
 const showDate = (d: Date | string): string => {
 	const date = new Date(d);
@@ -100,43 +102,78 @@ const RecommendationsC: React.FC<{data: RecommendationsList}> = ({data}) => (
 	</Grid>
 );
 
-const EventC: React.FC<{data: EventOverview; position: number}> = ({data: overview, position}) => (
-	<>
+const LegendC: React.FC<{label: string}> = ({label}) => {
+	if (!label) {
+		return null;
+	}
+
+	return (
+		<Typography variant='body1' sx={{
+			display: 'block',
+			fontSize: '0.8rem',
+			color: 'grey',
+		}}><strong>{label}</strong></Typography>
+	);
+};
+
+const EventC: React.FC<{data: EventOverview; position: number}> = ({data: overview, position}) => {
+	const contextLegend = () => {
+		if (overview.type === EventType.WATCH_TIME) {
+			return 'watchtime';
+		}
+
+		if (overview.type === EventType.PAGE_VIEW) {
+			return 'previous page';
+		}
+
+		if (overview.type === EventType.RECOMMENDATIONS_SHOWN) {
+			return '';
+		}
+
+		return 'context';
+	};
+
+	return (<>
 		<Grid container sx={{pl: 4}}>
 			<Grid item xs={2}>
 				<Typography variant='body1' sx={{mb: 2}}><strong>{position}</strong>&#41; {showDate(overview.createdAt)}</Typography>
 			</Grid>
 			<Grid item xs={3}>
+				<LegendC label='event type'/>
 				<Typography variant='body1' sx={{mb: 2}}>{overview.type}</Typography>
 			</Grid>
 			<Grid item xs={4}>
-				<Typography variant='body1' sx={{mb: 2}}><UrlC url={showWatchtimeOrContextUrl(overview)}/></Typography>
+				<LegendC label={contextLegend()}/>
+				<Typography variant='body1' sx={{mb: 2}}>
+					<UrlC url={showWatchtimeOrContextUrl(overview)}/>
+				</Typography>
 			</Grid>
 			<Grid item xs={3}>
+				<LegendC label='url'/>
 				<Typography variant='body1' sx={{mb: 2}}><UrlC url={overview.url}/></Typography>
 			</Grid>
 		</Grid>
 		{overview?.data?.kind === 'recommendations' && <RecommendationsC data={overview.data.recommendations} />}
-	</>
-);
+	</>);
+};
 
 const SessionC: React.FC<{data: SessionOverview}> = ({data}) => (
-	<Box component='section' sx={{mb: 4, pl: 2}}>
+	<Paper component='section' sx={{mb: 4, ml: 2, p: 2}}>
 		<Typography variant='h4' sx={{mb: 2}}>Session #{data.id}</Typography>
 		<Typography variant='body1' sx={{mb: 2}}>Started on: {showDate(data.startedAt)}</Typography>
 		<Typography variant='body1' sx={{mb: 2}}>Ended on: {showDate(data.endedAt)}</Typography>
 		{data.events.length === 0 ? 'No events' : (
 			<>
-				<Typography variant='h4' component='h5' sx={{mb: 1}}>Events (chronological order):</Typography>
+				<Typography variant='h4' component='h5' sx={{mb: 1}}>Events (most recent first):</Typography>
 				{data.events.map((e, p) => <EventC key={e.id} data={e} position={p + 1}/>)}
 			</>
 		)}
-	</Box>
+	</Paper>
 );
 
 const OverviewC: React.FC<{data: ParticipantOverview}> = ({data}) => (
 	<>
-		<Box component='section' sx={{mb: 4}}>
+		<Paper component='section' sx={{mb: 4, p: 2}}>
 			<Typography variant='h3' sx={{mb: 2}}>Basic info</Typography>
 			<Typography variant='body1' sx={{mb: 2}}><strong>Email:</strong> {data.email}</Typography>
 			<Typography variant='body1' sx={{mb: 2}}><strong>Code:</strong> {data.code}</Typography>
@@ -144,9 +181,9 @@ const OverviewC: React.FC<{data: ParticipantOverview}> = ({data}) => (
 			<Typography variant='body1' sx={{mb: 2}}><strong>Last seen:</strong> {showDate(data.latestSessionDate)}</Typography>
 			<Typography variant='body1' sx={{mb: 2}}><strong>First seen:</strong> {showDate(data.firstSessionDate)}</Typography>
 			<Typography variant='body1' sx={{mb: 2}}><strong>Number of sessions:</strong> {data.sessionCount}</Typography>
-		</Box>
+		</Paper>
 		<Box component='section' sx={{mb: 4}}>
-			<Typography variant='h3' sx={{mb: 2}}>Sessions</Typography>
+			<Typography variant='h3' sx={{mb: 2}}>Sessions (most recent first)</Typography>
 			{data.sessions.length === 0 ? 'No sessions' : data.sessions.map(
 				session => <SessionC key={session.id} data={session} />,
 			)}

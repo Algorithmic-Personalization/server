@@ -285,7 +285,7 @@ var createSessionOverview = function (dataSource) { return function (session) { 
                             sessionUuid: session.uuid
                         },
                         order: {
-                            createdAt: 'ASC'
+                            createdAt: 'DESC'
                         }
                     })];
             case 1:
