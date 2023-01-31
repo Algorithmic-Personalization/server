@@ -103,10 +103,10 @@ const RecommendationsC: React.FC<{data: RecommendationsList}> = ({data}) => (
 const EventC: React.FC<{data: EventOverview; position: number}> = ({data: overview, position}) => (
 	<>
 		<Grid container sx={{pl: 4}}>
-			<Grid item xs={3}>
+			<Grid item xs={2}>
 				<Typography variant='body1' sx={{mb: 2}}><strong>{position}</strong>&#41; {showDate(overview.createdAt)}</Typography>
 			</Grid>
-			<Grid item xs={2}>
+			<Grid item xs={3}>
 				<Typography variant='body1' sx={{mb: 2}}>{overview.type}</Typography>
 			</Grid>
 			<Grid item xs={4}>
@@ -138,12 +138,12 @@ const OverviewC: React.FC<{data: ParticipantOverview}> = ({data}) => (
 	<>
 		<Box component='section' sx={{mb: 4}}>
 			<Typography variant='h3' sx={{mb: 2}}>Basic info</Typography>
-			<Typography variant='body1' sx={{mb: 2}}>Email: {data.email}</Typography>
-			<Typography variant='body1' sx={{mb: 2}}>Code: {data.code}</Typography>
-			<Typography variant='body1' sx={{mb: 2}}>Added on: {showDate(data.createdAt)}</Typography>
-			<Typography variant='body1' sx={{mb: 2}}>Last seen: {showDate(data.latestSessionDate)}</Typography>
-			<Typography variant='body1' sx={{mb: 2}}>First seen: {showDate(data.firstSessionDate)}</Typography>
-			<Typography variant='body1' sx={{mb: 2}}>Number of sessions: {data.sessionCount}</Typography>
+			<Typography variant='body1' sx={{mb: 2}}><strong>Email:</strong> {data.email}</Typography>
+			<Typography variant='body1' sx={{mb: 2}}><strong>Code:</strong> {data.code}</Typography>
+			<Typography variant='body1' sx={{mb: 2}}><strong>Added on:</strong> {showDate(data.createdAt)}</Typography>
+			<Typography variant='body1' sx={{mb: 2}}><strong>Last seen:</strong> {showDate(data.latestSessionDate)}</Typography>
+			<Typography variant='body1' sx={{mb: 2}}><strong>First seen:</strong> {showDate(data.firstSessionDate)}</Typography>
+			<Typography variant='body1' sx={{mb: 2}}><strong>Number of sessions:</strong> {data.sessionCount}</Typography>
 		</Box>
 		<Box component='section' sx={{mb: 4}}>
 			<Typography variant='h3' sx={{mb: 2}}>Sessions</Typography>
