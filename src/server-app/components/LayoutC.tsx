@@ -26,6 +26,7 @@ import {
 
 import HomeC from './HomeC';
 import ParticipantsC from './ParticipantsC';
+import ParticipantPageC from './ParticipantPageC';
 import ExperimentConfigC from './ExperimentConfigC';
 import EventsC from './EventsC';
 import NotFoundC from './NotFoundC';
@@ -162,6 +163,7 @@ export const LayoutC: React.FC = () => {
 						<Route element={<item.component />} key={item.link} path={item.link} />
 					))}
 					<Route element={<NotFoundC />} path='*' />
+					<Route element={<ParticipantPageC />} path='/participants/:email' />
 				</Routes>
 			</Box>
 		</Box>

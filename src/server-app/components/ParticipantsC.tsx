@@ -14,6 +14,8 @@ import {
 import FileIcon from '@mui/icons-material/FileUpload';
 import SearchIcon from '@mui/icons-material/Search';
 
+import {Link} from 'react-router-dom';
+
 import DLinkC from './DownloadLinkC';
 import MessageC, {StatusMessageC} from '../../common/components/MessageC';
 
@@ -128,7 +130,7 @@ const ParticipantRowC: React.FC<{participant: Participant}> = ({
 	const ui = (
 		<Grid container item xs={12}>
 			<Grid item sm={4} xs={12}>
-				<Typography>{participant.email}</Typography>
+				<Typography><Link to={`/participants/${participant.email}`}>{participant.email}</Link></Typography>
 			</Grid>
 			<Grid item sm={4} xs={12}>
 				<Typography sx={{wordBreak: 'break-word'}}>{participant.code}</Typography>
