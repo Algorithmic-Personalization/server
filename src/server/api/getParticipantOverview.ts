@@ -2,6 +2,7 @@ import {type RouteCreator} from '../lib/routeContext';
 
 import Participant from '../../common/models/participant';
 import type ParticipantOverview from '../projections/ParticipantOverview';
+import Session from '../../common/models/session';
 
 export const createGetParticipantOverviewRoute: RouteCreator = ({createLogger, dataSource}) => async (req, res) => {
 	const log = createLogger(req.requestId);
@@ -23,9 +24,24 @@ export const createGetParticipantOverviewRoute: RouteCreator = ({createLogger, d
 		return;
 	}
 
+	const sessionRepo = dataSource.getRepository(Session);
+
+	const sessions = await sessionRepo.find({
+		where: {
+			participantCode: participant.code,
+		},
+		order: {
+			createdAt: 'DESC',
+		},
+	});
+
+	log('Session count:', sessions.length);
+
 	const participantOverview: ParticipantOverview = {
 		...participant,
-		sessionCount: 0,
+		sessionCount: sessions.length,
+		firstSessionDate: sessions.length > 0 ? sessions[sessions.length - 1].createdAt : new Date(0),
+		latestSessionDate: sessions.length > 0 ? sessions[0].createdAt : new Date(0),
 	};
 
 	res.status(200).json({kind: 'Success', value: participantOverview});

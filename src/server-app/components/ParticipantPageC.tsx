@@ -15,6 +15,11 @@ const OverviewC: React.FC<{data: ParticipantOverview}> = ({data}) => {
 		<Box component='section' sx={{mb: 4}}>
 			<Typography variant='h2' sx={{mb: 2}}>Basic info</Typography>
 			<Typography variant='body1' sx={{mb: 2}}>Email: {data.email}</Typography>
+			<Typography variant='body1' sx={{mb: 2}}>Code: {data.code}</Typography>
+			<Typography variant='body1' sx={{mb: 2}}>Added on: {new Date(data.createdAt).toLocaleDateString()}</Typography>
+			<Typography variant='body1' sx={{mb: 2}}>Last seen: {new Date(data.latestSessionDate).toLocaleDateString()}</Typography>
+			<Typography variant='body1' sx={{mb: 2}}>First seen: {new Date(data.firstSessionDate).toLocaleDateString()}</Typography>
+			<Typography variant='body1' sx={{mb: 2}}>Number of sessions: {data.sessionCount}</Typography>
 		</Box>
 	);
 
