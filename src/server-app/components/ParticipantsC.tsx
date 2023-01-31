@@ -6,10 +6,13 @@ import {
 	FormControl,
 	FormHelperText,
 	Grid,
+	InputAdornment,
+	TextField,
 	Typography,
 } from '@mui/material';
 
 import FileIcon from '@mui/icons-material/FileUpload';
+import SearchIcon from '@mui/icons-material/Search';
 
 import DLinkC from './DownloadLinkC';
 import MessageC, {StatusMessageC} from '../../common/components/MessageC';
@@ -146,12 +149,13 @@ const ListC: React.FC = () => {
 	const pageInputOk = Number.isInteger(pTmp);
 	const page = pageInputOk ? pTmp : 1;
 	const [error, setError] = useState<string | undefined>();
+	const [emailLike, setEmailLike] = useState('');
 
 	const api = useAdminApi();
 
 	useEffect(() => {
 		(async () => {
-			const res = await api.getParticipants(page - 1);
+			const res = await api.getParticipants(page - 1, emailLike);
 
 			if (res.kind === 'Success') {
 				setError(undefined);
@@ -160,48 +164,75 @@ const ListC: React.FC = () => {
 				setError(res.message);
 			}
 		})();
-	}, [page]);
+	}, [page, emailLike]);
 
 	const handlePageChange = (e: React.ChangeEvent<HTMLInputElement>) => {
 		setPageInput(e.target.value);
 	};
 
-	const list = participants === undefined ? <Typography>Loading...</Typography>
-		: participants.results.length === 0 ? (
-			<Typography>No participants yet.</Typography>
-		) : (
-			<Grid container spacing={2}>
-				<Grid container item xs={12}>
-					<Grid item sm={4} xs={12}>
-						<Typography><strong>Email</strong></Typography>
-					</Grid>
-					<Grid item sm={4} xs={12}>
-						<Typography><strong>Code</strong></Typography>
-					</Grid>
-					<Grid item sm={4} xs={12}>
-						<Typography><strong>Experiment arm</strong></Typography>
-					</Grid>
-				</Grid>
-				<Grid container item xs={12}>
-					<Typography sx={{display: 'flex', alignItems: 'center'}}>
-						<span>Page&nbsp;</span>
-						<input
-							type='number'
-							value={pageInputOk ? page : pageInput}
-							min={1}
-							max={participants.pageCount}
-							step={1}
-							onChange={handlePageChange}
-						/>
-						<span>&nbsp;/&nbsp;</span>
-						<span>{participants.pageCount}</span>
+	if (participants === undefined) {
+		return <Typography>Loading...</Typography>;
+	}
+
+	if (emailLike === '' && participants.results.length === 0) {
+		return <Typography>No participants yet.</Typography>;
+	}
+
+	const list = (
+		<Grid container spacing={2}>
+			<Grid item xs={12}>
+				<TextField
+					value={emailLike}
+					onChange={e => {
+						setEmailLike(e.target.value);
+					}}
+					sx={{display: 'block'}}
+					label='Search participant by email'
+					InputProps={{
+						endAdornment: (
+							<InputAdornment position='end'>
+								<SearchIcon/>
+							</InputAdornment>
+						),
+					}}
+				/>
+			</Grid>
+			<Grid container item xs={12}>
+				<Grid item sm={4} xs={12}>
+					<Typography>
+						<strong>Email</strong>
 					</Typography>
 				</Grid>
-				{participants.results.map(participant => (
-					<ParticipantRowC key={participant.id} participant={participant}/>
-				))}
+				<Grid item sm={4} xs={12}>
+					<Typography><strong>Code</strong></Typography>
+				</Grid>
+				<Grid item sm={4} xs={12}>
+					<Typography><strong>Experiment arm</strong></Typography>
+				</Grid>
 			</Grid>
-		);
+			<Grid container item xs={12}>
+				<Typography sx={{display: 'flex', alignItems: 'center'}}>
+					<span>Page&nbsp;</span>
+					<input
+						type='number'
+						value={pageInputOk ? page : pageInput}
+						min={1}
+						max={participants.pageCount}
+						step={1}
+						onChange={handlePageChange}
+					/>
+					<span>&nbsp;/&nbsp;</span>
+					<span>{participants.pageCount}</span>
+				</Typography>
+			</Grid>
+			{participants.results.length > 0 && participants.results.map(participant => (
+				<ParticipantRowC key={participant.id} participant={participant}/>
+			))}
+			{participants.results.length === 0 && (
+				<Grid item xs={12}><strong>No participant matching</strong></Grid>
+			)}
+		</Grid>
+	);
 
 	return (
 		<Box component='section' sx={{mb: 4}}>

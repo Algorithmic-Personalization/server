@@ -3,12 +3,14 @@ import {type RouteCreator} from '../lib/routeContext';
 import {type Page, extractPaginationRequest} from '../lib/pagination';
 
 import Participant from '../../common/models/participant';
+import {Like} from 'typeorm';
 
 export const createGetParticipantsRoute: RouteCreator = ({createLogger, dataSource}) => async (req, res) => {
 	const log = createLogger(req.requestId);
 	log('Received participants request');
 
 	const {page, pageSize} = extractPaginationRequest(req);
+	const {emailLike} = req.query;
 
 	const participantRepo = dataSource.getRepository(Participant);
 
@@ -19,6 +21,9 @@ export const createGetParticipantsRoute: RouteCreator = ({createLogger, dataSour
 				take: pageSize,
 				order: {
 					createdAt: 'DESC',
+				},
+				where: {
+					email: (typeof emailLike === 'string') ? Like(`%${emailLike}%`) : undefined,
 				},
 			});
 
