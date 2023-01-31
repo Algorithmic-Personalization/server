@@ -10,6 +10,29 @@ var __assign = (this && this.__assign) || function () {
     };
     return __assign.apply(this, arguments);
 };
+var __createBinding = (this && this.__createBinding) || (Object.create ? (function(o, m, k, k2) {
+    if (k2 === undefined) k2 = k;
+    var desc = Object.getOwnPropertyDescriptor(m, k);
+    if (!desc || ("get" in desc ? !m.__esModule : desc.writable || desc.configurable)) {
+      desc = { enumerable: true, get: function() { return m[k]; } };
+    }
+    Object.defineProperty(o, k2, desc);
+}) : (function(o, m, k, k2) {
+    if (k2 === undefined) k2 = k;
+    o[k2] = m[k];
+}));
+var __setModuleDefault = (this && this.__setModuleDefault) || (Object.create ? (function(o, v) {
+    Object.defineProperty(o, "default", { enumerable: true, value: v });
+}) : function(o, v) {
+    o["default"] = v;
+});
+var __importStar = (this && this.__importStar) || function (mod) {
+    if (mod && mod.__esModule) return mod;
+    var result = {};
+    if (mod != null) for (var k in mod) if (k !== "default" && Object.prototype.hasOwnProperty.call(mod, k)) __createBinding(result, mod, k);
+    __setModuleDefault(result, mod);
+    return result;
+};
 var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, generator) {
     function adopt(value) { return value instanceof P ? value : new P(function (resolve) { resolve(value); }); }
     return new (P || (P = Promise))(function (resolve, reject) {
@@ -46,18 +69,241 @@ var __generator = (this && this.__generator) || function (thisArg, body) {
         if (op[0] & 5) throw op[1]; return { value: op[0] ? op[1] : void 0, done: true };
     }
 };
+var __values = (this && this.__values) || function(o) {
+    var s = typeof Symbol === "function" && Symbol.iterator, m = s && o[s], i = 0;
+    if (m) return m.call(o);
+    if (o && typeof o.length === "number") return {
+        next: function () {
+            if (o && i >= o.length) o = void 0;
+            return { value: o && o[i++], done: !o };
+        }
+    };
+    throw new TypeError(s ? "Object is not iterable." : "Symbol.iterator is not defined.");
+};
 var __importDefault = (this && this.__importDefault) || function (mod) {
     return (mod && mod.__esModule) ? mod : { "default": mod };
 };
 exports.__esModule = true;
 exports.createGetParticipantOverviewRoute = void 0;
 var participant_1 = __importDefault(require("../../common/models/participant"));
+var event_1 = __importStar(require("../../common/models/event"));
+var watchTime_1 = __importDefault(require("../models/watchTime"));
+var session_1 = __importDefault(require("../../common/models/session"));
+var videoListItem_1 = __importStar(require("../models/videoListItem"));
+var video_1 = __importDefault(require("../models/video"));
+var firstDate = function (a) {
+    if (a.length === 0) {
+        return new Date(0);
+    }
+    return a[0].createdAt;
+};
+var lastDate = function (a) {
+    if (a.length === 0) {
+        return new Date(0);
+    }
+    return a[a.length - 1].createdAt;
+};
+var asyncMap = function (array) { return function (fn) { return __awaiter(void 0, void 0, void 0, function () {
+    var result, array_1, array_1_1, value, _a, _b, e_1_1;
+    var e_1, _c;
+    return __generator(this, function (_d) {
+        switch (_d.label) {
+            case 0:
+                result = [];
+                _d.label = 1;
+            case 1:
+                _d.trys.push([1, 6, 7, 8]);
+                array_1 = __values(array), array_1_1 = array_1.next();
+                _d.label = 2;
+            case 2:
+                if (!!array_1_1.done) return [3 /*break*/, 5];
+                value = array_1_1.value;
+                // eslint-disable-next-line no-await-in-loop
+                _b = (_a = result).push;
+                return [4 /*yield*/, fn(value)];
+            case 3:
+                // eslint-disable-next-line no-await-in-loop
+                _b.apply(_a, [_d.sent()]);
+                _d.label = 4;
+            case 4:
+                array_1_1 = array_1.next();
+                return [3 /*break*/, 2];
+            case 5: return [3 /*break*/, 8];
+            case 6:
+                e_1_1 = _d.sent();
+                e_1 = { error: e_1_1 };
+                return [3 /*break*/, 8];
+            case 7:
+                try {
+                    if (array_1_1 && !array_1_1.done && (_c = array_1["return"])) _c.call(array_1);
+                }
+                finally { if (e_1) throw e_1.error; }
+                return [7 /*endfinally*/];
+            case 8: return [2 /*return*/, result];
+        }
+    });
+}); }; };
+var createVideoListGetter = function (dataSource) {
+    var videoRepo = dataSource.getRepository(video_1["default"]);
+    var cache = new Map();
+    return function (ids) { return __awaiter(void 0, void 0, void 0, function () {
+        var result, ids_1, ids_1_1, id, video, e_2_1;
+        var e_2, _a;
+        return __generator(this, function (_b) {
+            switch (_b.label) {
+                case 0:
+                    result = [];
+                    _b.label = 1;
+                case 1:
+                    _b.trys.push([1, 7, 8, 9]);
+                    ids_1 = __values(ids), ids_1_1 = ids_1.next();
+                    _b.label = 2;
+                case 2:
+                    if (!!ids_1_1.done) return [3 /*break*/, 6];
+                    id = ids_1_1.value;
+                    if (!cache.has(id)) return [3 /*break*/, 3];
+                    result.push(cache.get(id));
+                    return [3 /*break*/, 5];
+                case 3: return [4 /*yield*/, videoRepo.findOneBy({ id: id })];
+                case 4:
+                    video = _b.sent();
+                    if (video) {
+                        cache.set(id, video);
+                        result.push(video);
+                    }
+                    _b.label = 5;
+                case 5:
+                    ids_1_1 = ids_1.next();
+                    return [3 /*break*/, 2];
+                case 6: return [3 /*break*/, 9];
+                case 7:
+                    e_2_1 = _b.sent();
+                    e_2 = { error: e_2_1 };
+                    return [3 /*break*/, 9];
+                case 8:
+                    try {
+                        if (ids_1_1 && !ids_1_1.done && (_a = ids_1["return"])) _a.call(ids_1);
+                    }
+                    finally { if (e_2) throw e_2.error; }
+                    return [7 /*endfinally*/];
+                case 9: return [2 /*return*/, result];
+            }
+        });
+    }); };
+};
+var createEventOverview = function (dataSource) { return function (event) { return __awaiter(void 0, void 0, void 0, function () {
+    var overview, watchtimeRepo, watchtime, videoListItemRepo, listItems, npIds, pIds, shownIds, shownItems_1, listItems_1, listItems_1_1, listItem, getVideos, npVideos, pVideos, shownVideos, recommendations;
+    var e_3, _a;
+    return __generator(this, function (_b) {
+        switch (_b.label) {
+            case 0:
+                overview = __assign({}, event);
+                if (!(event.type === event_1.EventType.WATCH_TIME)) return [3 /*break*/, 2];
+                watchtimeRepo = dataSource.getRepository(watchTime_1["default"]);
+                return [4 /*yield*/, watchtimeRepo.findOneBy({ eventId: event.id })];
+            case 1:
+                watchtime = _b.sent();
+                if (watchtime) {
+                    overview.data = {
+                        kind: 'watchtime',
+                        watchtime: watchtime.secondsWatched
+                    };
+                }
+                _b.label = 2;
+            case 2:
+                if (!(event.type === event_1.EventType.RECOMMENDATIONS_SHOWN)) return [3 /*break*/, 7];
+                videoListItemRepo = dataSource.getRepository(videoListItem_1["default"]);
+                return [4 /*yield*/, videoListItemRepo.find({
+                        where: {
+                            eventId: event.id
+                        },
+                        order: {
+                            position: 'ASC'
+                        }
+                    })];
+            case 3:
+                listItems = _b.sent();
+                npIds = [];
+                pIds = [];
+                shownIds = [];
+                shownItems_1 = [];
+                try {
+                    for (listItems_1 = __values(listItems), listItems_1_1 = listItems_1.next(); !listItems_1_1.done; listItems_1_1 = listItems_1.next()) {
+                        listItem = listItems_1_1.value;
+                        if (listItem.listType === videoListItem_1.ListType.NON_PERSONALIZED) {
+                            npIds.push(listItem.videoId);
+                        }
+                        else if (listItem.listType === videoListItem_1.ListType.PERSONALIZED) {
+                            pIds.push(listItem.videoId);
+                        }
+                        else {
+                            shownIds.push(listItem.videoId);
+                            shownItems_1.push(listItem);
+                        }
+                    }
+                }
+                catch (e_3_1) { e_3 = { error: e_3_1 }; }
+                finally {
+                    try {
+                        if (listItems_1_1 && !listItems_1_1.done && (_a = listItems_1["return"])) _a.call(listItems_1);
+                    }
+                    finally { if (e_3) throw e_3.error; }
+                }
+                getVideos = createVideoListGetter(dataSource);
+                return [4 /*yield*/, getVideos(npIds)];
+            case 4:
+                npVideos = _b.sent();
+                return [4 /*yield*/, getVideos(pIds)];
+            case 5:
+                pVideos = _b.sent();
+                return [4 /*yield*/, getVideos(shownIds)];
+            case 6:
+                shownVideos = _b.sent();
+                recommendations = {
+                    nonPersonalized: npVideos.map(function (video) { return (__assign(__assign({}, video), { source: videoListItem_1.VideoType.NON_PERSONALIZED })); }),
+                    personalized: pVideos.map(function (video) { return (__assign(__assign({}, video), { source: videoListItem_1.VideoType.PERSONALIZED })); }),
+                    shown: shownVideos.map(function (video, i) { return (__assign(__assign({}, video), { source: shownItems_1[i].videoType })); })
+                };
+                overview.data = {
+                    kind: 'recommendations',
+                    recommendations: recommendations
+                };
+                _b.label = 7;
+            case 7: return [2 /*return*/, overview];
+        }
+    });
+}); }; };
+var createSessionOverview = function (dataSource) { return function (session) { return __awaiter(void 0, void 0, void 0, function () {
+    var eventRepo, events, _a;
+    var _b;
+    return __generator(this, function (_c) {
+        switch (_c.label) {
+            case 0:
+                eventRepo = dataSource.getRepository(event_1["default"]);
+                return [4 /*yield*/, eventRepo.find({
+                        where: {
+                            sessionUuid: session.uuid
+                        },
+                        order: {
+                            createdAt: 'ASC'
+                        }
+                    })];
+            case 1:
+                events = _c.sent();
+                _a = [__assign({}, session)];
+                _b = { startedAt: firstDate(events), endedAt: lastDate(events) };
+                return [4 /*yield*/, asyncMap(events)(createEventOverview(dataSource))];
+            case 2: return [2 /*return*/, __assign.apply(void 0, _a.concat([(_b.events = _c.sent(), _b)]))];
+        }
+    });
+}); }; };
 var createGetParticipantOverviewRoute = function (_a) {
     var createLogger = _a.createLogger, dataSource = _a.dataSource;
     return function (req, res) { return __awaiter(void 0, void 0, void 0, function () {
-        var log, participantRepo, email, participant, participantOverview;
-        return __generator(this, function (_a) {
-            switch (_a.label) {
+        var log, participantRepo, email, participant, sessionRepo, sessions, participantOverview, _a;
+        var _b;
+        return __generator(this, function (_c) {
+            switch (_c.label) {
                 case 0:
                     log = createLogger(req.requestId);
                     log('Received participant overview request');
@@ -69,12 +315,28 @@ var createGetParticipantOverviewRoute = function (_a) {
                     }
                     return [4 /*yield*/, participantRepo.findOneBy({ email: email })];
                 case 1:
-                    participant = _a.sent();
+                    participant = _c.sent();
                     if (!participant) {
                         res.status(404).json({ kind: 'Error', message: 'Participant not found' });
                         return [2 /*return*/];
                     }
-                    participantOverview = __assign(__assign({}, participant), { sessionCount: 0 });
+                    sessionRepo = dataSource.getRepository(session_1["default"]);
+                    return [4 /*yield*/, sessionRepo.find({
+                            where: {
+                                participantCode: participant.code
+                            },
+                            order: {
+                                createdAt: 'DESC'
+                            }
+                        })];
+                case 2:
+                    sessions = _c.sent();
+                    log('Session count:', sessions.length);
+                    _a = [__assign({}, participant)];
+                    _b = { sessionCount: sessions.length, firstSessionDate: firstDate(sessions), latestSessionDate: lastDate(sessions) };
+                    return [4 /*yield*/, asyncMap(sessions)(createSessionOverview(dataSource))];
+                case 3:
+                    participantOverview = __assign.apply(void 0, _a.concat([(_b.sessions = _c.sent(), _b)]));
                     res.status(200).json({ kind: 'Success', value: participantOverview });
                     return [2 /*return*/];
             }

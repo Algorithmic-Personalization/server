@@ -1,5 +1,5 @@
 "use strict";
-var _a, _b, _c;
+var _a, _b, _c, _d;
 exports.__esModule = true;
 exports.theme = void 0;
 var material_1 = require("@mui/material");
@@ -25,4 +25,11 @@ exports.theme.typography.h3 = (_c = {
         fontSize: '1.2rem'
     },
     _c);
+exports.theme.typography.h4 = (_d = {
+        fontSize: '1rem'
+    },
+    _d[exports.theme.breakpoints.up('sm')] = {
+        fontSize: '1.2rem'
+    },
+    _d);
 exports["default"] = exports.theme;
