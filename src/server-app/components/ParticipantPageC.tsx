@@ -6,6 +6,7 @@ import type EventOverview from '../../server/projections/EventOverview';
 
 import {
 	Box,
+	Button,
 	Grid,
 	Paper,
 	Typography,
@@ -116,6 +117,43 @@ const LegendC: React.FC<{label: string}> = ({label}) => {
 	);
 };
 
+const FoldableC: React.FC<{label: string; children: React.ReactNode}> = ({label, children}) => {
+	const [folded, setFolded] = useState(true);
+
+	if (folded) {
+		return (
+			<Button
+				variant='outlined'
+				color='primary'
+				sx={{
+					m: 1,
+				}}
+				onClick={() => {
+					setFolded(false);
+				}}
+			>
+				Unfold {label}
+			</Button>
+		);
+	}
+
+	return (
+		<>
+			{children}
+			<Button
+				variant='outlined'
+				color='primary'
+				sx={{
+					m: 1,
+				}}
+				onClick={() => {
+					setFolded(true);
+				}}
+			>Fold back {label}</Button>
+		</>
+	);
+};
+
 const EventC: React.FC<{data: EventOverview; position: number}> = ({data: overview, position}) => {
 	const contextLegend = () => {
 		if (overview.type === EventType.WATCH_TIME) {
@@ -164,8 +202,10 @@ const SessionC: React.FC<{data: SessionOverview}> = ({data}) => (
 		<Typography variant='body1' sx={{mb: 2}}>Ended on: {showDate(data.endedAt)}</Typography>
 		{data.events.length === 0 ? 'No events' : (
 			<>
-				<Typography variant='h4' component='h5' sx={{mb: 1}}>Events (most recent first):</Typography>
-				{data.events.map((e, p) => <EventC key={e.id} data={e} position={data.events.length - p}/>)}
+				<FoldableC label={`${data.events.length} events`}>
+					<Typography variant='h4' component='h5' sx={{mb: 1}}>Events (most recent first):</Typography>
+					{data.events.map((e, p) => <EventC key={e.id} data={e} position={data.events.length - p}/>)}
+				</FoldableC>
 			</>
 		)}
 	</Paper>
