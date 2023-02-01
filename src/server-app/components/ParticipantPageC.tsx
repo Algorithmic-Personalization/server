@@ -165,7 +165,7 @@ const SessionC: React.FC<{data: SessionOverview}> = ({data}) => (
 		{data.events.length === 0 ? 'No events' : (
 			<>
 				<Typography variant='h4' component='h5' sx={{mb: 1}}>Events (most recent first):</Typography>
-				{data.events.map((e, p) => <EventC key={e.id} data={e} position={p + 1}/>)}
+				{data.events.map((e, p) => <EventC key={e.id} data={e} position={data.events.length - p}/>)}
 			</>
 		)}
 	</Paper>
