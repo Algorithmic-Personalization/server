@@ -32,29 +32,39 @@ const showWatchtimeOrContextUrl = (e: EventOverview): string => {
 	return e.context ?? '';
 };
 
-const UrlC: React.FC<{url: string}> = ({url}) => {
+const LinkC: React.FC<{href: string; label: string}> = ({href, label}) => (
+	<a
+		target='_blank'
+		rel='noreferrer'
+		href={href}
+		style={{
+			textDecoration: 'none',
+			color: 'inherit',
+		}}
+	>
+		<Typography variant='body1'>{label}</Typography>
+	</a>
+);
+
+const UrlC: React.FC<{url: string; prefix?: string}> = ({url, prefix}) => {
 	const link = url.startsWith('/') ? `https://youtube.com${url}` : url;
+
+	const p = prefix ?? '';
 
 	try {
 		const u = new URL(link);
 
 		if (u.pathname === '/results') {
-			return <a style={{textDecoration: 'none'}} href={url} target='_blank' rel='noreferrer'>
-				search: {u.searchParams.get('search_query')}
-			</a>;
+			return <LinkC href={url} label={`${p}search: ${u.searchParams.get('search_query') ?? ''}`} />;
 		}
 
 		if (u.pathname === '/watch') {
-			return <a style={{textDecoration: 'none'}} href={url} target='_blank' rel='noreferrer'>
-				video: {u.searchParams.get('v')}
-			</a>;
+			return <LinkC href={url} label={`${p}video: ${u.searchParams.get('v') ?? ''}`} />;
 		}
 
-		return <a style={{textDecoration: 'none'}} href={url} target='_blank' rel='noreferrer'>
-			{u.pathname} {u.search}
-		</a>;
+		return <LinkC href={url} label={`${p}${u.pathname}`} />;
 	} catch (e) {
-		return <>{url}</>;
+		return <>{p}{url}</>;
 	}
 };
 
@@ -76,10 +86,10 @@ const RecommendationsListC: React.FC<{data: VideoItem[]; details?: boolean}> = (
 	};
 
 	return (
-		<ul>
+		<ul style={{listStyle: 'none'}}>
 			{data.map(item => (
 				<li key={item.id}>
-					{getDetails(item)}<UrlC url={item.url} />
+					<UrlC url={item.url} prefix={getDetails(item)} />
 				</li>
 			))}
 		</ul>
@@ -89,15 +99,21 @@ const RecommendationsListC: React.FC<{data: VideoItem[]; details?: boolean}> = (
 const RecommendationsC: React.FC<{data: RecommendationsList}> = ({data}) => (
 	<Grid container sx={{pl: 8, mb: 2}}>
 		<Grid item xs={3}>
-			Non-Personalized
+			<Typography variant='body1' color='grey'>
+				Non-Personalized ({data.nonPersonalized.length})
+			</Typography>
 			<RecommendationsListC data={data.nonPersonalized}/>
 		</Grid>
 		<Grid item xs={3}>
-			Personalized
+			<Typography variant='body1' color='grey'>
+				Personalized ({data.personalized.length})
+			</Typography>
 			<RecommendationsListC data={data.personalized}/>
 		</Grid>
 		<Grid item xs={3}>
-			Shown
+			<Typography variant='body1' color='grey'>
+				Shown ({data.shown.length})
+			</Typography>
 			<RecommendationsListC data={data.shown} details={true}/>
 		</Grid>
 	</Grid>
