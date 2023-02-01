@@ -42,27 +42,27 @@ const LinkC: React.FC<{href: string; label: string}> = ({href, label}) => (
 			color: 'inherit',
 		}}
 	>
-		<Typography variant='body1'>{label}</Typography>
+		<Typography variant='body1' color='blue'>{label}</Typography>
 	</a>
 );
 
 const UrlC: React.FC<{url: string; prefix?: string}> = ({url, prefix}) => {
-	const link = url.startsWith('/') ? `https://youtube.com${url}` : url;
+	const withYtHostName = url.startsWith('/') ? `https://youtube.com${url}` : url;
 
 	const p = prefix ?? '';
 
 	try {
-		const u = new URL(link);
+		const u = new URL(withYtHostName);
 
 		if (u.pathname === '/results') {
-			return <LinkC href={url} label={`${p}search: ${u.searchParams.get('search_query') ?? ''}`} />;
+			return <LinkC href={withYtHostName} label={`${p}search: ${u.searchParams.get('search_query') ?? ''}`} />;
 		}
 
 		if (u.pathname === '/watch') {
-			return <LinkC href={url} label={`${p}video: ${u.searchParams.get('v') ?? ''}`} />;
+			return <LinkC href={withYtHostName} label={`${p}video: ${u.searchParams.get('v') ?? ''}`} />;
 		}
 
-		return <LinkC href={url} label={`${p}${u.pathname}`} />;
+		return <LinkC href={withYtHostName} label={`${p}${u.pathname}`} />;
 	} catch (e) {
 		return <>{p}{url}</>;
 	}
@@ -98,21 +98,24 @@ const RecommendationsListC: React.FC<{data: VideoItem[]; details?: boolean}> = (
 
 const RecommendationsC: React.FC<{data: RecommendationsList}> = ({data}) => (
 	<Grid container sx={{pl: 8, mb: 2}}>
-		<Grid item xs={3}>
+		<Grid item xs={12} sm={4} lg={3}>
 			<Typography variant='body1' color='grey'>
 				Non-Personalized ({data.nonPersonalized.length})
 			</Typography>
 			<RecommendationsListC data={data.nonPersonalized}/>
 		</Grid>
-		<Grid item xs={3}>
+		<Grid item xs={12} sm={4} lg={3}>
 			<Typography variant='body1' color='grey'>
 				Personalized ({data.personalized.length})
 			</Typography>
 			<RecommendationsListC data={data.personalized}/>
 		</Grid>
-		<Grid item xs={3}>
-			<Typography variant='body1' color='grey'>
+		<Grid item xs={12} sm={4} lg={3}>
+			<Typography variant='body1' color='grey' sx={{position: 'relative'}}>
 				Shown ({data.shown.length})
+				<small style={{position: 'absolute', left: 0, top: '1.2rem'}}>
+					p: personalized, np: non personalized, m: mixed
+				</small>
 			</Typography>
 			<RecommendationsListC data={data.shown} details={true}/>
 		</Grid>
@@ -189,20 +192,20 @@ const EventC: React.FC<{data: EventOverview; position: number}> = ({data: overvi
 
 	return (<>
 		<Grid container sx={{pl: 4}}>
-			<Grid item xs={2}>
+			<Grid item xs={12} md={2}>
 				<Typography variant='body1' sx={{mb: 2}}><strong>{position}</strong>&#41; {showDate(overview.createdAt)}</Typography>
 			</Grid>
-			<Grid item xs={3}>
+			<Grid item xs={12} md={3}>
 				<LegendC label='event type'/>
 				<Typography variant='body1' sx={{mb: 2}}>{overview.type}</Typography>
 			</Grid>
-			<Grid item xs={4}>
+			<Grid item xs={12} md={4}>
 				<LegendC label={contextLegend()}/>
 				<Typography variant='body1' sx={{mb: 2}}>
 					<UrlC url={showWatchtimeOrContextUrl(overview)}/>
 				</Typography>
 			</Grid>
-			<Grid item xs={3}>
+			<Grid item xs={12} md={3}>
 				<LegendC label='url'/>
 				<Typography variant='body1' sx={{mb: 2}}><UrlC url={overview.url}/></Typography>
 			</Grid>

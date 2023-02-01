@@ -57,28 +57,33 @@ var showWatchtimeOrContextUrl = function (e) {
     }
     return (_b = e.context) !== null && _b !== void 0 ? _b : '';
 };
+var LinkC = function (_a) {
+    var href = _a.href, label = _a.label;
+    return (react_1["default"].createElement("a", { target: '_blank', rel: 'noreferrer', href: href, style: {
+            textDecoration: 'none',
+            color: 'inherit'
+        } },
+        react_1["default"].createElement(material_1.Typography, { variant: 'body1', color: 'blue' }, label)));
+};
 var UrlC = function (_a) {
-    var url = _a.url;
-    var link = url.startsWith('/') ? "https://youtube.com".concat(url) : url;
+    var _b, _c;
+    var url = _a.url, prefix = _a.prefix;
+    var withYtHostName = url.startsWith('/') ? "https://youtube.com".concat(url) : url;
+    var p = prefix !== null && prefix !== void 0 ? prefix : '';
     try {
-        var u = new URL(link);
+        var u = new URL(withYtHostName);
         if (u.pathname === '/results') {
-            return react_1["default"].createElement("a", { style: { textDecoration: 'none' }, href: url, target: '_blank', rel: 'noreferrer' },
-                "search: ",
-                u.searchParams.get('search_query'));
+            return react_1["default"].createElement(LinkC, { href: withYtHostName, label: "".concat(p, "search: ").concat((_b = u.searchParams.get('search_query')) !== null && _b !== void 0 ? _b : '') });
         }
         if (u.pathname === '/watch') {
-            return react_1["default"].createElement("a", { style: { textDecoration: 'none' }, href: url, target: '_blank', rel: 'noreferrer' },
-                "video: ",
-                u.searchParams.get('v'));
+            return react_1["default"].createElement(LinkC, { href: withYtHostName, label: "".concat(p, "video: ").concat((_c = u.searchParams.get('v')) !== null && _c !== void 0 ? _c : '') });
         }
-        return react_1["default"].createElement("a", { style: { textDecoration: 'none' }, href: url, target: '_blank', rel: 'noreferrer' },
-            u.pathname,
-            " ",
-            u.search);
+        return react_1["default"].createElement(LinkC, { href: withYtHostName, label: "".concat(p).concat(u.pathname) });
     }
     catch (e) {
-        return react_1["default"].createElement(react_1["default"].Fragment, null, url);
+        return react_1["default"].createElement(react_1["default"].Fragment, null,
+            p,
+            url);
     }
 };
 var RecommendationsListC = function (_a) {
@@ -95,21 +100,30 @@ var RecommendationsListC = function (_a) {
         }
         return 'm: ';
     };
-    return (react_1["default"].createElement("ul", null, data.map(function (item) { return (react_1["default"].createElement("li", { key: item.id },
-        getDetails(item),
-        react_1["default"].createElement(UrlC, { url: item.url }))); })));
+    return (react_1["default"].createElement("ul", { style: { listStyle: 'none' } }, data.map(function (item) { return (react_1["default"].createElement("li", { key: item.id },
+        react_1["default"].createElement(UrlC, { url: item.url, prefix: getDetails(item) }))); })));
 };
 var RecommendationsC = function (_a) {
     var data = _a.data;
     return (react_1["default"].createElement(material_1.Grid, { container: true, sx: { pl: 8, mb: 2 } },
-        react_1["default"].createElement(material_1.Grid, { item: true, xs: 3 },
-            "Non-Personalized",
+        react_1["default"].createElement(material_1.Grid, { item: true, xs: 12, sm: 4, lg: 3 },
+            react_1["default"].createElement(material_1.Typography, { variant: 'body1', color: 'grey' },
+                "Non-Personalized (",
+                data.nonPersonalized.length,
+                ")"),
             react_1["default"].createElement(RecommendationsListC, { data: data.nonPersonalized })),
-        react_1["default"].createElement(material_1.Grid, { item: true, xs: 3 },
-            "Personalized",
+        react_1["default"].createElement(material_1.Grid, { item: true, xs: 12, sm: 4, lg: 3 },
+            react_1["default"].createElement(material_1.Typography, { variant: 'body1', color: 'grey' },
+                "Personalized (",
+                data.personalized.length,
+                ")"),
             react_1["default"].createElement(RecommendationsListC, { data: data.personalized })),
-        react_1["default"].createElement(material_1.Grid, { item: true, xs: 3 },
-            "Shown",
+        react_1["default"].createElement(material_1.Grid, { item: true, xs: 12, sm: 4, lg: 3 },
+            react_1["default"].createElement(material_1.Typography, { variant: 'body1', color: 'grey', sx: { position: 'relative' } },
+                "Shown (",
+                data.shown.length,
+                ")",
+                react_1["default"].createElement("small", { style: { position: 'absolute', left: 0, top: '1.2rem' } }, "p: personalized, np: non personalized, m: mixed")),
             react_1["default"].createElement(RecommendationsListC, { data: data.shown, details: true }))));
 };
 var LegendC = function (_a) {
@@ -123,6 +137,28 @@ var LegendC = function (_a) {
             color: 'grey'
         } },
         react_1["default"].createElement("strong", null, label)));
+};
+var FoldableC = function (_a) {
+    var label = _a.label, children = _a.children;
+    var _b = __read((0, react_1.useState)(true), 2), folded = _b[0], setFolded = _b[1];
+    if (folded) {
+        return (react_1["default"].createElement(material_1.Button, { variant: 'outlined', color: 'primary', sx: {
+                m: 1
+            }, onClick: function () {
+                setFolded(false);
+            } },
+            "Unfold ",
+            label));
+    }
+    return (react_1["default"].createElement(react_1["default"].Fragment, null,
+        children,
+        react_1["default"].createElement(material_1.Button, { variant: 'outlined', color: 'primary', sx: {
+                m: 1
+            }, onClick: function () {
+                setFolded(true);
+            } },
+            "Fold back ",
+            label)));
 };
 var EventC = function (_a) {
     var _b;
@@ -141,19 +177,19 @@ var EventC = function (_a) {
     };
     return (react_1["default"].createElement(react_1["default"].Fragment, null,
         react_1["default"].createElement(material_1.Grid, { container: true, sx: { pl: 4 } },
-            react_1["default"].createElement(material_1.Grid, { item: true, xs: 2 },
+            react_1["default"].createElement(material_1.Grid, { item: true, xs: 12, md: 2 },
                 react_1["default"].createElement(material_1.Typography, { variant: 'body1', sx: { mb: 2 } },
                     react_1["default"].createElement("strong", null, position),
                     ") ",
                     showDate(overview.createdAt))),
-            react_1["default"].createElement(material_1.Grid, { item: true, xs: 3 },
+            react_1["default"].createElement(material_1.Grid, { item: true, xs: 12, md: 3 },
                 react_1["default"].createElement(LegendC, { label: 'event type' }),
                 react_1["default"].createElement(material_1.Typography, { variant: 'body1', sx: { mb: 2 } }, overview.type)),
-            react_1["default"].createElement(material_1.Grid, { item: true, xs: 4 },
+            react_1["default"].createElement(material_1.Grid, { item: true, xs: 12, md: 4 },
                 react_1["default"].createElement(LegendC, { label: contextLegend() }),
                 react_1["default"].createElement(material_1.Typography, { variant: 'body1', sx: { mb: 2 } },
                     react_1["default"].createElement(UrlC, { url: showWatchtimeOrContextUrl(overview) }))),
-            react_1["default"].createElement(material_1.Grid, { item: true, xs: 3 },
+            react_1["default"].createElement(material_1.Grid, { item: true, xs: 12, md: 3 },
                 react_1["default"].createElement(LegendC, { label: 'url' }),
                 react_1["default"].createElement(material_1.Typography, { variant: 'body1', sx: { mb: 2 } },
                     react_1["default"].createElement(UrlC, { url: overview.url })))),
@@ -172,8 +208,9 @@ var SessionC = function (_a) {
             "Ended on: ",
             showDate(data.endedAt)),
         data.events.length === 0 ? 'No events' : (react_1["default"].createElement(react_1["default"].Fragment, null,
-            react_1["default"].createElement(material_1.Typography, { variant: 'h4', component: 'h5', sx: { mb: 1 } }, "Events (most recent first):"),
-            data.events.map(function (e, p) { return react_1["default"].createElement(EventC, { key: e.id, data: e, position: p + 1 }); })))));
+            react_1["default"].createElement(FoldableC, { label: "".concat(data.events.length, " events") },
+                react_1["default"].createElement(material_1.Typography, { variant: 'h4', component: 'h5', sx: { mb: 1 } }, "Events (most recent first):"),
+                data.events.map(function (e, p) { return react_1["default"].createElement(EventC, { key: e.id, data: e, position: data.events.length - p }); }))))));
 };
 var OverviewC = function (_a) {
     var data = _a.data;
