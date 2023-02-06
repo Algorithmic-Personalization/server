@@ -145,6 +145,22 @@ const createEventOverview = (dataSource: DataSource) => async (event: Event): Pr
 const createSessionOverview = (dataSource: DataSource) => async (session: Session): Promise<SessionOverview> => {
 	const eventRepo = dataSource.getRepository(Event);
 
+	type QueryResult = {
+		firstDate: Date;
+		lastDate: Date;
+		count: number;
+	};
+
+	const qResult = await eventRepo.createQueryBuilder()
+		.select('MIN(created_at)', 'firstDate')
+		.addSelect('MAX(created_at)', 'lastDate')
+		.addSelect('COUNT(*)', 'count')
+		.where('session_uuid = :sessionUuid', {sessionUuid: session.uuid})
+		.getRawOne() as unknown as QueryResult | undefined;
+
+	const startedAt = qResult ? qResult.firstDate : new Date(0);
+	const endedAt = qResult ? qResult.lastDate : new Date(0);
+
 	const events = await eventRepo.find({
 		where: {
 			sessionUuid: session.uuid,
@@ -156,8 +172,9 @@ const createSessionOverview = (dataSource: DataSource) => async (session: Sessio
 
 	return {
 		...session,
-		startedAt: firstDate(events),
-		endedAt: lastDate(events),
+		startedAt,
+		endedAt,
+		eventCount: qResult ? qResult.count : 0,
 		events: await asyncMap<Event, EventOverview>(events)(createEventOverview(dataSource)),
 	};
 };
