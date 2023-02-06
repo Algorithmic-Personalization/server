@@ -20,3 +20,5 @@ config.yaml
 docker-compose.yaml
 private.key
 private.key.pub
+
+secrets.yml
