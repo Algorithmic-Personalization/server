@@ -65,12 +65,14 @@ export const createAdminApi = (serverUrl: string, showLoginModal?: () => void): 
 
 	const verb = makeApiVerbCreator(serverUrl);
 
+	const wasLoggedIn = () => sessionStorage.getItem('wasLoggedIn') === 'true';
+
 	const decorate: VerbDecorator = verb => async <T>(url: string, data: unknown, h: Record<string, string>): Promise<Maybe<T>> => {
 		const result = await verb<T>(url, data, h);
 
 		if (isMaybe(result)) {
 			if (result.kind === 'Failure') {
-				if (result.code === 'NOT_AUTHENTICATED') {
+				if (result.code === 'NOT_AUTHENTICATED' && wasLoggedIn()) {
 					token = undefined;
 					admin = undefined;
 					sessionStorage.removeItem('token');
@@ -104,7 +106,7 @@ export const createAdminApi = (serverUrl: string, showLoginModal?: () => void): 
 		},
 
 		wasLoggedIn() {
-			return sessionStorage.getItem('wasLoggedIn') === 'true';
+			return wasLoggedIn();
 		},
 
 		setAuth(t: Token, a: Admin) {

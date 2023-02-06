@@ -10,7 +10,7 @@ export const RequireAuthC: React.FC<{
 	const api = useAdminApi();
 	const location = useLocation();
 
-	if (!api.isLoggedIn() && !api.wasLoggedIn) {
+	if (!api.isLoggedIn()) {
 		console.log('not logged in, redirecting to /login');
 		return <Navigate to='/login' state={{from: location}} replace />;
 	}
