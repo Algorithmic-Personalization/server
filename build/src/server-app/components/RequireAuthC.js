@@ -11,7 +11,7 @@ var RequireAuthC = function (_a) {
     var children = _a.children;
     var api = (0, adminApiProvider_1.useAdminApi)();
     var location = (0, react_router_dom_1.useLocation)();
-    if (!api.isLoggedIn() && !api.wasLoggedIn) {
+    if (!api.isLoggedIn()) {
         console.log('not logged in, redirecting to /login');
         return react_1["default"].createElement(react_router_dom_1.Navigate, { to: '/login', state: { from: location }, replace: true });
     }

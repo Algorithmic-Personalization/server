@@ -111,7 +111,7 @@ const RecommendationsC: React.FC<{data: RecommendationsList}> = ({data}) => (
 			<RecommendationsListC data={data.personalized}/>
 		</Grid>
 		<Grid item xs={12} sm={4} lg={3}>
-			<Typography variant='body1' color='grey' sx={{position: 'relative'}}>
+			<Typography variant='body1' color='grey' sx={{position: {md: 'relative'}}}>
 				Shown ({data.shown.length})
 				<small style={{position: 'absolute', left: 0, top: '1.2rem'}}>
 					p: personalized, np: non personalized, m: mixed
@@ -133,43 +133,6 @@ const LegendC: React.FC<{label: string}> = ({label}) => {
 			fontSize: '0.8rem',
 			color: 'grey',
 		}}><strong>{label}</strong></Typography>
-	);
-};
-
-const FoldableC: React.FC<{label: string; children: React.ReactNode}> = ({label, children}) => {
-	const [folded, setFolded] = useState(true);
-
-	if (folded) {
-		return (
-			<Button
-				variant='outlined'
-				color='primary'
-				sx={{
-					m: 1,
-				}}
-				onClick={() => {
-					setFolded(false);
-				}}
-			>
-				Unfold {label}
-			</Button>
-		);
-	}
-
-	return (
-		<>
-			{children}
-			<Button
-				variant='outlined'
-				color='primary'
-				sx={{
-					m: 1,
-				}}
-				onClick={() => {
-					setFolded(true);
-				}}
-			>Fold back {label}</Button>
-		</>
 	);
 };
 
@@ -214,19 +177,76 @@ const EventC: React.FC<{data: EventOverview; position: number}> = ({data: overvi
 	</>);
 };
 
+const EventsListC: React.FC<{count: number; sessionUuid: string}> = ({count, sessionUuid}) => {
+	const api = useAdminApi();
+	const [events, setEvents] = useState<EventOverview[]>([]);
+	const [folded, setFolded] = useState(true);
+
+	useEffect(() => {
+		if (folded) {
+			return;
+		}
+
+		api.getEventOverviews(sessionUuid).then(
+			data => {
+				if (data.kind === 'Success') {
+					setEvents(data.value);
+				}
+			},
+		).catch(console.error);
+	}, [sessionUuid, folded]);
+
+	if (count === 0) {
+		return <Typography variant='body1'>No events</Typography>;
+	}
+
+	if (folded) {
+		return (
+			<Button
+				variant='outlined'
+				color='primary'
+				sx={{
+					m: 1,
+				}}
+				onClick={() => {
+					setFolded(false);
+				}}
+			>
+				Unfold {count} events
+			</Button>
+		);
+	}
+
+	if (events.length === 0) {
+		return <Typography variant='body1'>Loading events...</Typography>;
+	}
+
+	return (
+		<Box>
+			<Typography variant='body1' sx={{mb: 2, fontWeight: 'bold'}}>Events (latest first)</Typography>
+			{events.map((event, index) => <EventC key={event.id} data={event} position={events.length - index} />)}
+			<Button
+				variant='outlined'
+				color='primary'
+				sx={{
+					m: 1,
+				}}
+				onClick={() => {
+					setFolded(true);
+				}}
+			>
+				Fold back {count} events
+			</Button>
+		</Box>
+	);
+};
+
 const SessionC: React.FC<{data: SessionOverview}> = ({data}) => (
 	<Paper component='section' sx={{mb: 4, ml: 2, p: 2}}>
 		<Typography variant='h4' sx={{mb: 2}}>Session #{data.id}</Typography>
 		<Typography variant='body1' sx={{mb: 2}}>Started on: {showDate(data.startedAt)}</Typography>
 		<Typography variant='body1' sx={{mb: 2}}>Ended on: {showDate(data.endedAt)}</Typography>
-		{data.events.length === 0 ? 'No events' : (
-			<>
-				<FoldableC label={`${data.events.length} events`}>
-					<Typography variant='h4' component='h5' sx={{mb: 1}}>Events (most recent first):</Typography>
-					{data.events.map((e, p) => <EventC key={e.id} data={e} position={data.events.length - p}/>)}
-				</FoldableC>
-			</>
-		)}
+		<EventsListC count={data.eventCount} sessionUuid={data.uuid} />
 	</Paper>
 );
 

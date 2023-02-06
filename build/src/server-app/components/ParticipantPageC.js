@@ -119,7 +119,7 @@ var RecommendationsC = function (_a) {
                 ")"),
             react_1["default"].createElement(RecommendationsListC, { data: data.personalized })),
         react_1["default"].createElement(material_1.Grid, { item: true, xs: 12, sm: 4, lg: 3 },
-            react_1["default"].createElement(material_1.Typography, { variant: 'body1', color: 'grey', sx: { position: 'relative' } },
+            react_1["default"].createElement(material_1.Typography, { variant: 'body1', color: 'grey', sx: { position: { md: 'relative' } } },
                 "Shown (",
                 data.shown.length,
                 ")",
@@ -137,28 +137,6 @@ var LegendC = function (_a) {
             color: 'grey'
         } },
         react_1["default"].createElement("strong", null, label)));
-};
-var FoldableC = function (_a) {
-    var label = _a.label, children = _a.children;
-    var _b = __read((0, react_1.useState)(true), 2), folded = _b[0], setFolded = _b[1];
-    if (folded) {
-        return (react_1["default"].createElement(material_1.Button, { variant: 'outlined', color: 'primary', sx: {
-                m: 1
-            }, onClick: function () {
-                setFolded(false);
-            } },
-            "Unfold ",
-            label));
-    }
-    return (react_1["default"].createElement(react_1["default"].Fragment, null,
-        children,
-        react_1["default"].createElement(material_1.Button, { variant: 'outlined', color: 'primary', sx: {
-                m: 1
-            }, onClick: function () {
-                setFolded(true);
-            } },
-            "Fold back ",
-            label)));
 };
 var EventC = function (_a) {
     var _b;
@@ -195,6 +173,49 @@ var EventC = function (_a) {
                     react_1["default"].createElement(UrlC, { url: overview.url })))),
         ((_b = overview === null || overview === void 0 ? void 0 : overview.data) === null || _b === void 0 ? void 0 : _b.kind) === 'recommendations' && react_1["default"].createElement(RecommendationsC, { data: overview.data.recommendations })));
 };
+var EventsListC = function (_a) {
+    var count = _a.count, sessionUuid = _a.sessionUuid;
+    var api = (0, adminApiProvider_1.useAdminApi)();
+    var _b = __read((0, react_1.useState)([]), 2), events = _b[0], setEvents = _b[1];
+    var _c = __read((0, react_1.useState)(true), 2), folded = _c[0], setFolded = _c[1];
+    (0, react_1.useEffect)(function () {
+        if (folded) {
+            return;
+        }
+        api.getEventOverviews(sessionUuid).then(function (data) {
+            if (data.kind === 'Success') {
+                setEvents(data.value);
+            }
+        })["catch"](console.error);
+    }, [sessionUuid, folded]);
+    if (count === 0) {
+        return react_1["default"].createElement(material_1.Typography, { variant: 'body1' }, "No events");
+    }
+    if (folded) {
+        return (react_1["default"].createElement(material_1.Button, { variant: 'outlined', color: 'primary', sx: {
+                m: 1
+            }, onClick: function () {
+                setFolded(false);
+            } },
+            "Unfold ",
+            count,
+            " events"));
+    }
+    if (events.length === 0) {
+        return react_1["default"].createElement(material_1.Typography, { variant: 'body1' }, "Loading events...");
+    }
+    return (react_1["default"].createElement(material_1.Box, null,
+        react_1["default"].createElement(material_1.Typography, { variant: 'body1', sx: { mb: 2, fontWeight: 'bold' } }, "Events (latest first)"),
+        events.map(function (event, index) { return react_1["default"].createElement(EventC, { key: event.id, data: event, position: events.length - index }); }),
+        react_1["default"].createElement(material_1.Button, { variant: 'outlined', color: 'primary', sx: {
+                m: 1
+            }, onClick: function () {
+                setFolded(true);
+            } },
+            "Fold back ",
+            count,
+            " events")));
+};
 var SessionC = function (_a) {
     var data = _a.data;
     return (react_1["default"].createElement(material_1.Paper, { component: 'section', sx: { mb: 4, ml: 2, p: 2 } },
@@ -207,10 +228,7 @@ var SessionC = function (_a) {
         react_1["default"].createElement(material_1.Typography, { variant: 'body1', sx: { mb: 2 } },
             "Ended on: ",
             showDate(data.endedAt)),
-        data.events.length === 0 ? 'No events' : (react_1["default"].createElement(react_1["default"].Fragment, null,
-            react_1["default"].createElement(FoldableC, { label: "".concat(data.events.length, " events") },
-                react_1["default"].createElement(material_1.Typography, { variant: 'h4', component: 'h5', sx: { mb: 1 } }, "Events (most recent first):"),
-                data.events.map(function (e, p) { return react_1["default"].createElement(EventC, { key: e.id, data: e, position: data.events.length - p }); }))))));
+        react_1["default"].createElement(EventsListC, { count: data.eventCount, sessionUuid: data.uuid })));
 };
 var OverviewC = function (_a) {
     var data = _a.data;

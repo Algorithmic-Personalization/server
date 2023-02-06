@@ -7,6 +7,7 @@ import {type LoginResponse} from '../server/api/login';
 import {type ExperimentConfig} from '../common/models/experimentConfig';
 import {type Event} from '../common/models/event';
 import type ParticipantOverview from '../server/projections/ParticipantOverview';
+import type EventOverview from '../server/projections/EventOverview';
 
 import {
 	postRegister,
@@ -18,6 +19,7 @@ import {
 	getExperimentConfig,
 	getExperimentConfigHistory,
 	getEvents,
+	getEventOverviews,
 } from '../common/routes';
 
 import {
@@ -38,6 +40,7 @@ export type AdminApi = {
 	uploadParticipants: (file: File) => Promise<Maybe<string>>;
 	getParticipants: (page: number, emailLike: string, pageSize?: number) => Promise<Maybe<Page<Participant>>>;
 	getParticipantOverview: (participantEmail: string) => Promise<Maybe<ParticipantOverview>>;
+	getEventOverviews: (sessionUuid: string) => Promise<Maybe<EventOverview[]>>;
 	getEvents: (page: number, pageSize?: number) => Promise<Maybe<Page<Event>>>;
 	getExperimentConfig: () => Promise<Maybe<ExperimentConfig>>;
 	postExperimentConfig: (config: ExperimentConfig) => Promise<Maybe<ExperimentConfig>>;
@@ -172,6 +175,10 @@ export const createAdminApi = (serverUrl: string, showLoginModal?: () => void): 
 
 		async getParticipantOverview(participantEmail: string) {
 			return get<ParticipantOverview>(`${getParticipantOverview}/${participantEmail}`, {}, headers());
+		},
+
+		async getEventOverviews(sessionUuid: string) {
+			return get<EventOverview[]>(`${getEventOverviews}/${sessionUuid}`, {}, headers());
 		},
 
 		async getEvents(page = 0, pageSize = 15) {

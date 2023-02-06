@@ -51,6 +51,7 @@ var createAdminApi = function (serverUrl, showLoginModal) {
     var token = loadItem('token');
     var admin = loadItem('admin');
     var verb = (0, util_1.makeApiVerbCreator)(serverUrl);
+    var wasLoggedIn = function () { return sessionStorage.getItem('wasLoggedIn') === 'true'; };
     var decorate = function (verb) { return function (url, data, h) { return __awaiter(void 0, void 0, void 0, function () {
         var result;
         return __generator(this, function (_a) {
@@ -60,7 +61,7 @@ var createAdminApi = function (serverUrl, showLoginModal) {
                     result = _a.sent();
                     if ((0, util_1.isMaybe)(result)) {
                         if (result.kind === 'Failure') {
-                            if (result.code === 'NOT_AUTHENTICATED') {
+                            if (result.code === 'NOT_AUTHENTICATED' && wasLoggedIn()) {
                                 token = undefined;
                                 admin = undefined;
                                 sessionStorage.removeItem('token');
@@ -93,7 +94,7 @@ var createAdminApi = function (serverUrl, showLoginModal) {
             return Boolean(token) && Boolean(admin);
         },
         wasLoggedIn: function () {
-            return sessionStorage.getItem('wasLoggedIn') === 'true';
+            return wasLoggedIn();
         },
         setAuth: function (t, a) {
             token = t;
@@ -179,6 +180,13 @@ var createAdminApi = function (serverUrl, showLoginModal) {
             return __awaiter(this, void 0, void 0, function () {
                 return __generator(this, function (_a) {
                     return [2 /*return*/, get("".concat(routes_1.getParticipantOverview, "/").concat(participantEmail), {}, headers())];
+                });
+            });
+        },
+        getEventOverviews: function (sessionUuid) {
+            return __awaiter(this, void 0, void 0, function () {
+                return __generator(this, function (_a) {
+                    return [2 /*return*/, get("".concat(routes_1.getEventOverviews, "/").concat(sessionUuid), {}, headers())];
                 });
             });
         },
