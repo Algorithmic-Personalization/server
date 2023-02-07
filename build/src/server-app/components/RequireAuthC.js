@@ -13,6 +13,7 @@ var RequireAuthC = function (_a) {
     var location = (0, react_router_dom_1.useLocation)();
     if (!api.isLoggedIn()) {
         console.log('not logged in, redirecting to /login');
+        console.log('should redirect to', location, 'after login');
         return react_1["default"].createElement(react_router_dom_1.Navigate, { to: '/login', state: { from: location }, replace: true });
     }
     return react_1["default"].createElement(react_1["default"].Fragment, null, children);

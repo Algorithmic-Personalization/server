@@ -55,12 +55,16 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
 exports.__esModule = true;
 exports.LoginModalC = void 0;
 var react_1 = __importStar(require("react"));
+var react_router_dom_1 = require("react-router-dom");
 var material_1 = require("@mui/material");
 var LoginC_1 = __importDefault(require("./LoginC"));
 var LoginModalC = function (_a) {
     var open = _a.open, setOpen = _a.setOpen, onSuccess = _a.onSuccess;
     var _b = __read((0, react_1.useState)(''), 2), email = _b[0], setEmail = _b[1];
     var _c = __read((0, react_1.useState)(''), 2), password = _c[0], setPassword = _c[1];
+    var location = (0, react_router_dom_1.useLocation)();
+    var navigate = (0, react_router_dom_1.useNavigate)();
+    console.log('modal says: location', location);
     return (react_1["default"].createElement(material_1.Modal, { open: open },
         react_1["default"].createElement(material_1.Box, { sx: { bgcolor: 'background.paper', padding: 4 } },
             react_1["default"].createElement(material_1.Typography, { sx: { textAlign: 'center' } }, "It seems your session has expired, please log back in."),
@@ -68,6 +72,14 @@ var LoginModalC = function (_a) {
                     setOpen(false);
                     if (onSuccess) {
                         onSuccess();
+                    }
+                    if (location.state.from) {
+                        console.log('redirecting to', location.state.from);
+                        navigate(location.state.from);
+                    }
+                    else {
+                        console.log('redirecting to /');
+                        navigate('/');
                     }
                 }, isModal: true })))));
 };
