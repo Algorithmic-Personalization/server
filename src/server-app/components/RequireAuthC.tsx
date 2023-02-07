@@ -12,6 +12,7 @@ export const RequireAuthC: React.FC<{
 
 	if (!api.isLoggedIn()) {
 		console.log('not logged in, redirecting to /login');
+		console.log('should redirect to', location, 'after login');
 		return <Navigate to='/login' state={{from: location}} replace />;
 	}
 

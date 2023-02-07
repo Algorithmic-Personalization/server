@@ -1,4 +1,5 @@
 import React, {useState} from 'react';
+import {useLocation, useNavigate} from 'react-router-dom';
 import {Box, Modal, Typography} from '@mui/material';
 
 import LoginC from './LoginC';
@@ -10,6 +11,10 @@ export const LoginModalC: React.FC<{
 }> = ({open, setOpen, onSuccess}) => {
 	const [email, setEmail] = useState('');
 	const [password, setPassword] = useState('');
+
+	const location = useLocation();
+	const navigate = useNavigate();
+	console.log('modal says: location', location);
 
 	return (
 		<Modal open={open}>
@@ -24,6 +29,14 @@ export const LoginModalC: React.FC<{
 
 						if (onSuccess) {
 							onSuccess();
+						}
+
+						if (location.state.from) {
+							console.log('redirecting to', location.state.from);
+							navigate(location.state.from);
+						} else {
+							console.log('redirecting to /');
+							navigate('/');
 						}
 					}}
 					isModal={true}
