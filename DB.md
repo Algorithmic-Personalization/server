@@ -165,7 +165,7 @@ inner join event e on e.session_uuid=s.uuid and e.type='RECOMMENDATIONS_SHOWN'
 inner join video_list_item v on v.event_id=e.id
 inner join video vd on vd.id = v.video_id
 where p.email='bob@example.com'
-order by e.created_at desc
+order by e.created_at desc, v.list_type, v.position
 limit 50
 ```
 
