@@ -56,7 +56,7 @@ This table contains the list of participants to the experiment.
 The most important fields are:
 - `email`
 - `code` (the code that the participants will input in the extension's setup form to identify themselves)
-- `arm` (the experiment arm, either `control` or `treatment`), stored as an enum so that invalid values cannot be input
+- `arm` (the experiment arm, either `control` or `treatment`, stored as an enum so that invalid values cannot be input)
 
 ### The `experiment_config` table
 
