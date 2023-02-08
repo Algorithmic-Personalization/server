@@ -117,7 +117,7 @@ All events have a `type` field, following is a description of the different type
 
 The time spent watching a video, the actual time in seconds is stored in the `watch_time` table with the `event_id` field populated with the id of the event.
 
-To get all the watch times of the latest 15 videos viewed by a given participant you can use a query like:
+To get all the watch times of the latest 50 videos viewed by a given participant you can use a query like:
 
 ```sql
 select p.email, e.url, e.created_at, w.seconds_watched
