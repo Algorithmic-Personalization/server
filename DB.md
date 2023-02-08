@@ -5,7 +5,7 @@
 The database is PostgreSQL. The choice of an SQL database vs a NoSQL one like MongoDB was made for the following main reasons:
 - SQL databases enforce data integrity constraints that NoSQL databases do not, thus avoiding many programming mistakes
 - storing the data in normalized form allows for a more efficient storage of the data and less resources consumption
-- complex queries are efficient even on modest hardware and are easy to write (the latest point may be a matter of personal taste)
+- complex queries are efficient even on modest hardware and are easy to write (the latter point may be a matter of personal taste)
 
 Most tables have a `created_at` and `updated_at` field, which represent the time of creation and latest update of the record.
 Records are rarely updated so in most cases `updated_at` will be the same as `created_at`.
