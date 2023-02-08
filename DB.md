@@ -130,6 +130,8 @@ order by e.created_at desc
 limit 50
 ```
 
+The `url` field of the event contains the URL of the video that was watched.
+
 ##### `MIXED_CLICKED` events
 
 The user clicked on a recommendation that was present in both the personalized and non-personalized recommendations.
@@ -167,7 +169,106 @@ order by e.created_at desc
 limit 50
 ```
 
+The `url` field of the event contains the URL of the page the user was on when the recommendations were shown.
+The `context` field is not used currently, I'm planning to fill it with the referrer as in the `PAGE_VIEW` events.
+
 ##### `PAGE_VIEW` events
 
 The user visited a page, the URL of the page is stored in the `url` field of the event.
 The `context` field represents the previous page the user was on (HTTP referrer).
+
+### The `watch_time` table
+
+This table contains the time spent watching a video.
+Its fields are:
+- `event_id` (the id of the event to which the watch time belongs)
+- `seconds_watched` (the time spent watching the video in seconds)
+
+### The `video_list_item` table
+
+This table contains the lists of videos that were shown to the user.
+
+There are two types of lists denoted by the `list_type` field:
+- `NON_PERSONALIZED` (the list of videos that would have been shown to the user if they were not logged in to YouTube)
+- `PERSONALIZED` (the list of videos that would have been shown to the user if they were logged in to YouTube)
+- `SHOWN` (the list of videos that were actually shown to the user)
+
+The `video_type` field represents the type of the video:
+- it is always `NON_PERSONALIZED` for the `NON_PERSONALIZED` list
+- it is always `PERSONALIZED` for the `PERSONALIZED` list
+- it is either: `PERSONALIZED`, `NON_PERSONALIZED` or `MIXED` for the `SHOWN` list, depending on whether the video was only present in the personalized list, only present in the non-personalized list or present in both lists.
+
+The `event_id` field represents the id of the event to which the list of videos belongs.
+
+The `position` field represents the position of the video in the list.
+
+Finally, the `video_id` field represents the id of the video in the `video` table, which contains basic information about the video.
+
+### The `video` table
+
+This table contains basic information about the videos stored in the `video_list_item` table.
+
+Its most important fields are:
+- `id` (the id of the video, used as a foreign key in the `video_list_item` table)
+- `title` (the title of the video)
+- `url` (the URL of the video, without the `https://www.youtube.com` prefix)
+- `youtube_id` (the id of the video on YouTube)
+
+## Some ideas to check the correctness of the data
+
+The easiest way to perform some sanity checks on the data would probably be to make a script that first retrieves all the events for all participants in one query (without the details), ordered by session, then by event creation date:
+
+```sql
+select
+p.email,
+e.*,
+s.created_at as session_date
+from participant p
+inner join session s on s.participant_code=p.code
+inner join event e on e.session_uuid=s.uuid
+order by s.id asc, e.created_at asc
+limit 50
+```
+
+(in the script, remove the `limit` clause, I'm just including it so that the query can be tried without making the interface explode)
+
+Then iterate over the events and perform the checks that you are interested in, using the queries that I detailed above to get the details of the events that are not fully contained in the `event` table (`WATCH_TIME` and `RECOMMENDATIONS_SHOWN`).
+
+Please note that in general the `PAGE_VIEW` events will come right before the corresponding `RECOMMENDATIONS_SHOWN` events, but this is not guaranteed, they may be reversed because the logic that detects the page views is independent from the one that triggers the display of recommendations. The various `*_CLICKED` events will always come after the corresponding `RECOMMENDATIONS_SHOWN` events though.
+
+Another example query you might find useful is the following, it will retrieve an overview of the participants that have viewed at least 10 pages,
+this can be useful to isolate the participants whose behaviour you want to analyze more closely:
+
+```sql
+select
+p.id as participant_id,
+p.email as participant_email,
+count (distinct s.id) as n_sessions,
+min(s.created_at) as first_session,
+max(s.created_at) as last_session,
+count(distinct pve.url) as n_pages_viewed,
+count(distinct pve.url) / count(distinct s.id) as pages_per_session,
+count(distinct npc.id) as n_non_personalized_clicked,
+count(distinct pc.id) as n_personalized_clicked
+from participant p inner join session s
+  on s.participant_code=p.code
+left join event pve
+  on pve.session_uuid=s.uuid and pve.type='PAGE_VIEW'
+left join event npc
+  on npc.session_uuid=s.uuid and npc.type='NON_PERSONALIZED_CLICKED'
+left join event pc
+  on pc.session_uuid=s.uuid and pc.type='PERSONALIZED_CLICKED'
+group by p.id
+having
+  count(distinct pve.url) >= 10
+order by n_pages_viewed desc
+```
+
+To limit some results to those participants, you would first run that query, then add a `where` clause to your other queries like:
+
+
+```sql
+where p.id in (a, b, c, ..., d)
+```
+
+where `a`, `b`, `c`, ..., `d` are the `id`s of the participants you are interested in.
