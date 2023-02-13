@@ -234,7 +234,9 @@ limit 50
 
 Then iterate over the events and perform the checks that you are interested in, using the queries that I detailed above to get the details of the events that are not fully contained in the `event` table (`WATCH_TIME` and `RECOMMENDATIONS_SHOWN`).
 
-Please note that in general the `PAGE_VIEW` events will come right before the corresponding `RECOMMENDATIONS_SHOWN` events, but this is not guaranteed, they may be reversed because the logic that detects the page views is independent from the one that triggers the display of recommendations. The various `*_CLICKED` events will always come after the corresponding `RECOMMENDATIONS_SHOWN` events though.
+Please note that in general the `PAGE_VIEW` events will come right before the corresponding `RECOMMENDATIONS_SHOWN` events, but this is not guaranteed, they may be reversed because the logic that detects the page views is independent from the one that triggers the display of recommendations. The time difference between the two events should be very small in all cases. The various `*_CLICKED` events will always come after the corresponding `RECOMMENDATIONS_SHOWN` events though.
+
+Until recently (Feb. 13, 2023) `PAGE_VIEW` events were not recorded for the first `PAGE_VIEW` of the first session of a participant, this has been fixed now.
 
 Another example query you might find useful is the following, it will retrieve an overview of the participants that have viewed at least 10 pages,
 this can be useful to isolate the participants whose behaviour you want to analyze more closely:
