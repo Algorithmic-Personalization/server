@@ -29,6 +29,7 @@ import ParticipantsC from './ParticipantsC';
 import ParticipantPageC from './ParticipantPageC';
 import ExperimentConfigC from './ExperimentConfigC';
 import EventsC from './EventsC';
+import TokenC from './TokenC';
 import NotFoundC from './NotFoundC';
 import UserWidgetC from './UserWidgetC';
 
@@ -58,6 +59,11 @@ const navItems: NavItem[] = [
 		label: 'Events',
 		link: '/events',
 		component: EventsC,
+	},
+	{
+		label: 'API Tokens',
+		link: '/tokens',
+		component: TokenC,
 	},
 ];
 

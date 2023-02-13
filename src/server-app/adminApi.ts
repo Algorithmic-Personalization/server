@@ -23,6 +23,12 @@ import {
 } from '../common/routes';
 
 import {
+	getApiTokens,
+	createApiToken,
+	deleteApiToken,
+} from '../server/serverRoutes';
+
+import {
 	type Maybe,
 	isMaybe,
 	getMessage,
@@ -45,6 +51,9 @@ export type AdminApi = {
 	getExperimentConfig: () => Promise<Maybe<ExperimentConfig>>;
 	postExperimentConfig: (config: ExperimentConfig) => Promise<Maybe<ExperimentConfig>>;
 	getExperimentConfigHistory: () => Promise<Maybe<ExperimentConfig[]>>;
+	getApiTokens: () => Promise<Maybe<Token[]>>;
+	createApiToken: (name: string) => Promise<Maybe<Token>>;
+	deleteApiToken: (token: string) => Promise<Maybe<string>>;
 };
 
 const loadItem = <T>(key: string): T | undefined => {
@@ -92,6 +101,7 @@ export const createAdminApi = (serverUrl: string, showLoginModal?: () => void): 
 
 	const get = decorate(verb('GET'));
 	const post = decorate(verb('POST'));
+	const del = decorate(verb('DELETE'));
 
 	const headers = () => ({
 		'Content-Type': 'application/json',
@@ -195,6 +205,18 @@ export const createAdminApi = (serverUrl: string, showLoginModal?: () => void): 
 
 		async getExperimentConfigHistory() {
 			return get<ExperimentConfig[]>(getExperimentConfigHistory, {}, headers());
+		},
+
+		async getApiTokens() {
+			return get<Token[]>(getApiTokens, {}, headers());
+		},
+
+		async createApiToken(name: string) {
+			return post<Token>(createApiToken, {name}, headers());
+		},
+
+		async deleteApiToken(token: string) {
+			return del<string>(deleteApiToken.replace(':token', token), {}, headers());
 		},
 	};
 };

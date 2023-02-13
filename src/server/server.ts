@@ -62,9 +62,18 @@ import {
 	getEvents,
 } from '../common/routes';
 
+import {
+	getApiTokens,
+	createApiToken,
+	deleteApiToken,
+} from './serverRoutes';
+
 import createRegisterRoute from './api/register';
 import createVerifyEmailRoute from './api/verifyEmail';
 import createLoginRoute from './api/login';
+import createCreateApiTokenRoute from './api/createApiToken';
+import createDeleteApiTokenRoute from './api/deleteApiToken';
+import createGetApiTokensRoute from './api/getApiTokens';
 import createAuthTestRoute from './api/authTest';
 import createUploadParticipantsRoute from './api/uploadParticipants';
 import createGetParticipantsRoute from './api/getParticipants';
@@ -264,6 +273,10 @@ const start = async () => {
 	app.post(postRegister, createRegisterRoute(routeContext));
 	app.get(getVerifyEmailToken, createVerifyEmailRoute(routeContext));
 	app.post(postLogin, createLoginRoute(routeContext));
+
+	app.get(getApiTokens, authMiddleware, createGetApiTokensRoute(routeContext));
+	app.post(createApiToken, authMiddleware, createCreateApiTokenRoute(routeContext));
+	app.delete(deleteApiToken, authMiddleware, createDeleteApiTokenRoute(routeContext));
 
 	app.get(getAuthTest, authMiddleware, createAuthTestRoute(routeContext));
 	app.post(postUploadParticipants, authMiddleware, upload.single('participants'), createUploadParticipantsRoute(routeContext));

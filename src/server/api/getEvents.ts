@@ -36,7 +36,7 @@ export const createGetEventsRoute: RouteCreator = ({createLogger, dataSource}) =
 	} catch (error) {
 		log('Error getting events', error);
 
-		res.status(500).json({kind: 'Error', value: 'Error getting events'});
+		res.status(500).json({kind: 'Error', message: 'Error getting events'});
 	}
 };
 

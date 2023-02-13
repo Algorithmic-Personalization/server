@@ -20,6 +20,13 @@ export class Token extends Model {
 	@Column()
 	@IsBoolean()
 		wasInvalidated: boolean = false;
+
+	@Column()
+		name?: string;
+
+	@Column()
+	@IsBoolean()
+		api: boolean = false;
 }
 
 export default Token;
