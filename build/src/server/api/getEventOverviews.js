@@ -240,7 +240,7 @@ var createGetEventOverviewsRoute = function (_a) {
                                 sessionUuid: sessionUuid
                             },
                             order: {
-                                id: 'DESC'
+                                createdAt: 'DESC'
                             }
                         })];
                 case 1:

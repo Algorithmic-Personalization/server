@@ -145,11 +145,8 @@ var EventC = function (_a) {
         if (overview.type === event_1.EventType.WATCH_TIME) {
             return 'watchtime';
         }
-        if (overview.type === event_1.EventType.PAGE_VIEW) {
+        if (overview.type === event_1.EventType.PAGE_VIEW || overview.type === event_1.EventType.RECOMMENDATIONS_SHOWN) {
             return 'previous page';
-        }
-        if (overview.type === event_1.EventType.RECOMMENDATIONS_SHOWN) {
-            return '';
         }
         return 'context';
     };
@@ -163,15 +160,18 @@ var EventC = function (_a) {
             react_1["default"].createElement(material_1.Grid, { item: true, xs: 12, md: 3 },
                 react_1["default"].createElement(LegendC, { label: 'event type' }),
                 react_1["default"].createElement(material_1.Typography, { variant: 'body1', sx: { mb: 2 } }, overview.type)),
-            react_1["default"].createElement(material_1.Grid, { item: true, xs: 12, md: 4 },
+            react_1["default"].createElement(material_1.Grid, { item: true, xs: 12, md: 2 },
                 react_1["default"].createElement(LegendC, { label: contextLegend() }),
                 react_1["default"].createElement(material_1.Typography, { variant: 'body1', sx: { mb: 2 } },
                     react_1["default"].createElement(UrlC, { url: showWatchtimeOrContextUrl(overview) }))),
-            react_1["default"].createElement(material_1.Grid, { item: true, xs: 12, md: 3 },
+            react_1["default"].createElement(material_1.Grid, { item: true, xs: 12, md: 2 },
                 react_1["default"].createElement(LegendC, { label: 'url' }),
                 react_1["default"].createElement(material_1.Typography, { variant: 'body1', sx: { mb: 2 } },
-                    react_1["default"].createElement(UrlC, { url: overview.url })))),
-        ((_b = overview === null || overview === void 0 ? void 0 : overview.data) === null || _b === void 0 ? void 0 : _b.kind) === 'recommendations' && react_1["default"].createElement(RecommendationsC, { data: overview.data.recommendations })));
+                    react_1["default"].createElement(UrlC, { url: overview.url }))),
+            react_1["default"].createElement(material_1.Grid, { item: true, xs: 12, md: 3 },
+                react_1["default"].createElement(LegendC, { label: 'extension version' }),
+                react_1["default"].createElement(material_1.Typography, { variant: 'body1', sx: { mb: 2 } }, overview.extensionVersion))),
+        react_1["default"].createElement(material_1.Box, { sx: { display: 'flex', alignItems: 'center' } }, ((_b = overview === null || overview === void 0 ? void 0 : overview.data) === null || _b === void 0 ? void 0 : _b.kind) === 'recommendations' && react_1["default"].createElement(RecommendationsC, { data: overview.data.recommendations }))));
 };
 var EventsListC = function (_a) {
     var count = _a.count, sessionUuid = _a.sessionUuid;

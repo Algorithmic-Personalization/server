@@ -39,6 +39,7 @@ var Token = /** @class */ (function (_super) {
         _this.token = '';
         _this.adminId = 0;
         _this.wasInvalidated = false;
+        _this.api = false;
         return _this;
     }
     __decorate([
@@ -58,6 +59,15 @@ var Token = /** @class */ (function (_super) {
         (0, class_validator_1.IsBoolean)(),
         __metadata("design:type", Boolean)
     ], Token.prototype, "wasInvalidated");
+    __decorate([
+        (0, typeorm_1.Column)(),
+        __metadata("design:type", String)
+    ], Token.prototype, "name");
+    __decorate([
+        (0, typeorm_1.Column)(),
+        (0, class_validator_1.IsBoolean)(),
+        __metadata("design:type", Boolean)
+    ], Token.prototype, "api");
     Token = __decorate([
         (0, typeorm_1.Entity)()
     ], Token);

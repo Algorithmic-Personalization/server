@@ -52,6 +52,7 @@ var ParticipantsC_1 = __importDefault(require("./ParticipantsC"));
 var ParticipantPageC_1 = __importDefault(require("./ParticipantPageC"));
 var ExperimentConfigC_1 = __importDefault(require("./ExperimentConfigC"));
 var EventsC_1 = __importDefault(require("./EventsC"));
+var TokenC_1 = __importDefault(require("./TokenC"));
 var NotFoundC_1 = __importDefault(require("./NotFoundC"));
 var UserWidgetC_1 = __importDefault(require("./UserWidgetC"));
 var navItems = [
@@ -74,6 +75,11 @@ var navItems = [
         label: 'Events',
         link: '/events',
         component: EventsC_1["default"]
+    },
+    {
+        label: 'API Tokens',
+        link: '/tokens',
+        component: TokenC_1["default"]
     },
 ];
 var LayoutC = function () {

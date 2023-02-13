@@ -38,6 +38,7 @@ var __generator = (this && this.__generator) || function (thisArg, body) {
 exports.__esModule = true;
 exports.createAdminApi = void 0;
 var routes_1 = require("../common/routes");
+var serverRoutes_1 = require("../server/serverRoutes");
 var util_1 = require("../common/util");
 var loadItem = function (key) {
     var item = sessionStorage.getItem(key);
@@ -78,6 +79,7 @@ var createAdminApi = function (serverUrl, showLoginModal) {
     }); }; };
     var get = decorate(verb('GET'));
     var post = decorate(verb('POST'));
+    var del = decorate(verb('DELETE'));
     var headers = function () {
         var _a;
         return ({
@@ -217,6 +219,27 @@ var createAdminApi = function (serverUrl, showLoginModal) {
             return __awaiter(this, void 0, void 0, function () {
                 return __generator(this, function (_a) {
                     return [2 /*return*/, get(routes_1.getExperimentConfigHistory, {}, headers())];
+                });
+            });
+        },
+        getApiTokens: function () {
+            return __awaiter(this, void 0, void 0, function () {
+                return __generator(this, function (_a) {
+                    return [2 /*return*/, get(serverRoutes_1.getApiTokens, {}, headers())];
+                });
+            });
+        },
+        createApiToken: function (name) {
+            return __awaiter(this, void 0, void 0, function () {
+                return __generator(this, function (_a) {
+                    return [2 /*return*/, post(serverRoutes_1.createApiToken, { name: name }, headers())];
+                });
+            });
+        },
+        deleteApiToken: function (token) {
+            return __awaiter(this, void 0, void 0, function () {
+                return __generator(this, function (_a) {
+                    return [2 /*return*/, del(serverRoutes_1.deleteApiToken.replace(':token', token), {}, headers())];
                 });
             });
         }

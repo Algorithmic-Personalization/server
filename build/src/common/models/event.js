@@ -93,6 +93,10 @@ var Event = /** @class */ (function (_super) {
         (0, class_validator_1.IsString)(),
         __metadata("design:type", String)
     ], Event.prototype, "localUuid");
+    __decorate([
+        (0, typeorm_1.Column)(),
+        __metadata("design:type", String)
+    ], Event.prototype, "extensionVersion");
     Event = __decorate([
         (0, typeorm_1.Entity)()
     ], Event);

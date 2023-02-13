@@ -1,4 +1,4 @@
-# This document aims to provide an overview of the database structure to facilitate data analysis
+# This document aims to provide an overview of the database structure and of the API to facilitate data analysis
 
 ## Introduction
 
@@ -26,6 +26,8 @@ from pg_type t
    inner join pg_enum e on t.oid = e.enumtypid
    inner join pg_catalog.pg_namespace n ON n.oid = t.typnamespace;
 ```
+
+The database can now be accessed through the API in an easy manner, which is described after the database structure.
 
 ## Database structure
 
@@ -274,3 +276,29 @@ where p.id in (a, b, c, ..., d)
 ```
 
 where `a`, `b`, `c`, ..., `d` are the `id`s of the participants you are interested in.
+
+## API Access
+
+In the [administration interface](https://ytdpnl.fmdj.fr) you can now generate permanent API keys for script access
+to the data.
+
+In order to access the API, first [log in](https://ytdpnl.fmdj.fr) and under the "API Tokens" tab, generate a token for your application.
+
+These tokens do not expire, but you can revoke them at any time by simply deleting them.
+
+The tokens allow the same access privileges to the application as any admin user, so any call the application makes can be made
+using these tokens.
+
+In order to authenticate with the API you just need to pass the token (the very long string of characters) as the `authorization` header
+of all of your HTTPS requests.
+
+The 3 main endpoints you will probably want to use for data analysis are:
+
+- `GET /api/participants/[:page]` to retrieve the list of participants
+- `GET /api/participant/:email` to retrieve all of the summary data for a given participant
+- `GET /api/event-overviews/:sessionUuid` to retrieve all of the events for a given session
+
+The events retrieved by the `event-overview` endpoint are fully detailed, that is, they contain all the information that is
+otherwise dispatched in the other tables for storage.
+
+The structure of the JSON responses should be self explanatory, I will detail it if necessary.

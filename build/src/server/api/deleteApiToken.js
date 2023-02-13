@@ -39,53 +39,45 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
     return (mod && mod.__esModule) ? mod : { "default": mod };
 };
 exports.__esModule = true;
-exports.createGetEventsRoute = void 0;
-var event_1 = __importDefault(require("../../common/models/event"));
-var pagination_1 = require("../lib/pagination");
-var createGetEventsRoute = function (_a) {
+exports.createDeleteApiTokenRoute = void 0;
+var token_1 = __importDefault(require("../models/token"));
+var createDeleteApiTokenRoute = function (_a) {
     var createLogger = _a.createLogger, dataSource = _a.dataSource;
     return function (req, res) { return __awaiter(void 0, void 0, void 0, function () {
-        var log, repo, _a, page, pageSize, results, count, data, error_1;
-        return __generator(this, function (_b) {
-            switch (_b.label) {
+        var log, token, adminId, repo, error_1;
+        return __generator(this, function (_a) {
+            switch (_a.label) {
                 case 0:
                     log = createLogger(req.requestId);
-                    log('received get event request');
-                    repo = dataSource.getRepository(event_1["default"]);
-                    _a = (0, pagination_1.extractPaginationRequest)(req), page = _a.page, pageSize = _a.pageSize;
-                    _b.label = 1;
+                    log('received delete api token request');
+                    token = req.params.token;
+                    if (!token || typeof token !== 'string') {
+                        res.status(400).json({ kind: 'Failure', message: 'Missing or invalid token' });
+                        return [2 /*return*/];
+                    }
+                    adminId = req.adminId;
+                    if (!adminId || typeof adminId !== 'number') {
+                        res.status(401).json({ kind: 'Failure', message: 'Unauthorized' });
+                        return [2 /*return*/];
+                    }
+                    repo = dataSource.getRepository(token_1["default"]);
+                    _a.label = 1;
                 case 1:
-                    _b.trys.push([1, 4, , 5]);
-                    return [4 /*yield*/, repo
-                            .find({
-                            skip: page * pageSize,
-                            take: pageSize,
-                            order: {
-                                id: 'DESC'
-                            }
-                        })];
+                    _a.trys.push([1, 3, , 4]);
+                    return [4 /*yield*/, repo["delete"]({ token: token })];
                 case 2:
-                    results = _b.sent();
-                    return [4 /*yield*/, repo.count()];
+                    _a.sent();
+                    res.status(200).json({ kind: 'Success', value: token });
+                    return [3 /*break*/, 4];
                 case 3:
-                    count = _b.sent();
-                    data = {
-                        results: results,
-                        page: page,
-                        pageSize: pageSize,
-                        pageCount: Math.ceil(count / pageSize)
-                    };
-                    res.status(200).json({ kind: 'Success', value: data });
-                    return [3 /*break*/, 5];
-                case 4:
-                    error_1 = _b.sent();
-                    log('Error getting events', error_1);
-                    res.status(500).json({ kind: 'Error', message: 'Error getting events' });
-                    return [3 /*break*/, 5];
-                case 5: return [2 /*return*/];
+                    error_1 = _a.sent();
+                    log('error deleting api token', error_1);
+                    res.status(500).json({ kind: 'Error', message: 'Error getting api tokens' });
+                    return [3 /*break*/, 4];
+                case 4: return [2 /*return*/];
             }
         });
     }); };
 };
-exports.createGetEventsRoute = createGetEventsRoute;
-exports["default"] = exports.createGetEventsRoute;
+exports.createDeleteApiTokenRoute = createDeleteApiTokenRoute;
+exports["default"] = exports.createDeleteApiTokenRoute;
