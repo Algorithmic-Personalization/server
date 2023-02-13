@@ -299,7 +299,7 @@ The 3 main endpoints you will probably want to use for data analysis are:
 - `GET /api/participant/:email` to retrieve all of the summary data for a given participant
 - `GET /api/event-overviews/:sessionUuid` to retrieve all of the events for a given session
 
-The events retrieved by the `event-overview` endpoint are fully detailed, that is, they contain all the information that is
+The events retrieved by the `/api/event-overviews` endpoint are fully detailed, that is, they contain all the information that is
 otherwise dispatched in the other tables for storage.
 
 The structure of the JSON responses should be self explanatory, I will detail it if necessary.
