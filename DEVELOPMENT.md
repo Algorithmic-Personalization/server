@@ -170,7 +170,7 @@ limit 50
 ```
 
 The `url` field of the event contains the URL of the page the user was on when the recommendations were shown.
-The `context` field is not used currently, I'm planning to fill it with the referrer as in the `PAGE_VIEW` events.
+The `context` field is the previous page the user was on (HTTP referrer), same as for `PAGE_VIEW` events.
 
 ##### `PAGE_VIEW` events
 
@@ -236,7 +236,7 @@ Then iterate over the events and perform the checks that you are interested in, 
 
 Please note that in general the `PAGE_VIEW` events will come right before the corresponding `RECOMMENDATIONS_SHOWN` events, but this is not guaranteed, they may be reversed because the logic that detects the page views is independent from the one that triggers the display of recommendations. The time difference between the two events should be very small in all cases. The various `*_CLICKED` events will always come after the corresponding `RECOMMENDATIONS_SHOWN` events though.
 
-Until recently (Feb. 13, 2023) `PAGE_VIEW` events were not recorded for the first `PAGE_VIEW` of the first session of a participant, this has been fixed now.
+Until recently (Feb. 13, 2023) `PAGE_VIEW` events were not recorded for the first `PAGE_VIEW` of the first session of a participant, this has been fixed now. The `RECOMMENDATIONS_SHOWN` stores the same information as the `PAGE_VIEW` event on video pages though, so when analyzing the data you can just discard the `PAGE_VIEW` events on video pages and use the `RECOMMENDATIONS_SHOWN` data instead.
 
 Another example query you might find useful is the following, it will retrieve an overview of the participants that have viewed at least 10 pages,
 this can be useful to isolate the participants whose behaviour you want to analyze more closely:

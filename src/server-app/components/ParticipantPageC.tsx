@@ -142,12 +142,8 @@ const EventC: React.FC<{data: EventOverview; position: number}> = ({data: overvi
 			return 'watchtime';
 		}
 
-		if (overview.type === EventType.PAGE_VIEW) {
+		if (overview.type === EventType.PAGE_VIEW || overview.type === EventType.RECOMMENDATIONS_SHOWN) {
 			return 'previous page';
-		}
-
-		if (overview.type === EventType.RECOMMENDATIONS_SHOWN) {
-			return '';
 		}
 
 		return 'context';
