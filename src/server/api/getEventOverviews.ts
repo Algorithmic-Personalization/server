@@ -129,7 +129,7 @@ export const createGetEventOverviewsRoute: RouteCreator = ({createLogger, dataSo
 			sessionUuid,
 		},
 		order: {
-			id: 'DESC',
+			createdAt: 'DESC',
 		},
 	});
 

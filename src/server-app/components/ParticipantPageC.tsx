@@ -158,18 +158,24 @@ const EventC: React.FC<{data: EventOverview; position: number}> = ({data: overvi
 				<LegendC label='event type'/>
 				<Typography variant='body1' sx={{mb: 2}}>{overview.type}</Typography>
 			</Grid>
-			<Grid item xs={12} md={4}>
+			<Grid item xs={12} md={2}>
 				<LegendC label={contextLegend()}/>
 				<Typography variant='body1' sx={{mb: 2}}>
 					<UrlC url={showWatchtimeOrContextUrl(overview)}/>
 				</Typography>
 			</Grid>
-			<Grid item xs={12} md={3}>
+			<Grid item xs={12} md={2}>
 				<LegendC label='url'/>
 				<Typography variant='body1' sx={{mb: 2}}><UrlC url={overview.url}/></Typography>
 			</Grid>
+			<Grid item xs={12} md={3}>
+				<LegendC label='extension version'/>
+				<Typography variant='body1' sx={{mb: 2}}>{overview.extensionVersion}</Typography>
+			</Grid>
 		</Grid>
-		{overview?.data?.kind === 'recommendations' && <RecommendationsC data={overview.data.recommendations} />}
+		<Box sx={{display: 'flex', alignItems: 'center'}}>
+			{overview?.data?.kind === 'recommendations' && <RecommendationsC data={overview.data.recommendations} />}
+		</Box>
 	</>);
 };
 
