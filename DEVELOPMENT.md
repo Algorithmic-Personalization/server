@@ -286,8 +286,9 @@ In order to access the API, first [log in](https://ytdpnl.fmdj.fr) and under the
 
 These tokens do not expire, but you can revoke them at any time by simply deleting them.
 
-The tokens allow the same access privileges to the application as any admin user, so any call the application makes can be made
-using these tokens.
+The tokens grant the same access privileges to the API user as to any admin user, so any call the application makes can be made
+using these tokens. To get an idea of what data is available, you can inspect the requests made by the browser when you use the
+interface.
 
 In order to authenticate with the API you just need to pass the token (the very long string of characters) as the `authorization` header
 of all of your HTTPS requests.
