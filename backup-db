@@ -1,13 +1,13 @@
 #!/bin/env bash
 echo "Backing up database..."
-docker-compose exec production-db pg_dump -U admin -f ytdpnl.tar -F t ytdpnl
+docker-compose exec production-db pg_dump -U admin -f ytdpnl.tar -F t ytdpnl || exit 1
 container_id=$(docker-compose ps -q production-db | tr -d '\r\n')
-echo "The container id is: '$container_id'"
+echo "Container id ($container_id) found."
 d=$(date +%Y-%m-%d)
 target="$(pwd)/ytdpnl-$d.tar"
 echo "Copying backup from container $container_id to host: $target..."
-docker cp "$container_id":/ytdpnl.tar "$target"
+docker cp "$container_id":/ytdpnl.tar "$target" || exit 2
 echo "Removing backup from container..."
-docker-compose exec production-db rm ytdpnl.tar
+docker-compose exec production-db rm ytdpnl.tar || exit 3
 echo "Backup done:"
 echo "$target"
