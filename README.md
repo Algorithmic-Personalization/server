@@ -30,7 +30,52 @@ Starts the docker containers:
 Start the docker server:
 - `yarn dev`
 
+Populate the local database from the remote one:
+- rename `scripts.conf.dist` to `scripts.conf` and modify appropriately
+- run `./update-db`
 
-## Production commands
 
-- just run `./start`
+## Production things
+
+### Enable backups
+
+- place `backup` inside the home `bin` directory (create it if it doesn't exist)
+- add crontab to execute this script every day or whenever you want
+
+### Build / start the server
+
+Stop all containers if running:
+
+```bash
+docker-compose down
+```
+
+Pull the code:
+
+```bash
+git pull
+```
+
+If the server is not very big on ram and disk, prune the docker cache:
+
+```bash
+docker system prune
+```
+
+Build the server code:
+
+```bash
+docker-compose build
+```
+
+Start the server in the background:
+
+```bash
+docker-compose up -d app-server
+```
+
+Or preferably in tmux:
+
+```bash
+docker-compose up app-server
+```

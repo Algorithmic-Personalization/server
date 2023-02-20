@@ -1,0 +1,3 @@
+#!/bin/bash
+cd "$HOME"/ytdpnl || exit 1
+./backup-db
