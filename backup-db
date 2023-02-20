@@ -1,5 +1,6 @@
 #!/bin/env bash
 echo "Backing up database..."
+export COMPOSE_INTERACTIVE_NO_CLI=1
 docker-compose exec production-db pg_dump -U admin -f ytdpnl.tar -F t ytdpnl || exit 1
 container_id=$(docker-compose ps -q production-db | tr -d '\r\n')
 echo "Container id ($container_id) found."
