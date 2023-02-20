@@ -2,6 +2,7 @@
 echo "Backing up database..."
 docker-compose exec production-db pg_dump -U admin -f ytdpnl.tar -F t ytdpnl
 container_id=$(docker-compose ps -q production-db | tr -d '\r\n')
+echo "The container id is: '$container_id'"
 d=$(date +%Y-%m-%d)
 target="$(pwd)/ytdpnl-$d.tar"
 echo "Copying backup from container $container_id to host: $target..."
