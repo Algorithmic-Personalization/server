@@ -4,7 +4,8 @@ import {parse} from '../lib/csv';
 
 import {has} from '../../common/util';
 
-import Participant, {ExperimentArm} from '../../common/models/participant';
+import Participant from '../models/participant';
+import {ExperimentArm} from '../../common/models/event';
 
 type ParticipantRecord = {
 	email: string;

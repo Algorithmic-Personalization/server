@@ -40,7 +40,7 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
 };
 exports.__esModule = true;
 exports.createPostCheckParticipantCodeRoute = void 0;
-var participant_1 = __importDefault(require("../../common/models/participant"));
+var participant_1 = __importDefault(require("../models/participant"));
 var createPostCheckParticipantCodeRoute = function (_a) {
     var createLogger = _a.createLogger, dataSource = _a.dataSource;
     return function (req, res) { return __awaiter(void 0, void 0, void 0, function () {

@@ -2,7 +2,7 @@ import {type RouteCreator} from '../lib/routeContext';
 
 import {type Page, extractPaginationRequest} from '../lib/pagination';
 
-import Participant from '../../common/models/participant';
+import Participant from '../models/participant';
 import {Like} from 'typeorm';
 
 export const createGetParticipantsRoute: RouteCreator = ({createLogger, dataSource}) => async (req, res) => {

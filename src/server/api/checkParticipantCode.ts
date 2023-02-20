@@ -1,6 +1,6 @@
 import {type RouteCreator} from '../lib/routeContext';
 
-import Participant from '../../common/models/participant';
+import Participant from '../models/participant';
 
 export const createPostCheckParticipantCodeRoute: RouteCreator = ({createLogger, dataSource}) => async (req, res) => {
 	const log = createLogger(req.requestId);

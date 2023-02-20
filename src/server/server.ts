@@ -25,7 +25,7 @@ import {getInteger, getString, has, findPackageJsonDir} from '../common/util';
 
 import Admin from '../common/models/admin';
 import Token from './models/token';
-import Participant from '../common/models/participant';
+import Participant from './models/participant';
 import ExperimentConfig from '../common/models/experimentConfig';
 import Session from '../common/models/session';
 import Event from '../common/models/event';

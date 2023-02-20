@@ -62,7 +62,7 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
 };
 exports.__esModule = true;
 exports.createGetParticipantOverviewRoute = exports.asyncMap = void 0;
-var participant_1 = __importDefault(require("../../common/models/participant"));
+var participant_1 = __importDefault(require("../models/participant"));
 var event_1 = __importDefault(require("../../common/models/event"));
 var session_1 = __importDefault(require("../../common/models/session"));
 var firstDate = function (a) {

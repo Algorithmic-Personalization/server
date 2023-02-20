@@ -2,7 +2,7 @@ import {type DataSource} from 'typeorm';
 
 import {type RouteCreator} from '../lib/routeContext';
 
-import Participant from '../../common/models/participant';
+import Participant from '../models/participant';
 import type ParticipantOverview from '../projections/ParticipantOverview';
 import type SessionOverview from '../projections/SessionOverview';
 

@@ -1,4 +1,4 @@
-import type Participant from '../../common/models/participant';
+import type Participant from '../models/participant';
 
 import type SessionOverview from './SessionOverview';
 

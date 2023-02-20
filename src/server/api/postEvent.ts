@@ -3,7 +3,7 @@ import {type DataSource, type Repository} from 'typeorm';
 import {type RouteCreator} from '../lib/routeContext';
 import {type LogFunction} from '../lib/logger';
 
-import Participant from '../../common/models/participant';
+import Participant from '../models/participant';
 import Event, {EventType} from '../../common/models/event';
 import {type RecommendationsEvent} from '../../common/models/recommendationsEvent';
 import {type WatchTimeEvent} from '../../common/models/watchTimeEvent';

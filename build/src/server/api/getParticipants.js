@@ -41,7 +41,7 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
 exports.__esModule = true;
 exports.createGetParticipantsRoute = void 0;
 var pagination_1 = require("../lib/pagination");
-var participant_1 = __importDefault(require("../../common/models/participant"));
+var participant_1 = __importDefault(require("../models/participant"));
 var typeorm_1 = require("typeorm");
 var createGetParticipantsRoute = function (_a) {
     var createLogger = _a.createLogger, dataSource = _a.dataSource;

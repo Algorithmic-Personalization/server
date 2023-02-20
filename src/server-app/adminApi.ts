@@ -2,7 +2,7 @@ import type {Page} from '../server/lib/pagination';
 
 import {type Admin} from '../common/models/admin';
 import {type Token} from '../server/models/token';
-import {type Participant} from '../common/models/participant';
+import {type Participant} from '../server/models/participant';
 import {type LoginResponse} from '../server/api/login';
 import {type ExperimentConfig} from '../common/models/experimentConfig';
 import {type Event} from '../common/models/event';

@@ -28,83 +28,40 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
     return (mod && mod.__esModule) ? mod : { "default": mod };
 };
 exports.__esModule = true;
-exports.Event = exports.ExperimentArm = exports.EventType = void 0;
+exports.Participant = void 0;
 var typeorm_1 = require("typeorm");
 var class_validator_1 = require("class-validator");
-var model_1 = __importDefault(require("../lib/model"));
-var util_1 = require("../util");
-var EventType;
-(function (EventType) {
-    EventType["PAGE_VIEW"] = "PAGE_VIEW";
-    EventType["RECOMMENDATIONS_SHOWN"] = "RECOMMENDATIONS_SHOWN";
-    EventType["PERSONALIZED_CLICKED"] = "PERSONALIZED_CLICKED";
-    EventType["NON_PERSONALIZED_CLICKED"] = "NON_PERSONALIZED_CLICKED";
-    EventType["MIXED_CLICKED"] = "MIXED_CLICKED";
-    EventType["WATCH_TIME"] = "WATCH_TIME";
-})(EventType = exports.EventType || (exports.EventType = {}));
-var ExperimentArm;
-(function (ExperimentArm) {
-    ExperimentArm["TREATMENT"] = "treatment";
-    ExperimentArm["CONTROL"] = "control";
-})(ExperimentArm = exports.ExperimentArm || (exports.ExperimentArm = {}));
-var Event = /** @class */ (function (_super) {
-    __extends(Event, _super);
-    function Event() {
+var model_1 = __importDefault(require("../../common/lib/model"));
+var event_1 = require("../../common/models/event");
+var Participant = /** @class */ (function (_super) {
+    __extends(Participant, _super);
+    function Participant() {
         var _this = _super !== null && _super.apply(this, arguments) || this;
-        _this.sessionUuid = '';
-        _this.experimentConfigId = 0;
-        _this.arm = ExperimentArm.TREATMENT;
-        _this.type = EventType.PAGE_VIEW;
-        _this.url = '';
-        _this.localUuid = (0, util_1.uuidv4)();
+        _this.email = '';
+        _this.code = '';
+        _this.arm = event_1.ExperimentArm.TREATMENT;
         return _this;
     }
     __decorate([
-        (0, typeorm_1.Column)(),
         (0, class_validator_1.IsNotEmpty)(),
+        (0, typeorm_1.Column)(),
         (0, class_validator_1.IsString)(),
         __metadata("design:type", String)
-    ], Event.prototype, "sessionUuid");
+    ], Participant.prototype, "email");
     __decorate([
-        (0, typeorm_1.Column)(),
-        (0, class_validator_1.IsInt)(),
-        (0, class_validator_1.IsPositive)(),
-        __metadata("design:type", Number)
-    ], Event.prototype, "experimentConfigId");
-    __decorate([
-        (0, typeorm_1.Column)(),
-        __metadata("design:type", String)
-    ], Event.prototype, "arm");
-    __decorate([
-        (0, typeorm_1.Column)(),
-        __metadata("design:type", String)
-    ], Event.prototype, "type");
-    __decorate([
-        (0, typeorm_1.Column)(),
         (0, class_validator_1.IsNotEmpty)(),
-        (0, class_validator_1.IsString)(),
-        __metadata("design:type", String)
-    ], Event.prototype, "url");
-    __decorate([
         (0, typeorm_1.Column)(),
         (0, class_validator_1.IsString)(),
-        (0, class_validator_1.IsOptional)(),
         __metadata("design:type", String)
-    ], Event.prototype, "context");
-    __decorate([
-        (0, typeorm_1.Column)(),
-        (0, class_validator_1.IsNotEmpty)(),
-        (0, class_validator_1.IsString)(),
-        __metadata("design:type", String)
-    ], Event.prototype, "localUuid");
+    ], Participant.prototype, "code");
     __decorate([
         (0, typeorm_1.Column)(),
         __metadata("design:type", String)
-    ], Event.prototype, "extensionVersion");
-    Event = __decorate([
+    ], Participant.prototype, "arm");
+    Participant = __decorate([
         (0, typeorm_1.Entity)()
-    ], Event);
-    return Event;
+    ], Participant);
+    return Participant;
 }(model_1["default"]));
-exports.Event = Event;
-exports["default"] = Event;
+exports.Participant = Participant;
+exports["default"] = Participant;

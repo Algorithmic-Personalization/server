@@ -1,6 +1,6 @@
 import {type RouteCreator} from '../lib/routeContext';
 
-import Participant from '../../common/models/participant';
+import Participant from '../models/participant';
 import ExperimentConfig, {type ParticipantConfig} from '../../common/models/experimentConfig';
 
 export const createGetParticipantConfigRoute: RouteCreator = ({createLogger, dataSource}) => async (req, res) => {

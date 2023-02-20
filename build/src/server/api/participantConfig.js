@@ -40,7 +40,7 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
 };
 exports.__esModule = true;
 exports.createGetParticipantConfigRoute = void 0;
-var participant_1 = __importDefault(require("../../common/models/participant"));
+var participant_1 = __importDefault(require("../models/participant"));
 var experimentConfig_1 = __importDefault(require("../../common/models/experimentConfig"));
 var createGetParticipantConfigRoute = function (_a) {
     var createLogger = _a.createLogger, dataSource = _a.dataSource;

@@ -74,7 +74,7 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
 };
 exports.__esModule = true;
 exports.createPostEventRoute = void 0;
-var participant_1 = __importDefault(require("../../common/models/participant"));
+var participant_1 = __importDefault(require("../models/participant"));
 var event_1 = __importStar(require("../../common/models/event"));
 var experimentConfig_1 = __importDefault(require("../../common/models/experimentConfig"));
 var video_1 = __importDefault(require("../models/video"));
