@@ -42,6 +42,22 @@ Populate the local database from the remote one:
 - place `backup` inside the home `bin` directory (create it if it doesn't exist)
 - add crontab to execute this script every day or whenever you want
 
+The following script can also be useful to save the backup to a remote server via `scp`:
+
+```
+#!/bin/env bash
+host=some_host
+latest_dump_path=$(find "$HOME"/ytdpnl/ytdpnl*.tar -maxdepth 0 -printf "%T@ %p\n" | sort -n | tail -n1 | cut -d' ' -f2)
+name=$(basename "$latest_dump_path")
+echo "Latest backup found is:"
+res=$(find "$latest_dump_path" -printf '%s %AY-%Am-%Ad %AH:%AM %p\n' | numfmt --field=1 --to=iec-i)
+echo " -> $res"
+target="$host":"~/backups/$name"
+echo "Uploading to $target..."
+scp "$latest_dump_path" "$target" || exit 1
+echo " -> Upload done."
+```
+
 ### Build / start the server
 
 Stop all containers if running:

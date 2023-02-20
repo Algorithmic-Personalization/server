@@ -24,3 +24,4 @@ private.key.pub
 secrets.yml
 scripts.conf
 *.tar
+upload-backup
