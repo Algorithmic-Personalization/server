@@ -5,6 +5,11 @@ import {type Request, type Response} from 'express';
 import {type CreateLogger} from './logger';
 import {type TokenTools} from './crypto';
 
+import {has} from '../../common/util';
+
+const hasMessage = has('message');
+const message = (x: unknown) => (hasMessage(x) ? x.message : 'An unknown error occurred');
+
 export type RouteContext = {
 	dataSource: DataSource;
 	mailer: Transporter;
@@ -14,5 +19,24 @@ export type RouteContext = {
 };
 
 export type RouteCreator = (context: RouteContext) => (req: Request, res: Response) => Promise<void>;
+
+export type RequestHandler<Output> = (req: Request) => Promise<Output>;
+
+export type RouteBuilder<Output> = (context: RouteContext) => RequestHandler<Output>;
+
+export const makeRouteConnector = (context: RouteContext) => <T>(builder: RouteBuilder<T>) => async (req: Request, res: Response) => {
+	try {
+		const value = await builder(context)(req);
+		res.json({
+			kind: 'Success',
+			value,
+		});
+	} catch (err) {
+		res.status(500).json({
+			kind: 'Failure',
+			message: message(err),
+		});
+	}
+};
 
 export default RouteContext;

@@ -38,6 +38,7 @@ import SmtpConfig from './lib/smtpConfig';
 import webpackConfig from '../../webpack.config';
 
 import type RouteContext from './lib/routeContext';
+import {makeRouteConnector} from './lib/routeContext';
 import {createDefaultLogger} from './lib/logger';
 import {createTokenTools} from './lib/crypto';
 import createAuthMiddleWare from './lib/authMiddleware';
@@ -77,7 +78,7 @@ import createDeleteApiTokenRoute from './api/deleteApiToken';
 import createGetApiTokensRoute from './api/getApiTokens';
 import createAuthTestRoute from './api/authTest';
 import createUploadParticipantsRoute from './api/uploadParticipants';
-import createCreateParticipantRoute from './api/createParticipant';
+import buildCreateParticipantRoute from './api/createParticipant';
 import createGetParticipantsRoute from './api/getParticipants';
 import createGetParticipantOverviewRoute from './api/getParticipantOverview';
 import createGetEventOverviewsRoute from './api/getEventOverviews';
@@ -231,6 +232,8 @@ const start = async () => {
 		tokenTools,
 	};
 
+	const connect = makeRouteConnector(routeContext);
+
 	const tokenRepo = ds.getRepository(Token);
 
 	const authMiddleware = createAuthMiddleWare({
@@ -282,7 +285,7 @@ const start = async () => {
 
 	app.get(getAuthTest, authMiddleware, createAuthTestRoute(routeContext));
 	app.post(postUploadParticipants, authMiddleware, upload.single('participants'), createUploadParticipantsRoute(routeContext));
-	app.post(postCreateParticipant, authMiddleware, createCreateParticipantRoute(routeContext));
+	app.post(postCreateParticipant, authMiddleware, connect(buildCreateParticipantRoute));
 	app.get(`${getParticipants}/:page?`, authMiddleware, createGetParticipantsRoute(routeContext));
 	app.get(`${getParticipantOverview}/:email`, authMiddleware, createGetParticipantOverviewRoute(routeContext));
 	app.get(`${getEventOverviews}/:sessionUuid`, authMiddleware, createGetEventOverviewsRoute(routeContext));
