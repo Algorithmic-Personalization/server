@@ -1,0 +1,4 @@
+#!/bin/env bash
+sh-add ~/.ssh/amazon-ytdnpl.pem
+echo "Updating database..."
+ssh ec2-user@ec2-54-210-59-250.compute-1.amazonaws.com /home/ec2-user/ytdnpl/backup-db

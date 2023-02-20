@@ -8,4 +8,5 @@ echo "Copying backup from container $container_id to host: $target..."
 docker cp "$container_id":/ytdpnl.tar "$target"
 echo "Removing backup from container..."
 docker-compose exec production-db rm ytdpnl.tar
-echo "Backup done: $target created."
+echo "Backup done:"
+echo "$target"
