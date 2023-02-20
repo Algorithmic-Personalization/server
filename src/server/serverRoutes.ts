@@ -13,3 +13,4 @@ export const getExperimentConfig = '/api/experiment-config';
 export const postExperimentConfig = '/api/experiment-config';
 export const getExperimentConfigHistory = '/api/experiment-config-history';
 export const getEvents = '/api/events';
+export const postCreateParticipant = '/api/participant';

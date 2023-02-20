@@ -2,26 +2,10 @@ import {type RouteCreator} from '../lib/routeContext';
 
 import {parse} from '../lib/csv';
 
-import {has} from '../../common/util';
-
 import Participant from '../models/participant';
 import {ExperimentArm} from '../../common/models/event';
 
-type ParticipantRecord = {
-	email: string;
-	code: string;
-	arm: 'control' | 'treatment';
-};
-
-const isParticipantRecord = (record: Record<string, string>): record is ParticipantRecord =>
-	has('email')(record)
-	&& has('code')(record)
-	&& has('arm')(record)
-	&& typeof record.email === 'string'
-	&& typeof record.code === 'string'
-	&& record.email.length > 0
-	&& record.code.length > 0
-	&& (record.arm === 'control' || record.arm === 'treatment');
+import {isParticipantRecord} from '../lib/participant';
 
 export const createUploadParticipantsRoute: RouteCreator = ({createLogger, dataSource}) => async (req, res) => {
 	const log = createLogger(req.requestId);

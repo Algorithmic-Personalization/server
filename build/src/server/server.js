@@ -118,6 +118,7 @@ var deleteApiToken_1 = __importDefault(require("./api/deleteApiToken"));
 var getApiTokens_1 = __importDefault(require("./api/getApiTokens"));
 var authTest_1 = __importDefault(require("./api/authTest"));
 var uploadParticipants_1 = __importDefault(require("./api/uploadParticipants"));
+var createParticipant_1 = __importDefault(require("./api/createParticipant"));
 var getParticipants_1 = __importDefault(require("./api/getParticipants"));
 var getParticipantOverview_1 = __importDefault(require("./api/getParticipantOverview"));
 var getEventOverviews_1 = __importDefault(require("./api/getEventOverviews"));
@@ -296,6 +297,7 @@ var start = function () { return __awaiter(void 0, void 0, void 0, function () {
                 app["delete"](serverRoutes_1.deleteApiToken, authMiddleware, (0, deleteApiToken_1["default"])(routeContext));
                 app.get(serverRoutes_1.getAuthTest, authMiddleware, (0, authTest_1["default"])(routeContext));
                 app.post(serverRoutes_1.postUploadParticipants, authMiddleware, upload.single('participants'), (0, uploadParticipants_1["default"])(routeContext));
+                app.post(serverRoutes_1.postCreateParticipant, authMiddleware, (0, createParticipant_1["default"])(routeContext));
                 app.get("".concat(serverRoutes_1.getParticipants, "/:page?"), authMiddleware, (0, getParticipants_1["default"])(routeContext));
                 app.get("".concat(serverRoutes_1.getParticipantOverview, "/:email"), authMiddleware, (0, getParticipantOverview_1["default"])(routeContext));
                 app.get("".concat(serverRoutes_1.getEventOverviews, "/:sessionUuid"), authMiddleware, (0, getEventOverviews_1["default"])(routeContext));

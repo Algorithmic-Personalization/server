@@ -52,19 +52,9 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
 exports.__esModule = true;
 exports.createUploadParticipantsRoute = void 0;
 var csv_1 = require("../lib/csv");
-var util_1 = require("../../common/util");
 var participant_1 = __importDefault(require("../models/participant"));
 var event_1 = require("../../common/models/event");
-var isParticipantRecord = function (record) {
-    return (0, util_1.has)('email')(record)
-        && (0, util_1.has)('code')(record)
-        && (0, util_1.has)('arm')(record)
-        && typeof record.email === 'string'
-        && typeof record.code === 'string'
-        && record.email.length > 0
-        && record.code.length > 0
-        && (record.arm === 'control' || record.arm === 'treatment');
-};
+var participant_2 = require("../lib/participant");
 var createUploadParticipantsRoute = function (_a) {
     var createLogger = _a.createLogger, dataSource = _a.dataSource;
     return function (req, res) { return __awaiter(void 0, void 0, void 0, function () {
@@ -113,7 +103,7 @@ var createUploadParticipantsRoute = function (_a) {
                     if (!!records_1_1.done) return [3 /*break*/, 14];
                     record = records_1_1.value;
                     line += 1;
-                    if (!isParticipantRecord(record)) {
+                    if (!(0, participant_2.isParticipantRecord)(record)) {
                         log('invalid record:', record);
                         errorLines.push(line);
                         return [3 /*break*/, 13];

@@ -1,4 +1,15 @@
 "use strict";
+var __assign = (this && this.__assign) || function () {
+    __assign = Object.assign || function(t) {
+        for (var s, i = 1, n = arguments.length; i < n; i++) {
+            s = arguments[i];
+            for (var p in s) if (Object.prototype.hasOwnProperty.call(s, p))
+                t[p] = s[p];
+        }
+        return t;
+    };
+    return __assign.apply(this, arguments);
+};
 var __createBinding = (this && this.__createBinding) || (Object.create ? (function(o, m, k, k2) {
     if (k2 === undefined) k2 = k;
     var desc = Object.getOwnPropertyDescriptor(m, k);
@@ -90,9 +101,48 @@ exports.__esModule = true;
 exports.TokenC = void 0;
 var react_1 = __importStar(require("react"));
 var material_1 = require("@mui/material");
+var ContentCopy_1 = __importDefault(require("@mui/icons-material/ContentCopy"));
 var adminApiProvider_1 = require("../adminApiProvider");
 var MessageC_1 = require("../../common/components/MessageC");
 var CardC_1 = __importDefault(require("./CardC"));
+var ConfirmButtonC = function (_a) {
+    var action = _a.action, label = _a.label, confirm = _a.confirm, sx = _a.sx;
+    var _b = __read((0, react_1.useState)(false), 2), clicked = _b[0], setClicked = _b[1];
+    var confirmText = confirm !== null && confirm !== void 0 ? confirm : 'Are you sure?';
+    if (clicked) {
+        return (react_1["default"].createElement(material_1.Box, { sx: __assign(__assign({}, sx), { display: 'flex', flexDirection: 'column', alignItems: 'center', mr: 2 }) },
+            react_1["default"].createElement(material_1.Typography, { variant: 'body2', sx: {
+                    mb: 1
+                } }, confirmText),
+            react_1["default"].createElement(material_1.Box, null,
+                react_1["default"].createElement(material_1.Button, { variant: 'outlined', color: 'warning', onClick: action, sx: { mr: 1 } }, "Yes"),
+                react_1["default"].createElement(material_1.Button, { variant: 'outlined', color: 'success', onClick: function () {
+                        setClicked(false);
+                    } }, "No"))));
+    }
+    return (react_1["default"].createElement(material_1.Button, { sx: sx, variant: 'outlined', color: 'primary', onClick: function () {
+            setClicked(true);
+        } }, label));
+};
+var CopyToClipboardC = function (_a) {
+    var text = _a.text;
+    var _b = __read((0, react_1.useState)(false), 2), copied = _b[0], setCopied = _b[1];
+    (0, react_1.useEffect)(function () {
+        if (copied) {
+            setTimeout(function () {
+                setCopied(false);
+            }, 5000);
+        }
+    }, [copied]);
+    return (react_1["default"].createElement(react_1["default"].Fragment, null,
+        react_1["default"].createElement(material_1.Button, { variant: 'contained', sx: {
+                mr: 1
+            }, onClick: function () {
+                navigator.clipboard.writeText(text)["catch"](console.error);
+                setCopied(true);
+            }, endIcon: react_1["default"].createElement(ContentCopy_1["default"], null) }, "Copy to clipboard"),
+        copied && react_1["default"].createElement(material_1.Typography, { variant: 'body2' }, "Token copied to clipboard")));
+};
 var TokenListC = function (_a) {
     var tokens = _a.tokens, deleteToken = _a.deleteToken;
     if (!tokens) {
@@ -104,8 +154,19 @@ var TokenListC = function (_a) {
     return (react_1["default"].createElement(material_1.Box, null, tokens.map(function (token) { return (react_1["default"].createElement(CardC_1["default"], { key: token.id, sx: { mb: 2 } },
         react_1["default"].createElement(material_1.Typography, { variant: 'body1', sx: { mb: 1 } },
             react_1["default"].createElement("strong", null, token.name)),
-        react_1["default"].createElement(material_1.Typography, { variant: 'body2', sx: { mb: 1, fontSize: '12px', wordBreak: 'break-all' } }, token.token),
-        react_1["default"].createElement(material_1.Button, { sx: { mt: 1 }, variant: 'outlined', color: 'primary', onClick: deleteToken(token.token) }, "Delete this token"))); })));
+        react_1["default"].createElement(material_1.Typography, { variant: 'body2', sx: {
+                mb: 1,
+                fontSize: '12px',
+                wordBreak: 'break-all',
+                userSelect: 'none'
+            } }, token.token),
+        react_1["default"].createElement(material_1.Box, { sx: {
+                display: 'flex',
+                flexDirection: 'row',
+                alignItems: 'center'
+            } },
+            react_1["default"].createElement(ConfirmButtonC, { sx: { mr: 1 }, action: deleteToken(token.token), label: 'Delete this token' }),
+            react_1["default"].createElement(CopyToClipboardC, { text: token.token })))); })));
 };
 var TokenC = function () {
     var _a = __read((0, react_1.useState)(), 2), tokens = _a[0], setTokens = _a[1];

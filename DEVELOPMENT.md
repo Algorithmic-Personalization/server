@@ -303,3 +303,50 @@ The events retrieved by the `/api/event-overviews` endpoint are fully detailed, 
 otherwise dispatched in the other tables for storage.
 
 The structure of the JSON responses should be self explanatory, I will detail it if necessary.
+
+### Create a participant through the API
+
+You can create a participant through the API by sending a `POST` request to to `https://ytdpnl.fmdj.fr/api/participant` with the following JSON body:
+
+```json
+{
+  "email": "some@email.or-any-identifier-you-want",
+  "code": "some unique code with sufficient entropy so that no one can find one at random",
+  "arm": "either the string 'control' or 'treatment'"
+}
+```
+
+As with all API codes, you must include an API token in your request, as the `authorization` header.
+
+The API should reply with either
+
+```json
+{
+  "kind": "Success",
+  "value": {...} // the participant object created
+}
+```
+
+in case of success (with the HTTP status code 200),
+or, in case of error:
+
+```json
+{
+  "kind": "Error",
+  "message": "Some error message"
+}
+```
+
+with an error HTTP status code depending on what happened.
+
+An example CURL request could be:
+
+```bash
+curl -X POST https://ytdpnl.fmdj.fr/api/participant \
+ -H "Content-Type: application/json" \
+ -d '{"email": "test.api@fmdj.fr", "arm": "treatment", "code": "A05SFUTF67854GHTGD236"}' \
+ -H "authorization: eyJhbGciOiJSUzI1NiIsInR5cCI6IkpXVCJ9.eyJhZG1pbklkIjoxLCJpYXQiOjE2NzY5MTkyMjIsImV4cCI6MzE3MjIxMzYxNjIyfQ.X-3ZziwMVRfDpstcSUgJlCL-Ki4mwQVL9LTddd2CnZqaly6VsjKrYd7mSgHQRn85x6wuKH2JueyFXGBEov-8z0F4XPCT9_NYLaKYccyPx3b4TO4Ww7hj5ZCvkJtb2GHe7Ho8V5uttOUxgxix0TPHYYEw90r5kQz0J2jaWhiz6NLDL3db202RCoOo_Vwgo-_PYXo0_zY5bULqCtkIBdbQqSZKWeT03QZJHSdtgsLhKJ_09w8_-daqr356CV-gKazi_uMAsW5WXPRXa5mtjgc3RxA9HW97uctLP7EunIkAjVwY3TqHxZCk87PLbiGCa-n-TCZZ6uoE49_aeAmbREG8SZTaUGNlslpHtfCsYXP48jo2wRbbHzR3wcgKaipEa3Ka6LgplW9qcIHkYqfiAvO53zrvrHJqXsBMHEbJmFm2oK87o0K9Sq5vB8d3CT8yyaysV5J06-X_0HlP3JYRan6FzyU1hht8PVbWG_wWHhwOPFXe3k8a3u5FaBm9DnpevKG4Dw4AvH3zrW-T2q89T7fpmImGTMOkIYrkNtTCMqhreWG66J24If1oww4x3h0Xreh2VOoPZbxP4jLpvIRmtNMvZxhmtNKxQXpDt8W8-gyJsovoXVOyjY5lhhcjUcjF4QpAX3TTVg5U0Jr3_2vH3mKpk6wl39_oujP-Odqf0zOOKU8"
+```
+
+(note that for obvious reasons this token is invalid, replace it with your own token)
+

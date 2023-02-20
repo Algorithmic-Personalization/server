@@ -66,6 +66,7 @@ import {
 	createApiToken,
 	deleteApiToken,
 	getEvents,
+	postCreateParticipant,
 } from './serverRoutes';
 
 import createRegisterRoute from './api/register';
@@ -76,6 +77,7 @@ import createDeleteApiTokenRoute from './api/deleteApiToken';
 import createGetApiTokensRoute from './api/getApiTokens';
 import createAuthTestRoute from './api/authTest';
 import createUploadParticipantsRoute from './api/uploadParticipants';
+import createCreateParticipantRoute from './api/createParticipant';
 import createGetParticipantsRoute from './api/getParticipants';
 import createGetParticipantOverviewRoute from './api/getParticipantOverview';
 import createGetEventOverviewsRoute from './api/getEventOverviews';
@@ -280,6 +282,7 @@ const start = async () => {
 
 	app.get(getAuthTest, authMiddleware, createAuthTestRoute(routeContext));
 	app.post(postUploadParticipants, authMiddleware, upload.single('participants'), createUploadParticipantsRoute(routeContext));
+	app.post(postCreateParticipant, authMiddleware, createCreateParticipantRoute(routeContext));
 	app.get(`${getParticipants}/:page?`, authMiddleware, createGetParticipantsRoute(routeContext));
 	app.get(`${getParticipantOverview}/:email`, authMiddleware, createGetParticipantOverviewRoute(routeContext));
 	app.get(`${getEventOverviews}/:sessionUuid`, authMiddleware, createGetEventOverviewsRoute(routeContext));
