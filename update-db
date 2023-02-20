@@ -1,0 +1,30 @@
+#!/bin/env bash
+export COMPOSE_INTERACTIVE_NO_CLI=1
+read -r key_path host < scripts.conf
+echo "1) Adding key to ssh-agent from: $key_path"
+out=$(ssh-add "$key_path" 2>&1)
+echo " -> $out"
+echo "2) Updating database..."
+echo " a) Making the remote backup..."
+remote_path=$(ssh "$host" /home/ec2-user/bin/backup | tail -1)
+echo "  -> Backup made remotely: $remote_path"
+echo " b) Copying backup from remote to local..."
+scp "$host":"$remote_path" .  1>&2 > /dev/null
+dump_file=$(basename "$remote_path")
+echo "  -> Backup copied to local $dump_file."
+
+echo " c) Ensuring development database is running..."
+container_id=$(docker-compose ps -q development-db)
+if [ "$container_id" == "" ]; then
+    echo " Development database container not found, starting it..."
+    docker-compose up -d development-db
+    container_id=$(docker-compose ps -q development-db)
+fi
+
+echo "  -> Container id is: $container_id"
+echo " d) Copying backup from host to container..."
+docker cp "$dump_file" "$container_id":/ytdpnl.tar 1>&2 > /dev/null
+echo "  -> Backup copied to container."
+echo " e) Restoring backup in development database..."
+docker-compose exec development-db pg_restore -c -U admin -d ytdpnl -F t ytdpnl.tar -v | xargs -I {} echo "  -> {}"
+echo "Development database updated with prod values from right now :)"

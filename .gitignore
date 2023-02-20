@@ -22,4 +22,5 @@ private.key
 private.key.pub
 
 secrets.yml
-update-db
+scripts.conf
+*.tar
