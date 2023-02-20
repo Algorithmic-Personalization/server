@@ -5,7 +5,7 @@ import {type LogFunction} from '../lib/logger';
 
 import Participant from '../../common/models/participant';
 import Event, {EventType} from '../../common/models/event';
-import {type RecommendationsEvent} from '../models/recommendationsEvent';
+import {type RecommendationsEvent} from '../../common/models/recommendationsEvent';
 import {type WatchTimeEvent} from '../../common/models/watchTimeEvent';
 import ExperimentConfig from '../../common/models/experimentConfig';
 import Video from '../models/video';
