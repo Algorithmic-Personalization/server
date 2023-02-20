@@ -3,7 +3,7 @@ import {type RouteCreator} from '../lib/routeContext';
 import Admin from '../../common/models/admin';
 import {validateExcept, type Maybe, getMessage, has} from '../../common/util';
 
-import {getVerifyEmailToken} from '../../common/routes';
+import {getVerifyEmailToken} from '../serverRoutes';
 import {randomToken, hashPassword} from '../lib/crypto';
 
 import whitelist from '../../../adminsWhitelist';

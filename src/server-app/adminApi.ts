@@ -20,9 +20,6 @@ import {
 	getExperimentConfigHistory,
 	getEvents,
 	getEventOverviews,
-} from '../common/routes';
-
-import {
 	getApiTokens,
 	createApiToken,
 	deleteApiToken,

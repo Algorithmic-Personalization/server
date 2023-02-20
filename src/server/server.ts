@@ -44,6 +44,13 @@ import createAuthMiddleWare from './lib/authMiddleware';
 import createParticipantMiddleware from './lib/participantMiddleware';
 
 import {
+	postCheckParticipantCode,
+	postCreateSession,
+	getParticipantConfig,
+	postEvent,
+} from '../common/clientRoutes';
+
+import {
 	postRegister,
 	getVerifyEmailToken,
 	postLogin,
@@ -55,17 +62,10 @@ import {
 	getExperimentConfig,
 	postExperimentConfig,
 	getExperimentConfigHistory,
-	postCheckParticipantCode,
-	postCreateSession,
-	getParticipantConfig,
-	postEvent,
-	getEvents,
-} from '../common/routes';
-
-import {
 	getApiTokens,
 	createApiToken,
 	deleteApiToken,
+	getEvents,
 } from './serverRoutes';
 
 import createRegisterRoute from './api/register';

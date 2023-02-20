@@ -37,7 +37,6 @@ var __generator = (this && this.__generator) || function (thisArg, body) {
 };
 exports.__esModule = true;
 exports.createAdminApi = void 0;
-var routes_1 = require("../common/routes");
 var serverRoutes_1 = require("../server/serverRoutes");
 var util_1 = require("../common/util");
 var loadItem = function (key) {
@@ -108,21 +107,21 @@ var createAdminApi = function (serverUrl, showLoginModal) {
         login: function (email, password) {
             return __awaiter(this, void 0, void 0, function () {
                 return __generator(this, function (_a) {
-                    return [2 /*return*/, post(routes_1.postLogin, { email: email, password: password }, headers())];
+                    return [2 /*return*/, post(serverRoutes_1.postLogin, { email: email, password: password }, headers())];
                 });
             });
         },
         register: function (admin) {
             return __awaiter(this, void 0, void 0, function () {
                 return __generator(this, function (_a) {
-                    return [2 /*return*/, post(routes_1.postRegister, admin, headers())];
+                    return [2 /*return*/, post(serverRoutes_1.postRegister, admin, headers())];
                 });
             });
         },
         getAuthTest: function () {
             return __awaiter(this, void 0, void 0, function () {
                 return __generator(this, function (_a) {
-                    return [2 /*return*/, get(routes_1.getAuthTest, {}, headers())];
+                    return [2 /*return*/, get(serverRoutes_1.getAuthTest, {}, headers())];
                 });
             });
         },
@@ -135,7 +134,7 @@ var createAdminApi = function (serverUrl, showLoginModal) {
                         case 0:
                             formData = new FormData();
                             formData.set('participants', file);
-                            return [4 /*yield*/, fetch("".concat(serverUrl).concat(routes_1.postUploadParticipants), {
+                            return [4 /*yield*/, fetch("".concat(serverUrl).concat(serverRoutes_1.postUploadParticipants), {
                                     method: 'POST',
                                     body: formData,
                                     headers: {
@@ -174,21 +173,21 @@ var createAdminApi = function (serverUrl, showLoginModal) {
             if (pageSize === void 0) { pageSize = 15; }
             return __awaiter(this, void 0, void 0, function () {
                 return __generator(this, function (_a) {
-                    return [2 /*return*/, get("".concat(routes_1.getParticipants, "/").concat(page, "?pageSize=").concat(pageSize, "&emailLike=").concat(encodeURIComponent(emailLike)), {}, headers())];
+                    return [2 /*return*/, get("".concat(serverRoutes_1.getParticipants, "/").concat(page, "?pageSize=").concat(pageSize, "&emailLike=").concat(encodeURIComponent(emailLike)), {}, headers())];
                 });
             });
         },
         getParticipantOverview: function (participantEmail) {
             return __awaiter(this, void 0, void 0, function () {
                 return __generator(this, function (_a) {
-                    return [2 /*return*/, get("".concat(routes_1.getParticipantOverview, "/").concat(participantEmail), {}, headers())];
+                    return [2 /*return*/, get("".concat(serverRoutes_1.getParticipantOverview, "/").concat(participantEmail), {}, headers())];
                 });
             });
         },
         getEventOverviews: function (sessionUuid) {
             return __awaiter(this, void 0, void 0, function () {
                 return __generator(this, function (_a) {
-                    return [2 /*return*/, get("".concat(routes_1.getEventOverviews, "/").concat(sessionUuid), {}, headers())];
+                    return [2 /*return*/, get("".concat(serverRoutes_1.getEventOverviews, "/").concat(sessionUuid), {}, headers())];
                 });
             });
         },
@@ -197,28 +196,28 @@ var createAdminApi = function (serverUrl, showLoginModal) {
             if (pageSize === void 0) { pageSize = 15; }
             return __awaiter(this, void 0, void 0, function () {
                 return __generator(this, function (_a) {
-                    return [2 /*return*/, get("".concat(routes_1.getEvents, "/").concat(page, "?pageSize=").concat(pageSize), {}, headers())];
+                    return [2 /*return*/, get("".concat(serverRoutes_1.getEvents, "/").concat(page, "?pageSize=").concat(pageSize), {}, headers())];
                 });
             });
         },
         getExperimentConfig: function () {
             return __awaiter(this, void 0, void 0, function () {
                 return __generator(this, function (_a) {
-                    return [2 /*return*/, get(routes_1.getExperimentConfig, {}, headers())];
+                    return [2 /*return*/, get(serverRoutes_1.getExperimentConfig, {}, headers())];
                 });
             });
         },
         postExperimentConfig: function (config) {
             return __awaiter(this, void 0, void 0, function () {
                 return __generator(this, function (_a) {
-                    return [2 /*return*/, post(routes_1.getExperimentConfig, config, headers())];
+                    return [2 /*return*/, post(serverRoutes_1.getExperimentConfig, config, headers())];
                 });
             });
         },
         getExperimentConfigHistory: function () {
             return __awaiter(this, void 0, void 0, function () {
                 return __generator(this, function (_a) {
-                    return [2 /*return*/, get(routes_1.getExperimentConfigHistory, {}, headers())];
+                    return [2 /*return*/, get(serverRoutes_1.getExperimentConfigHistory, {}, headers())];
                 });
             });
         },

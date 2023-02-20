@@ -42,7 +42,7 @@ exports.__esModule = true;
 exports.createRegisterRoute = void 0;
 var admin_1 = __importDefault(require("../../common/models/admin"));
 var util_1 = require("../../common/util");
-var routes_1 = require("../../common/routes");
+var serverRoutes_1 = require("../serverRoutes");
 var crypto_1 = require("../lib/crypto");
 var adminsWhitelist_1 = __importDefault(require("../../../adminsWhitelist"));
 var config_extension_1 = __importDefault(require("../../../config.extension"));
@@ -117,7 +117,7 @@ var createRegisterRoute = function (_a) {
                     });
                     return [2 /*return*/];
                 case 7:
-                    link = "".concat(serverUrl).concat(routes_1.getVerifyEmailToken, "?token=").concat(token);
+                    link = "".concat(serverUrl).concat(serverRoutes_1.getVerifyEmailToken, "?token=").concat(token);
                     _b.label = 8;
                 case 8:
                     _b.trys.push([8, 10, , 11]);

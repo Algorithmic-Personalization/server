@@ -1,3 +1,15 @@
 export const getApiTokens = '/api/tokens';
 export const createApiToken = '/api/tokens';
 export const deleteApiToken = '/api/tokens/:token';
+export const postRegister = '/api/register';
+export const getVerifyEmailToken = '/api/verify-email';
+export const postLogin = '/api/login';
+export const getAuthTest = '/api/auth-test';
+export const postUploadParticipants = '/api/upload-participants';
+export const getParticipants = '/api/participants';
+export const getEventOverviews = '/api/event-overviews';
+export const getParticipantOverview = '/api/participant';
+export const getExperimentConfig = '/api/experiment-config';
+export const postExperimentConfig = '/api/experiment-config';
+export const getExperimentConfigHistory = '/api/experiment-config-history';
+export const getEvents = '/api/events';
