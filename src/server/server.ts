@@ -37,8 +37,8 @@ import SmtpConfig from './lib/smtpConfig';
 
 import webpackConfig from '../../webpack.config';
 
-import type RouteContext from './lib/routeContext';
-import {makeRouteConnector} from './lib/routeContext';
+import type RouteContext from './lib/routeCreation';
+import {type RouteDefinition, makeRouteConnector as makeExpressHandlerCreator} from './lib/routeCreation';
 import {createDefaultLogger} from './lib/logger';
 import {createTokenTools} from './lib/crypto';
 import createAuthMiddleWare from './lib/authMiddleware';
@@ -67,7 +67,6 @@ import {
 	createApiToken,
 	deleteApiToken,
 	getEvents,
-	postCreateParticipant,
 } from './serverRoutes';
 
 import createRegisterRoute from './api/register';
@@ -78,7 +77,6 @@ import createDeleteApiTokenRoute from './api/deleteApiToken';
 import createGetApiTokensRoute from './api/getApiTokens';
 import createAuthTestRoute from './api/authTest';
 import createUploadParticipantsRoute from './api/uploadParticipants';
-import buildCreateParticipantRoute from './api/createParticipant';
 import createGetParticipantsRoute from './api/getParticipants';
 import createGetParticipantOverviewRoute from './api/getParticipantOverview';
 import createGetEventOverviewsRoute from './api/getEventOverviews';
@@ -90,6 +88,8 @@ import createCreateSessionRoute from './api/createSession';
 import createGetParticipantConfigRoute from './api/participantConfig';
 import createPostEventRoute from './api/postEvent';
 import createGetEventsRoute from './api/getEvents';
+
+import createParticipantDefinition from './api-2/createParticipant';
 
 // Add classes used by typeorm as models here
 // so that typeorm can extract the metadata from them.
@@ -232,7 +232,7 @@ const start = async () => {
 		tokenTools,
 	};
 
-	const connect = makeRouteConnector(routeContext);
+	const makeHandler = makeExpressHandlerCreator(routeContext);
 
 	const tokenRepo = ds.getRepository(Token);
 
@@ -275,6 +275,12 @@ const start = async () => {
 		next();
 	});
 
+	const defineAdminRoute = <T>(def: RouteDefinition<T>) => {
+		app[def.verb](def.path, authMiddleware, makeHandler(def));
+	};
+
+	defineAdminRoute(createParticipantDefinition);
+
 	app.post(postRegister, createRegisterRoute(routeContext));
 	app.get(getVerifyEmailToken, createVerifyEmailRoute(routeContext));
 	app.post(postLogin, createLoginRoute(routeContext));
@@ -285,7 +291,6 @@ const start = async () => {
 
 	app.get(getAuthTest, authMiddleware, createAuthTestRoute(routeContext));
 	app.post(postUploadParticipants, authMiddleware, upload.single('participants'), createUploadParticipantsRoute(routeContext));
-	app.post(postCreateParticipant, authMiddleware, connect(buildCreateParticipantRoute));
 	app.get(`${getParticipants}/:page?`, authMiddleware, createGetParticipantsRoute(routeContext));
 	app.get(`${getParticipantOverview}/:email`, authMiddleware, createGetParticipantOverviewRoute(routeContext));
 	app.get(`${getEventOverviews}/:sessionUuid`, authMiddleware, createGetEventOverviewsRoute(routeContext));

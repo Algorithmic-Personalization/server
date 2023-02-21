@@ -22,11 +22,20 @@ export type RouteCreator = (context: RouteContext) => (req: Request, res: Respon
 
 export type RequestHandler<Output> = (req: Request) => Promise<Output>;
 
-export type RouteBuilder<Output> = (context: RouteContext) => RequestHandler<Output>;
+export type HttpVerb = 'get' | 'post' | 'put' | 'delete';
 
-export const makeRouteConnector = (context: RouteContext) => <T>(builder: RouteBuilder<T>) => async (req: Request, res: Response) => {
+export type RouteDefinition<Output> = {
+	verb: HttpVerb;
+	path: string;
+	makeHandler: (context: RouteContext) => RequestHandler<Output>;
+};
+
+export const makeRouteConnector = (context: RouteContext) => <T>(definition: RouteDefinition<T>) => async (req: Request, res: Response) => {
+	const {makeHandler} = definition;
+	const handler = makeHandler(context);
+
 	try {
-		const value = await builder(context)(req);
+		const value = await handler(req);
 		res.json({
 			kind: 'Success',
 			value,

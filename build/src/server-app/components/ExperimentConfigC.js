@@ -99,9 +99,10 @@ var adminApiProvider_1 = require("../adminApiProvider");
 var ExperimentConfigC = function () {
     var _a = __read((0, react_1.useState)(), 2), message = _a[0], setMessage = _a[1];
     var _b = __read((0, react_1.useState)(new experimentConfig_1["default"]()), 2), config = _b[0], setConfig = _b[1];
-    var _c = __read((0, react_1.useState)([]), 2), configHistory = _c[0], setConfigHistory = _c[1];
+    var _c = __read((0, react_1.useState)(false), 2), configLoaded = _c[0], setConfigLoaded = _c[1];
+    var _d = __read((0, react_1.useState)([]), 2), configHistory = _d[0], setConfigHistory = _d[1];
     var api = (0, adminApiProvider_1.useAdminApi)();
-    var _d = __read((0, react_1.useState)(''), 2), probaField = _d[0], setProbaField = _d[1];
+    var _e = __read((0, react_1.useState)(''), 2), probaField = _e[0], setProbaField = _e[1];
     var loadHistory = function () { return __awaiter(void 0, void 0, void 0, function () {
         var configHistory;
         return __generator(this, function (_a) {
@@ -117,32 +118,34 @@ var ExperimentConfigC = function () {
         });
     }); };
     (0, react_1.useEffect)(function () {
-        (function () { return __awaiter(void 0, void 0, void 0, function () {
-            var config;
-            return __generator(this, function (_a) {
-                switch (_a.label) {
-                    case 0:
-                        setMessage({
-                            text: 'Loading experiment config...'
-                        });
-                        return [4 /*yield*/, api.getExperimentConfig()];
-                    case 1:
-                        config = _a.sent();
-                        if (config.kind === 'Success') {
-                            setConfig(config.value);
-                            setProbaField(config.value.nonPersonalizedProbability.toString());
-                        }
-                        else {
-                            setMessage({
-                                text: config.message
-                            });
-                        }
-                        return [2 /*return*/];
-                }
-            });
-        }); })();
-        loadHistory()["catch"](console.error);
-    }, []);
+        if (!configLoaded) {
+            setConfigLoaded(true);
+            (function () { return __awaiter(void 0, void 0, void 0, function () {
+                var config;
+                return __generator(this, function (_a) {
+                    switch (_a.label) {
+                        case 0: return [4 /*yield*/, api.getExperimentConfig()];
+                        case 1:
+                            config = _a.sent();
+                            if (config.kind === 'Success') {
+                                setConfig(config.value);
+                                setProbaField(config.value.nonPersonalizedProbability.toString());
+                            }
+                            else {
+                                setMessage({
+                                    text: config.message,
+                                    severity: 'error'
+                                });
+                            }
+                            return [2 /*return*/];
+                    }
+                });
+            }); })();
+        }
+        if (configHistory.length === 0) {
+            loadHistory()["catch"](console.error);
+        }
+    }, [configLoaded]);
     var handleProbabilityChange = function (event) {
         setProbaField(event.target.value);
         var proba = parseFloat(event.target.value);

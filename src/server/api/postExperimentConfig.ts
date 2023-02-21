@@ -1,4 +1,4 @@
-import {type RouteCreator} from '../lib/routeContext';
+import {type RouteCreator} from '../lib/routeCreation';
 
 import ExperimentConfig from '../../common/models/experimentConfig';
 import {validateNew} from '../../common/util';

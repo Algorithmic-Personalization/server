@@ -1,4 +1,4 @@
-import {type RouteCreator} from '../lib/routeContext';
+import {type RouteCreator} from '../lib/routeCreation';
 
 import Event from '../../common/models/event';
 

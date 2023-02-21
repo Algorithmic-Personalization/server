@@ -1,6 +1,6 @@
 import {type DataSource} from 'typeorm';
 
-import {type RouteCreator} from '../lib/routeContext';
+import {type RouteCreator} from '../lib/routeCreation';
 
 import Participant from '../models/participant';
 import type ParticipantOverview from '../projections/ParticipantOverview';

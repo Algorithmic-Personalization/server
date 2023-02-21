@@ -1,6 +1,6 @@
 import {type DataSource, type Repository} from 'typeorm';
 
-import {type RouteCreator} from '../lib/routeContext';
+import {type RouteCreator} from '../lib/routeCreation';
 import {type LogFunction} from '../lib/logger';
 
 import Participant from '../models/participant';

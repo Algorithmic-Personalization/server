@@ -1,6 +1,6 @@
 import {encode} from 'urlencode';
 
-import {type RouteCreator} from '../lib/routeContext';
+import {type RouteCreator} from '../lib/routeCreation';
 
 import Admin from '../../common/models/admin';
 

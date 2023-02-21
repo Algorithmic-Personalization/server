@@ -1,4 +1,4 @@
-import {type RouteCreator} from '../lib/routeContext';
+import {type RouteCreator} from '../lib/routeCreation';
 
 import Token from '../models/token';
 
