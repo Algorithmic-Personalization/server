@@ -1,15 +1,18 @@
 import React, {useEffect, useState} from 'react';
 
-import MessageC from './MessageC';
+import NotificationsC, {type Message} from './NotificationsC';
 
 export const RedirectMessageC: React.FC<{ignore?: boolean}> = ({ignore}) => {
-	const [message, setMessage] = useState<string | undefined>();
+	const [message, setMessage] = useState<Message>();
 
 	useEffect(() => {
 		const params = new URLSearchParams(window.location.search);
 		const message = params.get('message');
 		if (message) {
-			setMessage(message);
+			setMessage({
+				text: message,
+				permanent: true,
+			});
 		}
 	}, []);
 
@@ -17,7 +20,7 @@ export const RedirectMessageC: React.FC<{ignore?: boolean}> = ({ignore}) => {
 		return null;
 	}
 
-	return <MessageC message={message} type='success' />;
+	return <NotificationsC message={message}/>;
 };
 
 export default RedirectMessageC;

@@ -12,8 +12,7 @@ import {Link} from 'react-router-dom';
 
 import Admin from '../../common/models/admin';
 
-import MessageC from './MessageC';
-import ErrorsC from './ErrorsC';
+import NotificationsC, {type Message} from './NotificationsC';
 
 import {bind} from './helpers';
 
@@ -36,8 +35,7 @@ export const RegisterC: React.FC<{
 }) => {
 	const [confirm, setConfirm] = useState<string>('');
 	const [name, setName] = useState<string>('');
-	const [errors, setErrors] = useState<string[]>([]);
-	const [success, setSuccess] = useState<string>('');
+	const [message, setMessage] = useState<Message>();
 	const [isSubmitting, setIsSubmitting] = useState<boolean>(false);
 
 	const api = useAdminApi();
@@ -58,20 +56,27 @@ export const RegisterC: React.FC<{
 			}
 
 			if (validationErrors.length > 0) {
-				setErrors(validationErrors);
+				setMessage({
+					text: validationErrors,
+					severity: 'error',
+				});
 				return;
 			}
-
-			setErrors([]);
 
 			setIsSubmitting(true);
 			const result = await api.register(admin);
 			setIsSubmitting(false);
 
 			if (result.kind === 'Success') {
-				setSuccess(result.value);
+				setMessage({
+					text: result.value,
+					severity: 'success',
+				});
 			} else {
-				setErrors([result.message]);
+				setMessage({
+					text: result.message,
+					severity: 'error',
+				});
 			}
 		})();
 	};
@@ -90,8 +95,7 @@ export const RegisterC: React.FC<{
 			}}>
 				<h1>Admin registration</h1>
 
-				<ErrorsC errors={errors}/>
-				<MessageC message={success} type='success'/>
+				<NotificationsC message={message}/>
 
 				<FormControl sx={{mb: 2, display: 'block'}}>
 					<InputLabel htmlFor='name'>Name</InputLabel>

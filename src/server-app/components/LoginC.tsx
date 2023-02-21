@@ -13,7 +13,7 @@ import {
 import {useAdminApi} from '../adminApiProvider';
 
 import RedirectMessageC from './RedirectMessageC';
-import MessageC from './MessageC';
+import NotificationsC, {type Message} from './NotificationsC';
 
 import {bind} from './helpers';
 
@@ -32,7 +32,7 @@ export const LoginC: React.FC<{
 	onSuccess,
 	isModal,
 }) => {
-	const [error, setError] = useState<string | undefined>();
+	const [message, setMessage] = useState<Message>();
 	const api = useAdminApi();
 	const navigate = useNavigate();
 
@@ -44,7 +44,6 @@ export const LoginC: React.FC<{
 
 			if (response.kind === 'Success') {
 				api.setAuth(response.value.token, response.value.admin);
-				setError(undefined);
 				if (!isModal) {
 					console.log('navigating to /');
 					navigate('/');
@@ -54,7 +53,10 @@ export const LoginC: React.FC<{
 					onSuccess();
 				}
 			} else {
-				setError(response.message);
+				setMessage({
+					text: response.message,
+					severity: 'error',
+				});
 			}
 		})();
 	};
@@ -72,8 +74,8 @@ export const LoginC: React.FC<{
 			}}>
 				<h1>Admin login</h1>
 
-				<RedirectMessageC ignore={error !== undefined}/>
-				<MessageC message={error} type='error'/>
+				<RedirectMessageC />
+				<NotificationsC message={message}/>
 
 				<FormControl sx={{mb: 2, display: 'block'}}>
 					<InputLabel htmlFor='email'>Email</InputLabel>

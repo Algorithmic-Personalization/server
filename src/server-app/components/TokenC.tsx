@@ -6,7 +6,7 @@ import {type SxProps} from '@mui/material';
 import {useAdminApi} from '../adminApiProvider';
 
 import type {Token} from '../../server/models/token';
-import {StatusMessageC} from './MessageC';
+import {NotificationsC, type Message} from './NotificationsC';
 import CardC from './CardC';
 
 const ConfirmButtonC: React.FC<{
@@ -158,9 +158,8 @@ const TokenListC: React.FC<{
 
 export const TokenC: React.FC = () => {
 	const [tokens, setTokens] = useState<Token[]>();
-	const [error, setError] = useState<string>();
-	const [success, setSuccess] = useState<string>();
 	const [name, setName] = useState<string>('');
+	const [message, setMessage] = useState<Message>();
 
 	const api = useAdminApi();
 
@@ -171,7 +170,10 @@ export const TokenC: React.FC = () => {
 			if (tokens.kind === 'Success') {
 				setTokens(tokens.value);
 			} else {
-				setError(tokens.message);
+				setMessage({
+					text: tokens.message,
+					severity: 'error',
+				});
 			}
 		})();
 	}, []);
@@ -182,14 +184,22 @@ export const TokenC: React.FC = () => {
 
 			if (token.kind === 'Success') {
 				setTokens([...(tokens ?? []), token.value]);
-				setSuccess('API token created');
-				setError(undefined);
+				setMessage({
+					text: 'API token created',
+					severity: 'success',
+				});
 			} else {
-				setError(token.message);
+				setMessage({
+					text: token.message,
+					severity: 'error',
+				});
 			}
 		} catch (error) {
 			console.error(error);
-			setError('Failed to create API token, unexpected error');
+			setMessage({
+				text: 'Failed to create API token, unexpected error',
+				severity: 'error',
+			});
 		}
 	};
 
@@ -198,14 +208,21 @@ export const TokenC: React.FC = () => {
 			const res = await api.deleteApiToken(token);
 			if (res.kind === 'Success') {
 				setTokens((tokens ?? []).filter(t => t.token !== token));
-				setError(undefined);
-				setSuccess('API token deleted');
+				setMessage({
+					text: 'API token deleted',
+					severity: 'warning',
+				});
 			} else {
-				setError(res.message);
+				setMessage({
+					text: res.message,
+					severity: 'error',
+				});
 			}
 		} catch (error) {
-			console.error(error);
-			setError('Failed to delete API token, unexpected error');
+			setMessage({
+				text: 'Failed to delete API token, unexpected error',
+				severity: 'error',
+			});
 		}
 	};
 
@@ -213,7 +230,7 @@ export const TokenC: React.FC = () => {
 		<Box component='section' sx={{mb: 4}}>
 			<Typography variant='h2' sx={{mb: 2}}>API Tokens</Typography>
 
-			<StatusMessageC error={error} success={success}/>
+			<NotificationsC message={message}/>
 
 			<Paper sx={{p: 2}}>
 				<TokenListC tokens={tokens} deleteToken={deleteToken}/>

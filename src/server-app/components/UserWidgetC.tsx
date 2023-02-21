@@ -6,8 +6,6 @@ import {useAdminApi} from '../adminApiProvider';
 
 import type Admin from '../../common/models/admin';
 
-import MessageC from './MessageC';
-
 export const UserWidgetC: React.FC = () => {
 	const api = useAdminApi();
 
@@ -27,7 +25,7 @@ export const UserWidgetC: React.FC = () => {
 	}, []);
 
 	if (error) {
-		return <MessageC message={error} type='error' />;
+		return <Typography color='error.main'>{error}</Typography>;
 	}
 
 	if (!admin) {

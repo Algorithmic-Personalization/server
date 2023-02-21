@@ -10,7 +10,7 @@ import {
 	FormHelperText,
 } from '@mui/material';
 
-import {StatusMessageC} from './MessageC';
+import NotificationsC, {type Message} from './NotificationsC';
 import CardC from './CardC';
 
 import ExperimentConfig from '../../common/models/experimentConfig';
@@ -18,9 +18,7 @@ import ExperimentConfig from '../../common/models/experimentConfig';
 import {useAdminApi} from '../adminApiProvider';
 
 export const ExperimentConfigC = () => {
-	const [info, setInfo] = useState<string | undefined>();
-	const [success, setSuccess] = useState<string | undefined>();
-	const [error, setError] = useState<string | undefined>();
+	const [message, setMessage] = useState<Message>();
 	const [config, setConfig] = useState<ExperimentConfig>(new ExperimentConfig());
 	const [configHistory, setConfigHistory] = useState<ExperimentConfig[]>([]);
 	const api = useAdminApi();
@@ -36,16 +34,19 @@ export const ExperimentConfigC = () => {
 
 	useEffect(() => {
 		(async () => {
-			setInfo('Loading experiment config...');
+			setMessage({
+				text: 'Loading experiment config...',
+			});
 
 			const config = await api.getExperimentConfig();
 
 			if (config.kind === 'Success') {
 				setConfig(config.value);
 				setProbaField(config.value.nonPersonalizedProbability.toString());
-				setInfo(undefined);
 			} else {
-				setInfo(config.message);
+				setMessage({
+					text: config.message,
+				});
 			}
 		})();
 
@@ -58,32 +59,40 @@ export const ExperimentConfigC = () => {
 		const proba = parseFloat(event.target.value);
 
 		if (proba <= 1 && proba >= 0) {
-			setError(undefined);
 			setConfig({
 				...config,
 				nonPersonalizedProbability: parseFloat(event.target.value),
 			});
 		} else {
-			setError('Probability must be between 0 and 1');
+			setMessage({
+				text: 'Probability must be between 0 and 1',
+				severity: 'error',
+			});
 		}
 	};
 
 	const handleSubmit = (e: React.FormEvent) => {
 		e.preventDefault();
 
-		setInfo('Saving config...');
-		setError(undefined);
-		setSuccess(undefined);
+		setMessage({
+			text: 'Saving config...',
+		});
 
 		(async () => {
 			const response = await api.postExperimentConfig(config);
 
 			if (response.kind === 'Success') {
-				setSuccess('Config saved');
+				setMessage({
+					text: 'Config saved',
+					severity: 'success',
+				});
 				setConfig(response.value);
 				setProbaField(response.value.nonPersonalizedProbability.toString());
 			} else {
-				setError(response.message);
+				setMessage({
+					text: response.message,
+					severity: 'error',
+				});
 			}
 		})();
 
@@ -92,7 +101,7 @@ export const ExperimentConfigC = () => {
 
 	const ui = (
 		<Box>
-			<StatusMessageC {...{info, success, error}} sx={{my: 4}}/>
+			<NotificationsC message={message}/>
 			<Grid container spacing={8}>
 				<Grid item xs={12} sm={6} component='section'>
 					<Typography variant='h1' sx={{mb: 4}}>

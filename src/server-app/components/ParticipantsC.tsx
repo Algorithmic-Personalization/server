@@ -17,7 +17,7 @@ import SearchIcon from '@mui/icons-material/Search';
 import {Link} from 'react-router-dom';
 
 import DLinkC from './DownloadLinkC';
-import MessageC, {StatusMessageC} from './MessageC';
+import NotificationsC, {type Message} from './NotificationsC';
 
 import {useAdminApi} from '../adminApiProvider';
 
@@ -30,9 +30,7 @@ import type {Page} from '../../server/lib/pagination';
 const UploadFormC: React.FC = () => {
 	const exampleString = csvSample as string;
 
-	const [info, setInfo] = useState<string | undefined>(undefined);
-	const [error, setError] = useState<string | undefined>(undefined);
-	const [success, setSuccess] = useState<string | undefined>(undefined);
+	const [message, setMessage] = useState<Message>();
 	const form = useRef<HTMLFormElement>(null);
 
 	const api = useAdminApi();
@@ -45,16 +43,22 @@ const UploadFormC: React.FC = () => {
 		}
 
 		(async () => {
-			setInfo('Uploading...');
-			setError(undefined);
-			setSuccess(undefined);
+			setMessage({
+				text: 'Uploading participants file...',
+			});
 
 			const res = await api.uploadParticipants(file);
 
 			if (res.kind === 'Success') {
-				setSuccess(res.value);
+				setMessage({
+					text: res.value,
+					severity: 'success',
+				});
 			} else {
-				setError(res.message);
+				setMessage({
+					text: res.message,
+					severity: 'error',
+				});
 			}
 
 			if (form.current) {
@@ -116,7 +120,7 @@ const UploadFormC: React.FC = () => {
 						The separator must be a comma.
 					</FormHelperText>
 				</FormControl>
-				<StatusMessageC {...{info, error, success}}/>
+				<NotificationsC message={message}/>
 			</form>
 		</Box>
 	);
@@ -150,7 +154,7 @@ const ListC: React.FC = () => {
 	const pTmp = Math.min(Math.max(parseInt(pageInput, 10), 0), participants?.pageCount ?? 1);
 	const pageInputOk = Number.isInteger(pTmp);
 	const page = pageInputOk ? pTmp : 1;
-	const [error, setError] = useState<string | undefined>();
+	const [message, setMessage] = useState<Message>();
 	const [emailLike, setEmailLike] = useState('');
 
 	const api = useAdminApi();
@@ -160,10 +164,12 @@ const ListC: React.FC = () => {
 			const res = await api.getParticipants(page - 1, emailLike);
 
 			if (res.kind === 'Success') {
-				setError(undefined);
 				setParticipants(res.value);
 			} else {
-				setError(res.message);
+				setMessage({
+					text: res.message,
+					severity: 'error',
+				});
 			}
 		})();
 	}, [page, emailLike]);
@@ -239,8 +245,7 @@ const ListC: React.FC = () => {
 	return (
 		<Box component='section' sx={{mb: 4}}>
 			<Typography variant='h2' sx={{mb: 2}}>Participants list</Typography>
-			<MessageC message={error} type='error'/>
-
+			<NotificationsC message={message}/>
 			{list}
 		</Box>
 	);
