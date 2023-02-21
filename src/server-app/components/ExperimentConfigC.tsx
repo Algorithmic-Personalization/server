@@ -20,6 +20,7 @@ import {useAdminApi} from '../adminApiProvider';
 export const ExperimentConfigC = () => {
 	const [message, setMessage] = useState<Message>();
 	const [config, setConfig] = useState<ExperimentConfig>(new ExperimentConfig());
+	const [configLoaded, setConfigLoaded] = useState(false);
 	const [configHistory, setConfigHistory] = useState<ExperimentConfig[]>([]);
 	const api = useAdminApi();
 	const [probaField, setProbaField] = useState<string>('');
@@ -33,25 +34,27 @@ export const ExperimentConfigC = () => {
 	};
 
 	useEffect(() => {
-		(async () => {
-			setMessage({
-				text: 'Loading experiment config...',
-			});
+		if (!configLoaded) {
+			setConfigLoaded(true);
+			(async () => {
+				const config = await api.getExperimentConfig();
 
-			const config = await api.getExperimentConfig();
+				if (config.kind === 'Success') {
+					setConfig(config.value);
+					setProbaField(config.value.nonPersonalizedProbability.toString());
+				} else {
+					setMessage({
+						text: config.message,
+						severity: 'error',
+					});
+				}
+			})();
+		}
 
-			if (config.kind === 'Success') {
-				setConfig(config.value);
-				setProbaField(config.value.nonPersonalizedProbability.toString());
-			} else {
-				setMessage({
-					text: config.message,
-				});
-			}
-		})();
-
-		loadHistory().catch(console.error);
-	}, []);
+		if (configHistory.length === 0) {
+			loadHistory().catch(console.error);
+		}
+	}, [configLoaded]);
 
 	const handleProbabilityChange = (event: React.ChangeEvent<HTMLInputElement>) => {
 		setProbaField(event.target.value);
