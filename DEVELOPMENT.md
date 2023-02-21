@@ -339,7 +339,7 @@ or, in case of error:
 }
 ```
 
-with an error HTTP status code depending on what happened.
+with an error HTTP status code whose exact numeric value depends on what went wrong.
 
 An example CURL request to create a participant could be:
 
