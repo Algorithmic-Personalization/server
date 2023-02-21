@@ -1,3 +1,10 @@
 #!/bin/env bash
 git pull
-docker-compose up --detach --build app-server
+read -p "Are you sure you want to restart the container this way? The machine needs to have enough RAM available. [y/N] " -n 1 -r y
+echo ""
+if [[ $y =~ ^[Yy]$ ]]
+then
+    docker-compose up --detach --build app-server
+else
+    echo "Aborted!"
+fi

@@ -136,15 +136,17 @@ const TokenListC: React.FC<{
 					</Typography>
 					<Box
 						sx={{
+							mt: 1,
 							display: 'flex',
-							flexDirection: 'row',
-							alignItems: 'center',
+							flexDirection: {xs: 'column', sm: 'row'},
+							gap: 1,
+							alignItems: {xs: 'stretch', sm: 'center'},
 						}}
 					>
 						<ConfirmButtonC
-							sx={{mr: 1}}
 							action={deleteToken(token.token)}
 							label='Delete this token'
+							confirm='Are you sure you want to delete this token?'
 						/>
 						<CopyToClipboardC text={token.token}/>
 					</Box>
