@@ -279,19 +279,21 @@ where `a`, `b`, `c`, ..., `d` are the `id`s of the participants you are interest
 
 ## API Access
 
-In the [administration interface](https://ytdpnl.fmdj.fr) you can now generate permanent API keys for script access
-to the data.
+In the [administration interface](https://ytdpnl.fmdj.fr) you can now generate permanent API keys in the form of JSON web tokens for easy script access to the data.
 
-In order to access the API, first [log in](https://ytdpnl.fmdj.fr) and under the "API Tokens" tab, generate a token for your application.
+In order to access the API, first log in [to the admin panel of the experiment](https://ytdpnl.fmdj.fr) and under the "API Tokens" tab, generate a token for your application / API client.
 
 These tokens do not expire, but you can revoke them at any time by simply deleting them.
 
-The tokens grant the same access privileges to the API user as to any admin user, so any call the application makes can be made
-using these tokens. To get an idea of what data is available, you can inspect the requests made by the browser when you use the
-interface.
+The tokens grant the same access privileges to the API user who sends the token as to any admin user, so any call the application makes can be made
+using these tokens.
 
-In order to authenticate with the API you just need to pass the token (the very long string of characters) as the `authorization` header
-of all of your HTTPS requests.
+To get an idea of what data is available,
+you can inspect the requests made by the browser when you use theinterface.
+
+In order to authenticate with the API you just need to pass the token (the very long string of characters) as the `authorization` header of all of your HTTPS requests.
+
+Note that you *must not* prefix the token with the string `Bearer` as is often the case in JWT-based APIs, just pass the token as is in the `authorization` header.
 
 The 3 main endpoints you will probably want to use for data analysis are:
 
