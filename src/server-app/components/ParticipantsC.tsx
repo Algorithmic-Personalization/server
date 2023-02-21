@@ -17,7 +17,7 @@ import SearchIcon from '@mui/icons-material/Search';
 import {Link} from 'react-router-dom';
 
 import DLinkC from './DownloadLinkC';
-import MessageC, {StatusMessageC} from '../../common/components/MessageC';
+import MessageC, {StatusMessageC} from './MessageC';
 
 import {useAdminApi} from '../adminApiProvider';
 

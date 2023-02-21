@@ -96,7 +96,7 @@ var FileUpload_1 = __importDefault(require("@mui/icons-material/FileUpload"));
 var Search_1 = __importDefault(require("@mui/icons-material/Search"));
 var react_router_dom_1 = require("react-router-dom");
 var DownloadLinkC_1 = __importDefault(require("./DownloadLinkC"));
-var MessageC_1 = __importStar(require("../../common/components/MessageC"));
+var MessageC_1 = __importStar(require("./MessageC"));
 var adminApiProvider_1 = require("../adminApiProvider");
 // @ts-expect-error this is a text file, not a module
 var participants_sample_csv_1 = __importDefault(require("../../../public/participants.sample.csv"));

@@ -10,7 +10,7 @@ import {
 	FormHelperText,
 } from '@mui/material';
 
-import {StatusMessageC} from '../../common/components/MessageC';
+import {StatusMessageC} from './MessageC';
 import CardC from './CardC';
 
 import ExperimentConfig from '../../common/models/experimentConfig';

@@ -6,7 +6,7 @@ import {type SxProps} from '@mui/material';
 import {useAdminApi} from '../adminApiProvider';
 
 import type {Token} from '../../server/models/token';
-import {StatusMessageC} from '../../common/components/MessageC';
+import {StatusMessageC} from './MessageC';
 import CardC from './CardC';
 
 const ConfirmButtonC: React.FC<{

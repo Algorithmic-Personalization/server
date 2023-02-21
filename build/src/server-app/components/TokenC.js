@@ -103,7 +103,7 @@ var react_1 = __importStar(require("react"));
 var material_1 = require("@mui/material");
 var ContentCopy_1 = __importDefault(require("@mui/icons-material/ContentCopy"));
 var adminApiProvider_1 = require("../adminApiProvider");
-var MessageC_1 = require("../../common/components/MessageC");
+var MessageC_1 = require("./MessageC");
 var CardC_1 = __importDefault(require("./CardC"));
 var ConfirmButtonC = function (_a) {
     var action = _a.action, label = _a.label, confirm = _a.confirm, sx = _a.sx;

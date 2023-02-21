@@ -82,7 +82,7 @@ exports.UserWidgetC = void 0;
 var react_1 = __importStar(require("react"));
 var material_1 = require("@mui/material");
 var adminApiProvider_1 = require("../adminApiProvider");
-var MessageC_1 = __importDefault(require("../../common/components/MessageC"));
+var MessageC_1 = __importDefault(require("./MessageC"));
 var UserWidgetC = function () {
     var api = (0, adminApiProvider_1.useAdminApi)();
     var _a = __read((0, react_1.useState)(), 2), admin = _a[0], setAdmin = _a[1];

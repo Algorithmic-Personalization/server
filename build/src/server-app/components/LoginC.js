@@ -95,7 +95,7 @@ var react_router_dom_1 = require("react-router-dom");
 var material_1 = require("@mui/material");
 var adminApiProvider_1 = require("../adminApiProvider");
 var RedirectMessageC_1 = __importDefault(require("./RedirectMessageC"));
-var MessageC_1 = __importDefault(require("../../common/components/MessageC"));
+var MessageC_1 = __importDefault(require("./MessageC"));
 var helpers_1 = require("./helpers");
 var LoginC = function (_a) {
     var email = _a.email, setEmail = _a.setEmail, password = _a.password, setPassword = _a.setPassword, onSuccess = _a.onSuccess, isModal = _a.isModal;
