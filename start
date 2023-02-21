@@ -4,7 +4,7 @@ docker-compose down
 echo "Pulling latest changes from git..."
 git pull
 echo "Cleaning up the docker cache..."
-docker-system prune
+docker system prune
 echo "Building the new container..."
 docker-compose build
 echo "Starting the new container..."
