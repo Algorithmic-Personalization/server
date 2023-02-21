@@ -44,7 +44,7 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
 exports.__esModule = true;
 exports.RedirectMessageC = void 0;
 var react_1 = __importStar(require("react"));
-var MessageC_1 = __importDefault(require("./MessageC"));
+var NotificationsC_1 = __importDefault(require("./NotificationsC"));
 var RedirectMessageC = function (_a) {
     var ignore = _a.ignore;
     var _b = __read((0, react_1.useState)(), 2), message = _b[0], setMessage = _b[1];
@@ -52,13 +52,16 @@ var RedirectMessageC = function (_a) {
         var params = new URLSearchParams(window.location.search);
         var message = params.get('message');
         if (message) {
-            setMessage(message);
+            setMessage({
+                text: message,
+                permanent: true
+            });
         }
     }, []);
     if (ignore) {
         return null;
     }
-    return react_1["default"].createElement(MessageC_1["default"], { message: message, type: 'success' });
+    return react_1["default"].createElement(NotificationsC_1["default"], { message: message });
 };
 exports.RedirectMessageC = RedirectMessageC;
 exports["default"] = exports.RedirectMessageC;

@@ -92,18 +92,16 @@ exports.__esModule = true;
 exports.ExperimentConfigC = void 0;
 var react_1 = __importStar(require("react"));
 var material_1 = require("@mui/material");
-var MessageC_1 = require("./MessageC");
+var NotificationsC_1 = __importDefault(require("./NotificationsC"));
 var CardC_1 = __importDefault(require("./CardC"));
 var experimentConfig_1 = __importDefault(require("../../common/models/experimentConfig"));
 var adminApiProvider_1 = require("../adminApiProvider");
 var ExperimentConfigC = function () {
-    var _a = __read((0, react_1.useState)(), 2), info = _a[0], setInfo = _a[1];
-    var _b = __read((0, react_1.useState)(), 2), success = _b[0], setSuccess = _b[1];
-    var _c = __read((0, react_1.useState)(), 2), error = _c[0], setError = _c[1];
-    var _d = __read((0, react_1.useState)(new experimentConfig_1["default"]()), 2), config = _d[0], setConfig = _d[1];
-    var _e = __read((0, react_1.useState)([]), 2), configHistory = _e[0], setConfigHistory = _e[1];
+    var _a = __read((0, react_1.useState)(), 2), message = _a[0], setMessage = _a[1];
+    var _b = __read((0, react_1.useState)(new experimentConfig_1["default"]()), 2), config = _b[0], setConfig = _b[1];
+    var _c = __read((0, react_1.useState)([]), 2), configHistory = _c[0], setConfigHistory = _c[1];
     var api = (0, adminApiProvider_1.useAdminApi)();
-    var _f = __read((0, react_1.useState)(''), 2), probaField = _f[0], setProbaField = _f[1];
+    var _d = __read((0, react_1.useState)(''), 2), probaField = _d[0], setProbaField = _d[1];
     var loadHistory = function () { return __awaiter(void 0, void 0, void 0, function () {
         var configHistory;
         return __generator(this, function (_a) {
@@ -124,17 +122,20 @@ var ExperimentConfigC = function () {
             return __generator(this, function (_a) {
                 switch (_a.label) {
                     case 0:
-                        setInfo('Loading experiment config...');
+                        setMessage({
+                            text: 'Loading experiment config...'
+                        });
                         return [4 /*yield*/, api.getExperimentConfig()];
                     case 1:
                         config = _a.sent();
                         if (config.kind === 'Success') {
                             setConfig(config.value);
                             setProbaField(config.value.nonPersonalizedProbability.toString());
-                            setInfo(undefined);
                         }
                         else {
-                            setInfo(config.message);
+                            setMessage({
+                                text: config.message
+                            });
                         }
                         return [2 /*return*/];
                 }
@@ -146,18 +147,20 @@ var ExperimentConfigC = function () {
         setProbaField(event.target.value);
         var proba = parseFloat(event.target.value);
         if (proba <= 1 && proba >= 0) {
-            setError(undefined);
             setConfig(__assign(__assign({}, config), { nonPersonalizedProbability: parseFloat(event.target.value) }));
         }
         else {
-            setError('Probability must be between 0 and 1');
+            setMessage({
+                text: 'Probability must be between 0 and 1',
+                severity: 'error'
+            });
         }
     };
     var handleSubmit = function (e) {
         e.preventDefault();
-        setInfo('Saving config...');
-        setError(undefined);
-        setSuccess(undefined);
+        setMessage({
+            text: 'Saving config...'
+        });
         (function () { return __awaiter(void 0, void 0, void 0, function () {
             var response;
             return __generator(this, function (_a) {
@@ -166,12 +169,18 @@ var ExperimentConfigC = function () {
                     case 1:
                         response = _a.sent();
                         if (response.kind === 'Success') {
-                            setSuccess('Config saved');
+                            setMessage({
+                                text: 'Config saved',
+                                severity: 'success'
+                            });
                             setConfig(response.value);
                             setProbaField(response.value.nonPersonalizedProbability.toString());
                         }
                         else {
-                            setError(response.message);
+                            setMessage({
+                                text: response.message,
+                                severity: 'error'
+                            });
                         }
                         return [2 /*return*/];
                 }
@@ -180,7 +189,7 @@ var ExperimentConfigC = function () {
         loadHistory()["catch"](console.error);
     };
     var ui = (react_1["default"].createElement(material_1.Box, null,
-        react_1["default"].createElement(MessageC_1.StatusMessageC, __assign({}, { info: info, success: success, error: error }, { sx: { my: 4 } })),
+        react_1["default"].createElement(NotificationsC_1["default"], { message: message }),
         react_1["default"].createElement(material_1.Grid, { container: true, spacing: 8 },
             react_1["default"].createElement(material_1.Grid, { item: true, xs: 12, sm: 6, component: 'section' },
                 react_1["default"].createElement(material_1.Typography, { variant: 'h1', sx: { mb: 4 } }, "Experiment Config"),

@@ -95,11 +95,11 @@ var react_router_dom_1 = require("react-router-dom");
 var material_1 = require("@mui/material");
 var adminApiProvider_1 = require("../adminApiProvider");
 var RedirectMessageC_1 = __importDefault(require("./RedirectMessageC"));
-var MessageC_1 = __importDefault(require("./MessageC"));
+var NotificationsC_1 = __importDefault(require("./NotificationsC"));
 var helpers_1 = require("./helpers");
 var LoginC = function (_a) {
     var email = _a.email, setEmail = _a.setEmail, password = _a.password, setPassword = _a.setPassword, onSuccess = _a.onSuccess, isModal = _a.isModal;
-    var _b = __read((0, react_1.useState)(), 2), error = _b[0], setError = _b[1];
+    var _b = __read((0, react_1.useState)(), 2), message = _b[0], setMessage = _b[1];
     var api = (0, adminApiProvider_1.useAdminApi)();
     var navigate = (0, react_router_dom_1.useNavigate)();
     var tryToLogin = function () {
@@ -113,7 +113,6 @@ var LoginC = function (_a) {
                         console.log('response', response);
                         if (response.kind === 'Success') {
                             api.setAuth(response.value.token, response.value.admin);
-                            setError(undefined);
                             if (!isModal) {
                                 console.log('navigating to /');
                                 navigate('/');
@@ -123,7 +122,10 @@ var LoginC = function (_a) {
                             }
                         }
                         else {
-                            setError(response.message);
+                            setMessage({
+                                text: response.message,
+                                severity: 'error'
+                            });
                         }
                         return [2 /*return*/];
                 }
@@ -141,8 +143,8 @@ var LoginC = function (_a) {
                 e.preventDefault();
             } },
             react_1["default"].createElement("h1", null, "Admin login"),
-            react_1["default"].createElement(RedirectMessageC_1["default"], { ignore: error !== undefined }),
-            react_1["default"].createElement(MessageC_1["default"], { message: error, type: 'error' }),
+            react_1["default"].createElement(RedirectMessageC_1["default"], null),
+            react_1["default"].createElement(NotificationsC_1["default"], { message: message }),
             react_1["default"].createElement(material_1.FormControl, { sx: { mb: 2, display: 'block' } },
                 react_1["default"].createElement(material_1.InputLabel, { htmlFor: 'email' }, "Email"),
                 react_1["default"].createElement(material_1.Input, __assign({ id: 'email', type: 'email' }, (0, helpers_1.bind)(email, setEmail)))),

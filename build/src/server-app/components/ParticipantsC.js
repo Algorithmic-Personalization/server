@@ -1,15 +1,4 @@
 "use strict";
-var __assign = (this && this.__assign) || function () {
-    __assign = Object.assign || function(t) {
-        for (var s, i = 1, n = arguments.length; i < n; i++) {
-            s = arguments[i];
-            for (var p in s) if (Object.prototype.hasOwnProperty.call(s, p))
-                t[p] = s[p];
-        }
-        return t;
-    };
-    return __assign.apply(this, arguments);
-};
 var __createBinding = (this && this.__createBinding) || (Object.create ? (function(o, m, k, k2) {
     if (k2 === undefined) k2 = k;
     var desc = Object.getOwnPropertyDescriptor(m, k);
@@ -96,15 +85,13 @@ var FileUpload_1 = __importDefault(require("@mui/icons-material/FileUpload"));
 var Search_1 = __importDefault(require("@mui/icons-material/Search"));
 var react_router_dom_1 = require("react-router-dom");
 var DownloadLinkC_1 = __importDefault(require("./DownloadLinkC"));
-var MessageC_1 = __importStar(require("./MessageC"));
+var NotificationsC_1 = __importDefault(require("./NotificationsC"));
 var adminApiProvider_1 = require("../adminApiProvider");
 // @ts-expect-error this is a text file, not a module
 var participants_sample_csv_1 = __importDefault(require("../../../public/participants.sample.csv"));
 var UploadFormC = function () {
     var exampleString = participants_sample_csv_1["default"];
-    var _a = __read((0, react_1.useState)(undefined), 2), info = _a[0], setInfo = _a[1];
-    var _b = __read((0, react_1.useState)(undefined), 2), error = _b[0], setError = _b[1];
-    var _c = __read((0, react_1.useState)(undefined), 2), success = _c[0], setSuccess = _c[1];
+    var _a = __read((0, react_1.useState)(), 2), message = _a[0], setMessage = _a[1];
     var form = (0, react_1.useRef)(null);
     var api = (0, adminApiProvider_1.useAdminApi)();
     var onFileChange = function (e) {
@@ -118,17 +105,23 @@ var UploadFormC = function () {
             return __generator(this, function (_a) {
                 switch (_a.label) {
                     case 0:
-                        setInfo('Uploading...');
-                        setError(undefined);
-                        setSuccess(undefined);
+                        setMessage({
+                            text: 'Uploading participants file...'
+                        });
                         return [4 /*yield*/, api.uploadParticipants(file)];
                     case 1:
                         res = _a.sent();
                         if (res.kind === 'Success') {
-                            setSuccess(res.value);
+                            setMessage({
+                                text: res.value,
+                                severity: 'success'
+                            });
                         }
                         else {
-                            setError(res.message);
+                            setMessage({
+                                text: res.message,
+                                severity: 'error'
+                            });
                         }
                         if (form.current) {
                             form.current.reset();
@@ -163,7 +156,7 @@ var UploadFormC = function () {
                     "Upload CSV",
                     react_1["default"].createElement("input", { hidden: true, type: 'file', id: 'list', name: 'list', accept: '.csv', onChange: onFileChange })),
                 react_1["default"].createElement(material_1.FormHelperText, null, "The separator must be a comma.")),
-            react_1["default"].createElement(MessageC_1.StatusMessageC, __assign({}, { info: info, error: error, success: success })))));
+            react_1["default"].createElement(NotificationsC_1["default"], { message: message }))));
     return ui;
 };
 var ParticipantRowC = function (_a) {
@@ -185,7 +178,7 @@ var ListC = function () {
     var pTmp = Math.min(Math.max(parseInt(pageInput, 10), 0), (_a = participants === null || participants === void 0 ? void 0 : participants.pageCount) !== null && _a !== void 0 ? _a : 1);
     var pageInputOk = Number.isInteger(pTmp);
     var page = pageInputOk ? pTmp : 1;
-    var _d = __read((0, react_1.useState)(), 2), error = _d[0], setError = _d[1];
+    var _d = __read((0, react_1.useState)(), 2), message = _d[0], setMessage = _d[1];
     var _e = __read((0, react_1.useState)(''), 2), emailLike = _e[0], setEmailLike = _e[1];
     var api = (0, adminApiProvider_1.useAdminApi)();
     (0, react_1.useEffect)(function () {
@@ -197,11 +190,13 @@ var ListC = function () {
                     case 1:
                         res = _a.sent();
                         if (res.kind === 'Success') {
-                            setError(undefined);
                             setParticipants(res.value);
                         }
                         else {
-                            setError(res.message);
+                            setMessage({
+                                text: res.message,
+                                severity: 'error'
+                            });
                         }
                         return [2 /*return*/];
                 }
@@ -246,7 +241,7 @@ var ListC = function () {
             react_1["default"].createElement("strong", null, "No participant matching")))));
     return (react_1["default"].createElement(material_1.Box, { component: 'section', sx: { mb: 4 } },
         react_1["default"].createElement(material_1.Typography, { variant: 'h2', sx: { mb: 2 } }, "Participants list"),
-        react_1["default"].createElement(MessageC_1["default"], { message: error, type: 'error' }),
+        react_1["default"].createElement(NotificationsC_1["default"], { message: message }),
         list));
 };
 var ParticipantsC = function () { return (react_1["default"].createElement("div", null,

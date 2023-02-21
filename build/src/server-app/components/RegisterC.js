@@ -94,8 +94,7 @@ var react_1 = __importStar(require("react"));
 var material_1 = require("@mui/material");
 var react_router_dom_1 = require("react-router-dom");
 var admin_1 = __importDefault(require("../../common/models/admin"));
-var MessageC_1 = __importDefault(require("./MessageC"));
-var ErrorsC_1 = __importDefault(require("./ErrorsC"));
+var NotificationsC_1 = __importDefault(require("./NotificationsC"));
 var helpers_1 = require("./helpers");
 var adminApiProvider_1 = require("../adminApiProvider");
 var util_1 = require("../../common/util");
@@ -104,9 +103,8 @@ var RegisterC = function (_a) {
     var email = _a.email, setEmail = _a.setEmail, password = _a.password, setPassword = _a.setPassword;
     var _b = __read((0, react_1.useState)(''), 2), confirm = _b[0], setConfirm = _b[1];
     var _c = __read((0, react_1.useState)(''), 2), name = _c[0], setName = _c[1];
-    var _d = __read((0, react_1.useState)([]), 2), errors = _d[0], setErrors = _d[1];
-    var _e = __read((0, react_1.useState)(''), 2), success = _e[0], setSuccess = _e[1];
-    var _f = __read((0, react_1.useState)(false), 2), isSubmitting = _f[0], setIsSubmitting = _f[1];
+    var _d = __read((0, react_1.useState)(), 2), message = _d[0], setMessage = _d[1];
+    var _e = __read((0, react_1.useState)(false), 2), isSubmitting = _e[0], setIsSubmitting = _e[1];
     var api = (0, adminApiProvider_1.useAdminApi)();
     var tryToRegister = function () {
         (function () { return __awaiter(void 0, void 0, void 0, function () {
@@ -127,20 +125,28 @@ var RegisterC = function (_a) {
                             validationErrors.push('Passwords should match');
                         }
                         if (validationErrors.length > 0) {
-                            setErrors(validationErrors);
+                            setMessage({
+                                text: validationErrors,
+                                severity: 'error'
+                            });
                             return [2 /*return*/];
                         }
-                        setErrors([]);
                         setIsSubmitting(true);
                         return [4 /*yield*/, api.register(admin)];
                     case 2:
                         result = _a.sent();
                         setIsSubmitting(false);
                         if (result.kind === 'Success') {
-                            setSuccess(result.value);
+                            setMessage({
+                                text: result.value,
+                                severity: 'success'
+                            });
                         }
                         else {
-                            setErrors([result.message]);
+                            setMessage({
+                                text: result.message,
+                                severity: 'error'
+                            });
                         }
                         return [2 /*return*/];
                 }
@@ -159,8 +165,7 @@ var RegisterC = function (_a) {
                 e.preventDefault();
             } },
             react_1["default"].createElement("h1", null, "Admin registration"),
-            react_1["default"].createElement(ErrorsC_1["default"], { errors: errors }),
-            react_1["default"].createElement(MessageC_1["default"], { message: success, type: 'success' }),
+            react_1["default"].createElement(NotificationsC_1["default"], { message: message }),
             react_1["default"].createElement(material_1.FormControl, { sx: { mb: 2, display: 'block' } },
                 react_1["default"].createElement(material_1.InputLabel, { htmlFor: 'name' }, "Name"),
                 react_1["default"].createElement(material_1.Input, __assign({ id: 'name', type: 'text' }, (0, helpers_1.bind)(name, setName)))),

@@ -103,7 +103,7 @@ var react_1 = __importStar(require("react"));
 var material_1 = require("@mui/material");
 var ContentCopy_1 = __importDefault(require("@mui/icons-material/ContentCopy"));
 var adminApiProvider_1 = require("../adminApiProvider");
-var MessageC_1 = require("./MessageC");
+var NotificationsC_1 = require("./NotificationsC");
 var CardC_1 = __importDefault(require("./CardC"));
 var ConfirmButtonC = function (_a) {
     var action = _a.action, label = _a.label, confirm = _a.confirm, sx = _a.sx;
@@ -172,9 +172,8 @@ var TokenListC = function (_a) {
 };
 var TokenC = function () {
     var _a = __read((0, react_1.useState)(), 2), tokens = _a[0], setTokens = _a[1];
-    var _b = __read((0, react_1.useState)(), 2), error = _b[0], setError = _b[1];
-    var _c = __read((0, react_1.useState)(), 2), success = _c[0], setSuccess = _c[1];
-    var _d = __read((0, react_1.useState)(''), 2), name = _d[0], setName = _d[1];
+    var _b = __read((0, react_1.useState)(''), 2), name = _b[0], setName = _b[1];
+    var _c = __read((0, react_1.useState)(), 2), message = _c[0], setMessage = _c[1];
     var api = (0, adminApiProvider_1.useAdminApi)();
     (0, react_1.useEffect)(function () {
         (function () { return __awaiter(void 0, void 0, void 0, function () {
@@ -188,7 +187,10 @@ var TokenC = function () {
                             setTokens(tokens.value);
                         }
                         else {
-                            setError(tokens.message);
+                            setMessage({
+                                text: tokens.message,
+                                severity: 'error'
+                            });
                         }
                         return [2 /*return*/];
                 }
@@ -206,17 +208,25 @@ var TokenC = function () {
                     token = _a.sent();
                     if (token.kind === 'Success') {
                         setTokens(__spreadArray(__spreadArray([], __read((tokens !== null && tokens !== void 0 ? tokens : [])), false), [token.value], false));
-                        setSuccess('API token created');
-                        setError(undefined);
+                        setMessage({
+                            text: 'API token created',
+                            severity: 'success'
+                        });
                     }
                     else {
-                        setError(token.message);
+                        setMessage({
+                            text: token.message,
+                            severity: 'error'
+                        });
                     }
                     return [3 /*break*/, 3];
                 case 2:
                     error_1 = _a.sent();
                     console.error(error_1);
-                    setError('Failed to create API token, unexpected error');
+                    setMessage({
+                        text: 'Failed to create API token, unexpected error',
+                        severity: 'error'
+                    });
                     return [3 /*break*/, 3];
                 case 3: return [2 /*return*/];
             }
@@ -233,17 +243,24 @@ var TokenC = function () {
                     res = _a.sent();
                     if (res.kind === 'Success') {
                         setTokens((tokens !== null && tokens !== void 0 ? tokens : []).filter(function (t) { return t.token !== token; }));
-                        setError(undefined);
-                        setSuccess('API token deleted');
+                        setMessage({
+                            text: 'API token deleted',
+                            severity: 'warning'
+                        });
                     }
                     else {
-                        setError(res.message);
+                        setMessage({
+                            text: res.message,
+                            severity: 'error'
+                        });
                     }
                     return [3 /*break*/, 3];
                 case 2:
                     error_2 = _a.sent();
-                    console.error(error_2);
-                    setError('Failed to delete API token, unexpected error');
+                    setMessage({
+                        text: 'Failed to delete API token, unexpected error',
+                        severity: 'error'
+                    });
                     return [3 /*break*/, 3];
                 case 3: return [2 /*return*/];
             }
@@ -251,7 +268,7 @@ var TokenC = function () {
     }); }; };
     var ui = (react_1["default"].createElement(material_1.Box, { component: 'section', sx: { mb: 4 } },
         react_1["default"].createElement(material_1.Typography, { variant: 'h2', sx: { mb: 2 } }, "API Tokens"),
-        react_1["default"].createElement(MessageC_1.StatusMessageC, { error: error, success: success }),
+        react_1["default"].createElement(NotificationsC_1.NotificationsC, { message: message }),
         react_1["default"].createElement(material_1.Paper, { sx: { p: 2 } },
             react_1["default"].createElement(TokenListC, { tokens: tokens, deleteToken: deleteToken })),
         react_1["default"].createElement(material_1.Box, { sx: {

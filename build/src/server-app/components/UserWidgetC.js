@@ -74,15 +74,11 @@ var __read = (this && this.__read) || function (o, n) {
     }
     return ar;
 };
-var __importDefault = (this && this.__importDefault) || function (mod) {
-    return (mod && mod.__esModule) ? mod : { "default": mod };
-};
 exports.__esModule = true;
 exports.UserWidgetC = void 0;
 var react_1 = __importStar(require("react"));
 var material_1 = require("@mui/material");
 var adminApiProvider_1 = require("../adminApiProvider");
-var MessageC_1 = __importDefault(require("./MessageC"));
 var UserWidgetC = function () {
     var api = (0, adminApiProvider_1.useAdminApi)();
     var _a = __read((0, react_1.useState)(), 2), admin = _a[0], setAdmin = _a[1];
@@ -107,7 +103,7 @@ var UserWidgetC = function () {
         }); })();
     }, []);
     if (error) {
-        return react_1["default"].createElement(MessageC_1["default"], { message: error, type: 'error' });
+        return react_1["default"].createElement(material_1.Typography, { color: 'error.main' }, error);
     }
     if (!admin) {
         return null;
