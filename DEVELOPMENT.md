@@ -289,7 +289,7 @@ The tokens grant the same access privileges to the API user who sends the token 
 using these tokens.
 
 To get an idea of what data is available,
-you can inspect the requests made by the browser when you use theinterface.
+you can inspect the requests made by the browser when you use the interface.
 
 In order to authenticate with the API you just need to pass the token (the very long string of characters) as the `authorization` header of all of your HTTPS requests.
 
@@ -312,13 +312,13 @@ You can create a participant through the API by sending a `POST` request to to `
 
 ```json
 {
-  "email": "some@email.or-any-identifier-you-want",
-  "code": "some unique code with sufficient entropy so that no one can find one at random",
+  "email": "some@email.or-any-identifier-you.want",
+  "code": "some unique code with sufficient entropy so that no one can find a code at random",
   "arm": "either the string 'control' or 'treatment'"
 }
 ```
 
-As with all API codes, you must include an API token in your request, as the `authorization` header.
+As with all API calls, you must include a valid API token in your request, passed to the server with the `authorization` header.
 
 The API should reply with either
 
@@ -341,7 +341,7 @@ or, in case of error:
 
 with an error HTTP status code depending on what happened.
 
-An example CURL request could be:
+An example CURL request to create a participant could be:
 
 ```bash
 curl -X POST https://ytdpnl.fmdj.fr/api/participant \
