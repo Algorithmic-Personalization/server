@@ -104,6 +104,7 @@ var watchTime_1 = __importDefault(require("./models/watchTime"));
 var videoListItem_1 = __importDefault(require("./models/videoListItem"));
 var smtpConfig_1 = __importDefault(require("./lib/smtpConfig"));
 var webpack_config_1 = __importDefault(require("../../webpack.config"));
+var routeContext_1 = require("./lib/routeContext");
 var logger_1 = require("./lib/logger");
 var crypto_1 = require("./lib/crypto");
 var authMiddleware_1 = __importDefault(require("./lib/authMiddleware"));
@@ -149,7 +150,7 @@ if (env !== 'production' && env !== 'development') {
 }
 var upload = (0, multer_1["default"])();
 var start = function () { return __awaiter(void 0, void 0, void 0, function () {
-    var root, logsPath, logStream, configJson, config, dockerComposeJson, dockerComposeConfig, smtpConfig, smtpConfigErrors, mailer, portKey, port, dbPortString, _a, dbHostPort, dbDockerPort, dbPort, dbConfigPath, dbHost, dbUser, dbPassword, dbDatabase, dbConfig, pgClient, err_1, migrated, err_2, ds, err_3, createLogger, privateKey, tokenTools, routeContext, tokenRepo, authMiddleware, participantMw, app, staticRouter, compiler, requestId;
+    var root, logsPath, logStream, configJson, config, dockerComposeJson, dockerComposeConfig, smtpConfig, smtpConfigErrors, mailer, portKey, port, dbPortString, _a, dbHostPort, dbDockerPort, dbPort, dbConfigPath, dbHost, dbUser, dbPassword, dbDatabase, dbConfig, pgClient, err_1, migrated, err_2, ds, err_3, createLogger, privateKey, tokenTools, routeContext, connect, tokenRepo, authMiddleware, participantMw, app, staticRouter, compiler, requestId;
     return __generator(this, function (_b) {
         switch (_b.label) {
             case 0: return [4 /*yield*/, (0, util_1.findPackageJsonDir)(__dirname)];
@@ -261,6 +262,7 @@ var start = function () { return __awaiter(void 0, void 0, void 0, function () {
                     createLogger: createLogger,
                     tokenTools: tokenTools
                 };
+                connect = (0, routeContext_1.makeRouteConnector)(routeContext);
                 tokenRepo = ds.getRepository(token_1["default"]);
                 authMiddleware = (0, authMiddleware_1["default"])({
                     tokenRepo: tokenRepo,
@@ -297,7 +299,7 @@ var start = function () { return __awaiter(void 0, void 0, void 0, function () {
                 app["delete"](serverRoutes_1.deleteApiToken, authMiddleware, (0, deleteApiToken_1["default"])(routeContext));
                 app.get(serverRoutes_1.getAuthTest, authMiddleware, (0, authTest_1["default"])(routeContext));
                 app.post(serverRoutes_1.postUploadParticipants, authMiddleware, upload.single('participants'), (0, uploadParticipants_1["default"])(routeContext));
-                app.post(serverRoutes_1.postCreateParticipant, authMiddleware, (0, createParticipant_1["default"])(routeContext));
+                app.post(serverRoutes_1.postCreateParticipant, authMiddleware, connect(createParticipant_1["default"]));
                 app.get("".concat(serverRoutes_1.getParticipants, "/:page?"), authMiddleware, (0, getParticipants_1["default"])(routeContext));
                 app.get("".concat(serverRoutes_1.getParticipantOverview, "/:email"), authMiddleware, (0, getParticipantOverview_1["default"])(routeContext));
                 app.get("".concat(serverRoutes_1.getEventOverviews, "/:sessionUuid"), authMiddleware, (0, getEventOverviews_1["default"])(routeContext));

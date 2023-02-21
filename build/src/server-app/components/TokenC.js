@@ -161,11 +161,13 @@ var TokenListC = function (_a) {
                 userSelect: 'none'
             } }, token.token),
         react_1["default"].createElement(material_1.Box, { sx: {
+                mt: 1,
                 display: 'flex',
-                flexDirection: 'row',
-                alignItems: 'center'
+                flexDirection: { xs: 'column', sm: 'row' },
+                gap: 1,
+                alignItems: { xs: 'stretch', sm: 'center' }
             } },
-            react_1["default"].createElement(ConfirmButtonC, { sx: { mr: 1 }, action: deleteToken(token.token), label: 'Delete this token' }),
+            react_1["default"].createElement(ConfirmButtonC, { action: deleteToken(token.token), label: 'Delete this token', confirm: 'Are you sure you want to delete this token?' }),
             react_1["default"].createElement(CopyToClipboardC, { text: token.token })))); })));
 };
 var TokenC = function () {

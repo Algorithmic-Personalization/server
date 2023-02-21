@@ -39,44 +39,26 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
     return (mod && mod.__esModule) ? mod : { "default": mod };
 };
 exports.__esModule = true;
-exports.createCreateParticipantRoute = void 0;
+exports.buildParticipantRoute = void 0;
 var participant_1 = require("../lib/participant");
 var participant_2 = __importDefault(require("../models/participant"));
-var createCreateParticipantRoute = function (_a) {
+var buildParticipantRoute = function (_a) {
     var createLogger = _a.createLogger, dataSource = _a.dataSource;
-    return function (req, res) { return __awaiter(void 0, void 0, void 0, function () {
-        var log, participant, participantRepo, participantEntity, value, error_1;
+    return function (req) { return __awaiter(void 0, void 0, void 0, function () {
+        var log, participant, participantRepo, participantEntity;
         return __generator(this, function (_a) {
-            switch (_a.label) {
-                case 0:
-                    log = createLogger(req.requestId);
-                    log('Received create participant request');
-                    participant = req.body;
-                    if (!(0, participant_1.isParticipantRecord)(participant)) {
-                        log('invalid participant:', participant);
-                        res.status(400).json({ kind: 'Failure', message: 'Invalid participant' });
-                        return [2 /*return*/];
-                    }
-                    participantRepo = dataSource.getRepository(participant_2["default"]);
-                    participantEntity = new participant_2["default"]();
-                    Object.assign(participantEntity, participant);
-                    _a.label = 1;
-                case 1:
-                    _a.trys.push([1, 3, , 4]);
-                    return [4 /*yield*/, participantRepo.save(participantEntity)];
-                case 2:
-                    value = _a.sent();
-                    res.status(200).json({ kind: 'Success', value: value });
-                    return [3 /*break*/, 4];
-                case 3:
-                    error_1 = _a.sent();
-                    log('error:', error_1);
-                    res.status(500).json({ kind: 'Failure', message: 'Error creating participant' });
-                    return [3 /*break*/, 4];
-                case 4: return [2 /*return*/];
+            log = createLogger(req.requestId);
+            log('Received create participant request');
+            participant = req.body;
+            if (!(0, participant_1.isParticipantRecord)(participant)) {
+                throw new Error('Invalid participant record');
             }
+            participantRepo = dataSource.getRepository(participant_2["default"]);
+            participantEntity = new participant_2["default"]();
+            Object.assign(participantEntity, participant);
+            return [2 /*return*/, participantRepo.save(participantEntity)];
         });
     }); };
 };
-exports.createCreateParticipantRoute = createCreateParticipantRoute;
-exports["default"] = exports.createCreateParticipantRoute;
+exports.buildParticipantRoute = buildParticipantRoute;
+exports["default"] = exports.buildParticipantRoute;
