@@ -43,6 +43,7 @@ import {createDefaultLogger} from './lib/logger';
 import {createTokenTools} from './lib/crypto';
 import createAuthMiddleWare from './lib/authMiddleware';
 import createParticipantMiddleware from './lib/participantMiddleware';
+import updateCounters from './lib/updateCounters';
 
 import {
 	postCheckParticipantCode,
@@ -220,6 +221,11 @@ const start = async () => {
 	console.log('Successfully initialized data source');
 
 	const createLogger = createDefaultLogger(logStream);
+
+	await updateCounters({
+		dataSource: ds,
+		log: createLogger(0),
+	});
 
 	const privateKey = await readFile(join(root, 'private.key'), 'utf-8');
 	const tokenTools = createTokenTools(privateKey);
