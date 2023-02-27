@@ -175,6 +175,9 @@ export const updateCounters = async ({
 
 		try {
 			await atRepo.save(activityTimes);
+			if (activityTimes.length > 0) {
+				log(`Saved activity times for ${activityTimes.length} participants`);
+			}
 		} catch (error) {
 			log(`Error saving activity times for participant ${participant.id}:`, error);
 			log('Activity times:', activityTimes);
