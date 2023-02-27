@@ -1,13 +1,11 @@
 /* eslint-disable @typescript-eslint/no-inferrable-types */
 import {Column, Entity} from 'typeorm';
+import Model from '../../common/lib/model';
 
 @Entity()
-export class DailyActivityTime {
+export class DailyActivityTime extends Model {
 	@Column()
 		participantId: number = 0;
-
-	@Column()
-		date: Date = new Date();
 
 	@Column()
 		pagesViewed: number = 0;

@@ -32,6 +32,7 @@ import Event from '../common/models/event';
 import Video from './models/video';
 import WatchTime from './models/watchTime';
 import VideoListItem from './models/videoListItem';
+import DailyActivityTime from './models/dailyActivityTime';
 
 import SmtpConfig from './lib/smtpConfig';
 
@@ -104,6 +105,7 @@ const entities = [
 	Video,
 	VideoListItem,
 	WatchTime,
+	DailyActivityTime,
 ];
 
 const env = process.env.NODE_ENV;
