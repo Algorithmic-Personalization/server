@@ -152,12 +152,13 @@ var TimeSpentCounter = /** @class */ (function (_super) {
         var day = (0, exports.wholeDateAsNumber)(date);
         if (!this.currentDay || day > this.currentDay) {
             this.currentDay = day;
+            this.latestDate = date;
             return;
         }
-        this.latestDate = day;
         var existingValue = (_a = this.get(date)) !== null && _a !== void 0 ? _a : 0;
         var diff = Number(date) - Number(this.latestDate);
-        if (diff > exports.timeSpentEventDiffLimit) {
+        this.latestDate = date;
+        if (diff > exports.timeSpentEventDiffLimit || diff < 0) {
             return;
         }
         this.set(date, existingValue + (diff / 1000));

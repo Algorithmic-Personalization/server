@@ -53,22 +53,23 @@ export const timeSpentEventDiffLimit = 30 * 60 * 1000;
 
 class TimeSpentCounter extends Counter {
 	currentDay?: number;
-	latestDate?: number;
+	latestDate?: Date;
 
 	add(date: Date) {
 		const day = wholeDateAsNumber(date);
 
 		if (!this.currentDay || day > this.currentDay) {
 			this.currentDay = day;
+			this.latestDate = date;
 			return;
 		}
-
-		this.latestDate = day;
 
 		const existingValue = this.get(date) ?? 0;
 		const diff = Number(date) - Number(this.latestDate);
 
-		if (diff > timeSpentEventDiffLimit) {
+		this.latestDate = date;
+
+		if (diff > timeSpentEventDiffLimit || diff < 0) {
 			return;
 		}
 
