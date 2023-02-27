@@ -10,24 +10,32 @@ import WatchTime from '../models/watchTime';
 import {inspect} from 'util';
 import DailyActivityTime from '../models/dailyActivityTime';
 
+export const wholeDate = (date: Date): number =>
+	new Date(date).setHours(0, 0, 0, 0);
+
+export const toDate = (date: number): Date => new Date(date);
+
 class Counter {
-	days = new Map<Date, number>();
+	days = new Map<number, number>();
 
 	get(date: Date) {
-		return this.days.get(date) ?? 0;
+		return this.days.get(wholeDate(date)) ?? 0;
+	}
+
+	set(date: Date, value: number) {
+		this.days.set(wholeDate(date), value);
 	}
 }
 
 class DayCounter extends Counter {
 	add(date: Date, value: number) {
-		const day = new Date(new Date(date).setHours(0, 0, 0, 0));
-		const existingValue = this.days.get(day) ?? 0;
-		this.days.set(date, existingValue + value);
+		const existingValue = this.get(date) ?? 0;
+		this.set(date, existingValue + value);
 	}
 }
 
-const mergeCounterKeys = (...counters: Counter[]): Set<Date> => {
-	const keys = new Set<Date>();
+const mergeCounterKeys = (...counters: Counter[]): Date[] => {
+	const keys = new Set<number>();
 
 	for (const counter of counters) {
 		for (const key of counter.days.keys()) {
@@ -35,33 +43,34 @@ const mergeCounterKeys = (...counters: Counter[]): Set<Date> => {
 		}
 	}
 
-	return keys;
+	const numbers = Array.from(keys);
+	return numbers.map(toDate);
 };
 
 export const timeSpentEventDiffLimit = 30 * 60 * 1000;
 
 class TimeSpentCounter extends Counter {
-	currentDay?: Date;
-	latestDate?: Date;
+	currentDay?: number;
+	latestDate?: number;
 
 	add(date: Date) {
-		const day = new Date(new Date(date).setHours(0, 0, 0, 0));
+		const day = wholeDate(date);
 
 		if (!this.currentDay || day > this.currentDay) {
 			this.currentDay = day;
 			return;
 		}
 
-		this.latestDate = date;
+		this.latestDate = day;
 
-		const existingValue = this.days.get(day) ?? 0;
+		const existingValue = this.get(date) ?? 0;
 		const diff = Number(date) - Number(this.latestDate);
 
 		if (diff > timeSpentEventDiffLimit) {
 			return;
 		}
 
-		this.days.set(date, existingValue + (diff / 1000));
+		this.set(date, existingValue + (diff / 1000));
 	}
 }
 
@@ -73,6 +82,7 @@ export const updateCounters = async ({
 	dataSource: DataSource;
 }) => {
 	log('Updating counters...');
+	const atRepo = dataSource.getRepository(DailyActivityTime);
 
 	const participants: Array<{id: number}> = await dataSource
 		.getRepository(Participant)
@@ -150,7 +160,6 @@ export const updateCounters = async ({
 			timeSpent,
 		);
 
-		const atRepo = dataSource.getRepository(DailyActivityTime);
 		const activityTimes: DailyActivityTime[] = [];
 
 		for (const day of days) {
@@ -160,8 +169,11 @@ export const updateCounters = async ({
 			activity.videoPagesViewed = videoPagesViewed.get(day);
 			activity.timeSpentOnYoutubeSeconds = timeSpent.get(day);
 			activity.participantId = participant.id;
+			activity.createdAt = day;
 			activityTimes.push(activity);
 		}
+
+		console.log(inspect(activityTimes));
 
 		await atRepo.save(activityTimes);
 	}
