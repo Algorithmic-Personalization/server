@@ -59,7 +59,7 @@ exports.createGetActivityReportDefinition = {
                                     updatedAt: 'DESC'
                                 },
                                 relations: ['participant'],
-                                take: 10
+                                take: 100
                             })];
                     case 1:
                         latestActivity = _a.sent();
