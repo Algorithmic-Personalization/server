@@ -128,7 +128,7 @@ var ReportLineC = function (_a) {
                 react_1["default"].createElement(LegendC, { text: 'Video time viewed (seconds)' }),
                 react_1["default"].createElement(material_1.Typography, null, Math.round(entry.videoTimeViewedSeconds))),
             react_1["default"].createElement(material_1.Grid, { item: true, lg: 2, xs: 12 },
-                react_1["default"].createElement(LegendC, { text: 'Approximate time spent on YouTube' }),
+                react_1["default"].createElement(LegendC, { text: 'Approximate time spent on YouTube (seconds)' }),
                 react_1["default"].createElement(material_1.Typography, null, Math.round(entry.timeSpentOnYoutubeSeconds))))));
     return ui;
 };
@@ -149,7 +149,7 @@ var ActivityReportC = function (_a) {
                 react_1["default"].createElement(material_1.Grid, { item: true, lg: 2 },
                     react_1["default"].createElement(material_1.Typography, { sx: { fontWeight: 'bold' } }, "Video time viewed (seconds)")),
                 react_1["default"].createElement(material_1.Grid, { item: true, lg: 2 },
-                    react_1["default"].createElement(material_1.Typography, { sx: { fontWeight: 'bold' } }, "Approximate time spent on YouTube")))),
+                    react_1["default"].createElement(material_1.Typography, { sx: { fontWeight: 'bold' } }, "Approximate time spent on YouTube (seconds)")))),
         react_1["default"].createElement(material_1.Box, null, report.latest.map(function (entry) { return react_1["default"].createElement(ReportLineC, { key: entry.id, entry: entry }); }))));
     return ui;
 };

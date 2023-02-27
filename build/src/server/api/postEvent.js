@@ -314,7 +314,8 @@ var createUpdateActivity = function (_a) {
                     dt = latestSessionEvent
                         ? Number(event.createdAt) - Number(latestSessionEvent.createdAt)
                         : 0;
-                    if (dt > updateCounters_1.timeSpentEventDiffLimit) {
+                    log('Time since last event:', dt / 1000);
+                    if (dt < updateCounters_1.timeSpentEventDiffLimit) {
                         activity.timeSpentOnYoutubeSeconds += dt / 1000;
                     }
                     if (event.type === event_1.EventType.WATCH_TIME) {
@@ -437,11 +438,11 @@ var createPostEventRoute = function (_a) {
                 case 13: return [3 /*break*/, 15];
                 case 14:
                     e_3 = _a.sent();
-                    log('event save failed', e_3);
                     if (isLocalUuidAlreadyExistsError(e_3)) {
                         res.status(500).json({ kind: 'Failure', message: 'Event already exists', code: 'EVENT_ALREADY_EXISTS_OK' });
                         return [2 /*return*/];
                     }
+                    log('event save failed', e_3);
                     res.status(500).json({ kind: 'Failure', message: 'Event save failed' });
                     return [3 /*break*/, 15];
                 case 15: return [2 /*return*/];
