@@ -193,7 +193,7 @@ const createUpdateActivity = ({activityRepo, eventRepo, log}: {
 
 	log('Time since last event:', dt / 1000);
 
-	if (dt > timeSpentEventDiffLimit) {
+	if (dt < timeSpentEventDiffLimit) {
 		activity.timeSpentOnYoutubeSeconds += dt / 1000;
 	}
 
@@ -304,12 +304,12 @@ export const createPostEventRoute: RouteCreator = ({createLogger, dataSource}) =
 			await storeWatchTime(log, dataSource, event as WatchTimeEvent);
 		}
 	} catch (e) {
-		log('event save failed', e);
-
 		if (isLocalUuidAlreadyExistsError(e)) {
 			res.status(500).json({kind: 'Failure', message: 'Event already exists', code: 'EVENT_ALREADY_EXISTS_OK'});
 			return;
 		}
+
+		log('event save failed', e);
 
 		res.status(500).json({kind: 'Failure', message: 'Event save failed'});
 	}
