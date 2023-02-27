@@ -15,6 +15,10 @@ import WatchTime from '../models/watchTime';
 import type Recommendation from '../../common/types/Recommendation';
 
 import {validateNew, has} from '../../common/util';
+import DailyActivityTime from '../models/dailyActivityTime';
+import {timeSpentEventDiffLimit, wholeDate} from '../lib/updateCounters';
+
+import {withLock} from '../../util';
 
 const storeVideos = async (repo: Repository<Video>, videos: Video[]): Promise<number[]> => {
 	const ids: number[] = [];
@@ -139,6 +143,75 @@ const isLocalUuidAlreadyExistsError = (e: unknown): boolean =>
 	&& e.code === '23505'
 	&& e.constraint === 'event_local_uuid_idx';
 
+const getOrCreateActivity = async (
+	repo: Repository<DailyActivityTime>,
+	participantId: number,
+	day: Date,
+) => {
+	const existing = await repo.findOneBy({
+		participantId,
+		createdAt: day,
+	});
+
+	if (existing) {
+		return existing;
+	}
+
+	const newActivity = new DailyActivityTime();
+	newActivity.participantId = participantId;
+	newActivity.createdAt = day;
+
+	return repo.save(newActivity);
+};
+
+const createUpdateActivity = ({activityRepo, eventRepo}: {
+	activityRepo: Repository<DailyActivityTime>;
+	eventRepo: Repository<Event>;
+}) => async (
+	participant: Participant,
+	event: Event,
+) => {
+	const day = wholeDate(event.createdAt);
+
+	const newActivityTime = new DailyActivityTime();
+	newActivityTime.participantId = participant.id;
+	newActivityTime.createdAt = day;
+
+	const latestSessionEvent = await eventRepo
+		.findOne({
+			where: {
+				sessionUuid: event.sessionUuid,
+			},
+			order: {
+				createdAt: 'DESC',
+			},
+		});
+
+	const dt = latestSessionEvent
+		? Number(event.createdAt) - Number(latestSessionEvent.createdAt)
+		: 0;
+
+	const activity = await getOrCreateActivity(activityRepo, participant.id, day);
+
+	if (dt > timeSpentEventDiffLimit) {
+		activity.timeSpentOnYoutubeSeconds += dt / 1000;
+	}
+
+	if (event.type === EventType.WATCH_TIME) {
+		activity.videoTimeViewedSeconds += (event as WatchTimeEvent).secondsWatched;
+	}
+
+	if (event.type === EventType.PAGE_VIEW) {
+		activity.pagesViewed += 1;
+
+		if (event.url.includes('/watch')) {
+			activity.videoPagesViewed += 1;
+		}
+	}
+
+	await activityRepo.save(newActivityTime);
+};
+
 export const createPostEventRoute: RouteCreator = ({createLogger, dataSource}) => async (req, res) => {
 	const log = createLogger(req.requestId);
 
@@ -164,18 +237,24 @@ export const createPostEventRoute: RouteCreator = ({createLogger, dataSource}) =
 	event.updatedAt = new Date(event.updatedAt);
 
 	const participantRepo = dataSource.getRepository(Participant);
+	const activityRepo = dataSource.getRepository(DailyActivityTime);
+	const eventRepo = dataSource.getRepository(Event);
+
+	const updateActivity = createUpdateActivity({activityRepo, eventRepo});
+
+	const participant = await participantRepo.findOneBy({
+		code: participantCode,
+	});
+
+	if (!participant) {
+		log('no participant found');
+		res.status(500).json({kind: 'Failure', message: 'No participant found'});
+		return;
+	}
+
+	const withParticipantLock = withLock(`participant-${participant.id}`);
 
 	if (!event.arm) {
-		const participant = await participantRepo.findOneBy({
-			code: participantCode,
-		});
-
-		if (!participant) {
-			log('no participant found');
-			res.status(500).json({kind: 'Failure', message: 'No participant found'});
-			return;
-		}
-
 		event.arm = participant.arm;
 	}
 
@@ -203,7 +282,12 @@ export const createPostEventRoute: RouteCreator = ({createLogger, dataSource}) =
 	}
 
 	try {
-		const eventRepo = dataSource.getRepository(Event);
+		await withParticipantLock(async () => updateActivity(participant, event));
+	} catch (e) {
+		log('activity update failed', e);
+	}
+
+	try {
 		const e = await eventRepo.save(event);
 		log('event saved', e);
 		res.send({kind: 'Success', value: e});

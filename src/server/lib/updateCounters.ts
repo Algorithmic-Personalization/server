@@ -10,20 +10,22 @@ import WatchTime from '../models/watchTime';
 import {inspect} from 'util';
 import DailyActivityTime from '../models/dailyActivityTime';
 
-export const wholeDate = (date: Date): number =>
+export const wholeDateAsNumber = (date: Date): number =>
 	new Date(date).setHours(0, 0, 0, 0);
 
 export const toDate = (date: number): Date => new Date(date);
+
+export const wholeDate = (date: Date): Date => toDate(wholeDateAsNumber(date));
 
 class Counter {
 	days = new Map<number, number>();
 
 	get(date: Date) {
-		return this.days.get(wholeDate(date)) ?? 0;
+		return this.days.get(wholeDateAsNumber(date)) ?? 0;
 	}
 
 	set(date: Date, value: number) {
-		this.days.set(wholeDate(date), value);
+		this.days.set(wholeDateAsNumber(date), value);
 	}
 }
 
@@ -54,7 +56,7 @@ class TimeSpentCounter extends Counter {
 	latestDate?: number;
 
 	add(date: Date) {
-		const day = wholeDate(date);
+		const day = wholeDateAsNumber(date);
 
 		if (!this.currentDay || day > this.currentDay) {
 			this.currentDay = day;
@@ -87,12 +89,10 @@ export const updateCounters = async ({
 	const participants: Array<{id: number}> = await dataSource
 		.getRepository(Participant)
 		.createQueryBuilder('participant')
-		.leftJoinAndSelect(
-			'daily_activity_time',
-			'dat',
-			'dat.participant_id=participant.id and dat.participant_id=participant.id is null',
-		)
-		.select('distinct participant.id', 'id')
+		.select('participant.id', 'id')
+		.where(`participant.id not in (
+				select participant_id from daily_activity_time
+		)`)
 		.getRawMany();
 
 	log(`Found ${inspect(participants)} participants to update`);
@@ -173,9 +173,12 @@ export const updateCounters = async ({
 			activityTimes.push(activity);
 		}
 
-		console.log(inspect(activityTimes));
-
-		await atRepo.save(activityTimes);
+		try {
+			await atRepo.save(activityTimes);
+		} catch (error) {
+			log(`Error saving activity times for participant ${participant.id}:`, error);
+			log('Activity times:', activityTimes);
+		}
 	}
 };
 
