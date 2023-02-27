@@ -56,7 +56,12 @@ class TimeSpentCounter extends Counter {
 
 		const existingValue = this.days.get(day) ?? 0;
 		const diff = Number(date) - Number(this.latestDate);
-		this.days.set(date, (existingValue + diff) / 1000);
+
+		if (diff > timeSpentEventDiffLimit) {
+			return;
+		}
+
+		this.days.set(date, existingValue + (diff / 1000));
 	}
 }
 
