@@ -66,7 +66,7 @@ const ReportLineC: React.FC<{
 					<Typography>{Math.round(entry.videoTimeViewedSeconds)}</Typography>
 				</Grid>
 				<Grid item lg={2} xs={12}>
-					<LegendC text='Approximate time spent on YouTube'/>
+					<LegendC text='Approximate time spent on YouTube (seconds)'/>
 					<Typography>{Math.round(entry.timeSpentOnYoutubeSeconds)}</Typography>
 				</Grid>
 			</Grid>
@@ -100,7 +100,7 @@ const ActivityReportC: React.FC<{
 						<Typography sx={{fontWeight: 'bold'}}>Video time viewed (seconds)</Typography>
 					</Grid>
 					<Grid item lg={2}>
-						<Typography sx={{fontWeight: 'bold'}}>Approximate time spent on YouTube</Typography>
+						<Typography sx={{fontWeight: 'bold'}}>Approximate time spent on YouTube (seconds)</Typography>
 					</Grid>
 				</Grid>
 			</Box>
