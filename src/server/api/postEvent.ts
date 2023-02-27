@@ -173,9 +173,9 @@ const createUpdateActivity = ({activityRepo, eventRepo}: {
 ) => {
 	const day = wholeDate(event.createdAt);
 
-	const newActivityTime = new DailyActivityTime();
-	newActivityTime.participantId = participant.id;
-	newActivityTime.createdAt = day;
+	const activityTime = new DailyActivityTime();
+	activityTime.participantId = participant.id;
+	activityTime.createdAt = day;
 
 	const latestSessionEvent = await eventRepo
 		.findOne({
@@ -209,7 +209,9 @@ const createUpdateActivity = ({activityRepo, eventRepo}: {
 		}
 	}
 
-	await activityRepo.save(newActivityTime);
+	activityTime.updatedAt = new Date();
+
+	await activityRepo.save(activityTime);
 };
 
 export const createPostEventRoute: RouteCreator = ({createLogger, dataSource}) => async (req, res) => {

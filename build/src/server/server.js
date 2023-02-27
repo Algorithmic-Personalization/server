@@ -102,6 +102,7 @@ var event_1 = __importDefault(require("../common/models/event"));
 var video_1 = __importDefault(require("./models/video"));
 var watchTime_1 = __importDefault(require("./models/watchTime"));
 var videoListItem_1 = __importDefault(require("./models/videoListItem"));
+var dailyActivityTime_1 = __importDefault(require("./models/dailyActivityTime"));
 var smtpConfig_1 = __importDefault(require("./lib/smtpConfig"));
 var webpack_config_1 = __importDefault(require("../../webpack.config"));
 var routeCreation_1 = require("./lib/routeCreation");
@@ -109,6 +110,7 @@ var logger_1 = require("./lib/logger");
 var crypto_1 = require("./lib/crypto");
 var authMiddleware_1 = __importDefault(require("./lib/authMiddleware"));
 var participantMiddleware_1 = __importDefault(require("./lib/participantMiddleware"));
+var updateCounters_1 = __importDefault(require("./lib/updateCounters"));
 var clientRoutes_1 = require("../common/clientRoutes");
 var serverRoutes_1 = require("./serverRoutes");
 var register_1 = __importDefault(require("./api/register"));
@@ -143,6 +145,7 @@ var entities = [
     video_1["default"],
     videoListItem_1["default"],
     watchTime_1["default"],
+    dailyActivityTime_1["default"],
 ];
 var env = process.env.NODE_ENV;
 if (env !== 'production' && env !== 'development') {
@@ -150,7 +153,7 @@ if (env !== 'production' && env !== 'development') {
 }
 var upload = (0, multer_1["default"])();
 var start = function () { return __awaiter(void 0, void 0, void 0, function () {
-    var root, logsPath, logStream, configJson, config, dockerComposeJson, dockerComposeConfig, smtpConfig, smtpConfigErrors, mailer, portKey, port, dbPortString, _a, dbHostPort, dbDockerPort, dbPort, dbConfigPath, dbHost, dbUser, dbPassword, dbDatabase, dbConfig, pgClient, err_1, migrated, err_2, ds, err_3, createLogger, privateKey, tokenTools, routeContext, makeHandler, tokenRepo, authMiddleware, participantMw, app, staticRouter, compiler, requestId, defineAdminRoute;
+    var root, logsPath, logStream, configJson, config, dockerComposeJson, dockerComposeConfig, smtpConfig, smtpConfigErrors, mailer, portKey, port, dbPortString, _a, dbHostPort, dbDockerPort, dbPort, dbConfigPath, dbHost, dbUser, dbPassword, dbDatabase, dbConfig, pgClient, err_1, migrated, err_2, ds, err_3, createLogger, err_4, privateKey, tokenTools, routeContext, makeHandler, tokenRepo, authMiddleware, participantMw, app, staticRouter, compiler, requestId, defineAdminRoute;
     return __generator(this, function (_b) {
         switch (_b.label) {
             case 0: return [4 /*yield*/, (0, util_1.findPackageJsonDir)(__dirname)];
@@ -251,8 +254,23 @@ var start = function () { return __awaiter(void 0, void 0, void 0, function () {
             case 16:
                 console.log('Successfully initialized data source');
                 createLogger = (0, logger_1.createDefaultLogger)(logStream);
-                return [4 /*yield*/, (0, promises_1.readFile)((0, path_1.join)(root, 'private.key'), 'utf-8')];
+                _b.label = 17;
             case 17:
+                _b.trys.push([17, 19, , 20]);
+                return [4 /*yield*/, (0, updateCounters_1["default"])({
+                        dataSource: ds,
+                        log: createLogger(0)
+                    })];
+            case 18:
+                _b.sent();
+                return [3 /*break*/, 20];
+            case 19:
+                err_4 = _b.sent();
+                console.error('Error updating activity counters:', err_4);
+                process.exit(1);
+                return [3 /*break*/, 20];
+            case 20: return [4 /*yield*/, (0, promises_1.readFile)((0, path_1.join)(root, 'private.key'), 'utf-8')];
+            case 21:
                 privateKey = _b.sent();
                 tokenTools = (0, crypto_1.createTokenTools)(privateKey);
                 routeContext = {

@@ -81,6 +81,9 @@ var video_1 = __importDefault(require("../models/video"));
 var videoListItem_1 = __importStar(require("../models/videoListItem"));
 var watchTime_1 = __importDefault(require("../models/watchTime"));
 var util_1 = require("../../common/util");
+var dailyActivityTime_1 = __importDefault(require("../models/dailyActivityTime"));
+var updateCounters_1 = require("../lib/updateCounters");
+var util_2 = require("../../util");
 var storeVideos = function (repo, videos) { return __awaiter(void 0, void 0, void 0, function () {
     var ids, videos_1, videos_1_1, video, existing, newVideo, saved, e_1_1;
     var e_1, _a;
@@ -265,10 +268,79 @@ var isLocalUuidAlreadyExistsError = function (e) {
         && e.code === '23505'
         && e.constraint === 'event_local_uuid_idx';
 };
+var getOrCreateActivity = function (repo, participantId, day) { return __awaiter(void 0, void 0, void 0, function () {
+    var existing, newActivity;
+    return __generator(this, function (_a) {
+        switch (_a.label) {
+            case 0: return [4 /*yield*/, repo.findOneBy({
+                    participantId: participantId,
+                    createdAt: day
+                })];
+            case 1:
+                existing = _a.sent();
+                if (existing) {
+                    return [2 /*return*/, existing];
+                }
+                newActivity = new dailyActivityTime_1["default"]();
+                newActivity.participantId = participantId;
+                newActivity.createdAt = day;
+                return [2 /*return*/, repo.save(newActivity)];
+        }
+    });
+}); };
+var createUpdateActivity = function (_a) {
+    var activityRepo = _a.activityRepo, eventRepo = _a.eventRepo;
+    return function (participant, event) { return __awaiter(void 0, void 0, void 0, function () {
+        var day, activityTime, latestSessionEvent, dt, activity;
+        return __generator(this, function (_a) {
+            switch (_a.label) {
+                case 0:
+                    day = (0, updateCounters_1.wholeDate)(event.createdAt);
+                    activityTime = new dailyActivityTime_1["default"]();
+                    activityTime.participantId = participant.id;
+                    activityTime.createdAt = day;
+                    return [4 /*yield*/, eventRepo
+                            .findOne({
+                            where: {
+                                sessionUuid: event.sessionUuid
+                            },
+                            order: {
+                                createdAt: 'DESC'
+                            }
+                        })];
+                case 1:
+                    latestSessionEvent = _a.sent();
+                    dt = latestSessionEvent
+                        ? Number(event.createdAt) - Number(latestSessionEvent.createdAt)
+                        : 0;
+                    return [4 /*yield*/, getOrCreateActivity(activityRepo, participant.id, day)];
+                case 2:
+                    activity = _a.sent();
+                    if (dt > updateCounters_1.timeSpentEventDiffLimit) {
+                        activity.timeSpentOnYoutubeSeconds += dt / 1000;
+                    }
+                    if (event.type === event_1.EventType.WATCH_TIME) {
+                        activity.videoTimeViewedSeconds += event.secondsWatched;
+                    }
+                    if (event.type === event_1.EventType.PAGE_VIEW) {
+                        activity.pagesViewed += 1;
+                        if (event.url.includes('/watch')) {
+                            activity.videoPagesViewed += 1;
+                        }
+                    }
+                    activityTime.updatedAt = new Date();
+                    return [4 /*yield*/, activityRepo.save(activityTime)];
+                case 3:
+                    _a.sent();
+                    return [2 /*return*/];
+            }
+        });
+    }); };
+};
 var createPostEventRoute = function (_a) {
     var createLogger = _a.createLogger, dataSource = _a.dataSource;
     return function (req, res) { return __awaiter(void 0, void 0, void 0, function () {
-        var log, participantCode, event, participantRepo, participant, configRepo, config, errors, eventRepo, e, e_2;
+        var log, participantCode, event, participantRepo, activityRepo, eventRepo, updateActivity, participant, withParticipantLock, configRepo, config, errors, e_2, e, e_3;
         return __generator(this, function (_a) {
             switch (_a.label) {
                 case 0:
@@ -290,7 +362,9 @@ var createPostEventRoute = function (_a) {
                     event.createdAt = new Date(event.createdAt);
                     event.updatedAt = new Date(event.updatedAt);
                     participantRepo = dataSource.getRepository(participant_1["default"]);
-                    if (!!event.arm) return [3 /*break*/, 2];
+                    activityRepo = dataSource.getRepository(dailyActivityTime_1["default"]);
+                    eventRepo = dataSource.getRepository(event_1["default"]);
+                    updateActivity = createUpdateActivity({ activityRepo: activityRepo, eventRepo: eventRepo });
                     return [4 /*yield*/, participantRepo.findOneBy({
                             code: participantCode
                         })];
@@ -301,15 +375,16 @@ var createPostEventRoute = function (_a) {
                         res.status(500).json({ kind: 'Failure', message: 'No participant found' });
                         return [2 /*return*/];
                     }
-                    event.arm = participant.arm;
-                    _a.label = 2;
-                case 2:
-                    if (!!event.experimentConfigId) return [3 /*break*/, 4];
+                    withParticipantLock = (0, util_2.withLock)("participant-".concat(participant.id));
+                    if (!event.arm) {
+                        event.arm = participant.arm;
+                    }
+                    if (!!event.experimentConfigId) return [3 /*break*/, 3];
                     configRepo = dataSource.getRepository(experimentConfig_1["default"]);
                     return [4 /*yield*/, configRepo.findOneBy({
                             isCurrent: true
                         })];
-                case 3:
+                case 2:
                     config = _a.sent();
                     if (!config) {
                         log('no current config found');
@@ -317,46 +392,57 @@ var createPostEventRoute = function (_a) {
                         return [2 /*return*/];
                     }
                     event.experimentConfigId = config.id;
-                    _a.label = 4;
-                case 4: return [4 /*yield*/, (0, util_1.validateNew)(event)];
-                case 5:
+                    _a.label = 3;
+                case 3: return [4 /*yield*/, (0, util_1.validateNew)(event)];
+                case 4:
                     errors = _a.sent();
                     if (errors.length > 0) {
                         log('event validation failed', errors);
                         res.status(400).json({ kind: 'Failure', message: "Event validation failed: ".concat(errors.join(', '), ".") });
                         return [2 /*return*/];
                     }
-                    _a.label = 6;
+                    _a.label = 5;
+                case 5:
+                    _a.trys.push([5, 7, , 8]);
+                    return [4 /*yield*/, withParticipantLock(function () { return __awaiter(void 0, void 0, void 0, function () { return __generator(this, function (_a) {
+                            return [2 /*return*/, updateActivity(participant, event)];
+                        }); }); })];
                 case 6:
-                    _a.trys.push([6, 12, , 13]);
-                    eventRepo = dataSource.getRepository(event_1["default"]);
-                    return [4 /*yield*/, eventRepo.save(event)];
+                    _a.sent();
+                    return [3 /*break*/, 8];
                 case 7:
+                    e_2 = _a.sent();
+                    log('activity update failed', e_2);
+                    return [3 /*break*/, 8];
+                case 8:
+                    _a.trys.push([8, 14, , 15]);
+                    return [4 /*yield*/, eventRepo.save(event)];
+                case 9:
                     e = _a.sent();
                     log('event saved', e);
                     res.send({ kind: 'Success', value: e });
-                    if (!(event.type === event_1.EventType.RECOMMENDATIONS_SHOWN)) return [3 /*break*/, 9];
+                    if (!(event.type === event_1.EventType.RECOMMENDATIONS_SHOWN)) return [3 /*break*/, 11];
                     return [4 /*yield*/, storeRecommendationsShown(log, dataSource, event)];
-                case 8:
-                    _a.sent();
-                    return [3 /*break*/, 11];
-                case 9:
-                    if (!(event.type === event_1.EventType.WATCH_TIME)) return [3 /*break*/, 11];
-                    return [4 /*yield*/, storeWatchTime(log, dataSource, event)];
                 case 10:
                     _a.sent();
-                    _a.label = 11;
-                case 11: return [3 /*break*/, 13];
+                    return [3 /*break*/, 13];
+                case 11:
+                    if (!(event.type === event_1.EventType.WATCH_TIME)) return [3 /*break*/, 13];
+                    return [4 /*yield*/, storeWatchTime(log, dataSource, event)];
                 case 12:
-                    e_2 = _a.sent();
-                    log('event save failed', e_2);
-                    if (isLocalUuidAlreadyExistsError(e_2)) {
+                    _a.sent();
+                    _a.label = 13;
+                case 13: return [3 /*break*/, 15];
+                case 14:
+                    e_3 = _a.sent();
+                    log('event save failed', e_3);
+                    if (isLocalUuidAlreadyExistsError(e_3)) {
                         res.status(500).json({ kind: 'Failure', message: 'Event already exists', code: 'EVENT_ALREADY_EXISTS_OK' });
                         return [2 /*return*/];
                     }
                     res.status(500).json({ kind: 'Failure', message: 'Event save failed' });
-                    return [3 /*break*/, 13];
-                case 13: return [2 /*return*/];
+                    return [3 /*break*/, 15];
+                case 15: return [2 /*return*/];
             }
         });
     }); };
