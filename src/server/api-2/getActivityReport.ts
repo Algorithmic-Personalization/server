@@ -18,7 +18,7 @@ export const createGetActivityReportDefinition: RouteDefinition<ActivityReport> 
 				updatedAt: 'DESC',
 			},
 			relations: ['participant'],
-			take: 10,
+			take: 100,
 		});
 
 		return {
