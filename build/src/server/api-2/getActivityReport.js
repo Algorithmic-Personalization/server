@@ -56,6 +56,7 @@ exports.createGetActivityReportDefinition = {
                         activityRepo = dataSource.getRepository(dailyActivityTime_1["default"]);
                         return [4 /*yield*/, activityRepo.find({
                                 order: {
+                                    createdAt: 'DESC',
                                     updatedAt: 'DESC'
                                 },
                                 relations: ['participant'],

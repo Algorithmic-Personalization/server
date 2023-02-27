@@ -15,6 +15,7 @@ export const createGetActivityReportDefinition: RouteDefinition<ActivityReport> 
 		const activityRepo = dataSource.getRepository(DailyActivityTime);
 		const latestActivity = await activityRepo.find({
 			order: {
+				createdAt: 'DESC',
 				updatedAt: 'DESC',
 			},
 			relations: ['participant'],

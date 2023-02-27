@@ -49,15 +49,15 @@ const ReportLineC: React.FC<{
 					<LegendC text='Activity day'/>
 					<Typography>{new Date(entry.createdAt).toLocaleDateString()}</Typography>
 				</Grid>
-				<Grid item lg={2} xs={12}>
+				<Grid item lg={4} xs={12}>
 					<LegendC text='Participant'/>
 					<Typography>{entry.participant?.email}</Typography>
 				</Grid>
-				<Grid item lg={2} xs={12}>
+				<Grid item lg={1} xs={12}>
 					<LegendC text='Pages viewed'/>
 					<Typography>{entry.pagesViewed}</Typography>
 				</Grid>
-				<Grid item lg={2} xs={12}>
+				<Grid item lg={1} xs={12}>
 					<LegendC text='Video pages viewed'/>
 					<Typography>{entry.videoPagesViewed}</Typography>
 				</Grid>
@@ -82,18 +82,18 @@ const ActivityReportC: React.FC<{
 	const ui = (
 		<div>
 			<Typography variant='h2' sx={{mb: 2}}>Activity Report</Typography>
-			<Box sx={{display: {xs: 'none', lg: 'block'}}}>
+			<Box sx={{display: {xs: 'none', lg: 'block'}, mb: 1}}>
 				<Grid container spacing={1}>
 					<Grid item lg={2}>
 						<Typography sx={{fontWeight: 'bold'}}>Activity day</Typography>
 					</Grid>
-					<Grid item lg={2}>
+					<Grid item lg={4}>
 						<Typography sx={{fontWeight: 'bold'}}>Participant</Typography>
 					</Grid>
-					<Grid item lg={2}>
+					<Grid item lg={1}>
 						<Typography sx={{fontWeight: 'bold'}}>Pages viewed</Typography>
 					</Grid>
-					<Grid item lg={2}>
+					<Grid item lg={1}>
 						<Typography sx={{fontWeight: 'bold'}}>Video pages viewed</Typography>
 					</Grid>
 					<Grid item lg={2}>
