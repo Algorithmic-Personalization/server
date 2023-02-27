@@ -31,6 +31,7 @@ exports.DailyActivityTime = void 0;
 /* eslint-disable @typescript-eslint/no-inferrable-types */
 var typeorm_1 = require("typeorm");
 var model_1 = __importDefault(require("../../common/lib/model"));
+var participant_1 = __importDefault(require("./participant"));
 var DailyActivityTime = /** @class */ (function (_super) {
     __extends(DailyActivityTime, _super);
     function DailyActivityTime() {
@@ -62,6 +63,11 @@ var DailyActivityTime = /** @class */ (function (_super) {
         (0, typeorm_1.Column)(),
         __metadata("design:type", Number)
     ], DailyActivityTime.prototype, "timeSpentOnYoutubeSeconds");
+    __decorate([
+        (0, typeorm_1.ManyToOne)(function () { return participant_1["default"]; }),
+        (0, typeorm_1.JoinColumn)({ name: 'participant_id' }),
+        __metadata("design:type", participant_1["default"])
+    ], DailyActivityTime.prototype, "participant");
     DailyActivityTime = __decorate([
         (0, typeorm_1.Entity)()
     ], DailyActivityTime);

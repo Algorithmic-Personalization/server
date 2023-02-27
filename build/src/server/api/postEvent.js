@@ -289,16 +289,17 @@ var getOrCreateActivity = function (repo, participantId, day) { return __awaiter
     });
 }); };
 var createUpdateActivity = function (_a) {
-    var activityRepo = _a.activityRepo, eventRepo = _a.eventRepo;
+    var activityRepo = _a.activityRepo, eventRepo = _a.eventRepo, log = _a.log;
     return function (participant, event) { return __awaiter(void 0, void 0, void 0, function () {
-        var day, activityTime, latestSessionEvent, dt, activity;
+        var day, activity, latestSessionEvent, dt;
         return __generator(this, function (_a) {
             switch (_a.label) {
                 case 0:
+                    log('Updating activity for participant ', participant.email);
                     day = (0, updateCounters_1.wholeDate)(event.createdAt);
-                    activityTime = new dailyActivityTime_1["default"]();
-                    activityTime.participantId = participant.id;
-                    activityTime.createdAt = day;
+                    return [4 /*yield*/, getOrCreateActivity(activityRepo, participant.id, day)];
+                case 1:
+                    activity = _a.sent();
                     return [4 /*yield*/, eventRepo
                             .findOne({
                             where: {
@@ -308,14 +309,11 @@ var createUpdateActivity = function (_a) {
                                 createdAt: 'DESC'
                             }
                         })];
-                case 1:
+                case 2:
                     latestSessionEvent = _a.sent();
                     dt = latestSessionEvent
                         ? Number(event.createdAt) - Number(latestSessionEvent.createdAt)
                         : 0;
-                    return [4 /*yield*/, getOrCreateActivity(activityRepo, participant.id, day)];
-                case 2:
-                    activity = _a.sent();
                     if (dt > updateCounters_1.timeSpentEventDiffLimit) {
                         activity.timeSpentOnYoutubeSeconds += dt / 1000;
                     }
@@ -328,8 +326,8 @@ var createUpdateActivity = function (_a) {
                             activity.videoPagesViewed += 1;
                         }
                     }
-                    activityTime.updatedAt = new Date();
-                    return [4 /*yield*/, activityRepo.save(activityTime)];
+                    activity.updatedAt = new Date();
+                    return [4 /*yield*/, activityRepo.save(activity)];
                 case 3:
                     _a.sent();
                     return [2 /*return*/];
@@ -364,7 +362,11 @@ var createPostEventRoute = function (_a) {
                     participantRepo = dataSource.getRepository(participant_1["default"]);
                     activityRepo = dataSource.getRepository(dailyActivityTime_1["default"]);
                     eventRepo = dataSource.getRepository(event_1["default"]);
-                    updateActivity = createUpdateActivity({ activityRepo: activityRepo, eventRepo: eventRepo });
+                    updateActivity = createUpdateActivity({
+                        activityRepo: activityRepo,
+                        eventRepo: eventRepo,
+                        log: log
+                    });
                     return [4 /*yield*/, participantRepo.findOneBy({
                             code: participantCode
                         })];

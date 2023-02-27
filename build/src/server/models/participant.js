@@ -33,6 +33,7 @@ var typeorm_1 = require("typeorm");
 var class_validator_1 = require("class-validator");
 var model_1 = __importDefault(require("../../common/lib/model"));
 var event_1 = require("../../common/models/event");
+var dailyActivityTime_1 = __importDefault(require("./dailyActivityTime"));
 var Participant = /** @class */ (function (_super) {
     __extends(Participant, _super);
     function Participant() {
@@ -58,6 +59,10 @@ var Participant = /** @class */ (function (_super) {
         (0, typeorm_1.Column)(),
         __metadata("design:type", String)
     ], Participant.prototype, "arm");
+    __decorate([
+        (0, typeorm_1.OneToMany)(function () { return dailyActivityTime_1["default"]; }, function (activityTime) { return activityTime.participant; }),
+        __metadata("design:type", Array)
+    ], Participant.prototype, "activityTimes");
     Participant = __decorate([
         (0, typeorm_1.Entity)()
     ], Participant);

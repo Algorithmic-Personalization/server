@@ -92,6 +92,7 @@ import createPostEventRoute from './api/postEvent';
 import createGetEventsRoute from './api/getEvents';
 
 import createParticipantDefinition from './api-2/createParticipant';
+import createGetActivityReportDefinition from './api-2/getActivityReport';
 
 // Add classes used by typeorm as models here
 // so that typeorm can extract the metadata from them.
@@ -293,6 +294,7 @@ const start = async () => {
 	};
 
 	defineAdminRoute(createParticipantDefinition);
+	defineAdminRoute(createGetActivityReportDefinition);
 
 	app.post(postRegister, createRegisterRoute(routeContext));
 	app.get(getVerifyEmailToken, createVerifyEmailRoute(routeContext));

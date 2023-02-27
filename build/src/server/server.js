@@ -133,6 +133,7 @@ var participantConfig_1 = __importDefault(require("./api/participantConfig"));
 var postEvent_1 = __importDefault(require("./api/postEvent"));
 var getEvents_1 = __importDefault(require("./api/getEvents"));
 var createParticipant_1 = __importDefault(require("./api-2/createParticipant"));
+var getActivityReport_1 = __importDefault(require("./api-2/getActivityReport"));
 // Add classes used by typeorm as models here
 // so that typeorm can extract the metadata from them.
 var entities = [
@@ -313,6 +314,7 @@ var start = function () { return __awaiter(void 0, void 0, void 0, function () {
                     app[def.verb](def.path, authMiddleware, makeHandler(def));
                 };
                 defineAdminRoute(createParticipant_1["default"]);
+                defineAdminRoute(getActivityReport_1["default"]);
                 app.post(serverRoutes_1.postRegister, (0, register_1["default"])(routeContext));
                 app.get(serverRoutes_1.getVerifyEmailToken, (0, verifyEmail_1["default"])(routeContext));
                 app.post(serverRoutes_1.postLogin, (0, login_1["default"])(routeContext));

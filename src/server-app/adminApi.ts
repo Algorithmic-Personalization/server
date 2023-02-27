@@ -26,6 +26,11 @@ import {
 } from '../server/serverRoutes';
 
 import {
+	type ActivityReport,
+	createGetActivityReportDefinition,
+} from '../server/api-2/getActivityReport';
+
+import {
 	type Maybe,
 	isMaybe,
 	getMessage,
@@ -51,6 +56,7 @@ export type AdminApi = {
 	getApiTokens: () => Promise<Maybe<Token[]>>;
 	createApiToken: (name: string) => Promise<Maybe<Token>>;
 	deleteApiToken: (token: string) => Promise<Maybe<string>>;
+	getActivityReport: () => Promise<Maybe<ActivityReport>>;
 };
 
 const loadItem = <T>(key: string): T | undefined => {
@@ -214,6 +220,10 @@ export const createAdminApi = (serverUrl: string, showLoginModal?: () => void): 
 
 		async deleteApiToken(token: string) {
 			return del<string>(deleteApiToken.replace(':token', token), {}, headers());
+		},
+
+		async getActivityReport() {
+			return get<ActivityReport>(createGetActivityReportDefinition.path, {}, headers());
 		},
 	};
 };

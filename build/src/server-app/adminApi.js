@@ -38,6 +38,7 @@ var __generator = (this && this.__generator) || function (thisArg, body) {
 exports.__esModule = true;
 exports.createAdminApi = void 0;
 var serverRoutes_1 = require("../server/serverRoutes");
+var getActivityReport_1 = require("../server/api-2/getActivityReport");
 var util_1 = require("../common/util");
 var loadItem = function (key) {
     var item = sessionStorage.getItem(key);
@@ -239,6 +240,13 @@ var createAdminApi = function (serverUrl, showLoginModal) {
             return __awaiter(this, void 0, void 0, function () {
                 return __generator(this, function (_a) {
                     return [2 /*return*/, del(serverRoutes_1.deleteApiToken.replace(':token', token), {}, headers())];
+                });
+            });
+        },
+        getActivityReport: function () {
+            return __awaiter(this, void 0, void 0, function () {
+                return __generator(this, function (_a) {
+                    return [2 /*return*/, get(getActivityReport_1.createGetActivityReportDefinition.path, {}, headers())];
                 });
             });
         }

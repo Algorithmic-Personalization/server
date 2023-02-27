@@ -164,18 +164,18 @@ const getOrCreateActivity = async (
 	return repo.save(newActivity);
 };
 
-const createUpdateActivity = ({activityRepo, eventRepo}: {
+const createUpdateActivity = ({activityRepo, eventRepo, log}: {
 	activityRepo: Repository<DailyActivityTime>;
 	eventRepo: Repository<Event>;
+	log: LogFunction;
 }) => async (
 	participant: Participant,
 	event: Event,
 ) => {
+	log('Updating activity for participant ', participant.email);
 	const day = wholeDate(event.createdAt);
 
-	const activityTime = new DailyActivityTime();
-	activityTime.participantId = participant.id;
-	activityTime.createdAt = day;
+	const activity = await getOrCreateActivity(activityRepo, participant.id, day);
 
 	const latestSessionEvent = await eventRepo
 		.findOne({
@@ -191,7 +191,7 @@ const createUpdateActivity = ({activityRepo, eventRepo}: {
 		? Number(event.createdAt) - Number(latestSessionEvent.createdAt)
 		: 0;
 
-	const activity = await getOrCreateActivity(activityRepo, participant.id, day);
+	log('Time since last event:', dt / 1000);
 
 	if (dt > timeSpentEventDiffLimit) {
 		activity.timeSpentOnYoutubeSeconds += dt / 1000;
@@ -209,9 +209,9 @@ const createUpdateActivity = ({activityRepo, eventRepo}: {
 		}
 	}
 
-	activityTime.updatedAt = new Date();
+	activity.updatedAt = new Date();
 
-	await activityRepo.save(activityTime);
+	await activityRepo.save(activity);
 };
 
 export const createPostEventRoute: RouteCreator = ({createLogger, dataSource}) => async (req, res) => {
@@ -242,7 +242,11 @@ export const createPostEventRoute: RouteCreator = ({createLogger, dataSource}) =
 	const activityRepo = dataSource.getRepository(DailyActivityTime);
 	const eventRepo = dataSource.getRepository(Event);
 
-	const updateActivity = createUpdateActivity({activityRepo, eventRepo});
+	const updateActivity = createUpdateActivity({
+		activityRepo,
+		eventRepo,
+		log,
+	});
 
 	const participant = await participantRepo.findOneBy({
 		code: participantCode,
