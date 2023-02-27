@@ -224,10 +224,15 @@ const start = async () => {
 
 	const createLogger = createDefaultLogger(logStream);
 
-	await updateCounters({
-		dataSource: ds,
-		log: createLogger(0),
-	});
+	try {
+		await updateCounters({
+			dataSource: ds,
+			log: createLogger(0),
+		});
+	} catch (err) {
+		console.error('Error updating activity counters:', err);
+		process.exit(1);
+	}
 
 	const privateKey = await readFile(join(root, 'private.key'), 'utf-8');
 	const tokenTools = createTokenTools(privateKey);
