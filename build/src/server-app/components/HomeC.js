@@ -80,6 +80,7 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
 exports.__esModule = true;
 exports.HomeC = void 0;
 var react_1 = __importStar(require("react"));
+var react_router_dom_1 = require("react-router-dom");
 var material_1 = require("@mui/material");
 var NotificationsC_1 = __importDefault(require("./NotificationsC"));
 var adminApiProvider_1 = require("../adminApiProvider");
@@ -112,12 +113,13 @@ var tableDescriptor = {
         },
     ],
     rows: function (a) {
-        var _a, _b;
+        var _a, _b, _c, _d;
         return ({
             key: a.id.toString(),
             elements: [
                 new Date(a.createdAt).toLocaleDateString(),
-                (_b = (_a = a.participant) === null || _a === void 0 ? void 0 : _a.email) !== null && _b !== void 0 ? _b : '<unknown>',
+                // eslint-disable-next-line react/jsx-key
+                react_1["default"].createElement(react_router_dom_1.Link, { to: "/participants/".concat((_b = (_a = a.participant) === null || _a === void 0 ? void 0 : _a.email) !== null && _b !== void 0 ? _b : 'unknown') }, (_d = (_c = a.participant) === null || _c === void 0 ? void 0 : _c.email) !== null && _d !== void 0 ? _d : '<unknown>'),
                 a.pagesViewed.toString(),
                 a.videoPagesViewed.toString(),
                 Math.round(a.videoTimeViewedSeconds).toString(),

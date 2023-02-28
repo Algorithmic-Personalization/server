@@ -1,5 +1,7 @@
 import React, {useState, useEffect} from 'react';
 
+import {Link} from 'react-router-dom';
+
 import {Typography} from '@mui/material';
 
 import NotificationsC, {type Message} from './NotificationsC';
@@ -42,7 +44,8 @@ const tableDescriptor: TableDescriptor<DailyActivityTime> = {
 		key: a.id.toString(),
 		elements: [
 			new Date(a.createdAt).toLocaleDateString(),
-			a.participant?.email ?? '<unknown>',
+			// eslint-disable-next-line react/jsx-key
+			<Link to={`/participants/${a.participant?.email ?? 'unknown'}`}>{a.participant?.email ?? '<unknown>'}</Link>,
 			a.pagesViewed.toString(),
 			a.videoPagesViewed.toString(),
 			Math.round(a.videoTimeViewedSeconds).toString(),
