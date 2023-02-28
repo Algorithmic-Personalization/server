@@ -2,30 +2,52 @@ import React, {useState, useEffect} from 'react';
 
 import {
 	Box,
-	Grid,
 	Typography,
 } from '@mui/material';
 
 import {useAdminApi} from '../adminApiProvider';
 import type Event from '../../common/models/event';
 
-import CardC from './CardC';
+import createTableComponent, {type TableDescriptor} from './shared/TableC';
+import {showDate, UrlC} from './shared/Format';
 
-const EventC: React.FC<{event: Event}> = ({event}) => (
-	<Grid container item xs={12} sm={6} md={3}>
-		<CardC>
-			<strong>Event #{event.id}: {event.type}</strong>
-			<dl>
-				<dt><Typography>Timestamp</Typography></dt>
-				<dd><Typography>{new Date(event.createdAt).toISOString()}</Typography></dd>
-				<dt><Typography>Session</Typography></dt>
-				<dd><Typography>{event.sessionUuid}</Typography></dd>
-				<dt><Typography>URL</Typography></dt>
-				<dd><Typography>{event.url}</Typography></dd>
-			</dl>
-		</CardC>
-	</Grid>
-);
+const tableDescriptor: TableDescriptor<Event> = {
+	headers: [
+		{
+			key: 'id',
+			element: 'Event ID',
+		},
+		{
+			key: 'type',
+			element: 'Event type',
+		},
+		{
+			key: 'timestamp',
+			element: 'Timestamp',
+		},
+		{
+			key: 'sessionUuid',
+			element: 'Session UUID',
+		},
+		{
+			key: 'url',
+			element: 'URL',
+		},
+	],
+	rows: e => ({
+		key: e.id.toString(),
+		elements: [
+			e.id.toString(),
+			e.type,
+			showDate(e.createdAt),
+			e.sessionUuid,
+			// eslint-disable-next-line react/jsx-key
+			<UrlC url={e.url}/>,
+		],
+	}),
+};
+
+const TableC = createTableComponent(tableDescriptor);
 
 export const EventsC: React.FC = () => {
 	const [pageNumberControl, setPageNumberControl] = useState('1');
@@ -73,9 +95,7 @@ export const EventsC: React.FC = () => {
 				<span>{pageCount}</span>
 			</Typography>
 
-			<Grid container spacing={2}>
-				{events.map(event => <EventC key={event.id} event={event} />)}
-			</Grid>
+			<TableC items={events}/>
 		</Box>
 	);
 

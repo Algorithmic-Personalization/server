@@ -19,10 +19,7 @@ import type {VideoItem} from '../../server/projections/RecommendationsList';
 import {VideoType} from '../../server/models/videoListItem';
 import {EventType} from '../../common/models/event';
 
-const showDate = (d: Date | string): string => {
-	const date = new Date(d);
-	return `${date.toLocaleDateString()} ${date.toLocaleTimeString()}`;
-};
+import {showDate, UrlC} from './shared/Format';
 
 const showWatchtimeOrContextUrl = (e: EventOverview): string => {
 	if (e.data?.kind === 'watchtime') {
@@ -30,42 +27,6 @@ const showWatchtimeOrContextUrl = (e: EventOverview): string => {
 	}
 
 	return e.context ?? '';
-};
-
-const LinkC: React.FC<{href: string; label: string}> = ({href, label}) => (
-	<a
-		target='_blank'
-		rel='noreferrer'
-		href={href}
-		style={{
-			textDecoration: 'none',
-			color: 'inherit',
-		}}
-	>
-		<Typography variant='body1' color='blue'>{label}</Typography>
-	</a>
-);
-
-const UrlC: React.FC<{url: string; prefix?: string}> = ({url, prefix}) => {
-	const withYtHostName = url.startsWith('/') ? `https://youtube.com${url}` : url;
-
-	const p = prefix ?? '';
-
-	try {
-		const u = new URL(withYtHostName);
-
-		if (u.pathname === '/results') {
-			return <LinkC href={withYtHostName} label={`${p}search: ${u.searchParams.get('search_query') ?? ''}`} />;
-		}
-
-		if (u.pathname === '/watch') {
-			return <LinkC href={withYtHostName} label={`${p}video: ${u.searchParams.get('v') ?? ''}`} />;
-		}
-
-		return <LinkC href={withYtHostName} label={`${p}${u.pathname}`} />;
-	} catch (e) {
-		return <>{p}{url}</>;
-	}
 };
 
 const RecommendationsListC: React.FC<{data: VideoItem[]; details?: boolean}> = ({data, details}) => {
