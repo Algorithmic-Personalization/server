@@ -209,6 +209,14 @@ const createUpdateActivity = ({activityRepo, eventRepo, log}: {
 		}
 	}
 
+	if (
+		event.type === 'PERSONALIZED_CLICKED'
+		|| event.type === 'NON_PERSONALIZED_CLICKED'
+		|| event.type === 'MIXED_CLICKED'
+	) {
+		activity.sidebarRecommendationsClicked += 1;
+	}
+
 	activity.updatedAt = new Date();
 
 	await activityRepo.save(activity);

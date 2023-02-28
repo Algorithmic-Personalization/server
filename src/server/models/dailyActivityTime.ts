@@ -20,6 +20,9 @@ export class DailyActivityTime extends Model {
 	@Column()
 		timeSpentOnYoutubeSeconds: number = 0;
 
+	@Column()
+		sidebarRecommendationsClicked: number = 0;
+
 	@ManyToOne(() => Participant)
 	@JoinColumn({name: 'participant_id'})
 		participant?: Participant;

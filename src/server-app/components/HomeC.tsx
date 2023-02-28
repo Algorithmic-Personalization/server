@@ -32,6 +32,10 @@ const tableDescriptor: TableDescriptor<DailyActivityTime> = {
 			element: 'Video pages viewed',
 		},
 		{
+			key: 'sidebar-clicked',
+			element: 'Sidebar recommendations clicked',
+		},
+		{
 			key: 'watch-time',
 			element: 'Watch time (seconds)',
 		},
@@ -46,10 +50,11 @@ const tableDescriptor: TableDescriptor<DailyActivityTime> = {
 			new Date(a.createdAt).toLocaleDateString(),
 			// eslint-disable-next-line react/jsx-key
 			<Link to={`/participants/${a.participant?.email ?? 'unknown'}`}>{a.participant?.email ?? '<unknown>'}</Link>,
-			a.pagesViewed.toString(),
-			a.videoPagesViewed.toString(),
-			Math.round(a.videoTimeViewedSeconds).toString(),
-			Math.round(a.timeSpentOnYoutubeSeconds).toString(),
+			a.pagesViewed,
+			a.videoPagesViewed,
+			a.sidebarRecommendationsClicked,
+			Math.round(a.videoTimeViewedSeconds),
+			Math.round(a.timeSpentOnYoutubeSeconds),
 		],
 	}),
 };

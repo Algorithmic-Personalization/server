@@ -114,6 +114,7 @@ export const updateCounters = async ({
 		const pagesViewed = new DayCounter();
 		const watchTimes = new DayCounter();
 		const videoPagesViewed = new DayCounter();
+		const sideBarClicked = new DayCounter();
 		const timeSpent = new TimeSpentCounter();
 
 		for (const session of sessions) {
@@ -136,6 +137,14 @@ export const updateCounters = async ({
 					if (event.url.includes('/watch')) {
 						videoPagesViewed.add(event.createdAt, 1);
 					}
+				}
+
+				if (event.type === 'PERSONALIZED_CLICKED') {
+					sideBarClicked.add(event.createdAt, 1);
+				} else if (event.type === 'NON_PERSONALIZED_CLICKED') {
+					sideBarClicked.add(event.createdAt, 1);
+				} else if (event.type === 'MIXED_CLICKED') {
+					sideBarClicked.add(event.createdAt, 1);
 				}
 
 				if (event.type === 'WATCH_TIME') {
@@ -169,6 +178,7 @@ export const updateCounters = async ({
 			activity.videoTimeViewedSeconds = watchTimes.get(day);
 			activity.videoPagesViewed = videoPagesViewed.get(day);
 			activity.timeSpentOnYoutubeSeconds = timeSpent.get(day);
+			activity.sidebarRecommendationsClicked = sideBarClicked.get(day);
 			activity.participantId = participant.id;
 			activity.createdAt = day;
 			activityTimes.push(activity);
