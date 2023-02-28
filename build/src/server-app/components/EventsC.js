@@ -112,7 +112,7 @@ var tableDescriptor = {
         elements: [
             e.id.toString(),
             e.type,
-            (0, Format_1.showDate)(e.createdAt),
+            new Date(e.createdAt),
             e.sessionUuid,
             // eslint-disable-next-line react/jsx-key
             react_1["default"].createElement(Format_1.UrlC, { url: e.url }),

@@ -41,6 +41,7 @@ var DailyActivityTime = /** @class */ (function (_super) {
         _this.videoPagesViewed = 0;
         _this.videoTimeViewedSeconds = 0;
         _this.timeSpentOnYoutubeSeconds = 0;
+        _this.sidebarRecommendationsClicked = 0;
         return _this;
     }
     __decorate([
@@ -63,6 +64,10 @@ var DailyActivityTime = /** @class */ (function (_super) {
         (0, typeorm_1.Column)(),
         __metadata("design:type", Number)
     ], DailyActivityTime.prototype, "timeSpentOnYoutubeSeconds");
+    __decorate([
+        (0, typeorm_1.Column)(),
+        __metadata("design:type", Number)
+    ], DailyActivityTime.prototype, "sidebarRecommendationsClicked");
     __decorate([
         (0, typeorm_1.ManyToOne)(function () { return participant_1["default"]; }),
         (0, typeorm_1.JoinColumn)({ name: 'participant_id' }),

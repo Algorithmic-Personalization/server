@@ -168,7 +168,7 @@ var TimeSpentCounter = /** @class */ (function (_super) {
 var updateCounters = function (_a) {
     var log = _a.log, dataSource = _a.dataSource;
     return __awaiter(void 0, void 0, void 0, function () {
-        var atRepo, participants, participants_1, participants_1_1, id, participant, sessions, pagesViewed, watchTimes, videoPagesViewed, timeSpent, sessions_1, sessions_1_1, session, events, events_1, events_1_1, event_2, repo, watchTime, e_3_1, e_4_1, days, activityTimes, days_1, days_1_1, day, activity, error_1, e_5_1;
+        var atRepo, participants, participants_1, participants_1_1, id, participant, sessions, pagesViewed, watchTimes, videoPagesViewed, sideBarClicked, timeSpent, sessions_1, sessions_1_1, session, events, events_1, events_1_1, event_2, repo, watchTime, e_3_1, e_4_1, days, activityTimes, days_1, days_1_1, day, activity, error_1, e_5_1;
         var e_5, _b, e_4, _c, e_3, _d, e_6, _e;
         return __generator(this, function (_f) {
             switch (_f.label) {
@@ -209,6 +209,7 @@ var updateCounters = function (_a) {
                     pagesViewed = new DayCounter();
                     watchTimes = new DayCounter();
                     videoPagesViewed = new DayCounter();
+                    sideBarClicked = new DayCounter();
                     timeSpent = new TimeSpentCounter();
                     _f.label = 6;
                 case 6:
@@ -244,6 +245,15 @@ var updateCounters = function (_a) {
                         if (event_2.url.includes('/watch')) {
                             videoPagesViewed.add(event_2.createdAt, 1);
                         }
+                    }
+                    if (event_2.type === 'PERSONALIZED_CLICKED') {
+                        sideBarClicked.add(event_2.createdAt, 1);
+                    }
+                    else if (event_2.type === 'NON_PERSONALIZED_CLICKED') {
+                        sideBarClicked.add(event_2.createdAt, 1);
+                    }
+                    else if (event_2.type === 'MIXED_CLICKED') {
+                        sideBarClicked.add(event_2.createdAt, 1);
                     }
                     if (!(event_2.type === 'WATCH_TIME')) return [3 /*break*/, 12];
                     repo = dataSource.getRepository(watchTime_1["default"]);
@@ -298,6 +308,7 @@ var updateCounters = function (_a) {
                             activity.videoTimeViewedSeconds = watchTimes.get(day);
                             activity.videoPagesViewed = videoPagesViewed.get(day);
                             activity.timeSpentOnYoutubeSeconds = timeSpent.get(day);
+                            activity.sidebarRecommendationsClicked = sideBarClicked.get(day);
                             activity.participantId = participant.id;
                             activity.createdAt = day;
                             activityTimes.push(activity);

@@ -327,6 +327,11 @@ var createUpdateActivity = function (_a) {
                             activity.videoPagesViewed += 1;
                         }
                     }
+                    if (event.type === 'PERSONALIZED_CLICKED'
+                        || event.type === 'NON_PERSONALIZED_CLICKED'
+                        || event.type === 'MIXED_CLICKED') {
+                        activity.sidebarRecommendationsClicked += 1;
+                    }
                     activity.updatedAt = new Date();
                     return [4 /*yield*/, activityRepo.save(activity)];
                 case 3:

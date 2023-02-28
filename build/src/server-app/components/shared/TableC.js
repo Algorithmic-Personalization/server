@@ -7,6 +7,7 @@ exports.createTableComponent = void 0;
 var react_1 = __importDefault(require("react"));
 var material_1 = require("@mui/material");
 var styles_1 = require("@mui/material/styles");
+var Format_1 = require("./Format");
 var StyledRow = (0, styles_1.styled)(material_1.TableRow)(function (_a) {
     var theme = _a.theme;
     return ({
@@ -17,7 +18,20 @@ var StyledRow = (0, styles_1.styled)(material_1.TableRow)(function (_a) {
 });
 var decorateHeader = function (element) {
     if (typeof element === 'string') {
-        return react_1["default"].createElement(material_1.Typography, { sx: { fontWeight: 'bold' } }, element);
+        return react_1["default"].createElement(material_1.Typography, { variant: 'subtitle1' }, element);
+    }
+    return element;
+};
+var numberFormat = new Intl.NumberFormat();
+var decorateValue = function (element) {
+    if (element instanceof Date) {
+        return react_1["default"].createElement(material_1.Typography, { variant: 'body2' }, (0, Format_1.showDate)(element));
+    }
+    if (typeof element === 'number') {
+        return (react_1["default"].createElement(material_1.Typography, { variant: 'body2' }, numberFormat.format(element)));
+    }
+    if (typeof element === 'string') {
+        return react_1["default"].createElement(material_1.Typography, { variant: 'body2' }, element);
     }
     return element;
 };
@@ -43,8 +57,8 @@ function createTableComponent(descriptor) {
                                 return (react_1["default"].createElement(material_1.TableCell, { key: key }, decorateHeader(element)));
                             }))),
                         react_1["default"].createElement(material_1.TableBody, null, items.map(function (item) {
-                            var _a = descriptor.rows(item), key = _a.key, values = _a.elements;
-                            return (react_1["default"].createElement(StyledRow, { key: key }, values.map(function (value, index) { return (react_1["default"].createElement(material_1.TableCell, { key: headers[index].key }, value)); })));
+                            var _a = descriptor.rows(item), key = _a.key, elements = _a.elements;
+                            return (react_1["default"].createElement(StyledRow, { key: key }, elements.map(function (element, index) { return (react_1["default"].createElement(material_1.TableCell, { key: headers[index].key }, decorateValue(element))); })));
                         }))))),
             react_1["default"].createElement(material_1.Box, { sx: {
                     display: {
@@ -62,7 +76,7 @@ function createTableComponent(descriptor) {
                     decorateHeader(headers[index].element),
                     react_1["default"].createElement(material_1.Box, { sx: {
                             pl: 2
-                        } }, element))); })));
+                        } }, decorateValue(element)))); })));
             }))));
     };
     return TableComponent;

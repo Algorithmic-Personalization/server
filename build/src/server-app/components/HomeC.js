@@ -104,6 +104,10 @@ var tableDescriptor = {
             element: 'Video pages viewed'
         },
         {
+            key: 'sidebar-clicked',
+            element: 'Sidebar recommendations clicked'
+        },
+        {
             key: 'watch-time',
             element: 'Watch time (seconds)'
         },
@@ -120,10 +124,11 @@ var tableDescriptor = {
                 new Date(a.createdAt).toLocaleDateString(),
                 // eslint-disable-next-line react/jsx-key
                 react_1["default"].createElement(react_router_dom_1.Link, { to: "/participants/".concat((_b = (_a = a.participant) === null || _a === void 0 ? void 0 : _a.email) !== null && _b !== void 0 ? _b : 'unknown') }, (_d = (_c = a.participant) === null || _c === void 0 ? void 0 : _c.email) !== null && _d !== void 0 ? _d : '<unknown>'),
-                a.pagesViewed.toString(),
-                a.videoPagesViewed.toString(),
-                Math.round(a.videoTimeViewedSeconds).toString(),
-                Math.round(a.timeSpentOnYoutubeSeconds).toString(),
+                a.pagesViewed,
+                a.videoPagesViewed,
+                a.sidebarRecommendationsClicked,
+                Math.round(a.videoTimeViewedSeconds),
+                Math.round(a.timeSpentOnYoutubeSeconds),
             ]
         });
     }

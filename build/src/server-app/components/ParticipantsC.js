@@ -227,20 +227,20 @@ var ListC = function () {
     if (emailLike === '' && participants.results.length === 0) {
         return react_1["default"].createElement(material_1.Typography, null, "No participants yet.");
     }
-    var list = (react_1["default"].createElement(material_1.Grid, { container: true, spacing: 2 },
-        react_1["default"].createElement(material_1.Grid, { item: true, xs: 12 },
+    var list = (react_1["default"].createElement(material_1.Box, null,
+        react_1["default"].createElement(material_1.Box, { sx: { mb: 1 } },
             react_1["default"].createElement(material_1.TextField, { value: emailLike, onChange: function (e) {
                     setEmailLike(e.target.value);
                 }, sx: { display: 'block' }, label: 'Search participant by email', InputProps: {
                     endAdornment: (react_1["default"].createElement(material_1.InputAdornment, { position: 'end' },
                         react_1["default"].createElement(Search_1["default"], null)))
                 } })),
-        react_1["default"].createElement(material_1.Grid, { container: true, item: true, xs: 12 },
+        react_1["default"].createElement(material_1.Box, { sx: { my: 2 } },
             react_1["default"].createElement(material_1.Typography, { sx: { display: 'flex', alignItems: 'center' } },
-                react_1["default"].createElement("span", null, "Page\u00A0"),
+                react_1["default"].createElement(material_1.Typography, { variant: 'body2' }, "Page\u00A0"),
                 react_1["default"].createElement("input", { type: 'number', value: pageInputOk ? page : pageInput, min: 1, max: participants.pageCount, step: 1, onChange: handlePageChange }),
-                react_1["default"].createElement("span", null, "\u00A0/\u00A0"),
-                react_1["default"].createElement("span", null, participants.pageCount))),
+                react_1["default"].createElement(material_1.Typography, { variant: 'body2' }, "\u00A0/\u00A0"),
+                react_1["default"].createElement(material_1.Typography, { variant: 'body2' }, participants.pageCount))),
         react_1["default"].createElement(TableC, { items: participants.results })));
     return (react_1["default"].createElement(material_1.Box, { component: 'section', sx: { mb: 4 } },
         react_1["default"].createElement(material_1.Typography, { variant: 'h2', sx: { mb: 2 } }, "Participants list"),
