@@ -5,7 +5,6 @@ import {
 	Button,
 	FormControl,
 	FormHelperText,
-	Grid,
 	InputAdornment,
 	TextField,
 	Typography,
@@ -197,8 +196,8 @@ const ListC: React.FC = () => {
 	}
 
 	const list = (
-		<Grid container spacing={2}>
-			<Grid item xs={12}>
+		<Box>
+			<Box sx={{mb: 1}}>
 				<TextField
 					value={emailLike}
 					onChange={e => {
@@ -214,10 +213,10 @@ const ListC: React.FC = () => {
 						),
 					}}
 				/>
-			</Grid>
-			<Grid container item xs={12}>
+			</Box>
+			<Box sx={{my: 2}}>
 				<Typography sx={{display: 'flex', alignItems: 'center'}}>
-					<span>Page&nbsp;</span>
+					<Typography variant='body2'>Page&nbsp;</Typography>
 					<input
 						type='number'
 						value={pageInputOk ? page : pageInput}
@@ -226,12 +225,12 @@ const ListC: React.FC = () => {
 						step={1}
 						onChange={handlePageChange}
 					/>
-					<span>&nbsp;/&nbsp;</span>
-					<span>{participants.pageCount}</span>
+					<Typography variant='body2'>&nbsp;/&nbsp;</Typography>
+					<Typography variant='body2'>{participants.pageCount}</Typography>
 				</Typography>
-			</Grid>
+			</Box>
 			<TableC items={participants.results}/>
-		</Grid>
+		</Box>
 	);
 
 	return (
