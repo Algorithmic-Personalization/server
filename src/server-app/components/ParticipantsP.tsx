@@ -15,8 +15,8 @@ import SearchIcon from '@mui/icons-material/Search';
 
 import {Link} from 'react-router-dom';
 
-import DLinkC from './DownloadLinkC';
-import NotificationsC, {type Message} from './NotificationsC';
+import DLinkC from './shared/DownloadLinkC';
+import NotificationsC, {type Message} from './shared/NotificationsC';
 
 import createTableComponent, {type TableDescriptor} from './shared/TableC';
 

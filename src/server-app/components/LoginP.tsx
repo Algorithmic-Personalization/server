@@ -12,10 +12,10 @@ import {
 
 import {useAdminApi} from '../adminApiProvider';
 
-import RedirectMessageC from './RedirectMessageC';
-import NotificationsC, {type Message} from './NotificationsC';
+import RedirectMessageC from './shared/RedirectMessageC';
+import NotificationsC, {type Message} from './shared/NotificationsC';
 
-import {bind} from './helpers';
+import {bind} from './shared/helpers';
 
 export const LoginC: React.FC<{
 	email: string;

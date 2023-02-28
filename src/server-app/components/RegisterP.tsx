@@ -12,9 +12,9 @@ import {Link} from 'react-router-dom';
 
 import Admin from '../../common/models/admin';
 
-import NotificationsC, {type Message} from './NotificationsC';
+import NotificationsC, {type Message} from './shared/NotificationsC';
 
-import {bind} from './helpers';
+import {bind} from './shared/helpers';
 
 import {useAdminApi} from '../adminApiProvider';
 

@@ -2,7 +2,7 @@ import React from 'react';
 
 import {Navigate, useLocation} from 'react-router-dom';
 
-import {useAdminApi} from '../adminApiProvider';
+import {useAdminApi} from '../../adminApiProvider';
 
 export const RequireAuthC: React.FC<{
 	children?: React.ReactNode;

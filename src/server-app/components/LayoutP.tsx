@@ -24,14 +24,14 @@ import {
 	useNavigate,
 } from 'react-router-dom';
 
-import HomeC from './HomeC';
-import ParticipantsC from './ParticipantsC';
-import ParticipantPageC from './ParticipantPageC';
-import ExperimentConfigC from './ExperimentConfigC';
-import EventsC from './EventsC';
-import TokenC from './TokenC';
-import NotFoundC from './NotFoundC';
-import UserWidgetC from './UserWidgetC';
+import HomeC from './HomeP';
+import ParticipantsC from './ParticipantsP';
+import ParticipantPageC from './ParticipantOverviewP';
+import ExperimentConfigC from './ExperimentConfigP';
+import EventsC from './EventsP';
+import TokenC from './ApiTokenCreationP';
+import NotFoundC from './NotFoundP';
+import UserWidgetC from './shared/UserWidgetC';
 
 type NavItem = {
 	label: string;

@@ -2,7 +2,7 @@ import React, {useState} from 'react';
 import {useLocation, useNavigate} from 'react-router-dom';
 import {Box, Modal, Typography} from '@mui/material';
 
-import LoginC from './LoginC';
+import LoginC from './LoginP';
 
 export const LoginModalC: React.FC<{
 	open: boolean;

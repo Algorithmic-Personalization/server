@@ -2,9 +2,9 @@ import React, {useState, useEffect} from 'react';
 
 import {Typography} from '@mui/material';
 
-import {useAdminApi} from '../adminApiProvider';
+import {useAdminApi} from '../../adminApiProvider';
 
-import type Admin from '../../common/models/admin';
+import type Admin from '../../../common/models/admin';
 
 export const UserWidgetC: React.FC = () => {
 	const api = useAdminApi();

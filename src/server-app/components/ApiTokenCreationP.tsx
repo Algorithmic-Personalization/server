@@ -6,8 +6,8 @@ import {type SxProps} from '@mui/material';
 import {useAdminApi} from '../adminApiProvider';
 
 import type {Token} from '../../server/models/token';
-import {NotificationsC, type Message} from './NotificationsC';
-import CardC from './CardC';
+import {NotificationsC, type Message} from './shared/NotificationsC';
+import CardC from './shared/CardC';
 
 const ConfirmButtonC: React.FC<{
 	action: () => void;

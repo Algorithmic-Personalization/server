@@ -10,7 +10,7 @@ import AdminApiProvider, {serverUrl} from './adminApiProvider';
 import {createAdminApi} from './adminApi';
 
 import Server from './Server';
-import LoginModalC from './components/LoginModalC';
+import LoginModalC from './components/LoginModalP';
 
 const elt = document.getElementById('app');
 

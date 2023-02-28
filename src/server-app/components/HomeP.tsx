@@ -4,7 +4,7 @@ import {Link} from 'react-router-dom';
 
 import {Typography} from '@mui/material';
 
-import NotificationsC, {type Message} from './NotificationsC';
+import NotificationsC, {type Message} from './shared/NotificationsC';
 
 import {type ActivityReport} from '../../server/api-2/getActivityReport';
 import {type DailyActivityTime} from '../../server/models/dailyActivityTime';

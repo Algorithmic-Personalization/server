@@ -10,8 +10,8 @@ import {
 	FormHelperText,
 } from '@mui/material';
 
-import NotificationsC, {type Message} from './NotificationsC';
-import CardC from './CardC';
+import NotificationsC, {type Message} from './shared/NotificationsC';
+import CardC from './shared/CardC';
 
 import ExperimentConfig from '../../common/models/experimentConfig';
 
