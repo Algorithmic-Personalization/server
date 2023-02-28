@@ -193,7 +193,7 @@ const createUpdateActivity = ({activityRepo, eventRepo, log}: {
 
 	log('Time since last event:', dt / 1000);
 
-	if (dt < timeSpentEventDiffLimit) {
+	if (dt < timeSpentEventDiffLimit && dt > 0) {
 		activity.timeSpentOnYoutubeSeconds += dt / 1000;
 	}
 

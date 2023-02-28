@@ -315,7 +315,7 @@ var createUpdateActivity = function (_a) {
                         ? Number(event.createdAt) - Number(latestSessionEvent.createdAt)
                         : 0;
                     log('Time since last event:', dt / 1000);
-                    if (dt < updateCounters_1.timeSpentEventDiffLimit) {
+                    if (dt < updateCounters_1.timeSpentEventDiffLimit && dt > 0) {
                         activity.timeSpentOnYoutubeSeconds += dt / 1000;
                     }
                     if (event.type === event_1.EventType.WATCH_TIME) {
