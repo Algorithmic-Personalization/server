@@ -111,6 +111,11 @@ The most important fields are:
 - `arm` (the experiment arm, either `control` or `treatment`, stored on the event in case the participant is re-affected to a different arm later)
 - `type` (the type of the event, stored as an enum)
 
+**Note** that events are linked to sessions via the `session_uuid` field,
+and not the `session_id` field, this is on purpose because session uuids are
+basically random, so a malicious participant could send events for a session that
+does not belong to him.
+
 #### How the different events are stored
 
 All events have a `type` field, following is a description of the different types of events and how they are stored.
