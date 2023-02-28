@@ -9,7 +9,7 @@ import {useAdminApi} from '../adminApiProvider';
 import type Event from '../../common/models/event';
 
 import createTableComponent, {type TableDescriptor} from './shared/TableC';
-import {UrlC} from './shared/Format';
+import {UrlC} from './shared/util';
 
 const tableDescriptor: TableDescriptor<Event> = {
 	headers: [

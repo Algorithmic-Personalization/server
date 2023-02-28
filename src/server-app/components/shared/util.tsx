@@ -42,3 +42,15 @@ export const UrlC: React.FC<{url: string; prefix?: string}> = ({url, prefix}) =>
 		return <>{p}{url}</>;
 	}
 };
+
+export const takeValue = <T, U extends HTMLInputElement>(fn: (value: T) => void) =>
+	(e: React.ChangeEvent<U>) => {
+		fn(e.target.value as unknown as T);
+	};
+
+export function bind <T>(value: T, setValue: (value: T) => void) {
+	return {
+		value,
+		onChange: takeValue(setValue),
+	};
+}

@@ -15,7 +15,7 @@ import {useAdminApi} from '../adminApiProvider';
 import RedirectMessageC from './shared/RedirectMessageC';
 import NotificationsC, {type Message} from './shared/NotificationsC';
 
-import {bind} from './shared/helpers';
+import {bind} from './shared/util';
 
 export const LoginC: React.FC<{
 	email: string;

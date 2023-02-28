@@ -19,7 +19,7 @@ import type {VideoItem} from '../../server/projections/RecommendationsList';
 import {VideoType} from '../../server/models/videoListItem';
 import {EventType} from '../../common/models/event';
 
-import {showDate, UrlC} from './shared/Format';
+import {showDate, UrlC} from './shared/util';
 
 const showWatchtimeOrContextUrl = (e: EventOverview): string => {
 	if (e.data?.kind === 'watchtime') {

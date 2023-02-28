@@ -14,7 +14,7 @@ import Admin from '../../common/models/admin';
 
 import NotificationsC, {type Message} from './shared/NotificationsC';
 
-import {bind} from './shared/helpers';
+import {bind} from './shared/util';
 
 import {useAdminApi} from '../adminApiProvider';
 
