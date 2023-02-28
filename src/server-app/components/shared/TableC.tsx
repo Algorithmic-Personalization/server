@@ -41,7 +41,7 @@ const StyledRow = styled(TableRow)(({theme}) => ({
 
 const decorateHeader = (element: Element) => {
 	if (typeof element === 'string') {
-		return <Typography sx={{fontWeight: 'bold'}}>{element}</Typography>;
+		return <Typography variant='subtitle1'>{element}</Typography>;
 	}
 
 	return element;
@@ -51,15 +51,19 @@ const numberFormat = new Intl.NumberFormat();
 
 const decorateValue = (element: ValueElement) => {
 	if (element instanceof Date) {
-		return <Typography>{showDate(element)}</Typography>;
+		return <Typography variant='body2'>{showDate(element)}</Typography>;
 	}
 
 	if (typeof element === 'number') {
 		return (
-			<Typography>
+			<Typography variant='body2'>
 				{numberFormat.format(element)}
 			</Typography>
 		);
+	}
+
+	if (typeof element === 'string') {
+		return <Typography variant='body2'>{element}</Typography>;
 	}
 
 	return element;
