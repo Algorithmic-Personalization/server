@@ -19,6 +19,8 @@ import {Link} from 'react-router-dom';
 import DLinkC from './DownloadLinkC';
 import NotificationsC, {type Message} from './NotificationsC';
 
+import createTableComponent, {type TableDescriptor} from './shared/TableC';
+
 import {useAdminApi} from '../adminApiProvider';
 
 // @ts-expect-error this is a text file, not a module
@@ -26,6 +28,34 @@ import csvSample from '../../../public/participants.sample.csv';
 
 import type Participant from '../../server/models/participant';
 import type {Page} from '../../server/lib/pagination';
+
+const tableDescriptor: TableDescriptor<Participant> = {
+	headers: [
+		{
+			key: 'email',
+			element: 'Email',
+		},
+		{
+			key: 'code',
+			element: 'Participant Code',
+		},
+		{
+			key: 'experiment-arm',
+			element: 'Experiment arm',
+		},
+	],
+	rows: p => ({
+		key: p.email,
+		elements: [
+			// eslint-disable-next-line react/jsx-key
+			<Link to={`/participants/${p.email}`}>{p.email}</Link>,
+			p.code,
+			p.arm,
+		],
+	}),
+};
+
+const TableC = createTableComponent(tableDescriptor);
 
 const UploadFormC: React.FC = () => {
 	const exampleString = csvSample as string;
@@ -128,26 +158,6 @@ const UploadFormC: React.FC = () => {
 	return ui;
 };
 
-const ParticipantRowC: React.FC<{participant: Participant}> = ({
-	participant,
-}) => {
-	const ui = (
-		<Grid container item xs={12}>
-			<Grid item sm={4} xs={12}>
-				<Typography><Link to={`/participants/${participant.email}`}>{participant.email}</Link></Typography>
-			</Grid>
-			<Grid item sm={4} xs={12}>
-				<Typography sx={{wordBreak: 'break-word'}}>{participant.code}</Typography>
-			</Grid>
-			<Grid item sm={4} xs={12}>
-				<Typography>{participant.arm}</Typography>
-			</Grid>
-		</Grid>
-	);
-
-	return ui;
-};
-
 const ListC: React.FC = () => {
 	const [participants, setParticipants] = useState<Page<Participant> | undefined>();
 	const [pageInput, setPageInput] = useState('1');
@@ -206,19 +216,6 @@ const ListC: React.FC = () => {
 				/>
 			</Grid>
 			<Grid container item xs={12}>
-				<Grid item sm={4} xs={12}>
-					<Typography>
-						<strong>Email</strong>
-					</Typography>
-				</Grid>
-				<Grid item sm={4} xs={12}>
-					<Typography><strong>Code</strong></Typography>
-				</Grid>
-				<Grid item sm={4} xs={12}>
-					<Typography><strong>Experiment arm</strong></Typography>
-				</Grid>
-			</Grid>
-			<Grid container item xs={12}>
 				<Typography sx={{display: 'flex', alignItems: 'center'}}>
 					<span>Page&nbsp;</span>
 					<input
@@ -233,12 +230,7 @@ const ListC: React.FC = () => {
 					<span>{participants.pageCount}</span>
 				</Typography>
 			</Grid>
-			{participants.results.length > 0 && participants.results.map(participant => (
-				<ParticipantRowC key={participant.id} participant={participant}/>
-			))}
-			{participants.results.length === 0 && (
-				<Grid item xs={12}><strong>No participant matching</strong></Grid>
-			)}
+			<TableC items={participants.results}/>
 		</Grid>
 	);
 

@@ -82,30 +82,44 @@ exports.EventsC = void 0;
 var react_1 = __importStar(require("react"));
 var material_1 = require("@mui/material");
 var adminApiProvider_1 = require("../adminApiProvider");
-var CardC_1 = __importDefault(require("./CardC"));
-var EventC = function (_a) {
-    var event = _a.event;
-    return (react_1["default"].createElement(material_1.Grid, { container: true, item: true, xs: 12, sm: 6, md: 3 },
-        react_1["default"].createElement(CardC_1["default"], null,
-            react_1["default"].createElement("strong", null,
-                "Event #",
-                event.id,
-                ": ",
-                event.type),
-            react_1["default"].createElement("dl", null,
-                react_1["default"].createElement("dt", null,
-                    react_1["default"].createElement(material_1.Typography, null, "Timestamp")),
-                react_1["default"].createElement("dd", null,
-                    react_1["default"].createElement(material_1.Typography, null, new Date(event.createdAt).toISOString())),
-                react_1["default"].createElement("dt", null,
-                    react_1["default"].createElement(material_1.Typography, null, "Session")),
-                react_1["default"].createElement("dd", null,
-                    react_1["default"].createElement(material_1.Typography, null, event.sessionUuid)),
-                react_1["default"].createElement("dt", null,
-                    react_1["default"].createElement(material_1.Typography, null, "URL")),
-                react_1["default"].createElement("dd", null,
-                    react_1["default"].createElement(material_1.Typography, null, event.url))))));
+var TableC_1 = __importDefault(require("./shared/TableC"));
+var Format_1 = require("./shared/Format");
+var tableDescriptor = {
+    headers: [
+        {
+            key: 'id',
+            element: 'Event ID'
+        },
+        {
+            key: 'type',
+            element: 'Event type'
+        },
+        {
+            key: 'timestamp',
+            element: 'Timestamp'
+        },
+        {
+            key: 'sessionUuid',
+            element: 'Session UUID'
+        },
+        {
+            key: 'url',
+            element: 'URL'
+        },
+    ],
+    rows: function (e) { return ({
+        key: e.id.toString(),
+        elements: [
+            e.id.toString(),
+            e.type,
+            (0, Format_1.showDate)(e.createdAt),
+            e.sessionUuid,
+            // eslint-disable-next-line react/jsx-key
+            react_1["default"].createElement(Format_1.UrlC, { url: e.url }),
+        ]
+    }); }
 };
+var TableC = (0, TableC_1["default"])(tableDescriptor);
 var EventsC = function () {
     var _a = __read((0, react_1.useState)('1'), 2), pageNumberControl = _a[0], setPageNumberControl = _a[1];
     var _b = __read((0, react_1.useState)(1), 2), pageNumber = _b[0], setPageNumber = _b[1];
@@ -143,7 +157,7 @@ var EventsC = function () {
             react_1["default"].createElement("input", { type: 'number', value: pageNumberControl, onChange: handlePageNumberChange, min: 1, max: pageCount, step: 1 }),
             react_1["default"].createElement("span", null, "\u00A0/\u00A0"),
             react_1["default"].createElement("span", null, pageCount)),
-        react_1["default"].createElement(material_1.Grid, { container: true, spacing: 2 }, events.map(function (event) { return react_1["default"].createElement(EventC, { key: event.id, event: event }); }))));
+        react_1["default"].createElement(TableC, { items: events })));
     return ui;
 };
 exports.EventsC = EventsC;

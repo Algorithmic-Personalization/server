@@ -41,6 +41,7 @@ var EventType;
     EventType["NON_PERSONALIZED_CLICKED"] = "NON_PERSONALIZED_CLICKED";
     EventType["MIXED_CLICKED"] = "MIXED_CLICKED";
     EventType["WATCH_TIME"] = "WATCH_TIME";
+    EventType["SESSION_END"] = "SESSION_END";
 })(EventType = exports.EventType || (exports.EventType = {}));
 var ExperimentArm;
 (function (ExperimentArm) {

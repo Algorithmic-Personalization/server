@@ -86,9 +86,36 @@ var Search_1 = __importDefault(require("@mui/icons-material/Search"));
 var react_router_dom_1 = require("react-router-dom");
 var DownloadLinkC_1 = __importDefault(require("./DownloadLinkC"));
 var NotificationsC_1 = __importDefault(require("./NotificationsC"));
+var TableC_1 = __importDefault(require("./shared/TableC"));
 var adminApiProvider_1 = require("../adminApiProvider");
 // @ts-expect-error this is a text file, not a module
 var participants_sample_csv_1 = __importDefault(require("../../../public/participants.sample.csv"));
+var tableDescriptor = {
+    headers: [
+        {
+            key: 'email',
+            element: 'Email'
+        },
+        {
+            key: 'code',
+            element: 'Participant Code'
+        },
+        {
+            key: 'experiment-arm',
+            element: 'Experiment arm'
+        },
+    ],
+    rows: function (p) { return ({
+        key: p.email,
+        elements: [
+            // eslint-disable-next-line react/jsx-key
+            react_1["default"].createElement(react_router_dom_1.Link, { to: "/participants/".concat(p.email) }, p.email),
+            p.code,
+            p.arm,
+        ]
+    }); }
+};
+var TableC = (0, TableC_1["default"])(tableDescriptor);
 var UploadFormC = function () {
     var exampleString = participants_sample_csv_1["default"];
     var _a = __read((0, react_1.useState)(), 2), message = _a[0], setMessage = _a[1];
@@ -159,18 +186,6 @@ var UploadFormC = function () {
             react_1["default"].createElement(NotificationsC_1["default"], { message: message }))));
     return ui;
 };
-var ParticipantRowC = function (_a) {
-    var participant = _a.participant;
-    var ui = (react_1["default"].createElement(material_1.Grid, { container: true, item: true, xs: 12 },
-        react_1["default"].createElement(material_1.Grid, { item: true, sm: 4, xs: 12 },
-            react_1["default"].createElement(material_1.Typography, null,
-                react_1["default"].createElement(react_router_dom_1.Link, { to: "/participants/".concat(participant.email) }, participant.email))),
-        react_1["default"].createElement(material_1.Grid, { item: true, sm: 4, xs: 12 },
-            react_1["default"].createElement(material_1.Typography, { sx: { wordBreak: 'break-word' } }, participant.code)),
-        react_1["default"].createElement(material_1.Grid, { item: true, sm: 4, xs: 12 },
-            react_1["default"].createElement(material_1.Typography, null, participant.arm))));
-    return ui;
-};
 var ListC = function () {
     var _a;
     var _b = __read((0, react_1.useState)(), 2), participants = _b[0], setParticipants = _b[1];
@@ -221,24 +236,12 @@ var ListC = function () {
                         react_1["default"].createElement(Search_1["default"], null)))
                 } })),
         react_1["default"].createElement(material_1.Grid, { container: true, item: true, xs: 12 },
-            react_1["default"].createElement(material_1.Grid, { item: true, sm: 4, xs: 12 },
-                react_1["default"].createElement(material_1.Typography, null,
-                    react_1["default"].createElement("strong", null, "Email"))),
-            react_1["default"].createElement(material_1.Grid, { item: true, sm: 4, xs: 12 },
-                react_1["default"].createElement(material_1.Typography, null,
-                    react_1["default"].createElement("strong", null, "Code"))),
-            react_1["default"].createElement(material_1.Grid, { item: true, sm: 4, xs: 12 },
-                react_1["default"].createElement(material_1.Typography, null,
-                    react_1["default"].createElement("strong", null, "Experiment arm")))),
-        react_1["default"].createElement(material_1.Grid, { container: true, item: true, xs: 12 },
             react_1["default"].createElement(material_1.Typography, { sx: { display: 'flex', alignItems: 'center' } },
                 react_1["default"].createElement("span", null, "Page\u00A0"),
                 react_1["default"].createElement("input", { type: 'number', value: pageInputOk ? page : pageInput, min: 1, max: participants.pageCount, step: 1, onChange: handlePageChange }),
                 react_1["default"].createElement("span", null, "\u00A0/\u00A0"),
                 react_1["default"].createElement("span", null, participants.pageCount))),
-        participants.results.length > 0 && participants.results.map(function (participant) { return (react_1["default"].createElement(ParticipantRowC, { key: participant.id, participant: participant })); }),
-        participants.results.length === 0 && (react_1["default"].createElement(material_1.Grid, { item: true, xs: 12 },
-            react_1["default"].createElement("strong", null, "No participant matching")))));
+        react_1["default"].createElement(TableC, { items: participants.results })));
     return (react_1["default"].createElement(material_1.Box, { component: 'section', sx: { mb: 4 } },
         react_1["default"].createElement(material_1.Typography, { variant: 'h2', sx: { mb: 2 } }, "Participants list"),
         react_1["default"].createElement(NotificationsC_1["default"], { message: message }),

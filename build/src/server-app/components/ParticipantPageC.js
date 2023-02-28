@@ -46,45 +46,13 @@ var material_1 = require("@mui/material");
 var adminApiProvider_1 = require("../adminApiProvider");
 var videoListItem_1 = require("../../server/models/videoListItem");
 var event_1 = require("../../common/models/event");
-var showDate = function (d) {
-    var date = new Date(d);
-    return "".concat(date.toLocaleDateString(), " ").concat(date.toLocaleTimeString());
-};
+var Format_1 = require("./shared/Format");
 var showWatchtimeOrContextUrl = function (e) {
     var _a, _b;
     if (((_a = e.data) === null || _a === void 0 ? void 0 : _a.kind) === 'watchtime') {
         return "".concat(e.data.watchtime, " seconds");
     }
     return (_b = e.context) !== null && _b !== void 0 ? _b : '';
-};
-var LinkC = function (_a) {
-    var href = _a.href, label = _a.label;
-    return (react_1["default"].createElement("a", { target: '_blank', rel: 'noreferrer', href: href, style: {
-            textDecoration: 'none',
-            color: 'inherit'
-        } },
-        react_1["default"].createElement(material_1.Typography, { variant: 'body1', color: 'blue' }, label)));
-};
-var UrlC = function (_a) {
-    var _b, _c;
-    var url = _a.url, prefix = _a.prefix;
-    var withYtHostName = url.startsWith('/') ? "https://youtube.com".concat(url) : url;
-    var p = prefix !== null && prefix !== void 0 ? prefix : '';
-    try {
-        var u = new URL(withYtHostName);
-        if (u.pathname === '/results') {
-            return react_1["default"].createElement(LinkC, { href: withYtHostName, label: "".concat(p, "search: ").concat((_b = u.searchParams.get('search_query')) !== null && _b !== void 0 ? _b : '') });
-        }
-        if (u.pathname === '/watch') {
-            return react_1["default"].createElement(LinkC, { href: withYtHostName, label: "".concat(p, "video: ").concat((_c = u.searchParams.get('v')) !== null && _c !== void 0 ? _c : '') });
-        }
-        return react_1["default"].createElement(LinkC, { href: withYtHostName, label: "".concat(p).concat(u.pathname) });
-    }
-    catch (e) {
-        return react_1["default"].createElement(react_1["default"].Fragment, null,
-            p,
-            url);
-    }
 };
 var RecommendationsListC = function (_a) {
     var data = _a.data, details = _a.details;
@@ -101,7 +69,7 @@ var RecommendationsListC = function (_a) {
         return 'm: ';
     };
     return (react_1["default"].createElement("ul", { style: { listStyle: 'none' } }, data.map(function (item) { return (react_1["default"].createElement("li", { key: item.id },
-        react_1["default"].createElement(UrlC, { url: item.url, prefix: getDetails(item) }))); })));
+        react_1["default"].createElement(Format_1.UrlC, { url: item.url, prefix: getDetails(item) }))); })));
 };
 var RecommendationsC = function (_a) {
     var data = _a.data;
@@ -156,18 +124,18 @@ var EventC = function (_a) {
                 react_1["default"].createElement(material_1.Typography, { variant: 'body1', sx: { mb: 2 } },
                     react_1["default"].createElement("strong", null, position),
                     ") ",
-                    showDate(overview.createdAt))),
+                    (0, Format_1.showDate)(overview.createdAt))),
             react_1["default"].createElement(material_1.Grid, { item: true, xs: 12, md: 3 },
                 react_1["default"].createElement(LegendC, { label: 'event type' }),
                 react_1["default"].createElement(material_1.Typography, { variant: 'body1', sx: { mb: 2 } }, overview.type)),
             react_1["default"].createElement(material_1.Grid, { item: true, xs: 12, md: 2 },
                 react_1["default"].createElement(LegendC, { label: contextLegend() }),
                 react_1["default"].createElement(material_1.Typography, { variant: 'body1', sx: { mb: 2 } },
-                    react_1["default"].createElement(UrlC, { url: showWatchtimeOrContextUrl(overview) }))),
+                    react_1["default"].createElement(Format_1.UrlC, { url: showWatchtimeOrContextUrl(overview) }))),
             react_1["default"].createElement(material_1.Grid, { item: true, xs: 12, md: 2 },
                 react_1["default"].createElement(LegendC, { label: 'url' }),
                 react_1["default"].createElement(material_1.Typography, { variant: 'body1', sx: { mb: 2 } },
-                    react_1["default"].createElement(UrlC, { url: overview.url }))),
+                    react_1["default"].createElement(Format_1.UrlC, { url: overview.url }))),
             react_1["default"].createElement(material_1.Grid, { item: true, xs: 12, md: 3 },
                 react_1["default"].createElement(LegendC, { label: 'extension version' }),
                 react_1["default"].createElement(material_1.Typography, { variant: 'body1', sx: { mb: 2 } }, overview.extensionVersion))),
@@ -223,11 +191,14 @@ var SessionC = function (_a) {
             "Session #",
             data.id),
         react_1["default"].createElement(material_1.Typography, { variant: 'body1', sx: { mb: 2 } },
+            "Session UUID: ",
+            data.uuid),
+        react_1["default"].createElement(material_1.Typography, { variant: 'body1', sx: { mb: 2 } },
             "Started on: ",
-            showDate(data.startedAt)),
+            (0, Format_1.showDate)(data.startedAt)),
         react_1["default"].createElement(material_1.Typography, { variant: 'body1', sx: { mb: 2 } },
             "Ended on: ",
-            showDate(data.endedAt)),
+            (0, Format_1.showDate)(data.endedAt)),
         react_1["default"].createElement(EventsListC, { count: data.eventCount, sessionUuid: data.uuid })));
 };
 var OverviewC = function (_a) {
@@ -246,15 +217,15 @@ var OverviewC = function (_a) {
             react_1["default"].createElement(material_1.Typography, { variant: 'body1', sx: { mb: 2 } },
                 react_1["default"].createElement("strong", null, "Added on:"),
                 " ",
-                showDate(data.createdAt)),
+                (0, Format_1.showDate)(data.createdAt)),
             react_1["default"].createElement(material_1.Typography, { variant: 'body1', sx: { mb: 2 } },
                 react_1["default"].createElement("strong", null, "Last seen:"),
                 " ",
-                showDate(data.latestSessionDate)),
+                (0, Format_1.showDate)(data.latestSessionDate)),
             react_1["default"].createElement(material_1.Typography, { variant: 'body1', sx: { mb: 2 } },
                 react_1["default"].createElement("strong", null, "First seen:"),
                 " ",
-                showDate(data.firstSessionDate)),
+                (0, Format_1.showDate)(data.firstSessionDate)),
             react_1["default"].createElement(material_1.Typography, { variant: 'body1', sx: { mb: 2 } },
                 react_1["default"].createElement("strong", null, "Number of sessions:"),
                 " ",

@@ -83,74 +83,55 @@ var react_1 = __importStar(require("react"));
 var material_1 = require("@mui/material");
 var NotificationsC_1 = __importDefault(require("./NotificationsC"));
 var adminApiProvider_1 = require("../adminApiProvider");
-var LegendC = function (_a) {
-    var text = _a.text;
-    return react_1["default"].createElement(material_1.Typography, { sx: {
-            fontWeight: 'bold',
-            display: { xs: 'block', lg: 'none' }
-        } }, text);
+var TableC_1 = __importDefault(require("./shared/TableC"));
+var tableDescriptor = {
+    headers: [
+        {
+            key: 'activityDay',
+            element: 'Activity day'
+        },
+        {
+            key: 'participant',
+            element: 'Participant'
+        },
+        {
+            key: 'pages-viewed',
+            element: 'Pages viewed'
+        },
+        {
+            key: 'video-pages-viewed',
+            element: 'Video pages viewed'
+        },
+        {
+            key: 'watch-time',
+            element: 'Watch time (seconds)'
+        },
+        {
+            key: 'youtube-time',
+            element: 'Approximate time spent on YouTube (seconds)'
+        },
+    ],
+    rows: function (a) {
+        var _a, _b;
+        return ({
+            key: a.id.toString(),
+            elements: [
+                new Date(a.createdAt).toLocaleDateString(),
+                (_b = (_a = a.participant) === null || _a === void 0 ? void 0 : _a.email) !== null && _b !== void 0 ? _b : '<unknown>',
+                a.pagesViewed.toString(),
+                a.videoPagesViewed.toString(),
+                Math.round(a.videoTimeViewedSeconds).toString(),
+                Math.round(a.timeSpentOnYoutubeSeconds).toString(),
+            ]
+        });
+    }
 };
-var ReportLineC = function (_a) {
-    var _b;
-    var entry = _a.entry;
-    var ui = (react_1["default"].createElement(material_1.Box, { sx: {
-            border: {
-                xs: '1px solid gray',
-                lg: 'none'
-            },
-            mb: {
-                xs: 1,
-                lg: 0
-            },
-            p: {
-                xs: 1,
-                lg: 0
-            },
-            borderRadius: {
-                xs: 1,
-                lg: 0
-            }
-        } },
-        react_1["default"].createElement(material_1.Grid, { container: true, spacing: 1 },
-            react_1["default"].createElement(material_1.Grid, { item: true, lg: 2, xs: 12 },
-                react_1["default"].createElement(LegendC, { text: 'Activity day' }),
-                react_1["default"].createElement(material_1.Typography, null, new Date(entry.createdAt).toLocaleDateString())),
-            react_1["default"].createElement(material_1.Grid, { item: true, lg: 4, xs: 12 },
-                react_1["default"].createElement(LegendC, { text: 'Participant' }),
-                react_1["default"].createElement(material_1.Typography, null, (_b = entry.participant) === null || _b === void 0 ? void 0 : _b.email)),
-            react_1["default"].createElement(material_1.Grid, { item: true, lg: 1, xs: 12 },
-                react_1["default"].createElement(LegendC, { text: 'Pages viewed' }),
-                react_1["default"].createElement(material_1.Typography, null, entry.pagesViewed)),
-            react_1["default"].createElement(material_1.Grid, { item: true, lg: 1, xs: 12 },
-                react_1["default"].createElement(LegendC, { text: 'Video pages viewed' }),
-                react_1["default"].createElement(material_1.Typography, null, entry.videoPagesViewed)),
-            react_1["default"].createElement(material_1.Grid, { item: true, lg: 2, xs: 12 },
-                react_1["default"].createElement(LegendC, { text: 'Video time viewed (seconds)' }),
-                react_1["default"].createElement(material_1.Typography, null, Math.round(entry.videoTimeViewedSeconds))),
-            react_1["default"].createElement(material_1.Grid, { item: true, lg: 2, xs: 12 },
-                react_1["default"].createElement(LegendC, { text: 'Approximate time spent on YouTube (seconds)' }),
-                react_1["default"].createElement(material_1.Typography, null, Math.round(entry.timeSpentOnYoutubeSeconds))))));
-    return ui;
-};
+var TableC = (0, TableC_1["default"])(tableDescriptor);
 var ActivityReportC = function (_a) {
     var report = _a.report;
     var ui = (react_1["default"].createElement("div", null,
         react_1["default"].createElement(material_1.Typography, { variant: 'h2', sx: { mb: 2 } }, "Activity Report"),
-        react_1["default"].createElement(material_1.Box, { sx: { display: { xs: 'none', lg: 'block' }, mb: 1 } },
-            react_1["default"].createElement(material_1.Grid, { container: true, spacing: 1 },
-                react_1["default"].createElement(material_1.Grid, { item: true, lg: 2 },
-                    react_1["default"].createElement(material_1.Typography, { sx: { fontWeight: 'bold' } }, "Activity day")),
-                react_1["default"].createElement(material_1.Grid, { item: true, lg: 4 },
-                    react_1["default"].createElement(material_1.Typography, { sx: { fontWeight: 'bold' } }, "Participant")),
-                react_1["default"].createElement(material_1.Grid, { item: true, lg: 1 },
-                    react_1["default"].createElement(material_1.Typography, { sx: { fontWeight: 'bold' } }, "Pages viewed")),
-                react_1["default"].createElement(material_1.Grid, { item: true, lg: 1 },
-                    react_1["default"].createElement(material_1.Typography, { sx: { fontWeight: 'bold' } }, "Video pages viewed")),
-                react_1["default"].createElement(material_1.Grid, { item: true, lg: 2 },
-                    react_1["default"].createElement(material_1.Typography, { sx: { fontWeight: 'bold' } }, "Video time viewed (seconds)")),
-                react_1["default"].createElement(material_1.Grid, { item: true, lg: 2 },
-                    react_1["default"].createElement(material_1.Typography, { sx: { fontWeight: 'bold' } }, "Approximate time spent on YouTube (seconds)")))),
-        react_1["default"].createElement(material_1.Box, null, report.latest.map(function (entry) { return react_1["default"].createElement(ReportLineC, { key: entry.id, entry: entry }); }))));
+        react_1["default"].createElement(TableC, { items: report.latest })));
     return ui;
 };
 var HomeC = function () {
