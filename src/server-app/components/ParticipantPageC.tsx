@@ -246,6 +246,7 @@ const EventsListC: React.FC<{count: number; sessionUuid: string}> = ({count, ses
 const SessionC: React.FC<{data: SessionOverview}> = ({data}) => (
 	<Paper component='section' sx={{mb: 4, ml: 2, p: 2}}>
 		<Typography variant='h4' sx={{mb: 2}}>Session #{data.id}</Typography>
+		<Typography variant='body1' sx={{mb: 2}}>Session UUID: {data.uuid}</Typography>
 		<Typography variant='body1' sx={{mb: 2}}>Started on: {showDate(data.startedAt)}</Typography>
 		<Typography variant='body1' sx={{mb: 2}}>Ended on: {showDate(data.endedAt)}</Typography>
 		<EventsListC count={data.eventCount} sessionUuid={data.uuid} />
