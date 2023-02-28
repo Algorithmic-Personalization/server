@@ -13,8 +13,10 @@ import {
 } from '@mui/material';
 
 import {styled} from '@mui/material/styles';
+import {showDate} from './Format';
 
 type Element = React.ReactNode;
+type ValueElement = Element | Date;
 
 export type ColumnDescriptor = Array<{
 	key: string;
@@ -23,7 +25,7 @@ export type ColumnDescriptor = Array<{
 
 export type RowDescriptor<T> = (item: T) => {
 	key: string;
-	elements: Element[];
+	elements: ValueElement[];
 };
 
 export type TableDescriptor<T> = {
@@ -40,6 +42,24 @@ const StyledRow = styled(TableRow)(({theme}) => ({
 const decorateHeader = (element: Element) => {
 	if (typeof element === 'string') {
 		return <Typography sx={{fontWeight: 'bold'}}>{element}</Typography>;
+	}
+
+	return element;
+};
+
+const numberFormat = new Intl.NumberFormat();
+
+const decorateValue = (element: ValueElement) => {
+	if (element instanceof Date) {
+		return <Typography>{showDate(element)}</Typography>;
+	}
+
+	if (typeof element === 'number') {
+		return (
+			<Typography>
+				{numberFormat.format(element)}
+			</Typography>
+		);
 	}
 
 	return element;
@@ -76,13 +96,13 @@ export function createTableComponent<T>(descriptor: TableDescriptor<T>): React.F
 							</TableHead>
 							<TableBody>
 								{items.map(item => {
-									const {key, elements: values} = descriptor.rows(item);
+									const {key, elements} = descriptor.rows(item);
 
 									return (
 										<StyledRow key={key}>
-											{values.map((value, index) => (
+											{elements.map((element, index) => (
 												<TableCell key={headers[index].key}>
-													{value}
+													{decorateValue(element)}
 												</TableCell>
 											))}
 										</StyledRow>
@@ -125,7 +145,7 @@ export function createTableComponent<T>(descriptor: TableDescriptor<T>): React.F
 												pl: 2,
 											}}
 										>
-											{element}
+											{decorateValue(element)}
 										</Box>
 									</Box>
 								))}

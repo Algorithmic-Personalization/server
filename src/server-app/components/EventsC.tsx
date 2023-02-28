@@ -9,7 +9,7 @@ import {useAdminApi} from '../adminApiProvider';
 import type Event from '../../common/models/event';
 
 import createTableComponent, {type TableDescriptor} from './shared/TableC';
-import {showDate, UrlC} from './shared/Format';
+import {UrlC} from './shared/Format';
 
 const tableDescriptor: TableDescriptor<Event> = {
 	headers: [
@@ -39,7 +39,7 @@ const tableDescriptor: TableDescriptor<Event> = {
 		elements: [
 			e.id.toString(),
 			e.type,
-			showDate(e.createdAt),
+			new Date(e.createdAt),
 			e.sessionUuid,
 			// eslint-disable-next-line react/jsx-key
 			<UrlC url={e.url}/>,
