@@ -4,6 +4,7 @@ import {
 	Box,
 	Grid,
 	Button,
+	Paper,
 	Typography,
 	FormControl,
 	TextField,
@@ -16,6 +17,82 @@ import CardC from './shared/CardC';
 import ExperimentConfig from '../../common/models/experimentConfig';
 
 import {useAdminApi} from '../adminApiProvider';
+
+const PhaseC: React.FC<{
+	from: number;
+	to: number;
+}> = ({from, to}) => {
+	const ui = (
+		<Box
+			component={Paper}
+			sx={{
+				p: 2,
+				mb: 2,
+			}}
+		>
+			<Typography variant='h2'>
+				Move users from phase {from} to phase {to}
+			</Typography>
+			<Typography variant='body2' sx={{mb: 1}}>
+				Once they have met <strong>any</strong> of the following <strong>daily</strong> criteria:
+			</Typography>
+			<Box
+				sx={{
+					'& .MuiTextField-root': {m: 1},
+				}}
+			>
+				<Box sx={{mb: 1}}>
+					<TextField
+						label='Pages viewed'
+						type='number'
+						helperText='Minimum number of pages viewed'
+					/>
+					<TextField
+						label='Video pages viewed'
+						type='number'
+						helperText='Minimum number of video pages viewed'
+					/>
+				</Box>
+				<Box sx={{mb: 1}}>
+					<TextField
+						label='Recommendations clicked'
+						type='number'
+						helperText='Minimum number of sidebar recommendations clicked'
+					/>
+				</Box>
+				<Box sx={{mb: 1}}>
+					<TextField
+						label='Watch time'
+						type='number'
+						helperText='Minimum total watch time in minutes'
+					/>
+					<TextField
+						label='Time spent on YouTube'
+						type='number'
+						helperText='Minimum time spent on YouTube in minutes, approximate'
+					/>
+				</Box>
+				<Typography variant='body2' sx={{mb: 1}}>
+					For <strong>at least</strong>:
+				</Typography>
+				<TextField
+					sx={{display: 'block'}}
+					label='Number of days'
+					type='number'
+					helperText='Minimum number of days to trigger the phase transition, not necessarily consecutive'
+				/>
+				{from > 0 && (
+					<Typography variant='body2' sx={{mt: 2, mb: 1}}>
+						<strong>Note</strong> that this number of days are counted
+						since the entry of the the user into phase {from}, they are not cumulative with the days spent in earlier phases.
+					</Typography>
+				)}
+			</Box>
+		</Box>
+	);
+
+	return ui;
+};
 
 export const ExperimentConfigC = () => {
 	const [message, setMessage] = useState<Message>();
@@ -106,7 +183,31 @@ export const ExperimentConfigC = () => {
 		<Box>
 			<NotificationsC message={message}/>
 			<Grid container spacing={8}>
-				<Grid item xs={12} sm={6} component='section'>
+				<Grid item xs={12} component='section'>
+					<Typography variant='h1' sx={{mb: 4}}>
+						Phase transitioning
+					</Typography>
+					<Typography variant='body1' sx={{my: 2}}>
+						<strong>This is just a UI proposal, nothing is implemented!!</strong>
+					</Typography>
+					<Typography
+						variant='body1'
+						sx={{
+							mb: 2,
+							'& a:visited': {color: 'inherit'},
+							'& a': {color: 'inherit'},
+						}}
+					>
+						Here you can configure how participants are moved from one phase to another.
+						<br/>There are three phases, numbered 0, 1 and 2.
+						<br/>A participant starts in phase 0, and moves on to the subsequent phases according to the criteria you define below.
+						<br/>The setting of the <a href='#setting'>non-personalized</a> probability only applies to participants in phase 1.
+						<br/>Otherwise this probability is <strong>zero</strong>, so that the user experience is as close as the regular YouTube as possible.
+					</Typography>
+					<PhaseC from={0} to={1}/>
+					<PhaseC from={1} to={2}/>
+				</Grid>
+				<Grid item xs={12} sm={6} component='section' id='setting'>
 					<Typography variant='h1' sx={{mb: 4}}>
 						Experiment Config
 					</Typography>
