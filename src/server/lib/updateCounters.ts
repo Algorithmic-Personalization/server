@@ -132,6 +132,7 @@ export const updateCounters = async ({
 			for (const event of events) {
 				if (event.type === 'PAGE_VIEW') {
 					pagesViewed.add(event.createdAt, 1);
+					timeSpent.add(event.createdAt);
 
 					// eslint-disable-next-line max-depth
 					if (event.url.includes('/watch')) {
@@ -158,8 +159,6 @@ export const updateCounters = async ({
 
 					watchTimes.add(event.createdAt, watchTime.secondsWatched);
 				}
-
-				timeSpent.add(event.createdAt);
 			}
 		}
 

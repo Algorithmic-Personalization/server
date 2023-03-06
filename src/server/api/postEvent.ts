@@ -181,6 +181,7 @@ const createUpdateActivity = ({activityRepo, eventRepo, log}: {
 		.findOne({
 			where: {
 				sessionUuid: event.sessionUuid,
+				type: EventType.PAGE_VIEW,
 			},
 			order: {
 				createdAt: 'DESC',
