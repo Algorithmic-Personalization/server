@@ -42,28 +42,26 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
     return (mod && mod.__esModule) ? mod : { "default": mod };
 };
 exports.__esModule = true;
+exports.RedirectMessageC = void 0;
 var react_1 = __importStar(require("react"));
-var client_1 = require("react-dom/client");
-var material_1 = require("@mui/material");
-var react_router_dom_1 = require("react-router-dom");
-var theme_1 = __importDefault(require("./theme"));
-var adminApiProvider_1 = __importStar(require("./adminApiProvider"));
-var adminApi_1 = require("./adminApi");
-var Server_1 = __importDefault(require("./Server"));
-var LoginModalP_1 = __importDefault(require("./components/LoginModalP"));
-var elt = document.getElementById('app');
-if (!elt) {
-    throw new Error('No element with id "app" found');
-}
-var App = function () {
-    var _a = __read((0, react_1.useState)(false), 2), loginModalOpen = _a[0], setLoginModalOpen = _a[1];
-    return (react_1["default"].createElement(react_1["default"].StrictMode, null,
-        react_1["default"].createElement(material_1.ThemeProvider, { theme: theme_1["default"] },
-            react_1["default"].createElement(react_router_dom_1.BrowserRouter, null,
-                react_1["default"].createElement(adminApiProvider_1["default"], { value: (0, adminApi_1.createAdminApi)(adminApiProvider_1.serverUrl, function () {
-                        setLoginModalOpen(true);
-                    }) },
-                    react_1["default"].createElement(LoginModalP_1["default"], { open: loginModalOpen, setOpen: setLoginModalOpen }),
-                    react_1["default"].createElement(Server_1["default"], null))))));
+var NotificationsC_1 = __importDefault(require("./NotificationsC"));
+var RedirectMessageC = function (_a) {
+    var ignore = _a.ignore;
+    var _b = __read((0, react_1.useState)(), 2), message = _b[0], setMessage = _b[1];
+    (0, react_1.useEffect)(function () {
+        var params = new URLSearchParams(window.location.search);
+        var message = params.get('message');
+        if (message) {
+            setMessage({
+                text: message,
+                permanent: true
+            });
+        }
+    }, []);
+    if (ignore) {
+        return null;
+    }
+    return react_1["default"].createElement(NotificationsC_1["default"], { message: message });
 };
-(0, client_1.createRoot)(elt).render(react_1["default"].createElement(App, null));
+exports.RedirectMessageC = RedirectMessageC;
+exports["default"] = exports.RedirectMessageC;

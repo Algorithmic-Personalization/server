@@ -53,21 +53,35 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
     return (mod && mod.__esModule) ? mod : { "default": mod };
 };
 exports.__esModule = true;
-exports.Server = void 0;
+exports.LoginModalC = void 0;
 var react_1 = __importStar(require("react"));
 var react_router_dom_1 = require("react-router-dom");
-var RequireAuthC_1 = __importDefault(require("./components/shared/RequireAuthC"));
-var LoginP_1 = __importDefault(require("./components/LoginP"));
-var RegisterP_1 = __importDefault(require("./components/RegisterP"));
-var LayoutP_1 = __importDefault(require("./components/LayoutP"));
-var Server = function () {
-    var _a = __read((0, react_1.useState)(''), 2), email = _a[0], setEmail = _a[1];
-    var _b = __read((0, react_1.useState)(''), 2), password = _b[0], setPassword = _b[1];
-    return (react_1["default"].createElement(react_router_dom_1.Routes, null,
-        react_1["default"].createElement(react_router_dom_1.Route, { path: '*', element: react_1["default"].createElement(RequireAuthC_1["default"], null,
-                react_1["default"].createElement(LayoutP_1["default"], null)) }),
-        react_1["default"].createElement(react_router_dom_1.Route, { path: '/login', element: react_1["default"].createElement(LoginP_1["default"], __assign({}, { email: email, setEmail: setEmail, password: password, setPassword: setPassword })) }),
-        react_1["default"].createElement(react_router_dom_1.Route, { path: '/register', element: react_1["default"].createElement(RegisterP_1["default"], __assign({}, { email: email, setEmail: setEmail, password: password, setPassword: setPassword })) })));
+var material_1 = require("@mui/material");
+var LoginP_1 = __importDefault(require("./LoginP"));
+var LoginModalC = function (_a) {
+    var open = _a.open, setOpen = _a.setOpen, onSuccess = _a.onSuccess;
+    var _b = __read((0, react_1.useState)(''), 2), email = _b[0], setEmail = _b[1];
+    var _c = __read((0, react_1.useState)(''), 2), password = _c[0], setPassword = _c[1];
+    var location = (0, react_router_dom_1.useLocation)();
+    var navigate = (0, react_router_dom_1.useNavigate)();
+    console.log('modal says: location', location);
+    return (react_1["default"].createElement(material_1.Modal, { open: open },
+        react_1["default"].createElement(material_1.Box, { sx: { bgcolor: 'background.paper', padding: 4 } },
+            react_1["default"].createElement(material_1.Typography, { sx: { textAlign: 'center' } }, "It seems your session has expired, please log back in."),
+            react_1["default"].createElement(LoginP_1["default"], __assign({}, { email: email, setEmail: setEmail, password: password, setPassword: setPassword }, { onSuccess: function () {
+                    setOpen(false);
+                    if (onSuccess) {
+                        onSuccess();
+                    }
+                    if (location.state.from) {
+                        console.log('redirecting to', location.state.from);
+                        navigate(location.state.from);
+                    }
+                    else {
+                        console.log('redirecting to /');
+                        navigate('/');
+                    }
+                }, isModal: true })))));
 };
-exports.Server = Server;
-exports["default"] = exports.Server;
+exports.LoginModalC = LoginModalC;
+exports["default"] = exports.LoginModalC;

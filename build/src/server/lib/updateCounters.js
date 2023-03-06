@@ -186,11 +186,11 @@ var updateCounters = function (_a) {
                     log("Found ".concat((0, util_1.inspect)(participants), " participants to update"));
                     _f.label = 2;
                 case 2:
-                    _f.trys.push([2, 27, 28, 29]);
+                    _f.trys.push([2, 26, 27, 28]);
                     participants_1 = __values(participants), participants_1_1 = participants_1.next();
                     _f.label = 3;
                 case 3:
-                    if (!!participants_1_1.done) return [3 /*break*/, 26];
+                    if (!!participants_1_1.done) return [3 /*break*/, 25];
                     id = participants_1_1.value.id;
                     return [4 /*yield*/, dataSource
                             .getRepository(participant_1["default"])
@@ -213,11 +213,11 @@ var updateCounters = function (_a) {
                     timeSpent = new TimeSpentCounter();
                     _f.label = 6;
                 case 6:
-                    _f.trys.push([6, 19, 20, 21]);
+                    _f.trys.push([6, 18, 19, 20]);
                     sessions_1 = (e_4 = void 0, __values(sessions)), sessions_1_1 = sessions_1.next();
                     _f.label = 7;
                 case 7:
-                    if (!!sessions_1_1.done) return [3 /*break*/, 18];
+                    if (!!sessions_1_1.done) return [3 /*break*/, 17];
                     session = sessions_1_1.value;
                     return [4 /*yield*/, dataSource
                             .getRepository(event_1["default"])
@@ -233,14 +233,15 @@ var updateCounters = function (_a) {
                     events = _f.sent();
                     _f.label = 9;
                 case 9:
-                    _f.trys.push([9, 15, 16, 17]);
+                    _f.trys.push([9, 14, 15, 16]);
                     events_1 = (e_3 = void 0, __values(events)), events_1_1 = events_1.next();
                     _f.label = 10;
                 case 10:
-                    if (!!events_1_1.done) return [3 /*break*/, 14];
+                    if (!!events_1_1.done) return [3 /*break*/, 13];
                     event_2 = events_1_1.value;
                     if (event_2.type === 'PAGE_VIEW') {
                         pagesViewed.add(event_2.createdAt, 1);
+                        timeSpent.add(event_2.createdAt);
                         // eslint-disable-next-line max-depth
                         if (event_2.url.includes('/watch')) {
                             videoPagesViewed.add(event_2.createdAt, 1);
@@ -267,37 +268,34 @@ var updateCounters = function (_a) {
                     watchTimes.add(event_2.createdAt, watchTime.secondsWatched);
                     _f.label = 12;
                 case 12:
-                    timeSpent.add(event_2.createdAt);
-                    _f.label = 13;
-                case 13:
                     events_1_1 = events_1.next();
                     return [3 /*break*/, 10];
-                case 14: return [3 /*break*/, 17];
-                case 15:
+                case 13: return [3 /*break*/, 16];
+                case 14:
                     e_3_1 = _f.sent();
                     e_3 = { error: e_3_1 };
-                    return [3 /*break*/, 17];
-                case 16:
+                    return [3 /*break*/, 16];
+                case 15:
                     try {
                         if (events_1_1 && !events_1_1.done && (_d = events_1["return"])) _d.call(events_1);
                     }
                     finally { if (e_3) throw e_3.error; }
                     return [7 /*endfinally*/];
-                case 17:
+                case 16:
                     sessions_1_1 = sessions_1.next();
                     return [3 /*break*/, 7];
-                case 18: return [3 /*break*/, 21];
-                case 19:
+                case 17: return [3 /*break*/, 20];
+                case 18:
                     e_4_1 = _f.sent();
                     e_4 = { error: e_4_1 };
-                    return [3 /*break*/, 21];
-                case 20:
+                    return [3 /*break*/, 20];
+                case 19:
                     try {
                         if (sessions_1_1 && !sessions_1_1.done && (_c = sessions_1["return"])) _c.call(sessions_1);
                     }
                     finally { if (e_4) throw e_4.error; }
                     return [7 /*endfinally*/];
-                case 21:
+                case 20:
                     days = mergeCounterKeys(pagesViewed, watchTimes, videoPagesViewed, timeSpent);
                     activityTimes = [];
                     try {
@@ -321,36 +319,36 @@ var updateCounters = function (_a) {
                         }
                         finally { if (e_6) throw e_6.error; }
                     }
-                    _f.label = 22;
-                case 22:
-                    _f.trys.push([22, 24, , 25]);
+                    _f.label = 21;
+                case 21:
+                    _f.trys.push([21, 23, , 24]);
                     return [4 /*yield*/, atRepo.save(activityTimes)];
-                case 23:
+                case 22:
                     _f.sent();
                     if (activityTimes.length > 0) {
                         log("Saved activity times for ".concat(activityTimes.length, " participants"));
                     }
-                    return [3 /*break*/, 25];
-                case 24:
+                    return [3 /*break*/, 24];
+                case 23:
                     error_1 = _f.sent();
                     log("Error saving activity times for participant ".concat(participant.id, ":"), error_1);
                     log('Activity times:', activityTimes);
-                    return [3 /*break*/, 25];
-                case 25:
+                    return [3 /*break*/, 24];
+                case 24:
                     participants_1_1 = participants_1.next();
                     return [3 /*break*/, 3];
-                case 26: return [3 /*break*/, 29];
-                case 27:
+                case 25: return [3 /*break*/, 28];
+                case 26:
                     e_5_1 = _f.sent();
                     e_5 = { error: e_5_1 };
-                    return [3 /*break*/, 29];
-                case 28:
+                    return [3 /*break*/, 28];
+                case 27:
                     try {
                         if (participants_1_1 && !participants_1_1.done && (_b = participants_1["return"])) _b.call(participants_1);
                     }
                     finally { if (e_5) throw e_5.error; }
                     return [7 /*endfinally*/];
-                case 29: return [2 /*return*/];
+                case 28: return [2 /*return*/];
             }
         });
     });

@@ -37,11 +37,11 @@ const tableDescriptor: TableDescriptor<DailyActivityTime> = {
 		},
 		{
 			key: 'watch-time',
-			element: 'Watch time (seconds)',
+			element: 'Watch time (minutes)',
 		},
 		{
 			key: 'youtube-time',
-			element: 'Approximate time spent on YouTube (seconds)',
+			element: 'Approximate time spent on YouTube (minutes)',
 		},
 	],
 	rows: a => ({
@@ -53,8 +53,8 @@ const tableDescriptor: TableDescriptor<DailyActivityTime> = {
 			a.pagesViewed,
 			a.videoPagesViewed,
 			a.sidebarRecommendationsClicked,
-			Math.round(a.videoTimeViewedSeconds),
-			Math.round(a.timeSpentOnYoutubeSeconds),
+			Math.round(a.videoTimeViewedSeconds / 60),
+			Math.round(a.timeSpentOnYoutubeSeconds / 60),
 		],
 	}),
 };

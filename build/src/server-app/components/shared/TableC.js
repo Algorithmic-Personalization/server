@@ -7,7 +7,7 @@ exports.createTableComponent = void 0;
 var react_1 = __importDefault(require("react"));
 var material_1 = require("@mui/material");
 var styles_1 = require("@mui/material/styles");
-var Format_1 = require("./Format");
+var util_1 = require("./util");
 var StyledRow = (0, styles_1.styled)(material_1.TableRow)(function (_a) {
     var theme = _a.theme;
     return ({
@@ -25,7 +25,7 @@ var decorateHeader = function (element) {
 var numberFormat = new Intl.NumberFormat();
 var decorateValue = function (element) {
     if (element instanceof Date) {
-        return react_1["default"].createElement(material_1.Typography, { variant: 'body2' }, (0, Format_1.showDate)(element));
+        return react_1["default"].createElement(material_1.Typography, { variant: 'body2' }, (0, util_1.showDate)(element));
     }
     if (typeof element === 'number') {
         return (react_1["default"].createElement(material_1.Typography, { variant: 'body2' }, numberFormat.format(element)));

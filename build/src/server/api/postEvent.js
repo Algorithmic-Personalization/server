@@ -303,7 +303,8 @@ var createUpdateActivity = function (_a) {
                     return [4 /*yield*/, eventRepo
                             .findOne({
                             where: {
-                                sessionUuid: event.sessionUuid
+                                sessionUuid: event.sessionUuid,
+                                type: event_1.EventType.PAGE_VIEW
                             },
                             order: {
                                 createdAt: 'DESC'
