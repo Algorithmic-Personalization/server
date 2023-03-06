@@ -31,10 +31,10 @@ const PhaseC: React.FC<{
 			}}
 		>
 			<Typography variant='h2'>
-				Move users from phase {from} to phase {to}
+				Move participants from phase&nbsp;{from} to phase&nbsp;{to}...
 			</Typography>
 			<Typography variant='body2' sx={{mb: 1}}>
-				Once they have met <strong>any</strong> of the following <strong>daily</strong> criteria:
+				...once they have met <strong>any</strong> of the following <strong>daily</strong> criteria:
 			</Typography>
 			<Box
 				sx={{
@@ -73,7 +73,7 @@ const PhaseC: React.FC<{
 					/>
 				</Box>
 				<Typography variant='body2' sx={{mb: 1}}>
-					For <strong>at least</strong>:
+					for <strong>at least</strong>:
 				</Typography>
 				<TextField
 					sx={{display: 'block'}}
@@ -83,8 +83,8 @@ const PhaseC: React.FC<{
 				/>
 				{from > 0 && (
 					<Typography variant='body2' sx={{mt: 2, mb: 1}}>
-						<strong>Note</strong> that this number of days are counted
-						since the entry of the the user into phase {from}, they are not cumulative with the days spent in earlier phases.
+						<strong>Note</strong> that this number of days is counted
+						since the entry of the the participant into phase&nbsp;{from}, they are not cumulative with the days spent in phase&nbsp;{from - 1}.
 					</Typography>
 				)}
 			</Box>

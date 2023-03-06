@@ -103,12 +103,13 @@ var PhaseC = function (_a) {
             mb: 2
         } },
         react_1["default"].createElement(material_1.Typography, { variant: 'h2' },
-            "Move users from phase ",
+            "Move participants from phase\u00A0",
             from,
-            " to phase ",
-            to),
+            " to phase\u00A0",
+            to,
+            "..."),
         react_1["default"].createElement(material_1.Typography, { variant: 'body2', sx: { mb: 1 } },
-            "Once they have met ",
+            "...once they have met ",
             react_1["default"].createElement("strong", null, "any"),
             " of the following ",
             react_1["default"].createElement("strong", null, "daily"),
@@ -125,15 +126,17 @@ var PhaseC = function (_a) {
                 react_1["default"].createElement(material_1.TextField, { label: 'Watch time', type: 'number', helperText: 'Minimum total watch time in minutes' }),
                 react_1["default"].createElement(material_1.TextField, { label: 'Time spent on YouTube', type: 'number', helperText: 'Minimum time spent on YouTube in minutes, approximate' })),
             react_1["default"].createElement(material_1.Typography, { variant: 'body2', sx: { mb: 1 } },
-                "For ",
+                "for ",
                 react_1["default"].createElement("strong", null, "at least"),
                 ":"),
             react_1["default"].createElement(material_1.TextField, { sx: { display: 'block' }, label: 'Number of days', type: 'number', helperText: 'Minimum number of days to trigger the phase transition, not necessarily consecutive' }),
             from > 0 && (react_1["default"].createElement(material_1.Typography, { variant: 'body2', sx: { mt: 2, mb: 1 } },
                 react_1["default"].createElement("strong", null, "Note"),
-                " that this number of days are counted since the entry of the the user into phase ",
+                " that this number of days is counted since the entry of the the participant into phase\u00A0",
                 from,
-                ", they are not cumulative with the days spent in earlier phases.")))));
+                ", they are not cumulative with the days spent in phase\u00A0",
+                from - 1,
+                ".")))));
     return ui;
 };
 var ExperimentConfigC = function () {
@@ -255,7 +258,7 @@ var ExperimentConfigC = function () {
                     react_1["default"].createElement("br", null),
                     "Otherwise this probability is ",
                     react_1["default"].createElement("strong", null, "zero"),
-                    ", so that the user experience is as close as the regular YouTube as possible."),
+                    ", so that the user experience is as close to the regular YouTube as possible."),
                 react_1["default"].createElement(PhaseC, { from: 0, to: 1 }),
                 react_1["default"].createElement(PhaseC, { from: 1, to: 2 })),
             react_1["default"].createElement(material_1.Grid, { item: true, xs: 12, sm: 6, component: 'section', id: 'setting' },
