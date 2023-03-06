@@ -202,7 +202,7 @@ export const ExperimentConfigC = () => {
 						<br/>There are three phases, numbered 0, 1 and 2.
 						<br/>A participant starts in phase 0, and moves on to the subsequent phases according to the criteria you define below.
 						<br/>The setting of the <a href='#setting'>non-personalized</a> probability only applies to participants in phase 1.
-						<br/>Otherwise this probability is <strong>zero</strong>, so that the user experience is as close as the regular YouTube as possible.
+						<br/>Otherwise this probability is <strong>zero</strong>, so that the user experience is as close to the regular YouTube as possible.
 					</Typography>
 					<PhaseC from={0} to={1}/>
 					<PhaseC from={1} to={2}/>
