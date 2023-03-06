@@ -1,6 +1,8 @@
-import React from 'react';
+import React, {useState} from 'react';
 
 import {Typography} from '@mui/material';
+
+import {type Page} from '../../../server/lib/pagination';
 
 export const showDate = (d: Date | string): string => {
 	const date = new Date(d);
@@ -53,4 +55,20 @@ export function bind <T>(value: T, setValue: (value: T) => void) {
 		value,
 		onChange: takeValue(setValue),
 	};
+}
+
+export function createPaginationComponent<T>(): React.FC<{
+	page?: Page<T>;
+	onPageChange: (pageNumber: number) => void;
+}> {
+	const PaginationC: React.FC<{
+		page?: Page<T>;
+		onPageChange: (pageNumber: number) => void;
+	}> = ({page: _a, onPageChange: _b}) => {
+		const [_pageNumber, _setPageNumber] = useState<1>();
+
+		return <div></div>;
+	};
+
+	return PaginationC;
 }
