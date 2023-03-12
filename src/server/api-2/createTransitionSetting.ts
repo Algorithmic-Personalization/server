@@ -6,7 +6,7 @@ import {validateNew} from '../../common/util';
 
 export const createTransitionSettingDefinition: RouteDefinition<TransitionSetting> = {
 	verb: 'post',
-	path: '/api/transitionSetting',
+	path: '/api/transition-setting',
 	makeHandler: ({createLogger, dataSource}) => async (req): Promise<TransitionSetting> => {
 		const log = createLogger(req.requestId);
 		log('Received create transitionSetting request');
@@ -36,6 +36,7 @@ export const createTransitionSettingDefinition: RouteDefinition<TransitionSettin
 				await repo.save(current);
 			}
 
+			setting.id = 0;
 			setting.isCurrent = true;
 			setting.createdAt = new Date();
 			setting.updatedAt = new Date();

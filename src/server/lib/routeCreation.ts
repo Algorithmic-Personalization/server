@@ -6,6 +6,7 @@ import {type CreateLogger} from './logger';
 import {type TokenTools} from './crypto';
 
 import {has} from '../../common/util';
+import NotFoundError from './notFoundError';
 
 const hasMessage = has('message');
 const message = (x: unknown) => (hasMessage(x) ? x.message : 'An unknown error occurred');
@@ -41,6 +42,14 @@ export const makeRouteConnector = (context: RouteContext) => <T>(definition: Rou
 			value,
 		});
 	} catch (err) {
+		if (err instanceof NotFoundError) {
+			res.status(404).json({
+				kind: 'Failure',
+				message: message(err),
+			});
+			return;
+		}
+
 		res.status(500).json({
 			kind: 'Failure',
 			message: message(err),

@@ -96,6 +96,7 @@ import createGetEventsRoute from './api/getEvents';
 import createParticipantDefinition from './api-2/createParticipant';
 import createGetActivityReportDefinition from './api-2/getActivityReport';
 import createTransitionSettingDefinition from './api-2/createTransitionSetting';
+import getTransitionSettingDefinition from './api-2/getTransitionSetting';
 
 // Add classes used by typeorm as models here
 // so that typeorm can extract the metadata from them.
@@ -301,6 +302,7 @@ const start = async () => {
 	defineAdminRoute(createParticipantDefinition);
 	defineAdminRoute(createGetActivityReportDefinition);
 	defineAdminRoute(createTransitionSettingDefinition);
+	defineAdminRoute(getTransitionSettingDefinition);
 
 	app.post(postRegister, createRegisterRoute(routeContext));
 	app.get(getVerifyEmailToken, createVerifyEmailRoute(routeContext));

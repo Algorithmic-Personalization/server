@@ -36,6 +36,10 @@ import {
 } from '../server/api-2/createTransitionSetting';
 
 import {
+	getTransitionSettingDefinition,
+} from '../server/api-2/getTransitionSetting';
+
+import {
 	type Maybe,
 	isMaybe,
 	getMessage,
@@ -63,6 +67,7 @@ export type AdminApi = {
 	deleteApiToken: (token: string) => Promise<Maybe<string>>;
 	getActivityReport: () => Promise<Maybe<ActivityReport>>;
 	createTransitionSetting: (setting: TransitionSetting) => Promise<Maybe<TransitionSetting>>;
+	getTransitionSetting: (from: number, to: number) => Promise<Maybe<TransitionSetting>>;
 };
 
 const loadItem = <T>(key: string): T | undefined => {
@@ -234,6 +239,11 @@ export const createAdminApi = (serverUrl: string, showLoginModal?: () => void): 
 
 		async createTransitionSetting(setting: TransitionSetting) {
 			return post<TransitionSetting>(createTransitionSettingDefinition.path, setting, headers());
+		},
+
+		async getTransitionSetting(from: number, to: number) {
+			const {path} = getTransitionSettingDefinition;
+			return get<TransitionSetting>(`${path}?from=${from}&to=${to}`, {}, headers());
 		},
 	};
 };

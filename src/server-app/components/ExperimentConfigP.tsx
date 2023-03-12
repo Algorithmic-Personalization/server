@@ -15,80 +15,176 @@ import NotificationsC, {type Message} from './shared/NotificationsC';
 import CardC from './shared/CardC';
 
 import ExperimentConfig from '../../common/models/experimentConfig';
+import TransitionSetting from '../../server/models/transitionSetting';
 
 import {useAdminApi} from '../adminApiProvider';
+
+const createTransitionSetting = (from: number, to: number): TransitionSetting => {
+	const setting = new TransitionSetting();
+	setting.fromPhase = from;
+	setting.toPhase = to;
+	return setting;
+};
 
 const PhaseC: React.FC<{
 	from: number;
 	to: number;
 }> = ({from, to}) => {
+	const api = useAdminApi();
+	const [setting, setSetting] = useState(
+		createTransitionSetting(from, to),
+	);
+	const [message, setMessage] = useState<Message>();
+
+	useEffect(() => {
+		(async () => {
+			const setting = await api.getTransitionSetting(from, to);
+			if (setting.kind === 'Success') {
+				setSetting(setting.value);
+			}
+		})();
+	}, [from, to]);
+
 	const ui = (
-		<Box
-			component={Paper}
-			sx={{
-				p: 2,
-				mb: 2,
+		<form
+			onSubmit={async e => {
+				e.preventDefault();
+
+				const result = await api.createTransitionSetting(setting);
+
+				if (result.kind === 'Success') {
+					setMessage({
+						severity: 'success',
+						text: 'Saved!',
+					});
+				} else {
+					setMessage({
+						severity: 'error',
+						text: result.message,
+					});
+				}
 			}}
 		>
-			<Typography variant='h2'>
-				Move participants from phase&nbsp;{from} to phase&nbsp;{to}...
-			</Typography>
-			<Typography variant='body2' sx={{mb: 1}}>
-				...once they have met <strong>any</strong> of the following <strong>daily</strong> criteria:
-			</Typography>
 			<Box
+				component={Paper}
 				sx={{
-					'& .MuiTextField-root': {m: 1},
+					p: 2,
+					mb: 2,
 				}}
 			>
-				<Box sx={{mb: 1}}>
-					<TextField
-						label='Pages viewed'
-						type='number'
-						helperText='Minimum number of pages viewed'
-					/>
-					<TextField
-						label='Video pages viewed'
-						type='number'
-						helperText='Minimum number of video pages viewed'
-					/>
-				</Box>
-				<Box sx={{mb: 1}}>
-					<TextField
-						label='Recommendations clicked'
-						type='number'
-						helperText='Minimum number of sidebar recommendations clicked'
-					/>
-				</Box>
-				<Box sx={{mb: 1}}>
-					<TextField
-						label='Watch time'
-						type='number'
-						helperText='Minimum total watch time in minutes'
-					/>
-					<TextField
-						label='Time spent on YouTube'
-						type='number'
-						helperText='Minimum time spent on YouTube in minutes, approximate'
-					/>
-				</Box>
-				<Typography variant='body2' sx={{mb: 1}}>
-					for <strong>at least</strong>:
+				<Typography variant='h2'>
+					Move participants from phase&nbsp;{from} to phase&nbsp;{to}...
 				</Typography>
-				<TextField
-					sx={{display: 'block'}}
-					label='Number of days'
-					type='number'
-					helperText='Minimum number of days to trigger the phase transition, not necessarily consecutive'
-				/>
-				{from > 0 && (
-					<Typography variant='body2' sx={{mt: 2, mb: 1}}>
-						<strong>Note</strong> that this number of days is counted
-						since the entry of the the participant into phase&nbsp;{from}, they are not cumulative with the days spent in phase&nbsp;{from - 1}.
+				<Typography variant='body2' sx={{mb: 1}}>
+					...once they have met <strong>any</strong> of the following <strong>daily</strong> criteria:
+				</Typography>
+				<Box
+					sx={{
+						'& .MuiTextField-root': {m: 1},
+					}}
+				>
+					<Box sx={{mb: 1}}>
+						<TextField
+							label='Pages viewed'
+							type='number'
+							helperText='Minimum number of pages viewed'
+							value={setting.minPagesViewed}
+							onChange={e => {
+								setSetting({
+									...setting,
+									minPagesViewed: parseInt(e.target.value, 10),
+								});
+							}}
+						/>
+						<TextField
+							label='Video pages viewed'
+							type='number'
+							helperText='Minimum number of video pages viewed'
+							value={setting.minVideoPagesViewed}
+							onChange={e => {
+								setSetting({
+									...setting,
+									minVideoPagesViewed: parseInt(e.target.value, 10),
+								});
+							}}
+						/>
+					</Box>
+					<Box sx={{mb: 1}}>
+						<TextField
+							label='Recommendations clicked'
+							type='number'
+							helperText='Minimum number of sidebar recommendations clicked'
+							value={setting.minSidebarRecommendationsClicked}
+							onChange={e => {
+								setSetting({
+									...setting,
+									minSidebarRecommendationsClicked: parseInt(e.target.value, 10),
+								});
+							}}
+						/>
+					</Box>
+					<Box sx={{mb: 1}}>
+						<TextField
+							label='Watch time'
+							type='number'
+							helperText='Minimum total watch time in minutes'
+							value={setting.minVideoTimeViewedSeconds / 60}
+							onChange={e => {
+								setSetting({
+									...setting,
+									minVideoTimeViewedSeconds: parseFloat(e.target.value) * 60,
+								});
+							}}
+						/>
+						<TextField
+							label='Time spent on YouTube'
+							type='number'
+							helperText='Minimum time spent on YouTube in minutes, approximate'
+							value={setting.minTimeSpentOnYoutubeSeconds / 60}
+							onChange={e => {
+								setSetting({
+									...setting,
+									minTimeSpentOnYoutubeSeconds: parseFloat(e.target.value) * 60,
+								});
+							}}
+						/>
+					</Box>
+					<Typography variant='body2' sx={{mb: 1}}>
+						for <strong>at least</strong>:
 					</Typography>
-				)}
+					<TextField
+						sx={{display: 'block'}}
+						label='Number of days'
+						type='number'
+						helperText='Minimum number of days to trigger the phase transition, not necessarily consecutive'
+						value={setting.minDays}
+						onChange={e => {
+							setSetting({
+								...setting,
+								minDays: parseInt(e.target.value, 10),
+							});
+						}}
+					/>
+					{from > 0 && (
+						<Typography variant='body2' sx={{mt: 2, mb: 1}}>
+							<strong>Note</strong> that this number of days is counted
+							since the entry of the the participant into phase&nbsp;{from}, they are not cumulative with the days spent in phase&nbsp;{from - 1}.
+						</Typography>
+					)}
+
+					<Button
+						variant='contained'
+						type='submit'
+						color='primary'
+						sx={{m: 2}}
+					>
+						Save
+					</Button>
+
+					<NotificationsC message={message} />
+				</Box>
 			</Box>
-		</Box>
+		</form>
 	);
 
 	return ui;
