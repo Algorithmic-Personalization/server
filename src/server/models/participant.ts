@@ -1,7 +1,7 @@
 /* eslint-disable @typescript-eslint/no-inferrable-types */
 
 import {Entity, Column, OneToMany} from 'typeorm';
-import {IsNotEmpty, IsString} from 'class-validator';
+import {IsNotEmpty, IsString, IsInt, Min, Max} from 'class-validator';
 
 import Model from '../../common/lib/model';
 import {ExperimentArm} from '../../common/models/event';
@@ -18,6 +18,13 @@ export class Participant extends Model {
 	@Column()
 	@IsString()
 		code: string = '';
+
+	@Column()
+	@IsInt()
+	@IsNotEmpty()
+	@Min(0)
+	@Max(2)
+		phase: number = 0;
 
 	@Column()
 		arm: ExperimentArm = ExperimentArm.TREATMENT;

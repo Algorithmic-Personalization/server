@@ -33,6 +33,8 @@ import Video from './models/video';
 import WatchTime from './models/watchTime';
 import VideoListItem from './models/videoListItem';
 import DailyActivityTime from './models/dailyActivityTime';
+import TransitionEvent from './models/transitionEvent';
+import TransitionSetting from './models/transitionSetting';
 
 import SmtpConfig from './lib/smtpConfig';
 
@@ -93,6 +95,7 @@ import createGetEventsRoute from './api/getEvents';
 
 import createParticipantDefinition from './api-2/createParticipant';
 import createGetActivityReportDefinition from './api-2/getActivityReport';
+import createTransitionSettingDefinition from './api-2/createTransitionSetting';
 
 // Add classes used by typeorm as models here
 // so that typeorm can extract the metadata from them.
@@ -107,6 +110,8 @@ const entities = [
 	VideoListItem,
 	WatchTime,
 	DailyActivityTime,
+	TransitionEvent,
+	TransitionSetting,
 ];
 
 const env = process.env.NODE_ENV;
@@ -295,6 +300,7 @@ const start = async () => {
 
 	defineAdminRoute(createParticipantDefinition);
 	defineAdminRoute(createGetActivityReportDefinition);
+	defineAdminRoute(createTransitionSettingDefinition);
 
 	app.post(postRegister, createRegisterRoute(routeContext));
 	app.get(getVerifyEmailToken, createVerifyEmailRoute(routeContext));

@@ -6,6 +6,7 @@ import {type Participant} from '../server/models/participant';
 import {type LoginResponse} from '../server/api/login';
 import {type ExperimentConfig} from '../common/models/experimentConfig';
 import {type Event} from '../common/models/event';
+import {type TransitionSetting} from '../server/models/transitionSetting';
 import type ParticipantOverview from '../server/projections/ParticipantOverview';
 import type EventOverview from '../server/projections/EventOverview';
 
@@ -29,6 +30,10 @@ import {
 	type ActivityReport,
 	createGetActivityReportDefinition,
 } from '../server/api-2/getActivityReport';
+
+import {
+	createTransitionSettingDefinition,
+} from '../server/api-2/createTransitionSetting';
 
 import {
 	type Maybe,
@@ -57,6 +62,7 @@ export type AdminApi = {
 	createApiToken: (name: string) => Promise<Maybe<Token>>;
 	deleteApiToken: (token: string) => Promise<Maybe<string>>;
 	getActivityReport: () => Promise<Maybe<ActivityReport>>;
+	createTransitionSetting: (setting: TransitionSetting) => Promise<Maybe<TransitionSetting>>;
 };
 
 const loadItem = <T>(key: string): T | undefined => {
@@ -224,6 +230,10 @@ export const createAdminApi = (serverUrl: string, showLoginModal?: () => void): 
 
 		async getActivityReport() {
 			return get<ActivityReport>(createGetActivityReportDefinition.path, {}, headers());
+		},
+
+		async createTransitionSetting(setting: TransitionSetting) {
+			return post<TransitionSetting>(createTransitionSettingDefinition.path, setting, headers());
 		},
 	};
 };
