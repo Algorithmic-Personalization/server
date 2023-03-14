@@ -33,4 +33,7 @@ export class Participant extends Model {
 		activityTimes?: DailyActivityTime[];
 }
 
+export const isValidPhase = (phase: unknown): phase is number =>
+	typeof phase === 'number' && phase >= 0 && phase <= 2;
+
 export default Participant;

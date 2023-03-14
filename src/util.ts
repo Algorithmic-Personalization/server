@@ -49,3 +49,11 @@ export const withLock = (id: string) => async (fn: AsyncFn): Promise<void> => {
 
 	return unstackLock(id);
 };
+
+export const daysElapsed = (fromDate: Date, toDate: Date): number => {
+	const from = new Date(fromDate);
+	const to = new Date(toDate);
+	from.setHours(0, 0, 0, 0);
+	to.setHours(0, 0, 0, 0);
+	return Math.ceil((to.getTime() - from.getTime()) / (1000 * 60 * 60 * 24));
+};

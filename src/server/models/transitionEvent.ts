@@ -14,7 +14,7 @@ export enum TransitionReason {
 export class TransitionEvent extends DailyActivityTime {
 	@Column()
 	@IsInt()
-		eventId: number = 0;
+		eventId?: number;
 
 	@Column()
 	@IsInt()
@@ -38,6 +38,10 @@ export class TransitionEvent extends DailyActivityTime {
 	@Column()
 	@IsInt()
 		sidebarRecommendationsClicked: number = 0;
+
+	@Column()
+	@IsInt()
+		numDays: number = 0;
 }
 
 export default TransitionEvent;

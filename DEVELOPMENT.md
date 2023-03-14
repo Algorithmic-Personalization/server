@@ -357,3 +357,17 @@ curl -X POST https://ytdpnl.fmdj.fr/api/participant \
 
 (note that for obvious reasons this token is invalid, replace it with your own token)
 
+### Update a participant through the API
+
+Right now the only fields you can update are the `phase` and the `arm` fields.
+
+To update a participant, send a `PUT` request to `https://ytdpnl.fmdj.fr/api/participant/:email` with the following JSON body:
+
+```json
+{
+  "phase": "either the string 'pretest' or 'posttest'",
+  "arm": "either the string 'control' or 'treatment'"
+}
+```
+
+and the usual API token in the `authorization` header.

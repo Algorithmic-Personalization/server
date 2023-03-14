@@ -94,6 +94,7 @@ import createPostEventRoute from './api/postEvent';
 import createGetEventsRoute from './api/getEvents';
 
 import createParticipantDefinition from './api-2/createParticipant';
+import updateParticipantDefinition from './api-2/updateParticipant';
 import createGetActivityReportDefinition from './api-2/getActivityReport';
 import createTransitionSettingDefinition from './api-2/createTransitionSetting';
 import getTransitionSettingDefinition from './api-2/getTransitionSetting';
@@ -303,6 +304,7 @@ const start = async () => {
 	defineAdminRoute(createGetActivityReportDefinition);
 	defineAdminRoute(createTransitionSettingDefinition);
 	defineAdminRoute(getTransitionSettingDefinition);
+	defineAdminRoute(updateParticipantDefinition);
 
 	app.post(postRegister, createRegisterRoute(routeContext));
 	app.get(getVerifyEmailToken, createVerifyEmailRoute(routeContext));

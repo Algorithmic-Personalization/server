@@ -25,3 +25,5 @@ secrets.yml
 scripts.conf
 *.tar
 upload-backup
+
+*.draft

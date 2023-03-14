@@ -219,6 +219,7 @@ const OverviewC: React.FC<{data: ParticipantOverview}> = ({data}) => (
 		<Paper component='section' sx={{mb: 4, p: 2}}>
 			<Typography variant='h3' sx={{mb: 2}}>Basic info</Typography>
 			<Typography variant='body1' sx={{mb: 2}}><strong>Email:</strong> {data.email}</Typography>
+			<Typography variant='body1' sx={{mb: 2}}><strong>Phase:</strong> {data.phase}</Typography>
 			<Typography variant='body1' sx={{mb: 2}}><strong>Code:</strong> {data.code}</Typography>
 			<Typography variant='body1' sx={{mb: 2}}><strong>Added on:</strong> {showDate(data.createdAt)}</Typography>
 			<Typography variant='body1' sx={{mb: 2}}><strong>Last seen:</strong> {showDate(data.latestSessionDate)}</Typography>
