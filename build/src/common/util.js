@@ -399,17 +399,29 @@ var restoreInnerInstance = function (maybe, ctor) {
     return __assign(__assign({}, maybe), { value: instance });
 };
 exports.restoreInnerInstance = restoreInnerInstance;
+var makeQueryString = function (params) {
+    var entries = Object.entries(params);
+    var chunks = entries.map(function (_a) {
+        var _b = __read(_a, 2), key = _b[0], value = _b[1];
+        return "".concat(key, "=").concat(encodeURIComponent(value));
+    });
+    if (chunks.length === 0) {
+        return '';
+    }
+    return "?".concat(chunks.join('&'));
+};
 var makeApiVerbCreator = function (serverUrl) {
     return function (method) { return function (path, data, headers) { return __awaiter(void 0, void 0, void 0, function () {
-        var body, result, json, e_8, err, res;
+        var body, qs, result, json, e_8, err, res;
         return __generator(this, function (_a) {
             switch (_a.label) {
                 case 0:
-                    body = method === 'POST' ? JSON.stringify(data) : undefined;
+                    body = (method === 'POST' || method === 'PUT') ? JSON.stringify(data) : undefined;
+                    qs = (method === 'GET' && !path.includes('?')) ? makeQueryString(data) : '';
                     _a.label = 1;
                 case 1:
                     _a.trys.push([1, 4, , 5]);
-                    return [4 /*yield*/, fetch("".concat(serverUrl).concat(path), {
+                    return [4 /*yield*/, fetch("".concat(serverUrl).concat(path).concat(qs), {
                             method: method,
                             body: body,
                             headers: headers

@@ -35,52 +35,66 @@ var __generator = (this && this.__generator) || function (thisArg, body) {
         if (op[0] & 5) throw op[1]; return { value: op[0] ? op[1] : void 0, done: true };
     }
 };
-var __rest = (this && this.__rest) || function (s, e) {
-    var t = {};
-    for (var p in s) if (Object.prototype.hasOwnProperty.call(s, p) && e.indexOf(p) < 0)
-        t[p] = s[p];
-    if (s != null && typeof Object.getOwnPropertySymbols === "function")
-        for (var i = 0, p = Object.getOwnPropertySymbols(s); i < p.length; i++) {
-            if (e.indexOf(p[i]) < 0 && Object.prototype.propertyIsEnumerable.call(s, p[i]))
-                t[p[i]] = s[p[i]];
-        }
-    return t;
-};
 var __importDefault = (this && this.__importDefault) || function (mod) {
     return (mod && mod.__esModule) ? mod : { "default": mod };
 };
 exports.__esModule = true;
-exports.createParticipantDefinition = void 0;
-var participant_1 = require("../lib/participant");
-var participant_2 = __importDefault(require("../models/participant"));
-exports.createParticipantDefinition = {
+exports.createTransitionSettingDefinition = void 0;
+var transitionSetting_1 = __importDefault(require("../models/transitionSetting"));
+var util_1 = require("../../common/util");
+exports.createTransitionSettingDefinition = {
     verb: 'post',
-    path: '/api/participant',
+    path: '/api/transition-setting',
     makeHandler: function (_a) {
         var createLogger = _a.createLogger, dataSource = _a.dataSource;
         return function (req) { return __awaiter(void 0, void 0, void 0, function () {
-            var log, _a, _unused, participant, participantRepo, participantEntity;
-            return __generator(this, function (_b) {
-                switch (_b.label) {
+            var log, payload, setting, errors;
+            return __generator(this, function (_a) {
+                switch (_a.label) {
                     case 0:
                         log = createLogger(req.requestId);
-                        log('Received create participant request');
-                        _a = req.body, _unused = _a.id, participant = __rest(_a, ["id"]);
-                        if (!(0, participant_1.isParticipantRecord)(participant)) {
-                            throw new Error('Invalid participant record');
-                        }
-                        participantRepo = dataSource.getRepository(participant_2["default"]);
-                        return [4 /*yield*/, participantRepo.findOneBy({ email: participant.email })];
+                        log('Received create transitionSetting request');
+                        payload = req.body;
+                        setting = new transitionSetting_1["default"]();
+                        Object.assign(setting, payload);
+                        return [4 /*yield*/, (0, util_1.validateNew)(transitionSetting_1["default"])];
                     case 1:
-                        if (_b.sent()) {
-                            throw new Error('Participant with that email already exists');
+                        errors = _a.sent();
+                        if (errors.length > 0) {
+                            throw new Error('Invalid transitionSetting record: ' + errors.join(', '));
                         }
-                        participantEntity = new participant_2["default"]();
-                        Object.assign(participantEntity, participant);
-                        return [2 /*return*/, participantRepo.save(participantEntity)];
+                        return [2 /*return*/, dataSource.transaction(function (transaction) { return __awaiter(void 0, void 0, void 0, function () {
+                                var repo, current;
+                                return __generator(this, function (_a) {
+                                    switch (_a.label) {
+                                        case 0:
+                                            repo = transaction.getRepository(transitionSetting_1["default"]);
+                                            return [4 /*yield*/, repo.findOneBy({
+                                                    isCurrent: true,
+                                                    fromPhase: setting.fromPhase,
+                                                    toPhase: setting.toPhase
+                                                })];
+                                        case 1:
+                                            current = _a.sent();
+                                            if (!current) return [3 /*break*/, 3];
+                                            current.isCurrent = false;
+                                            current.updatedAt = new Date();
+                                            return [4 /*yield*/, repo.save(current)];
+                                        case 2:
+                                            _a.sent();
+                                            _a.label = 3;
+                                        case 3:
+                                            setting.id = 0;
+                                            setting.isCurrent = true;
+                                            setting.createdAt = new Date();
+                                            setting.updatedAt = new Date();
+                                            return [2 /*return*/, repo.save(setting)];
+                                    }
+                                });
+                            }); })];
                 }
             });
         }); };
     }
 };
-exports["default"] = exports.createParticipantDefinition;
+exports["default"] = exports.createTransitionSettingDefinition;

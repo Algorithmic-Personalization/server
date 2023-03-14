@@ -28,7 +28,7 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
     return (mod && mod.__esModule) ? mod : { "default": mod };
 };
 exports.__esModule = true;
-exports.Event = exports.ExperimentArm = exports.EventType = void 0;
+exports.Event = exports.isValidExperimentArm = exports.ExperimentArm = exports.EventType = void 0;
 var typeorm_1 = require("typeorm");
 var class_validator_1 = require("class-validator");
 var model_1 = __importDefault(require("../lib/model"));
@@ -42,12 +42,17 @@ var EventType;
     EventType["MIXED_CLICKED"] = "MIXED_CLICKED";
     EventType["WATCH_TIME"] = "WATCH_TIME";
     EventType["SESSION_END"] = "SESSION_END";
+    EventType["PHASE_TRANSITION"] = "PHASE_TRANSITION";
 })(EventType = exports.EventType || (exports.EventType = {}));
 var ExperimentArm;
 (function (ExperimentArm) {
     ExperimentArm["TREATMENT"] = "treatment";
     ExperimentArm["CONTROL"] = "control";
 })(ExperimentArm = exports.ExperimentArm || (exports.ExperimentArm = {}));
+var isValidExperimentArm = function (arm) {
+    return arm === ExperimentArm.TREATMENT || arm === ExperimentArm.CONTROL;
+};
+exports.isValidExperimentArm = isValidExperimentArm;
 var Event = /** @class */ (function (_super) {
     __extends(Event, _super);
     function Event() {
@@ -58,6 +63,7 @@ var Event = /** @class */ (function (_super) {
         _this.type = EventType.PAGE_VIEW;
         _this.url = '';
         _this.localUuid = (0, util_1.uuidv4)();
+        _this.phase = 0;
         return _this;
     }
     __decorate([
@@ -102,6 +108,17 @@ var Event = /** @class */ (function (_super) {
         (0, typeorm_1.Column)(),
         __metadata("design:type", String)
     ], Event.prototype, "extensionVersion");
+    __decorate([
+        (0, typeorm_1.Column)(),
+        (0, class_validator_1.IsInt)(),
+        (0, class_validator_1.Min)(0),
+        (0, class_validator_1.Max)(2),
+        __metadata("design:type", Number)
+    ], Event.prototype, "phase");
+    __decorate([
+        (0, typeorm_1.Column)(),
+        __metadata("design:type", Boolean)
+    ], Event.prototype, "tabActive");
     Event = __decorate([
         (0, typeorm_1.Entity)()
     ], Event);

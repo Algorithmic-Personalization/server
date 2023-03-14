@@ -36,7 +36,7 @@ var __generator = (this && this.__generator) || function (thisArg, body) {
     }
 };
 exports.__esModule = true;
-exports.withLock = void 0;
+exports.daysElapsed = exports.withLock = void 0;
 var locks = new Map();
 var unstackLock = function (id) { return __awaiter(void 0, void 0, void 0, function () {
     var stack, fn, newStack;
@@ -86,3 +86,11 @@ var withLock = function (id) { return function (fn) { return __awaiter(void 0, v
     });
 }); }; };
 exports.withLock = withLock;
+var daysElapsed = function (fromDate, toDate) {
+    var from = new Date(fromDate);
+    var to = new Date(toDate);
+    from.setHours(0, 0, 0, 0);
+    to.setHours(0, 0, 0, 0);
+    return Math.ceil((to.getTime() - from.getTime()) / (1000 * 60 * 60 * 24));
+};
+exports.daysElapsed = daysElapsed;

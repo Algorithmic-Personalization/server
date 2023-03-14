@@ -385,9 +385,8 @@ var createPostEventRoute = function (_a) {
                         return [2 /*return*/];
                     }
                     withParticipantLock = (0, util_2.withLock)("participant-".concat(participant.id));
-                    if (!event.arm) {
-                        event.arm = participant.arm;
-                    }
+                    event.arm = participant.arm;
+                    event.phase = participant.phase;
                     if (!!event.experimentConfigId) return [3 /*break*/, 3];
                     configRepo = dataSource.getRepository(experimentConfig_1["default"]);
                     return [4 /*yield*/, configRepo.findOneBy({
@@ -402,7 +401,7 @@ var createPostEventRoute = function (_a) {
                     }
                     event.experimentConfigId = config.id;
                     _a.label = 3;
-                case 3: return [4 /*yield*/, (0, util_1.validateNew)(event)];
+                case 3: return [4 /*yield*/, (0, util_1.validateExcept)('id', 'tabActive')(event)];
                 case 4:
                     errors = _a.sent();
                     if (errors.length > 0) {

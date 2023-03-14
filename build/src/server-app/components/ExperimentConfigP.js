@@ -95,48 +95,113 @@ var material_1 = require("@mui/material");
 var NotificationsC_1 = __importDefault(require("./shared/NotificationsC"));
 var CardC_1 = __importDefault(require("./shared/CardC"));
 var experimentConfig_1 = __importDefault(require("../../common/models/experimentConfig"));
+var transitionSetting_1 = __importDefault(require("../../server/models/transitionSetting"));
 var adminApiProvider_1 = require("../adminApiProvider");
+var createTransitionSetting = function (from, to) {
+    var setting = new transitionSetting_1["default"]();
+    setting.fromPhase = from;
+    setting.toPhase = to;
+    return setting;
+};
 var PhaseC = function (_a) {
     var from = _a.from, to = _a.to;
-    var ui = (react_1["default"].createElement(material_1.Box, { component: material_1.Paper, sx: {
-            p: 2,
-            mb: 2
-        } },
-        react_1["default"].createElement(material_1.Typography, { variant: 'h2' },
-            "Move participants from phase\u00A0",
-            from,
-            " to phase\u00A0",
-            to,
-            "..."),
-        react_1["default"].createElement(material_1.Typography, { variant: 'body2', sx: { mb: 1 } },
-            "...once they have met ",
-            react_1["default"].createElement("strong", null, "any"),
-            " of the following ",
-            react_1["default"].createElement("strong", null, "daily"),
-            " criteria:"),
-        react_1["default"].createElement(material_1.Box, { sx: {
-                '& .MuiTextField-root': { m: 1 }
+    var api = (0, adminApiProvider_1.useAdminApi)();
+    var _b = __read((0, react_1.useState)(createTransitionSetting(from, to)), 2), setting = _b[0], setSetting = _b[1];
+    var _c = __read((0, react_1.useState)(), 2), message = _c[0], setMessage = _c[1];
+    (0, react_1.useEffect)(function () {
+        (function () { return __awaiter(void 0, void 0, void 0, function () {
+            var setting;
+            return __generator(this, function (_a) {
+                switch (_a.label) {
+                    case 0: return [4 /*yield*/, api.getTransitionSetting(from, to)];
+                    case 1:
+                        setting = _a.sent();
+                        if (setting.kind === 'Success') {
+                            setSetting(setting.value);
+                        }
+                        return [2 /*return*/];
+                }
+            });
+        }); })();
+    }, [from, to]);
+    var ui = (react_1["default"].createElement("form", { onSubmit: function (e) { return __awaiter(void 0, void 0, void 0, function () {
+            var result;
+            return __generator(this, function (_a) {
+                switch (_a.label) {
+                    case 0:
+                        e.preventDefault();
+                        return [4 /*yield*/, api.createTransitionSetting(setting)];
+                    case 1:
+                        result = _a.sent();
+                        if (result.kind === 'Success') {
+                            setMessage({
+                                severity: 'success',
+                                text: 'Saved!'
+                            });
+                        }
+                        else {
+                            setMessage({
+                                severity: 'error',
+                                text: result.message
+                            });
+                        }
+                        return [2 /*return*/];
+                }
+            });
+        }); } },
+        react_1["default"].createElement(material_1.Box, { component: material_1.Paper, sx: {
+                p: 2,
+                mb: 2
             } },
-            react_1["default"].createElement(material_1.Box, { sx: { mb: 1 } },
-                react_1["default"].createElement(material_1.TextField, { label: 'Pages viewed', type: 'number', helperText: 'Minimum number of pages viewed' }),
-                react_1["default"].createElement(material_1.TextField, { label: 'Video pages viewed', type: 'number', helperText: 'Minimum number of video pages viewed' })),
-            react_1["default"].createElement(material_1.Box, { sx: { mb: 1 } },
-                react_1["default"].createElement(material_1.TextField, { label: 'Recommendations clicked', type: 'number', helperText: 'Minimum number of sidebar recommendations clicked' })),
-            react_1["default"].createElement(material_1.Box, { sx: { mb: 1 } },
-                react_1["default"].createElement(material_1.TextField, { label: 'Watch time', type: 'number', helperText: 'Minimum total watch time in minutes' }),
-                react_1["default"].createElement(material_1.TextField, { label: 'Time spent on YouTube', type: 'number', helperText: 'Minimum time spent on YouTube in minutes, approximate' })),
-            react_1["default"].createElement(material_1.Typography, { variant: 'body2', sx: { mb: 1 } },
-                "for ",
-                react_1["default"].createElement("strong", null, "at least"),
-                ":"),
-            react_1["default"].createElement(material_1.TextField, { sx: { display: 'block' }, label: 'Number of days', type: 'number', helperText: 'Minimum number of days to trigger the phase transition, not necessarily consecutive' }),
-            from > 0 && (react_1["default"].createElement(material_1.Typography, { variant: 'body2', sx: { mt: 2, mb: 1 } },
-                react_1["default"].createElement("strong", null, "Note"),
-                " that this number of days is counted since the entry of the the participant into phase\u00A0",
+            react_1["default"].createElement(material_1.Typography, { variant: 'h2' },
+                "Move participants from phase\u00A0",
                 from,
-                ", they are not cumulative with the days spent in phase\u00A0",
-                from - 1,
-                ".")))));
+                " to phase\u00A0",
+                to,
+                "..."),
+            react_1["default"].createElement(material_1.Typography, { variant: 'body2', sx: { mb: 1 } },
+                "...once they have met ",
+                react_1["default"].createElement("strong", null, "any"),
+                " of the following ",
+                react_1["default"].createElement("strong", null, "daily"),
+                " criteria:"),
+            react_1["default"].createElement(material_1.Box, { sx: {
+                    '& .MuiTextField-root': { m: 1 }
+                } },
+                react_1["default"].createElement(material_1.Box, { sx: { mb: 1 } },
+                    react_1["default"].createElement(material_1.TextField, { label: 'Pages viewed', type: 'number', helperText: 'Minimum number of pages viewed', value: setting.minPagesViewed, onChange: function (e) {
+                            setSetting(__assign(__assign({}, setting), { minPagesViewed: parseInt(e.target.value, 10) }));
+                        } }),
+                    react_1["default"].createElement(material_1.TextField, { label: 'Video pages viewed', type: 'number', helperText: 'Minimum number of video pages viewed', value: setting.minVideoPagesViewed, onChange: function (e) {
+                            setSetting(__assign(__assign({}, setting), { minVideoPagesViewed: parseInt(e.target.value, 10) }));
+                        } })),
+                react_1["default"].createElement(material_1.Box, { sx: { mb: 1 } },
+                    react_1["default"].createElement(material_1.TextField, { label: 'Recommendations clicked', type: 'number', helperText: 'Minimum number of sidebar recommendations clicked', value: setting.minSidebarRecommendationsClicked, onChange: function (e) {
+                            setSetting(__assign(__assign({}, setting), { minSidebarRecommendationsClicked: parseInt(e.target.value, 10) }));
+                        } })),
+                react_1["default"].createElement(material_1.Box, { sx: { mb: 1 } },
+                    react_1["default"].createElement(material_1.TextField, { label: 'Watch time', type: 'number', helperText: 'Minimum total watch time in minutes', value: setting.minVideoTimeViewedSeconds / 60, onChange: function (e) {
+                            setSetting(__assign(__assign({}, setting), { minVideoTimeViewedSeconds: parseFloat(e.target.value) * 60 }));
+                        } }),
+                    react_1["default"].createElement(material_1.TextField, { label: 'Time spent on YouTube', type: 'number', helperText: 'Minimum time spent on YouTube in minutes, approximate', value: setting.minTimeSpentOnYoutubeSeconds / 60, onChange: function (e) {
+                            setSetting(__assign(__assign({}, setting), { minTimeSpentOnYoutubeSeconds: parseFloat(e.target.value) * 60 }));
+                        } })),
+                react_1["default"].createElement(material_1.Typography, { variant: 'body2', sx: { mb: 1 } },
+                    "for ",
+                    react_1["default"].createElement("strong", null, "at least"),
+                    ":"),
+                react_1["default"].createElement(material_1.TextField, { sx: { display: 'block' }, label: 'Number of days', type: 'number', helperText: 'Minimum number of days to trigger the phase transition, not necessarily consecutive', value: setting.minDays, onChange: function (e) {
+                        setSetting(__assign(__assign({}, setting), { minDays: parseInt(e.target.value, 10) }));
+                    } }),
+                from > 0 && (react_1["default"].createElement(material_1.Typography, { variant: 'body2', sx: { mt: 2, mb: 1 } },
+                    react_1["default"].createElement("strong", null, "Note"),
+                    " that this number of days is counted since the entry of the the participant into phase\u00A0",
+                    from,
+                    ", they are not cumulative with the days spent in phase\u00A0",
+                    from - 1,
+                    ".")),
+                react_1["default"].createElement(material_1.Button, { variant: 'contained', type: 'submit', color: 'primary', sx: { m: 2 } }, "Save"),
+                react_1["default"].createElement(NotificationsC_1["default"], { message: message })))));
     return ui;
 };
 var ExperimentConfigC = function () {

@@ -1,4 +1,5 @@
 "use strict";
+/* eslint-disable @typescript-eslint/no-inferrable-types */
 var __extends = (this && this.__extends) || (function () {
     var extendStatics = function (d, b) {
         extendStatics = Object.setPrototypeOf ||
@@ -27,67 +28,84 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
     return (mod && mod.__esModule) ? mod : { "default": mod };
 };
 exports.__esModule = true;
-exports.DailyActivityTime = void 0;
-/* eslint-disable @typescript-eslint/no-inferrable-types */
+exports.TransitionSetting = void 0;
 var typeorm_1 = require("typeorm");
 var class_validator_1 = require("class-validator");
 var model_1 = __importDefault(require("../../common/lib/model"));
-var participant_1 = __importDefault(require("./participant"));
-var DailyActivityTime = /** @class */ (function (_super) {
-    __extends(DailyActivityTime, _super);
-    function DailyActivityTime() {
+var TransitionSetting = /** @class */ (function (_super) {
+    __extends(TransitionSetting, _super);
+    function TransitionSetting() {
         var _this = _super !== null && _super.apply(this, arguments) || this;
-        _this.participantId = 0;
-        _this.pagesViewed = 0;
-        _this.videoPagesViewed = 0;
-        _this.videoTimeViewedSeconds = 0;
-        _this.timeSpentOnYoutubeSeconds = 0;
-        _this.sidebarRecommendationsClicked = 0;
+        _this.fromPhase = 0;
+        _this.toPhase = 0;
+        _this.isCurrent = true;
+        _this.minPagesViewed = 0;
+        _this.minVideoPagesViewed = 0;
+        _this.minVideoTimeViewedSeconds = 0;
+        _this.minTimeSpentOnYoutubeSeconds = 0;
+        _this.minSidebarRecommendationsClicked = 0;
+        _this.minDays = 0;
         return _this;
     }
     __decorate([
         (0, typeorm_1.Column)(),
+        (0, class_validator_1.IsInt)(),
+        (0, class_validator_1.Min)(0),
+        (0, class_validator_1.Max)(2),
         __metadata("design:type", Number)
-    ], DailyActivityTime.prototype, "participantId");
+    ], TransitionSetting.prototype, "fromPhase");
+    __decorate([
+        (0, typeorm_1.Column)(),
+        (0, class_validator_1.IsInt)(),
+        (0, class_validator_1.Min)(0),
+        (0, class_validator_1.Max)(2),
+        __metadata("design:type", Number)
+    ], TransitionSetting.prototype, "toPhase");
+    __decorate([
+        (0, typeorm_1.Column)(),
+        (0, class_validator_1.IsBoolean)(),
+        __metadata("design:type", Boolean)
+    ], TransitionSetting.prototype, "isCurrent");
     __decorate([
         (0, typeorm_1.Column)(),
         (0, class_validator_1.IsInt)(),
         (0, class_validator_1.Min)(0),
         __metadata("design:type", Number)
-    ], DailyActivityTime.prototype, "pagesViewed");
+    ], TransitionSetting.prototype, "minPagesViewed");
     __decorate([
         (0, typeorm_1.Column)(),
         (0, class_validator_1.IsInt)(),
         (0, class_validator_1.Min)(0),
         __metadata("design:type", Number)
-    ], DailyActivityTime.prototype, "videoPagesViewed");
+    ], TransitionSetting.prototype, "minVideoPagesViewed");
     __decorate([
         (0, typeorm_1.Column)(),
         (0, class_validator_1.IsNumber)(),
         (0, class_validator_1.Min)(0),
         __metadata("design:type", Number)
-    ], DailyActivityTime.prototype, "videoTimeViewedSeconds");
+    ], TransitionSetting.prototype, "minVideoTimeViewedSeconds");
     __decorate([
         (0, typeorm_1.Column)(),
         (0, class_validator_1.IsNumber)(),
         (0, class_validator_1.Min)(0),
         __metadata("design:type", Number)
-    ], DailyActivityTime.prototype, "timeSpentOnYoutubeSeconds");
+    ], TransitionSetting.prototype, "minTimeSpentOnYoutubeSeconds");
     __decorate([
         (0, typeorm_1.Column)(),
         (0, class_validator_1.IsInt)(),
         (0, class_validator_1.Min)(0),
         __metadata("design:type", Number)
-    ], DailyActivityTime.prototype, "sidebarRecommendationsClicked");
+    ], TransitionSetting.prototype, "minSidebarRecommendationsClicked");
     __decorate([
-        (0, typeorm_1.ManyToOne)(function () { return participant_1["default"]; }),
-        (0, typeorm_1.JoinColumn)({ name: 'participant_id' }),
-        __metadata("design:type", participant_1["default"])
-    ], DailyActivityTime.prototype, "participant");
-    DailyActivityTime = __decorate([
+        (0, typeorm_1.Column)(),
+        (0, class_validator_1.IsInt)(),
+        (0, class_validator_1.Min)(0),
+        __metadata("design:type", Number)
+    ], TransitionSetting.prototype, "minDays");
+    TransitionSetting = __decorate([
         (0, typeorm_1.Entity)()
-    ], DailyActivityTime);
-    return DailyActivityTime;
+    ], TransitionSetting);
+    return TransitionSetting;
 }(model_1["default"]));
-exports.DailyActivityTime = DailyActivityTime;
-exports["default"] = DailyActivityTime;
+exports.TransitionSetting = TransitionSetting;
+exports["default"] = TransitionSetting;

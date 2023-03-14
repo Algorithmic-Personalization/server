@@ -45,7 +45,7 @@ var experimentConfig_1 = __importDefault(require("../../common/models/experiment
 var createGetParticipantConfigRoute = function (_a) {
     var createLogger = _a.createLogger, dataSource = _a.dataSource;
     return function (req, res) { return __awaiter(void 0, void 0, void 0, function () {
-        var log, participantRepo, configRepo, config, participant, arm, nonPersonalizedProbability, result;
+        var log, participantRepo, configRepo, config, participant, arm, configProbability, nonPersonalizedProbability, result;
         return __generator(this, function (_a) {
             switch (_a.label) {
                 case 0:
@@ -74,7 +74,10 @@ var createGetParticipantConfigRoute = function (_a) {
                         return [2 /*return*/];
                     }
                     arm = participant.arm;
-                    nonPersonalizedProbability = config.nonPersonalizedProbability;
+                    configProbability = config.nonPersonalizedProbability;
+                    nonPersonalizedProbability = participant.phase === 1
+                        ? configProbability
+                        : 0;
                     result = {
                         arm: arm,
                         nonPersonalizedProbability: nonPersonalizedProbability,

@@ -39,45 +39,48 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
     return (mod && mod.__esModule) ? mod : { "default": mod };
 };
 exports.__esModule = true;
-exports.makeRouteConnector = void 0;
-var util_1 = require("../../common/util");
-var notFoundError_1 = __importDefault(require("./notFoundError"));
-var hasMessage = (0, util_1.has)('message');
-var message = function (x) { return (hasMessage(x) ? x.message : 'An unknown error occurred'); };
-var makeRouteConnector = function (context) { return function (definition) { return function (req, res) { return __awaiter(void 0, void 0, void 0, function () {
-    var makeHandler, handler, value, err_1;
-    return __generator(this, function (_a) {
-        switch (_a.label) {
-            case 0:
-                makeHandler = definition.makeHandler;
-                handler = makeHandler(context);
-                _a.label = 1;
-            case 1:
-                _a.trys.push([1, 3, , 4]);
-                return [4 /*yield*/, handler(req)];
-            case 2:
-                value = _a.sent();
-                res.json({
-                    kind: 'Success',
-                    value: value
-                });
-                return [3 /*break*/, 4];
-            case 3:
-                err_1 = _a.sent();
-                if (err_1 instanceof notFoundError_1["default"]) {
-                    res.status(404).json({
-                        kind: 'Failure',
-                        message: message(err_1)
-                    });
-                    return [2 /*return*/];
+exports.getTransitionSettingDefinition = void 0;
+var notFoundError_1 = __importDefault(require("../lib/notFoundError"));
+var transitionSetting_1 = __importDefault(require("../models/transitionSetting"));
+exports.getTransitionSettingDefinition = {
+    verb: 'get',
+    path: '/api/transition-setting',
+    makeHandler: function (_a) {
+        var createLogger = _a.createLogger, dataSource = _a.dataSource;
+        return function (req) { return __awaiter(void 0, void 0, void 0, function () {
+            var log, _a, from, to, fromNumber, toNumber, repo, setting;
+            return __generator(this, function (_b) {
+                switch (_b.label) {
+                    case 0:
+                        log = createLogger(req.requestId);
+                        log('Received get transitionSetting request');
+                        _a = req.query, from = _a.from, to = _a.to;
+                        fromNumber = Number(from);
+                        toNumber = Number(to);
+                        if (isNaN(fromNumber) || isNaN(toNumber)) {
+                            throw new Error('Invalid phase numbers');
+                        }
+                        if (fromNumber < 0 || toNumber < 0) {
+                            throw new Error('Invalid phase numbers');
+                        }
+                        if (fromNumber > 2 || toNumber > 2) {
+                            throw new Error('Invalid phase numbers');
+                        }
+                        repo = dataSource.getRepository(transitionSetting_1["default"]);
+                        return [4 /*yield*/, repo.findOneBy({
+                                isCurrent: true,
+                                fromPhase: fromNumber,
+                                toPhase: toNumber
+                            })];
+                    case 1:
+                        setting = _b.sent();
+                        if (!setting) {
+                            throw new notFoundError_1["default"]('No transition setting found');
+                        }
+                        return [2 /*return*/, setting];
                 }
-                res.status(500).json({
-                    kind: 'Failure',
-                    message: message(err_1)
-                });
-                return [3 /*break*/, 4];
-            case 4: return [2 /*return*/];
-        }
-    });
-}); }; }; };
-exports.makeRouteConnector = makeRouteConnector;
+            });
+        }); };
+    }
+};
+exports["default"] = exports.getTransitionSettingDefinition;

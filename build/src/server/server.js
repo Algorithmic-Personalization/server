@@ -103,6 +103,8 @@ var video_1 = __importDefault(require("./models/video"));
 var watchTime_1 = __importDefault(require("./models/watchTime"));
 var videoListItem_1 = __importDefault(require("./models/videoListItem"));
 var dailyActivityTime_1 = __importDefault(require("./models/dailyActivityTime"));
+var transitionEvent_1 = __importDefault(require("./models/transitionEvent"));
+var transitionSetting_1 = __importDefault(require("./models/transitionSetting"));
 var smtpConfig_1 = __importDefault(require("./lib/smtpConfig"));
 var webpack_config_1 = __importDefault(require("../../webpack.config"));
 var routeCreation_1 = require("./lib/routeCreation");
@@ -133,7 +135,10 @@ var participantConfig_1 = __importDefault(require("./api/participantConfig"));
 var postEvent_1 = __importDefault(require("./api/postEvent"));
 var getEvents_1 = __importDefault(require("./api/getEvents"));
 var createParticipant_1 = __importDefault(require("./api-2/createParticipant"));
+var updateParticipant_1 = __importDefault(require("./api-2/updateParticipant"));
 var getActivityReport_1 = __importDefault(require("./api-2/getActivityReport"));
+var createTransitionSetting_1 = __importDefault(require("./api-2/createTransitionSetting"));
+var getTransitionSetting_1 = __importDefault(require("./api-2/getTransitionSetting"));
 // Add classes used by typeorm as models here
 // so that typeorm can extract the metadata from them.
 var entities = [
@@ -147,6 +152,8 @@ var entities = [
     videoListItem_1["default"],
     watchTime_1["default"],
     dailyActivityTime_1["default"],
+    transitionEvent_1["default"],
+    transitionSetting_1["default"],
 ];
 var env = process.env.NODE_ENV;
 if (env !== 'production' && env !== 'development') {
@@ -307,7 +314,7 @@ var start = function () { return __awaiter(void 0, void 0, void 0, function () {
                 app.use(function (req, _res, next) {
                     ++requestId;
                     req.requestId = requestId;
-                    createLogger(req.requestId)(req.method, req.url);
+                    createLogger(req.requestId)(req.method, req.url, req.headers);
                     next();
                 });
                 defineAdminRoute = function (def) {
@@ -315,6 +322,9 @@ var start = function () { return __awaiter(void 0, void 0, void 0, function () {
                 };
                 defineAdminRoute(createParticipant_1["default"]);
                 defineAdminRoute(getActivityReport_1["default"]);
+                defineAdminRoute(createTransitionSetting_1["default"]);
+                defineAdminRoute(getTransitionSetting_1["default"]);
+                defineAdminRoute(updateParticipant_1["default"]);
                 app.post(serverRoutes_1.postRegister, (0, register_1["default"])(routeContext));
                 app.get(serverRoutes_1.getVerifyEmailToken, (0, verifyEmail_1["default"])(routeContext));
                 app.post(serverRoutes_1.postLogin, (0, login_1["default"])(routeContext));

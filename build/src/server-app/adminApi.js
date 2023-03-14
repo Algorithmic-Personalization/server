@@ -39,6 +39,9 @@ exports.__esModule = true;
 exports.createAdminApi = void 0;
 var serverRoutes_1 = require("../server/serverRoutes");
 var getActivityReport_1 = require("../server/api-2/getActivityReport");
+var createTransitionSetting_1 = require("../server/api-2/createTransitionSetting");
+var getTransitionSetting_1 = require("../server/api-2/getTransitionSetting");
+var updateParticipant_1 = require("../server/api-2/updateParticipant");
 var util_1 = require("../common/util");
 var loadItem = function (key) {
     var item = sessionStorage.getItem(key);
@@ -80,6 +83,7 @@ var createAdminApi = function (serverUrl, showLoginModal) {
     var get = decorate(verb('GET'));
     var post = decorate(verb('POST'));
     var del = decorate(verb('DELETE'));
+    var put = decorate(verb('PUT'));
     var headers = function () {
         var _a;
         return ({
@@ -174,7 +178,7 @@ var createAdminApi = function (serverUrl, showLoginModal) {
             if (pageSize === void 0) { pageSize = 15; }
             return __awaiter(this, void 0, void 0, function () {
                 return __generator(this, function (_a) {
-                    return [2 /*return*/, get("".concat(serverRoutes_1.getParticipants, "/").concat(page, "?pageSize=").concat(pageSize, "&emailLike=").concat(encodeURIComponent(emailLike)), {}, headers())];
+                    return [2 /*return*/, get("".concat(serverRoutes_1.getParticipants, "/").concat(page), { pageSize: pageSize, emailLike: emailLike }, headers())];
                 });
             });
         },
@@ -197,7 +201,7 @@ var createAdminApi = function (serverUrl, showLoginModal) {
             if (pageSize === void 0) { pageSize = 15; }
             return __awaiter(this, void 0, void 0, function () {
                 return __generator(this, function (_a) {
-                    return [2 /*return*/, get("".concat(serverRoutes_1.getEvents, "/").concat(page, "?pageSize=").concat(pageSize), {}, headers())];
+                    return [2 /*return*/, get("".concat(serverRoutes_1.getEvents, "/").concat(page), { pageSize: pageSize }, headers())];
                 });
             });
         },
@@ -247,6 +251,31 @@ var createAdminApi = function (serverUrl, showLoginModal) {
             return __awaiter(this, void 0, void 0, function () {
                 return __generator(this, function (_a) {
                     return [2 /*return*/, get(getActivityReport_1.createGetActivityReportDefinition.path, {}, headers())];
+                });
+            });
+        },
+        createTransitionSetting: function (setting) {
+            return __awaiter(this, void 0, void 0, function () {
+                return __generator(this, function (_a) {
+                    return [2 /*return*/, post(createTransitionSetting_1.createTransitionSettingDefinition.path, setting, headers())];
+                });
+            });
+        },
+        getTransitionSetting: function (from, to) {
+            return __awaiter(this, void 0, void 0, function () {
+                var path;
+                return __generator(this, function (_a) {
+                    path = getTransitionSetting_1.getTransitionSettingDefinition.path;
+                    return [2 /*return*/, get(path, { from: from, to: to }, headers())];
+                });
+            });
+        },
+        updateParticipantPhase: function (participantEmail, phase) {
+            return __awaiter(this, void 0, void 0, function () {
+                var path;
+                return __generator(this, function (_a) {
+                    path = updateParticipant_1.updateParticipantDefinition.path;
+                    return [2 /*return*/, put(path.replace(':email', participantEmail), { phase: phase }, headers())];
                 });
             });
         }
