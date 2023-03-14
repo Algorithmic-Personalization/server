@@ -40,6 +40,10 @@ import {
 } from '../server/api-2/getTransitionSetting';
 
 import {
+	updateParticipantDefinition,
+} from '../server/api-2/updateParticipant';
+
+import {
 	type Maybe,
 	isMaybe,
 	getMessage,
@@ -68,6 +72,7 @@ export type AdminApi = {
 	getActivityReport: () => Promise<Maybe<ActivityReport>>;
 	createTransitionSetting: (setting: TransitionSetting) => Promise<Maybe<TransitionSetting>>;
 	getTransitionSetting: (from: number, to: number) => Promise<Maybe<TransitionSetting>>;
+	updateParticipantPhase: (participantEmail: string, phase: number) => Promise<Maybe<Participant>>;
 };
 
 const loadItem = <T>(key: string): T | undefined => {
@@ -116,6 +121,7 @@ export const createAdminApi = (serverUrl: string, showLoginModal?: () => void): 
 	const get = decorate(verb('GET'));
 	const post = decorate(verb('POST'));
 	const del = decorate(verb('DELETE'));
+	const put = decorate(verb('PUT'));
 
 	const headers = () => ({
 		'Content-Type': 'application/json',
@@ -191,8 +197,8 @@ export const createAdminApi = (serverUrl: string, showLoginModal?: () => void): 
 
 		async getParticipants(page: number, emailLike: string, pageSize = 15) {
 			return get<Page<Participant>>(
-				`${getParticipants}/${page}?pageSize=${pageSize}&emailLike=${encodeURIComponent(emailLike)}`,
-				{},
+				`${getParticipants}/${page}`,
+				{pageSize, emailLike},
 				headers(),
 			);
 		},
@@ -206,7 +212,7 @@ export const createAdminApi = (serverUrl: string, showLoginModal?: () => void): 
 		},
 
 		async getEvents(page = 0, pageSize = 15) {
-			return get<Page<Event>>(`${getEvents}/${page}?pageSize=${pageSize}`, {}, headers());
+			return get<Page<Event>>(`${getEvents}/${page}`, {pageSize}, headers());
 		},
 
 		async getExperimentConfig() {
@@ -243,7 +249,16 @@ export const createAdminApi = (serverUrl: string, showLoginModal?: () => void): 
 
 		async getTransitionSetting(from: number, to: number) {
 			const {path} = getTransitionSettingDefinition;
-			return get<TransitionSetting>(`${path}?from=${from}&to=${to}`, {}, headers());
+			return get<TransitionSetting>(path, {from, to}, headers());
+		},
+
+		async updateParticipantPhase(participantEmail: string, phase: number) {
+			const {path} = updateParticipantDefinition;
+			return put<Participant>(
+				path.replace(':email', participantEmail),
+				{phase},
+				headers(),
+			);
 		},
 	};
 };

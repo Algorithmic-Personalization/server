@@ -7,10 +7,16 @@ import type EventOverview from '../../server/projections/EventOverview';
 import {
 	Box,
 	Button,
+	FormControl,
 	Grid,
+	InputLabel,
+	MenuItem,
 	Paper,
+	Select,
 	Typography,
 } from '@mui/material';
+
+import {type SelectChangeEvent} from '@mui/material';
 
 import {useAdminApi} from '../adminApiProvider';
 import type SessionOverview from '../../server/projections/SessionOverview';
@@ -19,6 +25,7 @@ import type {VideoItem} from '../../server/projections/RecommendationsList';
 import {VideoType} from '../../server/models/videoListItem';
 import {EventType} from '../../common/models/event';
 
+import NotificationsC, {type Message} from './shared/NotificationsC';
 import {showDate, UrlC} from './shared/util';
 
 const showWatchtimeOrContextUrl = (e: EventOverview): string => {
@@ -214,26 +221,60 @@ const SessionC: React.FC<{data: SessionOverview}> = ({data}) => (
 	</Paper>
 );
 
-const OverviewC: React.FC<{data: ParticipantOverview}> = ({data}) => (
-	<>
-		<Paper component='section' sx={{mb: 4, p: 2}}>
-			<Typography variant='h3' sx={{mb: 2}}>Basic info</Typography>
-			<Typography variant='body1' sx={{mb: 2}}><strong>Email:</strong> {data.email}</Typography>
-			<Typography variant='body1' sx={{mb: 2}}><strong>Phase:</strong> {data.phase}</Typography>
-			<Typography variant='body1' sx={{mb: 2}}><strong>Code:</strong> {data.code}</Typography>
-			<Typography variant='body1' sx={{mb: 2}}><strong>Added on:</strong> {showDate(data.createdAt)}</Typography>
-			<Typography variant='body1' sx={{mb: 2}}><strong>Last seen:</strong> {showDate(data.latestSessionDate)}</Typography>
-			<Typography variant='body1' sx={{mb: 2}}><strong>First seen:</strong> {showDate(data.firstSessionDate)}</Typography>
-			<Typography variant='body1' sx={{mb: 2}}><strong>Number of sessions:</strong> {data.sessionCount}</Typography>
-		</Paper>
-		<Box component='section' sx={{mb: 4}}>
-			<Typography variant='h3' sx={{mb: 2}}>Sessions (most recent first)</Typography>
-			{data.sessions.length === 0 ? 'No sessions' : data.sessions.map(
-				session => <SessionC key={session.id} data={session} />,
-			)}
-		</Box>
-	</>
-);
+const OverviewC: React.FC<{data: ParticipantOverview}> = ({data}) => {
+	const [phase, setPhase] = useState(data.phase);
+	const [message, setMessage] = useState<Message>();
+
+	const api = useAdminApi();
+
+	const handlePhaseChange = async (e: SelectChangeEvent<number>) => {
+		const targetPhase = parseInt(e.target.value as string, 10);
+		setPhase(targetPhase);
+
+		const result = await api.updateParticipantPhase(data.email, targetPhase);
+
+		if (result.kind === 'Success') {
+			setMessage({severity: 'success', text: 'Phase updated'});
+			return;
+		}
+
+		setMessage({severity: 'error', text: 'Failed to update phase'});
+	};
+
+	return (
+		<>
+			<Paper component='section' sx={{mb: 4, p: 2}}>
+				<NotificationsC message={message} />
+				<Typography variant='h3' sx={{mb: 2}}>Basic info</Typography>
+				<Typography variant='body1' sx={{mb: 2}}><strong>Email:</strong> {data.email}</Typography>
+				<FormControl sx={{mb: 2}}>
+					<InputLabel id='phase-label'>Phase</InputLabel>
+					<Select
+						labelId='phase-label'
+						value={phase}
+						label='Phase'
+						onChange={handlePhaseChange}
+					>
+						<MenuItem value={0}>Pre-Experiment</MenuItem>
+						<MenuItem value={1}>Experiment</MenuItem>
+						<MenuItem value={2}>Post-Experiment Observation</MenuItem>
+					</Select>
+				</FormControl>
+				<Typography variant='body1' sx={{mb: 2}}><strong>Code:</strong> {data.code}</Typography>
+				<Typography variant='body1' sx={{mb: 2}}><strong>Added on:</strong> {showDate(data.createdAt)}</Typography>
+				<Typography variant='body1' sx={{mb: 2}}><strong>Last seen:</strong> {showDate(data.latestSessionDate)}</Typography>
+				<Typography variant='body1' sx={{mb: 2}}><strong>First seen:</strong> {showDate(data.firstSessionDate)}</Typography>
+				<Typography variant='body1' sx={{mb: 2}}><strong>Number of sessions:</strong> {data.sessionCount}</Typography>
+			</Paper>
+			<Box component='section' sx={{mb: 4}}>
+				<Typography variant='h3' sx={{mb: 2}}>Sessions (most recent first)</Typography>
+				{data.sessions.length === 0 ? 'No sessions' : data.sessions.map(
+					session => <SessionC key={session.id} data={session} />,
+				)}
+			</Box>
+		</>
+	);
+};
 
 export const ParticipantPageC: React.FC = () => {
 	const {email} = useParams();
