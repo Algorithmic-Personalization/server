@@ -14,7 +14,7 @@ import WatchTime from '../models/watchTime';
 
 import type Recommendation from '../../common/types/Recommendation';
 
-import {validateNew, has} from '../../common/util';
+import {validateNew, has, validateExcept} from '../../common/util';
 import DailyActivityTime from '../models/dailyActivityTime';
 import {timeSpentEventDiffLimit, wholeDate} from '../lib/updateCounters';
 
@@ -287,7 +287,7 @@ export const createPostEventRoute: RouteCreator = ({createLogger, dataSource}) =
 		event.experimentConfigId = config.id;
 	}
 
-	const errors = await validateNew(event);
+	const errors = await validateExcept('id', 'tabActive')(event);
 
 	if (errors.length > 0) {
 		log('event validation failed', errors);
