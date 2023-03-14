@@ -269,9 +269,8 @@ export const createPostEventRoute: RouteCreator = ({createLogger, dataSource}) =
 
 	const withParticipantLock = withLock(`participant-${participant.id}`);
 
-	if (!event.arm) {
-		event.arm = participant.arm;
-	}
+	event.arm = participant.arm;
+	event.phase = participant.phase;
 
 	if (!event.experimentConfigId) {
 		const configRepo = dataSource.getRepository(ExperimentConfig);
