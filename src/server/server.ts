@@ -291,7 +291,7 @@ const start = async () => {
 	app.use((req, _res, next) => {
 		++requestId;
 		req.requestId = requestId;
-		createLogger(req.requestId)(req.method, req.url);
+		createLogger(req.requestId)(req.method, req.url, req.headers);
 		next();
 	});
 
