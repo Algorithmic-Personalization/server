@@ -32,7 +32,11 @@ export const createGetParticipantConfigRoute: RouteCreator = ({createLogger, dat
 	}
 
 	const {arm} = participant;
-	const {nonPersonalizedProbability} = config;
+	const {nonPersonalizedProbability: configProbability} = config;
+
+	const nonPersonalizedProbability = participant.phase === 1
+		? configProbability
+		: 0;
 
 	const result: ParticipantConfig = {
 		arm,

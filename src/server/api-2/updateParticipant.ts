@@ -53,12 +53,16 @@ const updateParticipantPhase = (dataSource: DataSource, log: LogFunction) =>
 				isCurrent: true,
 			});
 
-		if (!setting) {
-			log('no transition setting found for that phase transition');
-			throw new Error('No transition setting found for that phase transition');
+		if (setting) {
+			transition.transitionSettingId = setting.id;
+		} else {
+			log(
+				'warning: no transition setting found from phase',
+				fromPhase,
+				'to phase',
+				toPhase,
+			);
 		}
-
-		transition.transitionSettingId = setting.id;
 
 		return dataSource.transaction(async manager => {
 			log('saving transition', transition);

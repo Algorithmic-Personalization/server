@@ -18,7 +18,7 @@ export class TransitionEvent extends DailyActivityTime {
 
 	@Column()
 	@IsInt()
-		transitionSettingId: number = 0;
+		transitionSettingId?: number;
 
 	@Column()
 		reason: TransitionReason = TransitionReason.AUTOMATIC;
