@@ -6,7 +6,6 @@ import {type LogFunction} from '../lib/logger';
 import Participant, {isValidPhase} from '../models/participant';
 import {isValidExperimentArm} from '../../common/models/event';
 import TransitionEvent, {TransitionReason} from '../models/transitionEvent';
-import TransitionSetting from '../models/transitionSetting';
 
 import {daysElapsed} from '../../util';
 
@@ -44,25 +43,6 @@ const updateParticipantPhase = (dataSource: DataSource, log: LogFunction) =>
 		transition.participantId = participant.id;
 		transition.reason = TransitionReason.FORCED;
 		transition.numDays = daysElapsed(startOfLatestPhase, new Date());
-
-		const setting = await dataSource
-			.getRepository(TransitionSetting)
-			.findOneBy({
-				fromPhase,
-				toPhase,
-				isCurrent: true,
-			});
-
-		if (setting) {
-			transition.transitionSettingId = setting.id;
-		} else {
-			log(
-				'warning: no transition setting found from phase',
-				fromPhase,
-				'to phase',
-				toPhase,
-			);
-		}
 
 		return dataSource.transaction(async manager => {
 			log('saving transition', transition);
