@@ -371,6 +371,21 @@ const createUpdatePhase = ({
 	}
 };
 
+const summarizeForDisplay = (event: Event): Record<string, unknown> => {
+	const summary: Record<string, unknown> = {
+		...event,
+	};
+
+	if (event.type === EventType.RECOMMENDATIONS_SHOWN) {
+		const e = event as RecommendationsEvent;
+		summary.nonPersonalized = e.nonPersonalized.length;
+		summary.personalized = e.personalized.length;
+		summary.shown = e.shown.length;
+	}
+
+	return summary;
+};
+
 export const createPostEventRoute: RouteCreator = ({createLogger, dataSource}) => async (req, res) => {
 	const log = createLogger(req.requestId);
 
@@ -459,7 +474,7 @@ export const createPostEventRoute: RouteCreator = ({createLogger, dataSource}) =
 
 	try {
 		const e = await eventRepo.save(event);
-		log('event saved', e);
+		log('event saved', summarizeForDisplay(e));
 		res.send({kind: 'Success', value: e});
 
 		if (event.type === EventType.RECOMMENDATIONS_SHOWN) {
