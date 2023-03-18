@@ -5,6 +5,12 @@ import {IsInt, IsNumber, Min, Max, IsBoolean} from 'class-validator';
 
 import Model from '../../common/lib/model';
 
+export enum Phase {
+	PRE_EXPERIMENT = 0,
+	EXPERIMENT = 1,
+	POST_EXPERIMENT = 2,
+}
+
 @Entity()
 export class TransitionSetting extends Model {
 	@Column()

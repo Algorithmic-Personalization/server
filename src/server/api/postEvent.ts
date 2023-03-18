@@ -1,4 +1,4 @@
-import {type DataSource, type Repository} from 'typeorm';
+import {type DataSource, type Repository, MoreThan} from 'typeorm';
 
 import {type RouteCreator} from '../lib/routeCreation';
 import {type LogFunction} from '../lib/logger';
@@ -17,6 +17,8 @@ import type Recommendation from '../../common/types/Recommendation';
 import {validateNew, has, validateExcept} from '../../common/util';
 import DailyActivityTime from '../models/dailyActivityTime';
 import {timeSpentEventDiffLimit, wholeDate} from '../lib/updateCounters';
+import TransitionSetting, {Phase} from '../models/transitionSetting';
+import TransitionEvent, {TransitionReason} from '../models/transitionEvent';
 
 import {withLock} from '../../util';
 
@@ -223,6 +225,152 @@ const createUpdateActivity = ({activityRepo, eventRepo, log}: {
 	await activityRepo.save(activity);
 };
 
+const activityMatches = (
+	setting: TransitionSetting,
+	activity: DailyActivityTime,
+): boolean => {
+	if (activity.timeSpentOnYoutubeSeconds >= setting.minTimeSpentOnYoutubeSeconds) {
+		return true;
+	}
+
+	if (activity.videoTimeViewedSeconds >= setting.minVideoTimeViewedSeconds) {
+		return true;
+	}
+
+	if (activity.pagesViewed >= setting.minPagesViewed) {
+		return true;
+	}
+
+	if (activity.videoPagesViewed >= setting.minVideoPagesViewed) {
+		return true;
+	}
+
+	if (activity.sidebarRecommendationsClicked >= setting.minSidebarRecommendationsClicked) {
+		return true;
+	}
+
+	return false;
+};
+
+const shouldTriggerPhaseTransition = (
+	setting: TransitionSetting,
+	activities: DailyActivityTime[],
+): TransitionEvent | undefined => {
+	let matchingDays = 0;
+	const transition = new TransitionEvent();
+
+	for (const activity of activities) {
+		const matches = activityMatches(setting, activity);
+
+		if (matches) {
+			matchingDays += 1;
+			transition.timeSpentOnYoutubeSeconds += activity.timeSpentOnYoutubeSeconds;
+			transition.videoTimeViewedSeconds += activity.videoTimeViewedSeconds;
+			transition.pagesViewed += activity.pagesViewed;
+			transition.videoPagesViewed += activity.videoPagesViewed;
+			transition.sidebarRecommendationsClicked += activity.sidebarRecommendationsClicked;
+		}
+	}
+
+	if (matchingDays >= setting.minDays) {
+		return transition;
+	}
+
+	return undefined;
+};
+
+const createUpdatePhase = ({
+	dataSource,
+	log,
+}: {
+	dataSource: DataSource;
+	log: LogFunction;
+}) => async (participant: Participant, latestEvent: Event) => {
+	log('updating participant phase if needed...');
+
+	if (participant.phase === Phase.POST_EXPERIMENT) {
+		log('participant in post-experiment, no need to check for phase transition, skipping');
+		return;
+	}
+
+	// Find the right transition settings to apply
+
+	const fromPhase = participant.phase;
+	const toPhase = fromPhase === Phase.PRE_EXPERIMENT
+		? Phase.EXPERIMENT
+		: Phase.POST_EXPERIMENT;
+
+	const transitionSettingRepo = dataSource.getRepository(TransitionSetting);
+
+	const setting = await transitionSettingRepo.findOneBy({
+		fromPhase,
+		toPhase,
+		isCurrent: true,
+	});
+
+	if (!setting) {
+		log('/!\\ no transition setting from', fromPhase, 'to', toPhase, 'found, skipping - this is probably a bug or a misconfiguration');
+		return;
+	}
+
+	log('transition setting from phase', fromPhase, 'to phase', toPhase, 'found:', setting);
+
+	// Find the entry date of participant in the phase they're currently in
+
+	const transitionRepo = dataSource.getRepository(TransitionEvent);
+
+	const latestTransition = await transitionRepo.findOne({
+		where: {
+			toPhase: participant.phase,
+			participantId: participant.id,
+		},
+		order: {
+			id: 'DESC',
+		},
+	});
+
+	const entryDate = latestTransition ? latestTransition.createdAt : participant.createdAt;
+
+	// Get all statistics for the participant after entry into current phase
+
+	const activityRepo = dataSource.getRepository(DailyActivityTime);
+
+	const activities = await activityRepo.find({
+		where: {
+			participantId: participant.id,
+			createdAt: MoreThan(entryDate),
+		},
+	});
+
+	const transitionEvent = shouldTriggerPhaseTransition(setting, activities);
+
+	if (transitionEvent) {
+		log('triggering transition from phase', fromPhase, 'to phase', toPhase);
+
+		const triggerEvent = new Event();
+		Object.assign(triggerEvent, latestEvent);
+		triggerEvent.id = 0;
+		triggerEvent.type = EventType.PHASE_TRANSITION;
+
+		transitionEvent.participantId = participant.id;
+		transitionEvent.fromPhase = fromPhase;
+		transitionEvent.toPhase = toPhase;
+		transitionEvent.reason = TransitionReason.AUTOMATIC;
+		transitionEvent.transitionSettingId = setting.id;
+
+		participant.phase = toPhase;
+
+		await dataSource.transaction(async manager => {
+			const trigger = await manager.save(triggerEvent);
+			transitionEvent.eventId = trigger.id;
+			await manager.save(transitionEvent);
+			await manager.save(participant);
+		});
+	} else {
+		log('no transition needed at this point');
+	}
+};
+
 export const createPostEventRoute: RouteCreator = ({createLogger, dataSource}) => async (req, res) => {
 	const log = createLogger(req.requestId);
 
@@ -254,6 +402,11 @@ export const createPostEventRoute: RouteCreator = ({createLogger, dataSource}) =
 	const updateActivity = createUpdateActivity({
 		activityRepo,
 		eventRepo,
+		log,
+	});
+
+	const updatePhase = createUpdatePhase({
+		dataSource,
 		log,
 	});
 
@@ -296,7 +449,10 @@ export const createPostEventRoute: RouteCreator = ({createLogger, dataSource}) =
 	}
 
 	try {
-		await withParticipantLock(async () => updateActivity(participant, event));
+		await withParticipantLock(async () => {
+			await updateActivity(participant, event);
+			await updatePhase(participant, event);
+		});
 	} catch (e) {
 		log('activity update failed', e);
 	}
