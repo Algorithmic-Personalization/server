@@ -1,4 +1,15 @@
 "use strict";
+var __assign = (this && this.__assign) || function () {
+    __assign = Object.assign || function(t) {
+        for (var s, i = 1, n = arguments.length; i < n; i++) {
+            s = arguments[i];
+            for (var p in s) if (Object.prototype.hasOwnProperty.call(s, p))
+                t[p] = s[p];
+        }
+        return t;
+    };
+    return __assign.apply(this, arguments);
+};
 var __createBinding = (this && this.__createBinding) || (Object.create ? (function(o, m, k, k2) {
     if (k2 === undefined) k2 = k;
     var desc = Object.getOwnPropertyDescriptor(m, k);
@@ -74,6 +85,7 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
 };
 exports.__esModule = true;
 exports.createPostEventRoute = void 0;
+var typeorm_1 = require("typeorm");
 var participant_1 = __importDefault(require("../models/participant"));
 var event_1 = __importStar(require("../../common/models/event"));
 var experimentConfig_1 = __importDefault(require("../../common/models/experimentConfig"));
@@ -83,6 +95,8 @@ var watchTime_1 = __importDefault(require("../models/watchTime"));
 var util_1 = require("../../common/util");
 var dailyActivityTime_1 = __importDefault(require("../models/dailyActivityTime"));
 var updateCounters_1 = require("../lib/updateCounters");
+var transitionSetting_1 = __importStar(require("../models/transitionSetting"));
+var transitionEvent_1 = __importStar(require("../models/transitionEvent"));
 var util_2 = require("../../util");
 var storeVideos = function (repo, videos) { return __awaiter(void 0, void 0, void 0, function () {
     var ids, videos_1, videos_1_1, video, existing, newVideo, saved, e_1_1;
@@ -342,10 +356,167 @@ var createUpdateActivity = function (_a) {
         });
     }); };
 };
+var activityMatches = function (setting, activity) {
+    var criteriaOk = 0;
+    var criteriaCount = 5;
+    if (activity.timeSpentOnYoutubeSeconds >= setting.minTimeSpentOnYoutubeSeconds) {
+        criteriaOk += 1;
+    }
+    if (activity.videoTimeViewedSeconds >= setting.minVideoTimeViewedSeconds) {
+        criteriaOk += 1;
+    }
+    if (activity.pagesViewed >= setting.minPagesViewed) {
+        criteriaOk += 1;
+    }
+    if (activity.videoPagesViewed >= setting.minVideoPagesViewed) {
+        criteriaOk += 1;
+    }
+    if (activity.sidebarRecommendationsClicked >= setting.minSidebarRecommendationsClicked) {
+        criteriaOk += 1;
+    }
+    if (setting.operator === transitionSetting_1.OperatorType.ALL) {
+        return criteriaOk === criteriaCount;
+    }
+    return criteriaOk > 0;
+};
+var shouldTriggerPhaseTransition = function (setting, activities) {
+    var e_2, _a;
+    var matchingDays = 0;
+    var transition = new transitionEvent_1["default"]();
+    try {
+        for (var activities_1 = __values(activities), activities_1_1 = activities_1.next(); !activities_1_1.done; activities_1_1 = activities_1.next()) {
+            var activity = activities_1_1.value;
+            var matches = activityMatches(setting, activity);
+            if (matches) {
+                matchingDays += 1;
+                transition.timeSpentOnYoutubeSeconds += activity.timeSpentOnYoutubeSeconds;
+                transition.videoTimeViewedSeconds += activity.videoTimeViewedSeconds;
+                transition.pagesViewed += activity.pagesViewed;
+                transition.videoPagesViewed += activity.videoPagesViewed;
+                transition.sidebarRecommendationsClicked += activity.sidebarRecommendationsClicked;
+            }
+        }
+    }
+    catch (e_2_1) { e_2 = { error: e_2_1 }; }
+    finally {
+        try {
+            if (activities_1_1 && !activities_1_1.done && (_a = activities_1["return"])) _a.call(activities_1);
+        }
+        finally { if (e_2) throw e_2.error; }
+    }
+    if (matchingDays >= setting.minDays) {
+        return transition;
+    }
+    return undefined;
+};
+var createUpdatePhase = function (_a) {
+    var dataSource = _a.dataSource, log = _a.log;
+    return function (participant, latestEvent) { return __awaiter(void 0, void 0, void 0, function () {
+        var fromPhase, toPhase, transitionSettingRepo, setting, transitionRepo, latestTransition, entryDate, activityRepo, activities, transitionEvent, triggerEvent_1;
+        return __generator(this, function (_a) {
+            switch (_a.label) {
+                case 0:
+                    log('updating participant phase if needed...');
+                    if (participant.phase === transitionSetting_1.Phase.POST_EXPERIMENT) {
+                        log('participant in post-experiment, no need to check for phase transition, skipping');
+                        return [2 /*return*/];
+                    }
+                    fromPhase = participant.phase;
+                    toPhase = fromPhase === transitionSetting_1.Phase.PRE_EXPERIMENT
+                        ? transitionSetting_1.Phase.EXPERIMENT
+                        : transitionSetting_1.Phase.POST_EXPERIMENT;
+                    transitionSettingRepo = dataSource.getRepository(transitionSetting_1["default"]);
+                    return [4 /*yield*/, transitionSettingRepo.findOneBy({
+                            fromPhase: fromPhase,
+                            toPhase: toPhase,
+                            isCurrent: true
+                        })];
+                case 1:
+                    setting = _a.sent();
+                    if (!setting) {
+                        log('/!\\ no transition setting from', fromPhase, 'to', toPhase, 'found, skipping - this is probably a bug or a misconfiguration');
+                        return [2 /*return*/];
+                    }
+                    log('transition setting from phase', fromPhase, 'to phase', toPhase, 'found:', setting);
+                    transitionRepo = dataSource.getRepository(transitionEvent_1["default"]);
+                    return [4 /*yield*/, transitionRepo.findOne({
+                            where: {
+                                toPhase: participant.phase,
+                                participantId: participant.id
+                            },
+                            order: {
+                                id: 'DESC'
+                            }
+                        })];
+                case 2:
+                    latestTransition = _a.sent();
+                    entryDate = latestTransition ? latestTransition.createdAt : participant.createdAt;
+                    activityRepo = dataSource.getRepository(dailyActivityTime_1["default"]);
+                    return [4 /*yield*/, activityRepo.find({
+                            where: {
+                                participantId: participant.id,
+                                createdAt: (0, typeorm_1.MoreThan)(entryDate)
+                            }
+                        })];
+                case 3:
+                    activities = _a.sent();
+                    log('found', activities.length, 'activities for participant', participant.id, 'after entry date', entryDate, 'into phase', participant.phase);
+                    transitionEvent = shouldTriggerPhaseTransition(setting, activities);
+                    if (!transitionEvent) return [3 /*break*/, 5];
+                    log('triggering transition from phase', fromPhase, 'to phase', toPhase);
+                    triggerEvent_1 = new event_1["default"]();
+                    Object.assign(triggerEvent_1, latestEvent);
+                    triggerEvent_1.id = 0;
+                    triggerEvent_1.type = event_1.EventType.PHASE_TRANSITION;
+                    transitionEvent.participantId = participant.id;
+                    transitionEvent.fromPhase = fromPhase;
+                    transitionEvent.toPhase = toPhase;
+                    transitionEvent.reason = transitionEvent_1.TransitionReason.AUTOMATIC;
+                    transitionEvent.transitionSettingId = setting.id;
+                    participant.phase = toPhase;
+                    return [4 /*yield*/, dataSource.transaction(function (manager) { return __awaiter(void 0, void 0, void 0, function () {
+                            var trigger;
+                            return __generator(this, function (_a) {
+                                switch (_a.label) {
+                                    case 0: return [4 /*yield*/, manager.save(triggerEvent_1)];
+                                    case 1:
+                                        trigger = _a.sent();
+                                        transitionEvent.eventId = trigger.id;
+                                        return [4 /*yield*/, manager.save(transitionEvent)];
+                                    case 2:
+                                        _a.sent();
+                                        return [4 /*yield*/, manager.save(participant)];
+                                    case 3:
+                                        _a.sent();
+                                        return [2 /*return*/];
+                                }
+                            });
+                        }); })];
+                case 4:
+                    _a.sent();
+                    return [3 /*break*/, 6];
+                case 5:
+                    log('no phase transition needed at this point');
+                    _a.label = 6;
+                case 6: return [2 /*return*/];
+            }
+        });
+    }); };
+};
+var summarizeForDisplay = function (event) {
+    var summary = __assign({}, event);
+    if (event.type === event_1.EventType.RECOMMENDATIONS_SHOWN) {
+        var e = event;
+        summary.nonPersonalized = e.nonPersonalized.length;
+        summary.personalized = e.personalized.length;
+        summary.shown = e.shown.length;
+    }
+    return summary;
+};
 var createPostEventRoute = function (_a) {
     var createLogger = _a.createLogger, dataSource = _a.dataSource;
     return function (req, res) { return __awaiter(void 0, void 0, void 0, function () {
-        var log, participantCode, event, participantRepo, activityRepo, eventRepo, updateActivity, participant, withParticipantLock, configRepo, config, errors, e_2, e, e_3;
+        var log, participantCode, event, participantRepo, activityRepo, eventRepo, updateActivity, updatePhase, participant, withParticipantLock, configRepo, config, errors, e_3, e, e_4;
         return __generator(this, function (_a) {
             switch (_a.label) {
                 case 0:
@@ -372,6 +543,10 @@ var createPostEventRoute = function (_a) {
                     updateActivity = createUpdateActivity({
                         activityRepo: activityRepo,
                         eventRepo: eventRepo,
+                        log: log
+                    });
+                    updatePhase = createUpdatePhase({
+                        dataSource: dataSource,
                         log: log
                     });
                     return [4 /*yield*/, participantRepo.findOneBy({
@@ -412,22 +587,32 @@ var createPostEventRoute = function (_a) {
                     _a.label = 5;
                 case 5:
                     _a.trys.push([5, 7, , 8]);
-                    return [4 /*yield*/, withParticipantLock(function () { return __awaiter(void 0, void 0, void 0, function () { return __generator(this, function (_a) {
-                            return [2 /*return*/, updateActivity(participant, event)];
-                        }); }); })];
+                    return [4 /*yield*/, withParticipantLock(function () { return __awaiter(void 0, void 0, void 0, function () {
+                            return __generator(this, function (_a) {
+                                switch (_a.label) {
+                                    case 0: return [4 /*yield*/, updateActivity(participant, event)];
+                                    case 1:
+                                        _a.sent();
+                                        return [4 /*yield*/, updatePhase(participant, event)];
+                                    case 2:
+                                        _a.sent();
+                                        return [2 /*return*/];
+                                }
+                            });
+                        }); })];
                 case 6:
                     _a.sent();
                     return [3 /*break*/, 8];
                 case 7:
-                    e_2 = _a.sent();
-                    log('activity update failed', e_2);
+                    e_3 = _a.sent();
+                    log('activity update failed', e_3);
                     return [3 /*break*/, 8];
                 case 8:
                     _a.trys.push([8, 14, , 15]);
                     return [4 /*yield*/, eventRepo.save(event)];
                 case 9:
                     e = _a.sent();
-                    log('event saved', e);
+                    log('event saved', summarizeForDisplay(e));
                     res.send({ kind: 'Success', value: e });
                     if (!(event.type === event_1.EventType.RECOMMENDATIONS_SHOWN)) return [3 /*break*/, 11];
                     return [4 /*yield*/, storeRecommendationsShown(log, dataSource, event)];
@@ -442,12 +627,12 @@ var createPostEventRoute = function (_a) {
                     _a.label = 13;
                 case 13: return [3 /*break*/, 15];
                 case 14:
-                    e_3 = _a.sent();
-                    if (isLocalUuidAlreadyExistsError(e_3)) {
+                    e_4 = _a.sent();
+                    if (isLocalUuidAlreadyExistsError(e_4)) {
                         res.status(500).json({ kind: 'Failure', message: 'Event already exists', code: 'EVENT_ALREADY_EXISTS_OK' });
                         return [2 /*return*/];
                     }
-                    log('event save failed', e_3);
+                    log('event save failed', e_4);
                     res.status(500).json({ kind: 'Failure', message: 'Event save failed' });
                     return [3 /*break*/, 15];
                 case 15: return [2 /*return*/];

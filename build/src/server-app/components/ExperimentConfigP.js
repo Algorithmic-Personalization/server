@@ -95,7 +95,7 @@ var material_1 = require("@mui/material");
 var NotificationsC_1 = __importDefault(require("./shared/NotificationsC"));
 var CardC_1 = __importDefault(require("./shared/CardC"));
 var experimentConfig_1 = __importDefault(require("../../common/models/experimentConfig"));
-var transitionSetting_1 = __importDefault(require("../../server/models/transitionSetting"));
+var transitionSetting_1 = __importStar(require("../../server/models/transitionSetting"));
 var adminApiProvider_1 = require("../adminApiProvider");
 var createTransitionSetting = function (from, to) {
     var setting = new transitionSetting_1["default"]();
@@ -136,7 +136,7 @@ var PhaseC = function (_a) {
                         if (result.kind === 'Success') {
                             setMessage({
                                 severity: 'success',
-                                text: 'Saved!'
+                                text: "Phase transition settings from phase ".concat(setting.fromPhase, " to ").concat(setting.toPhase, " saved!")
                             });
                         }
                         else {
@@ -159,10 +159,16 @@ var PhaseC = function (_a) {
                 " to phase\u00A0",
                 to,
                 "..."),
-            react_1["default"].createElement(material_1.Typography, { variant: 'body2', sx: { mb: 1 } },
-                "...once they have met ",
-                react_1["default"].createElement("strong", null, "any"),
-                " of the following ",
+            react_1["default"].createElement(material_1.Typography, { variant: 'body2', sx: { mb: 1 } }, "...once they have met"),
+            react_1["default"].createElement(material_1.FormControl, { sx: { width: 235 } },
+                react_1["default"].createElement(material_1.InputLabel, { id: "transition-type-label-".concat(from, "-").concat(to) }, "Operator"),
+                react_1["default"].createElement(material_1.Select, { labelId: "transition-type-label-".concat(from, "-").concat(to), label: 'Operator', value: setting.operator, onChange: function (e) {
+                        setSetting(__assign(__assign({}, setting), { operator: e.target.value }));
+                    } },
+                    react_1["default"].createElement(material_1.MenuItem, { value: transitionSetting_1.OperatorType.ALL }, transitionSetting_1.OperatorType.ALL),
+                    react_1["default"].createElement(material_1.MenuItem, { value: transitionSetting_1.OperatorType.ANY }, transitionSetting_1.OperatorType.ANY))),
+            react_1["default"].createElement(material_1.Typography, { variant: 'body2', sx: { mb: 2 } },
+                "of the following ",
                 react_1["default"].createElement("strong", null, "daily"),
                 " criteria:"),
             react_1["default"].createElement(material_1.Box, { sx: {

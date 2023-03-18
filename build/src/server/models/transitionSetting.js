@@ -28,10 +28,21 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
     return (mod && mod.__esModule) ? mod : { "default": mod };
 };
 exports.__esModule = true;
-exports.TransitionSetting = void 0;
+exports.TransitionSetting = exports.OperatorType = exports.Phase = void 0;
 var typeorm_1 = require("typeorm");
 var class_validator_1 = require("class-validator");
 var model_1 = __importDefault(require("../../common/lib/model"));
+var Phase;
+(function (Phase) {
+    Phase[Phase["PRE_EXPERIMENT"] = 0] = "PRE_EXPERIMENT";
+    Phase[Phase["EXPERIMENT"] = 1] = "EXPERIMENT";
+    Phase[Phase["POST_EXPERIMENT"] = 2] = "POST_EXPERIMENT";
+})(Phase = exports.Phase || (exports.Phase = {}));
+var OperatorType;
+(function (OperatorType) {
+    OperatorType["ANY"] = "ANY";
+    OperatorType["ALL"] = "ALL";
+})(OperatorType = exports.OperatorType || (exports.OperatorType = {}));
 var TransitionSetting = /** @class */ (function (_super) {
     __extends(TransitionSetting, _super);
     function TransitionSetting() {
@@ -39,6 +50,7 @@ var TransitionSetting = /** @class */ (function (_super) {
         _this.fromPhase = 0;
         _this.toPhase = 0;
         _this.isCurrent = true;
+        _this.operator = OperatorType.ANY;
         _this.minPagesViewed = 0;
         _this.minVideoPagesViewed = 0;
         _this.minVideoTimeViewedSeconds = 0;
@@ -66,6 +78,10 @@ var TransitionSetting = /** @class */ (function (_super) {
         (0, class_validator_1.IsBoolean)(),
         __metadata("design:type", Boolean)
     ], TransitionSetting.prototype, "isCurrent");
+    __decorate([
+        (0, typeorm_1.Column)(),
+        __metadata("design:type", String)
+    ], TransitionSetting.prototype, "operator");
     __decorate([
         (0, typeorm_1.Column)(),
         (0, class_validator_1.IsInt)(),
