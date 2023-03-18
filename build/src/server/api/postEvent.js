@@ -404,6 +404,7 @@ var shouldTriggerPhaseTransition = function (setting, activities) {
         }
         finally { if (e_2) throw e_2.error; }
     }
+    transition.numDays = matchingDays;
     if (matchingDays >= setting.minDays) {
         return transition;
     }

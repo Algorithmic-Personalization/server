@@ -279,6 +279,8 @@ const shouldTriggerPhaseTransition = (
 		}
 	}
 
+	transition.numDays = matchingDays;
+
 	if (matchingDays >= setting.minDays) {
 		return transition;
 	}
