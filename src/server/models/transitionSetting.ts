@@ -11,6 +11,11 @@ export enum Phase {
 	POST_EXPERIMENT = 2,
 }
 
+export enum OperatorType {
+	ANY = 'ANY',
+	ALL = 'ALL',
+}
+
 @Entity()
 export class TransitionSetting extends Model {
 	@Column()
@@ -28,6 +33,9 @@ export class TransitionSetting extends Model {
 	@Column()
 	@IsBoolean()
 		isCurrent: boolean = true;
+
+	@Column()
+		operator: OperatorType = OperatorType.ANY;
 
 	@Column()
 	@IsInt()

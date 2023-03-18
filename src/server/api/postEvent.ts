@@ -17,7 +17,7 @@ import type Recommendation from '../../common/types/Recommendation';
 import {validateNew, has, validateExcept} from '../../common/util';
 import DailyActivityTime from '../models/dailyActivityTime';
 import {timeSpentEventDiffLimit, wholeDate} from '../lib/updateCounters';
-import TransitionSetting, {Phase} from '../models/transitionSetting';
+import TransitionSetting, {OperatorType, Phase} from '../models/transitionSetting';
 import TransitionEvent, {TransitionReason} from '../models/transitionEvent';
 
 import {withLock} from '../../util';
@@ -229,27 +229,34 @@ const activityMatches = (
 	setting: TransitionSetting,
 	activity: DailyActivityTime,
 ): boolean => {
+	let criteriaOk = 0;
+	const criteriaCount = 5;
+
 	if (activity.timeSpentOnYoutubeSeconds >= setting.minTimeSpentOnYoutubeSeconds) {
-		return true;
+		criteriaOk += 1;
 	}
 
 	if (activity.videoTimeViewedSeconds >= setting.minVideoTimeViewedSeconds) {
-		return true;
+		criteriaOk += 1;
 	}
 
 	if (activity.pagesViewed >= setting.minPagesViewed) {
-		return true;
+		criteriaOk += 1;
 	}
 
 	if (activity.videoPagesViewed >= setting.minVideoPagesViewed) {
-		return true;
+		criteriaOk += 1;
 	}
 
 	if (activity.sidebarRecommendationsClicked >= setting.minSidebarRecommendationsClicked) {
-		return true;
+		criteriaOk += 1;
 	}
 
-	return false;
+	if (setting.operator === OperatorType.ALL) {
+		return criteriaOk === criteriaCount;
+	}
+
+	return criteriaOk > 0;
 };
 
 const shouldTriggerPhaseTransition = (
@@ -342,6 +349,8 @@ const createUpdatePhase = ({
 		},
 	});
 
+	log('found', activities.length, 'activities for participant', participant.id, 'after entry date', entryDate, 'into phase', participant.phase);
+
 	const transitionEvent = shouldTriggerPhaseTransition(setting, activities);
 
 	if (transitionEvent) {
@@ -367,7 +376,7 @@ const createUpdatePhase = ({
 			await manager.save(participant);
 		});
 	} else {
-		log('no transition needed at this point');
+		log('no phase transition needed at this point');
 	}
 };
 

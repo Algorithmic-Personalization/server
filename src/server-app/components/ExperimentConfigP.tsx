@@ -4,9 +4,12 @@ import {
 	Box,
 	Grid,
 	Button,
+	MenuItem,
 	Paper,
 	Typography,
 	FormControl,
+	InputLabel,
+	Select,
 	TextField,
 	FormHelperText,
 } from '@mui/material';
@@ -15,7 +18,7 @@ import NotificationsC, {type Message} from './shared/NotificationsC';
 import CardC from './shared/CardC';
 
 import ExperimentConfig from '../../common/models/experimentConfig';
-import TransitionSetting from '../../server/models/transitionSetting';
+import TransitionSetting, {OperatorType} from '../../server/models/transitionSetting';
 
 import {useAdminApi} from '../adminApiProvider';
 
@@ -55,7 +58,7 @@ const PhaseC: React.FC<{
 				if (result.kind === 'Success') {
 					setMessage({
 						severity: 'success',
-						text: 'Saved!',
+						text: `Phase transition settings from phase ${setting.fromPhase} to ${setting.toPhase} saved!`,
 					});
 				} else {
 					setMessage({
@@ -76,7 +79,29 @@ const PhaseC: React.FC<{
 					Move participants from phase&nbsp;{from} to phase&nbsp;{to}...
 				</Typography>
 				<Typography variant='body2' sx={{mb: 1}}>
-					...once they have met <strong>any</strong> of the following <strong>daily</strong> criteria:
+					...once they have met
+				</Typography>
+				<FormControl sx={{width: 235}}>
+					<InputLabel id={`transition-type-label-${from}-${to}`}>
+						Operator
+					</InputLabel>
+					<Select
+						labelId={`transition-type-label-${from}-${to}`}
+						label='Operator'
+						value={setting.operator}
+						onChange={e => {
+							setSetting({
+								...setting,
+								operator: e.target.value as OperatorType,
+							});
+						}}
+					>
+						<MenuItem value={OperatorType.ALL}>{OperatorType.ALL}</MenuItem>
+						<MenuItem value={OperatorType.ANY}>{OperatorType.ANY}</MenuItem>
+					</Select>
+				</FormControl>
+				<Typography variant='body2' sx={{mb: 2}}>
+					of the following <strong>daily</strong> criteria:
 				</Typography>
 				<Box
 					sx={{
