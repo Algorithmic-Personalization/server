@@ -26,17 +26,18 @@ var __spreadArray = (this && this.__spreadArray) || function (to, from, pack) {
 };
 exports.__esModule = true;
 exports.createDefaultLogger = void 0;
+var util_1 = require("util");
 var createDefaultLogger = function (f) { return function (requestId) {
     return function () {
         var args = [];
         for (var _i = 0; _i < arguments.length; _i++) {
             args[_i] = arguments[_i];
         }
-        var parts = __spreadArray(["[request #".concat(requestId, " at ").concat(new Date().toISOString(), "]")], __read(args.map(function (arg) {
-            if (typeof arg === 'string') {
+        var parts = __spreadArray(["\u001B[94m[request #".concat(requestId, " at ").concat(new Date().toISOString(), "]\u001B[0m")], __read(args.map(function (arg, i) {
+            if (typeof arg === 'string' && i === 0) {
                 return arg.toLowerCase();
             }
-            return arg;
+            return (0, util_1.inspect)(arg, { depth: null, colors: true });
         })), false);
         console.log.apply(console, __spreadArray([], __read(parts), false));
         f.write("".concat(parts.join(' '), "\n"));

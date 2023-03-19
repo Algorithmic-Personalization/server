@@ -591,7 +591,9 @@ var createPostEventRoute = function (_a) {
                     return [4 /*yield*/, withParticipantLock(function () { return __awaiter(void 0, void 0, void 0, function () {
                             return __generator(this, function (_a) {
                                 switch (_a.label) {
-                                    case 0: return [4 /*yield*/, updateActivity(participant, event)];
+                                    case 0:
+                                        log('updating activity and phase for participant', participant.id);
+                                        return [4 /*yield*/, updateActivity(participant, event)];
                                     case 1:
                                         _a.sent();
                                         return [4 /*yield*/, updatePhase(participant, event)];
@@ -600,7 +602,7 @@ var createPostEventRoute = function (_a) {
                                         return [2 /*return*/];
                                 }
                             });
-                        }); })];
+                        }); }, log)];
                 case 6:
                     _a.sent();
                     return [3 /*break*/, 8];

@@ -38,8 +38,8 @@ var __generator = (this && this.__generator) || function (thisArg, body) {
 exports.__esModule = true;
 exports.daysElapsed = exports.withLock = void 0;
 var locks = new Map();
-var unstackLock = function (id) { return __awaiter(void 0, void 0, void 0, function () {
-    var stack, fn, newStack;
+var unstackLock = function (id, log) { return __awaiter(void 0, void 0, void 0, function () {
+    var stack, fn, error_1, newStack;
     return __generator(this, function (_a) {
         switch (_a.label) {
             case 0:
@@ -50,27 +50,38 @@ var unstackLock = function (id) { return __awaiter(void 0, void 0, void 0, funct
                 if (stack.queue.length === 0) {
                     return [2 /*return*/];
                 }
-                if (!!stack.running) return [3 /*break*/, 3];
+                if (!!stack.running) return [3 /*break*/, 7];
                 fn = stack.queue.shift();
-                if (!fn) return [3 /*break*/, 3];
+                if (!fn) return [3 /*break*/, 7];
+                _a.label = 1;
+            case 1:
+                _a.trys.push([1, 3, 4, 6]);
                 stack.running = fn();
                 return [4 /*yield*/, stack.running];
-            case 1:
-                _a.sent();
-                stack.running = undefined;
-                return [4 /*yield*/, unstackLock(id)];
             case 2:
                 _a.sent();
+                return [3 /*break*/, 6];
+            case 3:
+                error_1 = _a.sent();
+                log === null || log === void 0 ? void 0 : log('error in unstackLock', { id: id, error: error_1 });
+                return [3 /*break*/, 6];
+            case 4:
+                stack.running = undefined;
+                return [4 /*yield*/, unstackLock(id)];
+            case 5:
+                _a.sent();
+                return [7 /*endfinally*/];
+            case 6:
                 newStack = locks.get(id);
                 if (newStack && newStack.queue.length === 0) {
                     locks["delete"](id);
                 }
-                _a.label = 3;
-            case 3: return [2 /*return*/];
+                _a.label = 7;
+            case 7: return [2 /*return*/];
         }
     });
 }); };
-var withLock = function (id) { return function (fn) { return __awaiter(void 0, void 0, void 0, function () {
+var withLock = function (id) { return function (fn, log) { return __awaiter(void 0, void 0, void 0, function () {
     var lock;
     return __generator(this, function (_a) {
         if (!locks.has(id)) {
@@ -82,7 +93,7 @@ var withLock = function (id) { return function (fn) { return __awaiter(void 0, v
             throw new Error('Lock is not defined');
         }
         lock.queue.push(fn);
-        return [2 /*return*/, unstackLock(id)];
+        return [2 /*return*/, unstackLock(id, log)];
     });
 }); }; };
 exports.withLock = withLock;
