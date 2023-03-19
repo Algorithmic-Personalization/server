@@ -476,9 +476,10 @@ export const createPostEventRoute: RouteCreator = ({createLogger, dataSource}) =
 
 	try {
 		await withParticipantLock(async () => {
+			log('updating activity and phase for participant', participant.id);
 			await updateActivity(participant, event);
 			await updatePhase(participant, event);
-		});
+		}, log);
 	} catch (e) {
 		log('activity update failed', e);
 	}
