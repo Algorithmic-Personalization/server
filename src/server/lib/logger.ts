@@ -12,6 +12,10 @@ export const createDefaultLogger = (f: WriteStream): CreateLogger => (requestId:
 				return arg.toLowerCase();
 			}
 
+			if (typeof arg === 'string') {
+				return arg;
+			}
+
 			return inspect(arg, {depth: null, colors: true});
 		})];
 

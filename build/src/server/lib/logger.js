@@ -37,6 +37,9 @@ var createDefaultLogger = function (f) { return function (requestId) {
             if (typeof arg === 'string' && i === 0) {
                 return arg.toLowerCase();
             }
+            if (typeof arg === 'string') {
+                return arg;
+            }
             return (0, util_1.inspect)(arg, { depth: null, colors: true });
         })), false);
         console.log.apply(console, __spreadArray([], __read(parts), false));
