@@ -1,3 +1,5 @@
+import {type LogFunction} from './server/lib/logger';
+
 type AsyncFn = () => Promise<void>;
 
 type Lock = {
@@ -7,7 +9,7 @@ type Lock = {
 
 const locks = new Map<string, Lock>();
 
-const unstackLock = async (id: string) => {
+const unstackLock = async (id: string, log?: LogFunction) => {
 	const stack = locks.get(id);
 
 	if (!stack) {
@@ -21,10 +23,16 @@ const unstackLock = async (id: string) => {
 	if (!stack.running) {
 		const fn = stack.queue.shift();
 		if (fn) {
-			stack.running = fn();
-			await stack.running;
-			stack.running = undefined;
-			await unstackLock(id);
+			try {
+				stack.running = fn();
+				await stack.running;
+			} catch (error) {
+				log?.('error in unstackLock', {id, error});
+			} finally {
+				stack.running = undefined;
+				await unstackLock(id);
+			}
+
 			const newStack = locks.get(id);
 			if (newStack && newStack.queue.length === 0) {
 				locks.delete(id);
@@ -33,7 +41,7 @@ const unstackLock = async (id: string) => {
 	}
 };
 
-export const withLock = (id: string) => async (fn: AsyncFn): Promise<void> => {
+export const withLock = (id: string) => async (fn: AsyncFn, log?: LogFunction): Promise<void> => {
 	if (!locks.has(id)) {
 		locks.set(id, {running: undefined, queue: []});
 	}
@@ -47,7 +55,7 @@ export const withLock = (id: string) => async (fn: AsyncFn): Promise<void> => {
 
 	lock.queue.push(fn);
 
-	return unstackLock(id);
+	return unstackLock(id, log);
 };
 
 export const daysElapsed = (fromDate: Date, toDate: Date): number => {
