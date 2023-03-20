@@ -59,7 +59,7 @@ export type AdminApi = {
 	getAdmin: () => Admin | undefined;
 	getAuthTest: () => Promise<Maybe<Admin>>;
 	uploadParticipants: (file: File) => Promise<Maybe<string>>;
-	getParticipants: (page: number, codeLike: string, pageSize?: number) => Promise<Maybe<Page<Participant>>>;
+	getParticipants: (page: number, codeLike: string, phase: number, pageSize?: number) => Promise<Maybe<Page<Participant>>>;
 	getParticipantOverview: (participantCode: string) => Promise<Maybe<ParticipantOverview>>;
 	getEventOverviews: (sessionUuid: string) => Promise<Maybe<EventOverview[]>>;
 	getEvents: (page: number, pageSize?: number) => Promise<Maybe<Page<Event>>>;
@@ -195,10 +195,10 @@ export const createAdminApi = (serverUrl: string, showLoginModal?: () => void): 
 			};
 		},
 
-		async getParticipants(page: number, codeLike: string, pageSize = 15) {
+		async getParticipants(page: number, codeLike: string, phase: number, pageSize = 15) {
 			return get<Page<Participant>>(
 				`${getParticipants}/${page}`,
-				{pageSize, codeLike},
+				{pageSize, codeLike, phase},
 				headers(),
 			);
 		},

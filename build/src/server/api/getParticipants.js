@@ -1,4 +1,27 @@
 "use strict";
+var __createBinding = (this && this.__createBinding) || (Object.create ? (function(o, m, k, k2) {
+    if (k2 === undefined) k2 = k;
+    var desc = Object.getOwnPropertyDescriptor(m, k);
+    if (!desc || ("get" in desc ? !m.__esModule : desc.writable || desc.configurable)) {
+      desc = { enumerable: true, get: function() { return m[k]; } };
+    }
+    Object.defineProperty(o, k2, desc);
+}) : (function(o, m, k, k2) {
+    if (k2 === undefined) k2 = k;
+    o[k2] = m[k];
+}));
+var __setModuleDefault = (this && this.__setModuleDefault) || (Object.create ? (function(o, v) {
+    Object.defineProperty(o, "default", { enumerable: true, value: v });
+}) : function(o, v) {
+    o["default"] = v;
+});
+var __importStar = (this && this.__importStar) || function (mod) {
+    if (mod && mod.__esModule) return mod;
+    var result = {};
+    if (mod != null) for (var k in mod) if (k !== "default" && Object.prototype.hasOwnProperty.call(mod, k)) __createBinding(result, mod, k);
+    __setModuleDefault(result, mod);
+    return result;
+};
 var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, generator) {
     function adopt(value) { return value instanceof P ? value : new P(function (resolve) { resolve(value); }); }
     return new (P || (P = Promise))(function (resolve, reject) {
@@ -35,29 +58,26 @@ var __generator = (this && this.__generator) || function (thisArg, body) {
         if (op[0] & 5) throw op[1]; return { value: op[0] ? op[1] : void 0, done: true };
     }
 };
-var __importDefault = (this && this.__importDefault) || function (mod) {
-    return (mod && mod.__esModule) ? mod : { "default": mod };
-};
 exports.__esModule = true;
 exports.createGetParticipantsRoute = void 0;
 var pagination_1 = require("../lib/pagination");
-var participant_1 = __importDefault(require("../models/participant"));
+var participant_1 = __importStar(require("../models/participant"));
 var typeorm_1 = require("typeorm");
 var createGetParticipantsRoute = function (_a) {
     var createLogger = _a.createLogger, dataSource = _a.dataSource;
     return function (req, res) { return __awaiter(void 0, void 0, void 0, function () {
-        var log, _a, page, pageSize, codeLike, participantRepo, participants, count, data, error_1;
-        return __generator(this, function (_b) {
-            switch (_b.label) {
+        var log, _a, page, pageSize, _b, codeLike, phase, participantRepo, participants, count, data, error_1;
+        return __generator(this, function (_c) {
+            switch (_c.label) {
                 case 0:
                     log = createLogger(req.requestId);
                     log('Received participants request');
                     _a = (0, pagination_1.extractPaginationRequest)(req), page = _a.page, pageSize = _a.pageSize;
-                    codeLike = req.query.codeLike;
+                    _b = req.query, codeLike = _b.codeLike, phase = _b.phase;
                     participantRepo = dataSource.getRepository(participant_1["default"]);
-                    _b.label = 1;
+                    _c.label = 1;
                 case 1:
-                    _b.trys.push([1, 4, , 5]);
+                    _c.trys.push([1, 4, , 5]);
                     return [4 /*yield*/, participantRepo
                             .find({
                             skip: page * pageSize,
@@ -66,14 +86,15 @@ var createGetParticipantsRoute = function (_a) {
                                 createdAt: 'DESC'
                             },
                             where: {
-                                code: (typeof codeLike === 'string') ? (0, typeorm_1.Like)("%".concat(codeLike, "%")) : undefined
+                                code: (typeof codeLike === 'string') ? (0, typeorm_1.Like)("%".concat(codeLike, "%")) : undefined,
+                                phase: (0, participant_1.isValidPhase)(Number(phase)) ? Number(phase) : undefined
                             }
                         })];
                 case 2:
-                    participants = _b.sent();
+                    participants = _c.sent();
                     return [4 /*yield*/, participantRepo.count()];
                 case 3:
-                    count = _b.sent();
+                    count = _c.sent();
                     data = {
                         results: participants,
                         page: page,
@@ -83,7 +104,7 @@ var createGetParticipantsRoute = function (_a) {
                     res.status(200).json({ kind: 'Success', value: data });
                     return [3 /*break*/, 5];
                 case 4:
-                    error_1 = _b.sent();
+                    error_1 = _c.sent();
                     log('Error getting participants', error_1);
                     res.status(500).json({ kind: 'Error', message: 'Error getting participants' });
                     return [3 /*break*/, 5];

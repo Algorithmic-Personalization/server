@@ -90,12 +90,9 @@ var TableC_1 = __importDefault(require("./shared/TableC"));
 var adminApiProvider_1 = require("../adminApiProvider");
 // @ts-expect-error this is a text file, not a module
 var participants_sample_csv_1 = __importDefault(require("../../../public/participants.sample.csv"));
+var transitionSetting_1 = require("../../server/models/transitionSetting");
 var tableDescriptor = {
     headers: [
-        {
-            key: 'email',
-            element: 'Email'
-        },
         {
             key: 'code',
             element: 'Participant Code'
@@ -104,14 +101,18 @@ var tableDescriptor = {
             key: 'experiment-arm',
             element: 'Experiment arm'
         },
+        {
+            key: 'phase',
+            element: 'Experiment Phase'
+        },
     ],
     rows: function (p) { return ({
         key: p.code,
         elements: [
             // eslint-disable-next-line react/jsx-key
             react_1["default"].createElement(react_router_dom_1.Link, { to: "/participants/".concat(p.code) }, p.code),
-            p.code,
             p.arm,
+            p.phase,
         ]
     }); }
 };
@@ -193,14 +194,15 @@ var ListC = function () {
     var pageInputOk = Number.isInteger(pTmp);
     var page = pageInputOk ? pTmp : 1;
     var _d = __read((0, react_1.useState)(), 2), message = _d[0], setMessage = _d[1];
-    var _e = __read((0, react_1.useState)(''), 2), emailLike = _e[0], setEmailLike = _e[1];
+    var _e = __read((0, react_1.useState)(''), 2), codeLike = _e[0], setCodeLike = _e[1];
+    var _f = __read((0, react_1.useState)(-1), 2), phase = _f[0], setPhase = _f[1];
     var api = (0, adminApiProvider_1.useAdminApi)();
     (0, react_1.useEffect)(function () {
         (function () { return __awaiter(void 0, void 0, void 0, function () {
             var res;
             return __generator(this, function (_a) {
                 switch (_a.label) {
-                    case 0: return [4 /*yield*/, api.getParticipants(page - 1, emailLike)];
+                    case 0: return [4 /*yield*/, api.getParticipants(page - 1, codeLike, phase)];
                     case 1:
                         res = _a.sent();
                         if (res.kind === 'Success') {
@@ -216,28 +218,41 @@ var ListC = function () {
                 }
             });
         }); })();
-    }, [page, emailLike]);
-    var handlePageChange = function (e) {
-        setPageInput(e.target.value);
-    };
+    }, [page, codeLike, phase]);
     if (participants === undefined) {
         return react_1["default"].createElement(material_1.Typography, null, "Loading...");
     }
-    if (emailLike === '' && participants.results.length === 0) {
-        return react_1["default"].createElement(material_1.Typography, null, "No participants yet.");
-    }
     var list = (react_1["default"].createElement(material_1.Box, null,
-        react_1["default"].createElement(material_1.Box, { sx: { mb: 1 } },
-            react_1["default"].createElement(material_1.TextField, { value: emailLike, onChange: function (e) {
-                    setEmailLike(e.target.value);
+        react_1["default"].createElement(material_1.Box, { sx: {
+                mb: 2,
+                display: 'flex',
+                alignItems: 'stretch',
+                flexDirection: 'column',
+                width: 'max-content',
+                gap: 1
+            } },
+            react_1["default"].createElement(material_1.TextField, { value: codeLike, onChange: function (e) {
+                    setCodeLike(e.target.value);
+                    setPageInput('1');
                 }, sx: { display: 'block' }, label: 'Search participant by email', InputProps: {
                     endAdornment: (react_1["default"].createElement(material_1.InputAdornment, { position: 'end' },
                         react_1["default"].createElement(Search_1["default"], null)))
-                } })),
-        react_1["default"].createElement(material_1.Box, { sx: { my: 2 } },
-            react_1["default"].createElement(material_1.Typography, { sx: { display: 'flex', alignItems: 'center' } },
+                } }),
+            react_1["default"].createElement(material_1.FormControl, null,
+                react_1["default"].createElement(material_1.InputLabel, { id: 'participant-phase-search' }, "Filter by phase"),
+                react_1["default"].createElement(material_1.Select, { labelId: 'participant-phase-search', label: 'Filter by phase', onChange: function (e) {
+                        setPhase(e.target.value);
+                        setPageInput('1');
+                    }, value: phase },
+                    react_1["default"].createElement(material_1.MenuItem, { value: -1 }, "Any"),
+                    react_1["default"].createElement(material_1.MenuItem, { value: transitionSetting_1.Phase.PRE_EXPERIMENT }, "Pre-Experiment"),
+                    react_1["default"].createElement(material_1.MenuItem, { value: transitionSetting_1.Phase.EXPERIMENT }, "Experiment"),
+                    react_1["default"].createElement(material_1.MenuItem, { value: transitionSetting_1.Phase.POST_EXPERIMENT }, "Post-Experiment"))),
+            react_1["default"].createElement(material_1.Box, { sx: { display: 'flex', alignItems: 'center' } },
                 react_1["default"].createElement(material_1.Typography, { variant: 'body2' }, "Page\u00A0"),
-                react_1["default"].createElement("input", { type: 'number', value: pageInputOk ? page : pageInput, min: 1, max: participants.pageCount, step: 1, onChange: handlePageChange }),
+                react_1["default"].createElement("input", { type: 'number', value: pageInputOk ? page : pageInput, min: 1, max: participants.pageCount, step: 1, onChange: function (e) {
+                        setPageInput(e.target.value);
+                    } }),
                 react_1["default"].createElement(material_1.Typography, { variant: 'body2' }, "\u00A0/\u00A0"),
                 react_1["default"].createElement(material_1.Typography, { variant: 'body2' }, participants.pageCount))),
         react_1["default"].createElement(TableC, { items: participants.results })));

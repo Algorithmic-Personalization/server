@@ -2,7 +2,7 @@ import {type RouteCreator} from '../lib/routeCreation';
 
 import {type Page, extractPaginationRequest} from '../lib/pagination';
 
-import Participant from '../models/participant';
+import Participant, {isValidPhase} from '../models/participant';
 import {Like} from 'typeorm';
 
 export const createGetParticipantsRoute: RouteCreator = ({createLogger, dataSource}) => async (req, res) => {
@@ -10,7 +10,7 @@ export const createGetParticipantsRoute: RouteCreator = ({createLogger, dataSour
 	log('Received participants request');
 
 	const {page, pageSize} = extractPaginationRequest(req);
-	const {codeLike} = req.query;
+	const {codeLike, phase} = req.query;
 
 	const participantRepo = dataSource.getRepository(Participant);
 
@@ -24,6 +24,7 @@ export const createGetParticipantsRoute: RouteCreator = ({createLogger, dataSour
 				},
 				where: {
 					code: (typeof codeLike === 'string') ? Like(`%${codeLike}%`) : undefined,
+					phase: isValidPhase(Number(phase)) ? Number(phase) : undefined,
 				},
 			});
 

@@ -6,6 +6,9 @@ import {
 	FormControl,
 	FormHelperText,
 	InputAdornment,
+	InputLabel,
+	MenuItem,
+	Select,
 	TextField,
 	Typography,
 } from '@mui/material';
@@ -26,14 +29,11 @@ import {useAdminApi} from '../adminApiProvider';
 import csvSample from '../../../public/participants.sample.csv';
 
 import type Participant from '../../server/models/participant';
+import {Phase} from '../../server/models/transitionSetting';
 import type {Page} from '../../server/lib/pagination';
 
 const tableDescriptor: TableDescriptor<Participant> = {
 	headers: [
-		{
-			key: 'email',
-			element: 'Email',
-		},
 		{
 			key: 'code',
 			element: 'Participant Code',
@@ -42,14 +42,18 @@ const tableDescriptor: TableDescriptor<Participant> = {
 			key: 'experiment-arm',
 			element: 'Experiment arm',
 		},
+		{
+			key: 'phase',
+			element: 'Experiment Phase',
+		},
 	],
 	rows: p => ({
 		key: p.code,
 		elements: [
 			// eslint-disable-next-line react/jsx-key
 			<Link to={`/participants/${p.code}`}>{p.code}</Link>,
-			p.code,
 			p.arm,
+			p.phase,
 		],
 	}),
 };
@@ -162,13 +166,14 @@ const ListC: React.FC = () => {
 	const pageInputOk = Number.isInteger(pTmp);
 	const page = pageInputOk ? pTmp : 1;
 	const [message, setMessage] = useState<Message>();
-	const [emailLike, setEmailLike] = useState('');
+	const [codeLike, setCodeLike] = useState('');
+	const [phase, setPhase] = useState<Phase | number>(-1);
 
 	const api = useAdminApi();
 
 	useEffect(() => {
 		(async () => {
-			const res = await api.getParticipants(page - 1, emailLike);
+			const res = await api.getParticipants(page - 1, codeLike, phase);
 
 			if (res.kind === 'Success') {
 				setParticipants(res.value);
@@ -179,27 +184,27 @@ const ListC: React.FC = () => {
 				});
 			}
 		})();
-	}, [page, emailLike]);
-
-	const handlePageChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-		setPageInput(e.target.value);
-	};
+	}, [page, codeLike, phase]);
 
 	if (participants === undefined) {
 		return <Typography>Loading...</Typography>;
 	}
 
-	if (emailLike === '' && participants.results.length === 0) {
-		return <Typography>No participants yet.</Typography>;
-	}
-
 	const list = (
 		<Box>
-			<Box sx={{mb: 1}}>
+			<Box sx={{
+				mb: 2,
+				display: 'flex',
+				alignItems: 'stretch',
+				flexDirection: 'column',
+				width: 'max-content',
+				gap: 1,
+			}}>
 				<TextField
-					value={emailLike}
+					value={codeLike}
 					onChange={e => {
-						setEmailLike(e.target.value);
+						setCodeLike(e.target.value);
+						setPageInput('1');
 					}}
 					sx={{display: 'block'}}
 					label='Search participant by email'
@@ -211,9 +216,24 @@ const ListC: React.FC = () => {
 						),
 					}}
 				/>
-			</Box>
-			<Box sx={{my: 2}}>
-				<Typography sx={{display: 'flex', alignItems: 'center'}}>
+				<FormControl>
+					<InputLabel id='participant-phase-search'>Filter by phase</InputLabel>
+					<Select
+						labelId='participant-phase-search'
+						label='Filter by phase'
+						onChange={e => {
+							setPhase(e.target.value as Phase);
+							setPageInput('1');
+						}}
+						value={phase}
+					>
+						<MenuItem value={-1}>Any</MenuItem>
+						<MenuItem value={Phase.PRE_EXPERIMENT}>Pre-Experiment</MenuItem>
+						<MenuItem value={Phase.EXPERIMENT}>Experiment</MenuItem>
+						<MenuItem value={Phase.POST_EXPERIMENT}>Post-Experiment</MenuItem>
+					</Select>
+				</FormControl>
+				<Box sx={{display: 'flex', alignItems: 'center'}}>
 					<Typography variant='body2'>Page&nbsp;</Typography>
 					<input
 						type='number'
@@ -221,11 +241,13 @@ const ListC: React.FC = () => {
 						min={1}
 						max={participants.pageCount}
 						step={1}
-						onChange={handlePageChange}
+						onChange={e => {
+							setPageInput(e.target.value);
+						}}
 					/>
 					<Typography variant='body2'>&nbsp;/&nbsp;</Typography>
 					<Typography variant='body2'>{participants.pageCount}</Typography>
-				</Typography>
+				</Box>
 			</Box>
 			<TableC items={participants.results}/>
 		</Box>

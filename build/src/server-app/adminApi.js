@@ -174,11 +174,11 @@ var createAdminApi = function (serverUrl, showLoginModal) {
                 });
             });
         },
-        getParticipants: function (page, codeLike, pageSize) {
+        getParticipants: function (page, codeLike, phase, pageSize) {
             if (pageSize === void 0) { pageSize = 15; }
             return __awaiter(this, void 0, void 0, function () {
                 return __generator(this, function (_a) {
-                    return [2 /*return*/, get("".concat(serverRoutes_1.getParticipants, "/").concat(page), { pageSize: pageSize, codeLike: codeLike }, headers())];
+                    return [2 /*return*/, get("".concat(serverRoutes_1.getParticipants, "/").concat(page), { pageSize: pageSize, codeLike: codeLike, phase: phase }, headers())];
                 });
             });
         },
