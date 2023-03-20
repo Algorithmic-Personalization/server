@@ -98,3 +98,4 @@ exports.createTransitionSettingDefinition = {
     }
 };
 exports["default"] = exports.createTransitionSettingDefinition;
+//# sourceMappingURL=createTransitionSetting.js.map

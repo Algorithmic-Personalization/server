@@ -256,3 +256,4 @@ var createGetEventOverviewsRoute = function (_a) {
 };
 exports.createGetEventOverviewsRoute = createGetEventOverviewsRoute;
 exports["default"] = exports.createGetEventOverviewsRoute;
+//# sourceMappingURL=getEventOverviews.js.map

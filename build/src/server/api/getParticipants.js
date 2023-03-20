@@ -46,14 +46,14 @@ var typeorm_1 = require("typeorm");
 var createGetParticipantsRoute = function (_a) {
     var createLogger = _a.createLogger, dataSource = _a.dataSource;
     return function (req, res) { return __awaiter(void 0, void 0, void 0, function () {
-        var log, _a, page, pageSize, emailLike, participantRepo, participants, count, data, error_1;
+        var log, _a, page, pageSize, codeLike, participantRepo, participants, count, data, error_1;
         return __generator(this, function (_b) {
             switch (_b.label) {
                 case 0:
                     log = createLogger(req.requestId);
                     log('Received participants request');
                     _a = (0, pagination_1.extractPaginationRequest)(req), page = _a.page, pageSize = _a.pageSize;
-                    emailLike = req.query.emailLike;
+                    codeLike = req.query.codeLike;
                     participantRepo = dataSource.getRepository(participant_1["default"]);
                     _b.label = 1;
                 case 1:
@@ -66,7 +66,7 @@ var createGetParticipantsRoute = function (_a) {
                                 createdAt: 'DESC'
                             },
                             where: {
-                                email: (typeof emailLike === 'string') ? (0, typeorm_1.Like)("%".concat(emailLike, "%")) : undefined
+                                code: (typeof codeLike === 'string') ? (0, typeorm_1.Like)("%".concat(codeLike, "%")) : undefined
                             }
                         })];
                 case 2:
@@ -94,3 +94,4 @@ var createGetParticipantsRoute = function (_a) {
 };
 exports.createGetParticipantsRoute = createGetParticipantsRoute;
 exports["default"] = exports.createGetParticipantsRoute;
+//# sourceMappingURL=getParticipants.js.map

@@ -150,3 +150,4 @@ var createRegisterRoute = function (_a) {
 };
 exports.createRegisterRoute = createRegisterRoute;
 exports["default"] = exports.createRegisterRoute;
+//# sourceMappingURL=register.js.map

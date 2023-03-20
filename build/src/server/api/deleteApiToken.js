@@ -81,3 +81,4 @@ var createDeleteApiTokenRoute = function (_a) {
 };
 exports.createDeleteApiTokenRoute = createDeleteApiTokenRoute;
 exports["default"] = exports.createDeleteApiTokenRoute;
+//# sourceMappingURL=deleteApiToken.js.map

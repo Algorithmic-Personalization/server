@@ -174,18 +174,18 @@ var createAdminApi = function (serverUrl, showLoginModal) {
                 });
             });
         },
-        getParticipants: function (page, emailLike, pageSize) {
+        getParticipants: function (page, codeLike, pageSize) {
             if (pageSize === void 0) { pageSize = 15; }
             return __awaiter(this, void 0, void 0, function () {
                 return __generator(this, function (_a) {
-                    return [2 /*return*/, get("".concat(serverRoutes_1.getParticipants, "/").concat(page), { pageSize: pageSize, emailLike: emailLike }, headers())];
+                    return [2 /*return*/, get("".concat(serverRoutes_1.getParticipants, "/").concat(page), { pageSize: pageSize, codeLike: codeLike }, headers())];
                 });
             });
         },
-        getParticipantOverview: function (participantEmail) {
+        getParticipantOverview: function (participantCode) {
             return __awaiter(this, void 0, void 0, function () {
                 return __generator(this, function (_a) {
-                    return [2 /*return*/, get("".concat(serverRoutes_1.getParticipantOverview, "/").concat(participantEmail), {}, headers())];
+                    return [2 /*return*/, get("".concat(serverRoutes_1.getParticipantOverview, "/").concat(participantCode), {}, headers())];
                 });
             });
         },
@@ -270,15 +270,16 @@ var createAdminApi = function (serverUrl, showLoginModal) {
                 });
             });
         },
-        updateParticipantPhase: function (participantEmail, phase) {
+        updateParticipantPhase: function (participantCode, phase) {
             return __awaiter(this, void 0, void 0, function () {
                 var path;
                 return __generator(this, function (_a) {
                     path = updateParticipant_1.updateParticipantDefinition.path;
-                    return [2 /*return*/, put(path.replace(':email', participantEmail), { phase: phase }, headers())];
+                    return [2 /*return*/, put(path.replace(':code', participantCode), { phase: phase }, headers())];
                 });
             });
         }
     };
 };
 exports.createAdminApi = createAdminApi;
+//# sourceMappingURL=adminApi.js.map

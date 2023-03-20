@@ -136,7 +136,7 @@ var PhaseC = function (_a) {
                         if (result.kind === 'Success') {
                             setMessage({
                                 severity: 'success',
-                                text: "Phase transition settings from phase ".concat(setting.fromPhase, " to ").concat(setting.toPhase, " saved!")
+                                text: "Phase transition settings from phase ".concat(setting.fromPhase, " to phase ").concat(setting.toPhase, " saved!")
                             });
                         }
                         else {
@@ -380,3 +380,4 @@ var ExperimentConfigC = function () {
 };
 exports.ExperimentConfigC = ExperimentConfigC;
 exports["default"] = exports.ExperimentConfigC;
+//# sourceMappingURL=ExperimentConfigP.js.map

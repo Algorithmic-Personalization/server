@@ -87,3 +87,4 @@ var createVerifyEmailRoute = function (_a) {
 };
 exports.createVerifyEmailRoute = createVerifyEmailRoute;
 exports["default"] = exports.createVerifyEmailRoute;
+//# sourceMappingURL=verifyEmail.js.map

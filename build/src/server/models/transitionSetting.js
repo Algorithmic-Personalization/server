@@ -125,3 +125,4 @@ var TransitionSetting = /** @class */ (function (_super) {
 }(model_1["default"]));
 exports.TransitionSetting = TransitionSetting;
 exports["default"] = TransitionSetting;
+//# sourceMappingURL=transitionSetting.js.map

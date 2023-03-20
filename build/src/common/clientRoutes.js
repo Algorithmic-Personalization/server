@@ -5,3 +5,4 @@ exports.postCreateSession = '/api/session';
 exports.postCheckParticipantCode = '/api/check-participant-code';
 exports.getParticipantConfig = '/api/config';
 exports.postEvent = '/api/event';
+//# sourceMappingURL=clientRoutes.js.map

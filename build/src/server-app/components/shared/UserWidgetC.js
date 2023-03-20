@@ -112,3 +112,4 @@ var UserWidgetC = function () {
 };
 exports.UserWidgetC = UserWidgetC;
 exports["default"] = exports.UserWidgetC;
+//# sourceMappingURL=UserWidgetC.js.map

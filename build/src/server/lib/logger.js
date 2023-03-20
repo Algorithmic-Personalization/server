@@ -48,3 +48,4 @@ var createDefaultLogger = function (f) { return function (requestId) {
 }; };
 exports.createDefaultLogger = createDefaultLogger;
 exports["default"] = exports.createDefaultLogger;
+//# sourceMappingURL=logger.js.map

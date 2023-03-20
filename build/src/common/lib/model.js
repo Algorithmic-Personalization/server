@@ -38,3 +38,4 @@ var Model = /** @class */ (function () {
 }());
 exports.Model = Model;
 exports["default"] = Model;
+//# sourceMappingURL=model.js.map

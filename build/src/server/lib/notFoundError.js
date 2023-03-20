@@ -28,3 +28,4 @@ var NotFoundError = /** @class */ (function (_super) {
 }(Error));
 exports.NotFoundError = NotFoundError;
 exports["default"] = NotFoundError;
+//# sourceMappingURL=notFoundError.js.map

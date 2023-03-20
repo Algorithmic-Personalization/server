@@ -123,7 +123,7 @@ var tableDescriptor = {
             elements: [
                 new Date(a.createdAt).toLocaleDateString(),
                 // eslint-disable-next-line react/jsx-key
-                react_1["default"].createElement(react_router_dom_1.Link, { to: "/participants/".concat((_b = (_a = a.participant) === null || _a === void 0 ? void 0 : _a.email) !== null && _b !== void 0 ? _b : 'unknown') }, (_d = (_c = a.participant) === null || _c === void 0 ? void 0 : _c.email) !== null && _d !== void 0 ? _d : '<unknown>'),
+                react_1["default"].createElement(react_router_dom_1.Link, { to: "/participants/".concat((_b = (_a = a.participant) === null || _a === void 0 ? void 0 : _a.code) !== null && _b !== void 0 ? _b : 'unknown') }, (_d = (_c = a.participant) === null || _c === void 0 ? void 0 : _c.code) !== null && _d !== void 0 ? _d : '<unknown, this is a bug>'),
                 a.pagesViewed,
                 a.videoPagesViewed,
                 a.sidebarRecommendationsClicked,
@@ -176,3 +176,4 @@ var HomeC = function () {
 };
 exports.HomeC = HomeC;
 exports["default"] = exports.HomeC;
+//# sourceMappingURL=HomeP.js.map

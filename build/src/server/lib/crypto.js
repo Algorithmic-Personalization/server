@@ -114,3 +114,4 @@ var createTokenTools = function (secretKey) { return ({
     }
 }); };
 exports.createTokenTools = createTokenTools;
+//# sourceMappingURL=crypto.js.map

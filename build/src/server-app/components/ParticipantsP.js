@@ -106,10 +106,10 @@ var tableDescriptor = {
         },
     ],
     rows: function (p) { return ({
-        key: p.email,
+        key: p.code,
         elements: [
             // eslint-disable-next-line react/jsx-key
-            react_1["default"].createElement(react_router_dom_1.Link, { to: "/participants/".concat(p.email) }, p.email),
+            react_1["default"].createElement(react_router_dom_1.Link, { to: "/participants/".concat(p.code) }, p.code),
             p.code,
             p.arm,
         ]
@@ -167,15 +167,14 @@ var UploadFormC = function () {
     var ui = (react_1["default"].createElement(material_1.Box, { component: 'section', sx: { mb: 4 } },
         react_1["default"].createElement(material_1.Typography, { variant: 'h2', sx: { mb: 2 } }, "Add Participants"),
         react_1["default"].createElement(material_1.Typography, { variant: 'body1', component: 'div', sx: { mb: 2 } },
-            "You can add participants to the experiment by uploading a CSV file, it should have at least the following 3 columns:",
+            "You can add participants to the experiment by uploading a CSV file, it should have at least the following 2 columns:",
             react_1["default"].createElement("ul", null,
-                react_1["default"].createElement("li", null, "email"),
                 react_1["default"].createElement("li", null, "code"),
                 react_1["default"].createElement("li", null, "arm")),
             "where \"arm\" is either \"control\" or \"treatment\".",
-            react_1["default"].createElement("p", null,
-                react_1["default"].createElement("strong", null, "Note:"),
-                " The \"code\" column should contain large random values so that participant codes cannot be guessed.")),
+            react_1["default"].createElement("br", null),
+            react_1["default"].createElement("strong", null, "Note:"),
+            " The \"code\" column should contain large random values so that participant codes cannot be guessed."),
         example,
         react_1["default"].createElement("form", { ref: form },
             react_1["default"].createElement(material_1.FormControl, { sx: { mb: 2 } },
@@ -253,3 +252,4 @@ var ParticipantsC = function () { return (react_1["default"].createElement("div"
     react_1["default"].createElement(UploadFormC, null))); };
 exports.ParticipantsC = ParticipantsC;
 exports["default"] = exports.ParticipantsC;
+//# sourceMappingURL=ParticipantsP.js.map

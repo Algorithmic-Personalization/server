@@ -59,24 +59,24 @@ exports.createParticipantDefinition = {
     makeHandler: function (_a) {
         var createLogger = _a.createLogger, dataSource = _a.dataSource;
         return function (req) { return __awaiter(void 0, void 0, void 0, function () {
-            var log, _a, _unused, participant, participantRepo, participantEntity;
+            var log, _a, _unused, participantPayload, participantRepo, participantEntity;
             return __generator(this, function (_b) {
                 switch (_b.label) {
                     case 0:
                         log = createLogger(req.requestId);
                         log('Received create participant request');
-                        _a = req.body, _unused = _a.id, participant = __rest(_a, ["id"]);
-                        if (!(0, participant_1.isParticipantRecord)(participant)) {
+                        _a = req.body, _unused = _a.id, participantPayload = __rest(_a, ["id"]);
+                        if (!(0, participant_1.isParticipantRecord)(participantPayload)) {
                             throw new Error('Invalid participant record');
                         }
                         participantRepo = dataSource.getRepository(participant_2["default"]);
-                        return [4 /*yield*/, participantRepo.findOneBy({ email: participant.email })];
+                        return [4 /*yield*/, participantRepo.findOneBy({ code: participantPayload.code })];
                     case 1:
                         if (_b.sent()) {
-                            throw new Error('Participant with that email already exists');
+                            throw new Error('Participant with that code already exists, use the update endpoint (PUT method) if you want to update it');
                         }
                         participantEntity = new participant_2["default"]();
-                        Object.assign(participantEntity, participant);
+                        Object.assign(participantEntity, participantPayload);
                         return [2 /*return*/, participantRepo.save(participantEntity)];
                 }
             });
@@ -84,3 +84,4 @@ exports.createParticipantDefinition = {
     }
 };
 exports["default"] = exports.createParticipantDefinition;
+//# sourceMappingURL=createParticipant.js.map

@@ -84,3 +84,4 @@ exports.getTransitionSettingDefinition = {
     }
 };
 exports["default"] = exports.getTransitionSettingDefinition;
+//# sourceMappingURL=getTransitionSetting.js.map

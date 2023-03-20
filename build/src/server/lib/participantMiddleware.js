@@ -23,3 +23,4 @@ var createParticipantMiddleWare = function (createLogger) {
 };
 exports.createParticipantMiddleWare = createParticipantMiddleWare;
 exports["default"] = exports.createParticipantMiddleWare;
+//# sourceMappingURL=participantMiddleware.js.map

@@ -81,3 +81,4 @@ var createAuthTestRoute = function (_a) {
 };
 exports.createAuthTestRoute = createAuthTestRoute;
 exports["default"] = exports.createAuthTestRoute;
+//# sourceMappingURL=authTest.js.map

@@ -83,3 +83,4 @@ function createTableComponent(descriptor) {
 }
 exports.createTableComponent = createTableComponent;
 exports["default"] = createTableComponent;
+//# sourceMappingURL=TableC.js.map

@@ -73,3 +73,4 @@ exports.createGetActivityReportDefinition = {
     }
 };
 exports["default"] = exports.createGetActivityReportDefinition;
+//# sourceMappingURL=getActivityReport.js.map

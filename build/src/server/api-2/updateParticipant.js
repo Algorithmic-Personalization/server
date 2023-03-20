@@ -121,23 +121,23 @@ var updateParticipantPhase = function (dataSource, log) {
 };
 exports.updateParticipantDefinition = {
     verb: 'put',
-    path: '/api/participant/:email',
+    path: '/api/participant/:code',
     makeHandler: function (_a) {
         var createLogger = _a.createLogger, dataSource = _a.dataSource;
         return function (req) { return __awaiter(void 0, void 0, void 0, function () {
-            var log, _a, _unused, phase, arm, email, participantRepo, participantEntity, previousPhase;
+            var log, _a, _unused, phase, arm, code, participantRepo, participantEntity, previousPhase;
             return __generator(this, function (_b) {
                 switch (_b.label) {
                     case 0:
                         log = createLogger(req.requestId);
                         log('Received update participant request');
                         _a = req.body, _unused = _a.id, phase = _a.phase, arm = _a.arm;
-                        email = req.params.email;
-                        if (!email || typeof email !== 'string') {
+                        code = req.params.code;
+                        if (!code || typeof code !== 'string') {
                             throw new Error('Invalid participant email');
                         }
                         participantRepo = dataSource.getRepository(participant_1["default"]);
-                        return [4 /*yield*/, participantRepo.findOneBy({ email: email })];
+                        return [4 /*yield*/, participantRepo.findOneBy({ code: code })];
                     case 1:
                         participantEntity = _b.sent();
                         if (!participantEntity) {
@@ -146,6 +146,9 @@ exports.updateParticipantDefinition = {
                         previousPhase = participantEntity.phase;
                         if ((0, event_1.isValidExperimentArm)(arm)) {
                             participantEntity.arm = arm;
+                        }
+                        if (phase && !(0, participant_1.isValidPhase)(phase)) {
+                            throw new Error('Invalid phase, must be one of: 0, 1, 2');
                         }
                         if ((0, participant_1.isValidPhase)(phase)) {
                             return [2 /*return*/, updateParticipantPhase(dataSource, log)(participantEntity, previousPhase, phase)];
@@ -157,3 +160,4 @@ exports.updateParticipantDefinition = {
     }
 };
 exports["default"] = exports.updateParticipantDefinition;
+//# sourceMappingURL=updateParticipant.js.map

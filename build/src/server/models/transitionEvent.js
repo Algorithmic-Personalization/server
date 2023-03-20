@@ -93,3 +93,4 @@ var TransitionEvent = /** @class */ (function (_super) {
 }(dailyActivityTime_1["default"]));
 exports.TransitionEvent = TransitionEvent;
 exports["default"] = TransitionEvent;
+//# sourceMappingURL=transitionEvent.js.map

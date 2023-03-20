@@ -109,15 +109,13 @@ var createUploadParticipantsRoute = function (_a) {
                         return [3 /*break*/, 13];
                     }
                     participant = new participant_1["default"]();
-                    participant.email = record.email;
                     participant.code = record.code;
                     participant.arm = record.arm === 'control' ? event_1.ExperimentArm.CONTROL : event_1.ExperimentArm.TREATMENT;
-                    return [4 /*yield*/, participantRepo.findOneBy({ email: participant.email })];
+                    return [4 /*yield*/, participantRepo.findOneBy({ code: participant.code })];
                 case 5:
                     existingParticipant = _c.sent();
                     if (!existingParticipant) return [3 /*break*/, 10];
-                    if (!(existingParticipant.code !== participant.code || existingParticipant.arm !== participant.arm)) return [3 /*break*/, 9];
-                    existingParticipant.code = participant.code;
+                    if (!(existingParticipant.arm !== participant.arm)) return [3 /*break*/, 9];
                     existingParticipant.arm = participant.arm;
                     existingParticipant.updatedAt = new Date();
                     _c.label = 6;
@@ -179,3 +177,4 @@ var createUploadParticipantsRoute = function (_a) {
 };
 exports.createUploadParticipantsRoute = createUploadParticipantsRoute;
 exports["default"] = exports.createUploadParticipantsRoute;
+//# sourceMappingURL=uploadParticipants.js.map

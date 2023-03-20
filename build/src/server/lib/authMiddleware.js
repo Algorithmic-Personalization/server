@@ -84,3 +84,4 @@ var createAuthMiddleWare = function (_a) {
 };
 exports.createAuthMiddleWare = createAuthMiddleWare;
 exports["default"] = exports.createAuthMiddleWare;
+//# sourceMappingURL=authMiddleware.js.map

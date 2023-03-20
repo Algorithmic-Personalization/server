@@ -16,3 +16,4 @@ exports.getExperimentConfig = '/api/experiment-config';
 exports.postExperimentConfig = '/api/experiment-config';
 exports.getExperimentConfigHistory = '/api/experiment-config-history';
 exports.getEvents = '/api/events';
+//# sourceMappingURL=serverRoutes.js.map

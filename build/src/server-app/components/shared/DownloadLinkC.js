@@ -20,3 +20,4 @@ var material_1 = require("@mui/material");
 var DownloadLinkC = function (props) { return (react_1["default"].createElement(material_1.Link, __assign({}, props))); };
 exports.DownloadLinkC = DownloadLinkC;
 exports["default"] = exports.DownloadLinkC;
+//# sourceMappingURL=DownloadLinkC.js.map

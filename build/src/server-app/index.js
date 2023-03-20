@@ -67,3 +67,4 @@ var App = function () {
                     react_1["default"].createElement(Server_1["default"], null))))));
 };
 (0, client_1.createRoot)(elt).render(react_1["default"].createElement(App, null));
+//# sourceMappingURL=index.js.map

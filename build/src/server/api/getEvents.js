@@ -89,3 +89,4 @@ var createGetEventsRoute = function (_a) {
 };
 exports.createGetEventsRoute = createGetEventsRoute;
 exports["default"] = exports.createGetEventsRoute;
+//# sourceMappingURL=getEvents.js.map

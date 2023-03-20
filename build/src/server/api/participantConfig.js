@@ -92,3 +92,4 @@ var createGetParticipantConfigRoute = function (_a) {
 };
 exports.createGetParticipantConfigRoute = createGetParticipantConfigRoute;
 exports["default"] = exports.createGetParticipantConfigRoute;
+//# sourceMappingURL=participantConfig.js.map

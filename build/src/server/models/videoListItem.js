@@ -85,3 +85,4 @@ var VideoListItem = /** @class */ (function (_super) {
 }(model_1["default"]));
 exports.VideoListItem = VideoListItem;
 exports["default"] = VideoListItem;
+//# sourceMappingURL=videoListItem.js.map

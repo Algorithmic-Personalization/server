@@ -52,3 +52,4 @@ var WatchTimeEvent = /** @class */ (function (_super) {
 }(event_1["default"]));
 exports.WatchTimeEvent = WatchTimeEvent;
 exports["default"] = WatchTimeEvent;
+//# sourceMappingURL=watchTimeEvent.js.map

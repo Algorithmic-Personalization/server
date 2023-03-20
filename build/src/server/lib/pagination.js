@@ -15,3 +15,4 @@ var extractPaginationRequest = function (req, defaultPageSize) {
     };
 };
 exports.extractPaginationRequest = extractPaginationRequest;
+//# sourceMappingURL=pagination.js.map

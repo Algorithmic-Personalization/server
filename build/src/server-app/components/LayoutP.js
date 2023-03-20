@@ -128,8 +128,9 @@ var LayoutC = function () {
         react_1["default"].createElement(material_1.Box, { component: 'main', sx: { p: 3, mt: 6, width: '100%' } },
             react_1["default"].createElement(react_router_dom_1.Routes, null,
                 navItems.map(function (item) { return (react_1["default"].createElement(react_router_dom_1.Route, { element: react_1["default"].createElement(item.component, null), key: item.link, path: item.link })); }),
-                react_1["default"].createElement(react_router_dom_1.Route, { element: react_1["default"].createElement(NotFoundP_1["default"], null), path: '*' }),
-                react_1["default"].createElement(react_router_dom_1.Route, { element: react_1["default"].createElement(ParticipantOverviewP_1["default"], null), path: '/participants/:email' })))));
+                react_1["default"].createElement(react_router_dom_1.Route, { element: react_1["default"].createElement(ParticipantOverviewP_1["default"], null), path: '/participants/:code' }),
+                react_1["default"].createElement(react_router_dom_1.Route, { element: react_1["default"].createElement(NotFoundP_1["default"], null), path: '*' })))));
 };
 exports.LayoutC = LayoutC;
 exports["default"] = exports.LayoutC;
+//# sourceMappingURL=LayoutP.js.map

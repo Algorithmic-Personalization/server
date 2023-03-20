@@ -54,3 +54,4 @@ var RecommendationsEvent = /** @class */ (function (_super) {
 }(event_1["default"]));
 exports.RecommendationsEvent = RecommendationsEvent;
 exports["default"] = RecommendationsEvent;
+//# sourceMappingURL=recommendationsEvent.js.map

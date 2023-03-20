@@ -126,3 +126,4 @@ var Event = /** @class */ (function (_super) {
 }(model_1["default"]));
 exports.Event = Event;
 exports["default"] = Event;
+//# sourceMappingURL=event.js.map

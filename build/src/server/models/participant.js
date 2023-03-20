@@ -38,18 +38,11 @@ var Participant = /** @class */ (function (_super) {
     __extends(Participant, _super);
     function Participant() {
         var _this = _super !== null && _super.apply(this, arguments) || this;
-        _this.email = '';
         _this.code = '';
         _this.phase = 0;
         _this.arm = event_1.ExperimentArm.TREATMENT;
         return _this;
     }
-    __decorate([
-        (0, class_validator_1.IsNotEmpty)(),
-        (0, typeorm_1.Column)(),
-        (0, class_validator_1.IsString)(),
-        __metadata("design:type", String)
-    ], Participant.prototype, "email");
     __decorate([
         (0, class_validator_1.IsNotEmpty)(),
         (0, typeorm_1.Column)(),
@@ -83,3 +76,4 @@ var isValidPhase = function (phase) {
 };
 exports.isValidPhase = isValidPhase;
 exports["default"] = Participant;
+//# sourceMappingURL=participant.js.map

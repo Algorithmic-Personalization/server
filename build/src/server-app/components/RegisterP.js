@@ -185,3 +185,4 @@ var RegisterC = function (_a) {
 };
 exports.RegisterC = RegisterC;
 exports["default"] = exports.RegisterC;
+//# sourceMappingURL=RegisterP.js.map

@@ -9,3 +9,4 @@ var material_1 = require("@mui/material");
 var NotFoundC = function () { return (react_1["default"].createElement(material_1.Typography, { variant: 'h1', align: 'center' }, "404 Not Found")); };
 exports.NotFoundC = NotFoundC;
 exports["default"] = exports.NotFoundC;
+//# sourceMappingURL=NotFoundP.js.map

@@ -91,3 +91,4 @@ var DailyActivityTime = /** @class */ (function (_super) {
 }(model_1["default"]));
 exports.DailyActivityTime = DailyActivityTime;
 exports["default"] = DailyActivityTime;
+//# sourceMappingURL=dailyActivityTime.js.map

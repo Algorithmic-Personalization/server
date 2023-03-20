@@ -253,7 +253,7 @@ var OverviewC = function (_a) {
                 case 0:
                     targetPhase = parseInt(e.target.value, 10);
                     setPhase(targetPhase);
-                    return [4 /*yield*/, api.updateParticipantPhase(data.email, targetPhase)];
+                    return [4 /*yield*/, api.updateParticipantPhase(data.code, targetPhase)];
                 case 1:
                     result = _a.sent();
                     if (result.kind === 'Success') {
@@ -270,19 +270,15 @@ var OverviewC = function (_a) {
             react_1["default"].createElement(NotificationsC_1["default"], { message: message }),
             react_1["default"].createElement(material_1.Typography, { variant: 'h3', sx: { mb: 2 } }, "Basic info"),
             react_1["default"].createElement(material_1.Typography, { variant: 'body1', sx: { mb: 2 } },
-                react_1["default"].createElement("strong", null, "Email:"),
+                react_1["default"].createElement("strong", null, "Code:"),
                 " ",
-                data.email),
+                data.code),
             react_1["default"].createElement(material_1.FormControl, { sx: { mb: 2 } },
                 react_1["default"].createElement(material_1.InputLabel, { id: 'phase-label' }, "Phase"),
                 react_1["default"].createElement(material_1.Select, { labelId: 'phase-label', value: phase, label: 'Phase', onChange: handlePhaseChange },
                     react_1["default"].createElement(material_1.MenuItem, { value: 0 }, "Pre-Experiment"),
                     react_1["default"].createElement(material_1.MenuItem, { value: 1 }, "Experiment"),
                     react_1["default"].createElement(material_1.MenuItem, { value: 2 }, "Post-Experiment Observation"))),
-            react_1["default"].createElement(material_1.Typography, { variant: 'body1', sx: { mb: 2 } },
-                react_1["default"].createElement("strong", null, "Code:"),
-                " ",
-                data.code),
             react_1["default"].createElement(material_1.Typography, { variant: 'body1', sx: { mb: 2 } },
                 react_1["default"].createElement("strong", null, "Added on:"),
                 " ",
@@ -304,28 +300,29 @@ var OverviewC = function (_a) {
             data.sessions.length === 0 ? 'No sessions' : data.sessions.map(function (session) { return react_1["default"].createElement(SessionC, { key: session.id, data: session }); }))));
 };
 var ParticipantPageC = function () {
-    var email = (0, react_router_1.useParams)().email;
+    var code = (0, react_router_1.useParams)().code;
     var api = (0, adminApiProvider_1.useAdminApi)();
     var _a = __read((0, react_1.useState)(undefined), 2), overview = _a[0], setOverview = _a[1];
     (0, react_1.useEffect)(function () {
-        if (!email) {
+        if (!code) {
             console.error('No email provided');
             return;
         }
-        api.getParticipantOverview(email).then(function (res) {
+        api.getParticipantOverview(code).then(function (res) {
             if (res.kind === 'Success') {
                 setOverview(res.value);
             }
         })["catch"](function (err) {
             console.error(err);
         });
-    }, [email]);
+    }, [code]);
     var ui = (react_1["default"].createElement(material_1.Box, { component: 'section', sx: { mb: 4 } },
         react_1["default"].createElement(material_1.Typography, { variant: 'h2', sx: { mb: 2 } },
             "Participant: ",
-            email),
+            code),
         overview === undefined ? 'Loading...' : react_1["default"].createElement(OverviewC, { data: overview })));
     return ui;
 };
 exports.ParticipantPageC = ParticipantPageC;
 exports["default"] = exports.ParticipantPageC;
+//# sourceMappingURL=ParticipantOverviewP.js.map

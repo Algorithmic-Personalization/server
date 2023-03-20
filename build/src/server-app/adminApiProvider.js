@@ -21,3 +21,4 @@ exports.adminApiProvider = exports.adminApiContext.Provider;
 var useAdminApi = function () { return react_1["default"].useContext(exports.adminApiContext); };
 exports.useAdminApi = useAdminApi;
 exports["default"] = exports.adminApiProvider;
+//# sourceMappingURL=adminApiProvider.js.map

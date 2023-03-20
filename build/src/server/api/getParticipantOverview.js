@@ -141,7 +141,7 @@ var createSessionOverview = function (dataSource) { return function (session) { 
 var createGetParticipantOverviewRoute = function (_a) {
     var createLogger = _a.createLogger, dataSource = _a.dataSource;
     return function (req, res) { return __awaiter(void 0, void 0, void 0, function () {
-        var log, participantRepo, email, participant, sessionRepo, sessions, participantOverview, _a;
+        var log, participantRepo, code, participant, sessionRepo, sessions, participantOverview, _a;
         var _b;
         return __generator(this, function (_c) {
             switch (_c.label) {
@@ -149,12 +149,12 @@ var createGetParticipantOverviewRoute = function (_a) {
                     log = createLogger(req.requestId);
                     log('Received participant overview request');
                     participantRepo = dataSource.getRepository(participant_1["default"]);
-                    email = req.params.email;
-                    if (!email) {
+                    code = req.params.code;
+                    if (!code) {
                         res.status(400).json({ kind: 'Error', message: 'Missing email' });
                         return [2 /*return*/];
                     }
-                    return [4 /*yield*/, participantRepo.findOneBy({ email: email })];
+                    return [4 /*yield*/, participantRepo.findOneBy({ code: code })];
                 case 1:
                     participant = _c.sent();
                     if (!participant) {
@@ -186,3 +186,4 @@ var createGetParticipantOverviewRoute = function (_a) {
 };
 exports.createGetParticipantOverviewRoute = createGetParticipantOverviewRoute;
 exports["default"] = exports.createGetParticipantOverviewRoute;
+//# sourceMappingURL=getParticipantOverview.js.map

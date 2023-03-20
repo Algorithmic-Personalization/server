@@ -334,7 +334,7 @@ var start = function () { return __awaiter(void 0, void 0, void 0, function () {
                 app.get(serverRoutes_1.getAuthTest, authMiddleware, (0, authTest_1["default"])(routeContext));
                 app.post(serverRoutes_1.postUploadParticipants, authMiddleware, upload.single('participants'), (0, uploadParticipants_1["default"])(routeContext));
                 app.get("".concat(serverRoutes_1.getParticipants, "/:page?"), authMiddleware, (0, getParticipants_1["default"])(routeContext));
-                app.get("".concat(serverRoutes_1.getParticipantOverview, "/:email"), authMiddleware, (0, getParticipantOverview_1["default"])(routeContext));
+                app.get("".concat(serverRoutes_1.getParticipantOverview, "/:code"), authMiddleware, (0, getParticipantOverview_1["default"])(routeContext));
                 app.get("".concat(serverRoutes_1.getEventOverviews, "/:sessionUuid"), authMiddleware, (0, getEventOverviews_1["default"])(routeContext));
                 app.get(serverRoutes_1.getExperimentConfig, authMiddleware, (0, getExperimentConfig_1["default"])(routeContext));
                 app.post(serverRoutes_1.postExperimentConfig, authMiddleware, (0, postExperimentConfig_1["default"])(routeContext));
@@ -363,3 +363,4 @@ start()["catch"](function (err) {
     console.error(err);
     process.exit(1);
 });
+//# sourceMappingURL=server.js.map

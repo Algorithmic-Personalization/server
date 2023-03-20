@@ -76,3 +76,4 @@ var ExperimentConfig = /** @class */ (function (_super) {
 }(model_1["default"]));
 exports.ExperimentConfig = ExperimentConfig;
 exports["default"] = ExperimentConfig;
+//# sourceMappingURL=experimentConfig.js.map

@@ -9,3 +9,4 @@ for (var i = 0; i < count; i++) {
     var arm = Math.random() < 0.5 ? 'control' : 'treatment';
     console.log("".concat(email, ",").concat(code, ",").concat(arm));
 }
+//# sourceMappingURL=generateSampleParticipants.js.map

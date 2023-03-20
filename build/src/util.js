@@ -105,3 +105,4 @@ var daysElapsed = function (fromDate, toDate) {
     return Math.ceil((to.getTime() - from.getTime()) / (1000 * 60 * 60 * 24));
 };
 exports.daysElapsed = daysElapsed;
+//# sourceMappingURL=util.js.map

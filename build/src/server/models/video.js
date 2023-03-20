@@ -66,3 +66,4 @@ var Video = /** @class */ (function (_super) {
 }(model_1["default"]));
 exports.Video = Video;
 exports["default"] = Video;
+//# sourceMappingURL=video.js.map

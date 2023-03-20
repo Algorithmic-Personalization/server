@@ -309,7 +309,7 @@ var createUpdateActivity = function (_a) {
         return __generator(this, function (_a) {
             switch (_a.label) {
                 case 0:
-                    log('Updating activity for participant ', participant.email);
+                    log('Updating activity for participant ', participant.code);
                     day = (0, updateCounters_1.wholeDate)(event.createdAt);
                     return [4 /*yield*/, getOrCreateActivity(activityRepo, participant.id, day)];
                 case 1:
@@ -645,3 +645,4 @@ var createPostEventRoute = function (_a) {
 };
 exports.createPostEventRoute = createPostEventRoute;
 exports["default"] = exports.createPostEventRoute;
+//# sourceMappingURL=postEvent.js.map
