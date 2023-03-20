@@ -113,18 +113,16 @@ const UploadFormC: React.FC = () => {
 			<Typography variant='h2' sx={{mb: 2}}>Add Participants</Typography>
 			<Typography variant='body1' component='div' sx={{mb: 2}}>
 				You can add participants to the experiment by uploading a CSV file,
-				it should have at least the following 3 columns:
+				it should have at least the following 2 columns:
 				<ul>
-					<li>email</li>
 					<li>code</li>
 					<li>arm</li>
 				</ul>
 				where &quot;arm&quot; is either
 				&quot;control&quot; or &quot;treatment&quot;.
-				<p>
-					<strong>Note:</strong> The &quot;code&quot; column should contain
-					large random values so that participant codes cannot be guessed.
-				</p>
+				<br/>
+				<strong>Note:</strong> The &quot;code&quot; column should contain
+				large random values so that participant codes cannot be guessed.
 			</Typography>
 			{example}
 			<form ref={form}>

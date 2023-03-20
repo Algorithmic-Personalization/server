@@ -10,6 +10,5 @@ export const isParticipantRecord = (record: Record<string, string>): record is P
 	has('code')(record)
 	&& has('arm')(record)
 	&& typeof record.code === 'string'
-	&& record.email.length > 0
 	&& record.code.length > 0
 	&& (record.arm === 'control' || record.arm === 'treatment');
