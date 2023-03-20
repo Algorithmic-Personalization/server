@@ -58,7 +58,7 @@ const PhaseC: React.FC<{
 				if (result.kind === 'Success') {
 					setMessage({
 						severity: 'success',
-						text: `Phase transition settings from phase ${setting.fromPhase} to ${setting.toPhase} saved!`,
+						text: `Phase transition settings from phase ${setting.fromPhase} to phase ${setting.toPhase} saved!`,
 					});
 				} else {
 					setMessage({
