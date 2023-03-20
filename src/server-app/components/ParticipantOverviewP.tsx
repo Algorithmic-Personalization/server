@@ -231,7 +231,7 @@ const OverviewC: React.FC<{data: ParticipantOverview}> = ({data}) => {
 		const targetPhase = parseInt(e.target.value as string, 10);
 		setPhase(targetPhase);
 
-		const result = await api.updateParticipantPhase(data.email, targetPhase);
+		const result = await api.updateParticipantPhase(data.code, targetPhase);
 
 		if (result.kind === 'Success') {
 			setMessage({severity: 'success', text: 'Phase updated'});
@@ -246,7 +246,7 @@ const OverviewC: React.FC<{data: ParticipantOverview}> = ({data}) => {
 			<Paper component='section' sx={{mb: 4, p: 2}}>
 				<NotificationsC message={message} />
 				<Typography variant='h3' sx={{mb: 2}}>Basic info</Typography>
-				<Typography variant='body1' sx={{mb: 2}}><strong>Email:</strong> {data.email}</Typography>
+				<Typography variant='body1' sx={{mb: 2}}><strong>Code:</strong> {data.code}</Typography>
 				<FormControl sx={{mb: 2}}>
 					<InputLabel id='phase-label'>Phase</InputLabel>
 					<Select
@@ -260,7 +260,6 @@ const OverviewC: React.FC<{data: ParticipantOverview}> = ({data}) => {
 						<MenuItem value={2}>Post-Experiment Observation</MenuItem>
 					</Select>
 				</FormControl>
-				<Typography variant='body1' sx={{mb: 2}}><strong>Code:</strong> {data.code}</Typography>
 				<Typography variant='body1' sx={{mb: 2}}><strong>Added on:</strong> {showDate(data.createdAt)}</Typography>
 				<Typography variant='body1' sx={{mb: 2}}><strong>Last seen:</strong> {showDate(data.latestSessionDate)}</Typography>
 				<Typography variant='body1' sx={{mb: 2}}><strong>First seen:</strong> {showDate(data.firstSessionDate)}</Typography>
@@ -277,29 +276,29 @@ const OverviewC: React.FC<{data: ParticipantOverview}> = ({data}) => {
 };
 
 export const ParticipantPageC: React.FC = () => {
-	const {email} = useParams();
+	const {code} = useParams();
 	const api = useAdminApi();
 
 	const [overview, setOverview] = useState<ParticipantOverview | undefined>(undefined);
 
 	useEffect(() => {
-		if (!email) {
+		if (!code) {
 			console.error('No email provided');
 			return;
 		}
 
-		api.getParticipantOverview(email).then(res => {
+		api.getParticipantOverview(code).then(res => {
 			if (res.kind === 'Success') {
 				setOverview(res.value);
 			}
 		}).catch(err => {
 			console.error(err);
 		});
-	}, [email]);
+	}, [code]);
 
 	const ui = (
 		<Box component='section' sx={{mb: 4}}>
-			<Typography variant='h2' sx={{mb: 2}}>Participant: {email}</Typography>
+			<Typography variant='h2' sx={{mb: 2}}>Participant: {code}</Typography>
 			{overview === undefined ? 'Loading...' : <OverviewC data={overview} />}
 		</Box>
 	);

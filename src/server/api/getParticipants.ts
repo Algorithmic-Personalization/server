@@ -10,7 +10,7 @@ export const createGetParticipantsRoute: RouteCreator = ({createLogger, dataSour
 	log('Received participants request');
 
 	const {page, pageSize} = extractPaginationRequest(req);
-	const {emailLike} = req.query;
+	const {codeLike} = req.query;
 
 	const participantRepo = dataSource.getRepository(Participant);
 
@@ -23,7 +23,7 @@ export const createGetParticipantsRoute: RouteCreator = ({createLogger, dataSour
 					createdAt: 'DESC',
 				},
 				where: {
-					email: (typeof emailLike === 'string') ? Like(`%${emailLike}%`) : undefined,
+					code: (typeof codeLike === 'string') ? Like(`%${codeLike}%`) : undefined,
 				},
 			});
 

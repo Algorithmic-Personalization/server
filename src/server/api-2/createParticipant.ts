@@ -10,21 +10,21 @@ export const createParticipantDefinition: RouteDefinition<Participant> = {
 		const log = createLogger(req.requestId);
 		log('Received create participant request');
 
-		const {id: _unused, ...participant} = req.body as Record<string, string>;
+		const {id: _unused, ...participantPayload} = req.body as Record<string, string>;
 
-		if (!isParticipantRecord(participant)) {
+		if (!isParticipantRecord(participantPayload)) {
 			throw new Error('Invalid participant record');
 		}
 
 		const participantRepo = dataSource.getRepository(Participant);
 
-		if (await participantRepo.findOneBy({email: participant.email})) {
-			throw new Error('Participant with that email already exists');
+		if (await participantRepo.findOneBy({code: participantPayload.code})) {
+			throw new Error('Participant with that code already exists, use the update endpoint (PUT method) if you want to update it');
 		}
 
 		const participantEntity = new Participant();
 
-		Object.assign(participantEntity, participant);
+		Object.assign(participantEntity, participantPayload);
 
 		return participantRepo.save(participantEntity);
 	},

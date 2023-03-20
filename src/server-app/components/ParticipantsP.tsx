@@ -44,10 +44,10 @@ const tableDescriptor: TableDescriptor<Participant> = {
 		},
 	],
 	rows: p => ({
-		key: p.email,
+		key: p.code,
 		elements: [
 			// eslint-disable-next-line react/jsx-key
-			<Link to={`/participants/${p.email}`}>{p.email}</Link>,
+			<Link to={`/participants/${p.code}`}>{p.code}</Link>,
 			p.code,
 			p.arm,
 		],

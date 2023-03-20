@@ -168,8 +168,8 @@ export const LayoutC: React.FC = () => {
 					{navItems.map(item => (
 						<Route element={<item.component />} key={item.link} path={item.link} />
 					))}
+					<Route element={<ParticipantPageC />} path='/participants/:code' />
 					<Route element={<NotFoundC />} path='*' />
-					<Route element={<ParticipantPageC />} path='/participants/:email' />
 				</Routes>
 			</Box>
 		</Box>

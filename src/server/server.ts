@@ -317,7 +317,7 @@ const start = async () => {
 	app.get(getAuthTest, authMiddleware, createAuthTestRoute(routeContext));
 	app.post(postUploadParticipants, authMiddleware, upload.single('participants'), createUploadParticipantsRoute(routeContext));
 	app.get(`${getParticipants}/:page?`, authMiddleware, createGetParticipantsRoute(routeContext));
-	app.get(`${getParticipantOverview}/:email`, authMiddleware, createGetParticipantOverviewRoute(routeContext));
+	app.get(`${getParticipantOverview}/:code`, authMiddleware, createGetParticipantOverviewRoute(routeContext));
 	app.get(`${getEventOverviews}/:sessionUuid`, authMiddleware, createGetEventOverviewsRoute(routeContext));
 	app.get(getExperimentConfig, authMiddleware, createGetExperimentConfigRoute(routeContext));
 	app.post(postExperimentConfig, authMiddleware, createPostExperimentConfigRoute(routeContext));

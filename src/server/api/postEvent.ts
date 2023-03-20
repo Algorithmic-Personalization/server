@@ -174,7 +174,7 @@ const createUpdateActivity = ({activityRepo, eventRepo, log}: {
 	participant: Participant,
 	event: Event,
 ) => {
-	log('Updating activity for participant ', participant.email);
+	log('Updating activity for participant ', participant.code);
 	const day = wholeDate(event.createdAt);
 
 	const activity = await getOrCreateActivity(activityRepo, participant.id, day);

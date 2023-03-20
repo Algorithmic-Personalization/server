@@ -71,14 +71,14 @@ export const createGetParticipantOverviewRoute: RouteCreator = ({createLogger, d
 
 	const participantRepo = dataSource.getRepository(Participant);
 
-	const {email} = req.params;
+	const {code} = req.params;
 
-	if (!email) {
+	if (!code) {
 		res.status(400).json({kind: 'Error', message: 'Missing email'});
 		return;
 	}
 
-	const participant = await participantRepo.findOneBy({email});
+	const participant = await participantRepo.findOneBy({code});
 
 	if (!participant) {
 		res.status(404).json({kind: 'Error', message: 'Participant not found'});

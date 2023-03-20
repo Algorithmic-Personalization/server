@@ -55,21 +55,21 @@ const updateParticipantPhase = (dataSource: DataSource, log: LogFunction) =>
 
 export const updateParticipantDefinition: RouteDefinition<Participant> = {
 	verb: 'put',
-	path: '/api/participant/:email',
+	path: '/api/participant/:code',
 	makeHandler: ({createLogger, dataSource}) => async (req): Promise<Participant> => {
 		const log = createLogger(req.requestId);
 		log('Received update participant request');
 
 		const {id: _unused, phase, arm} = req.body as Record<string, string | number>;
-		const {email} = req.params;
+		const {code} = req.params;
 
-		if (!email || typeof email !== 'string') {
+		if (!code || typeof code !== 'string') {
 			throw new Error('Invalid participant email');
 		}
 
 		const participantRepo = dataSource.getRepository(Participant);
 
-		const participantEntity = await participantRepo.findOneBy({email});
+		const participantEntity = await participantRepo.findOneBy({code});
 
 		if (!participantEntity) {
 			throw new Error('Participant with that email does not exist');
@@ -79,6 +79,10 @@ export const updateParticipantDefinition: RouteDefinition<Participant> = {
 
 		if (isValidExperimentArm(arm)) {
 			participantEntity.arm = arm;
+		}
+
+		if (phase && !isValidPhase(phase)) {
+			throw new Error('Invalid phase, must be one of: 0, 1, 2');
 		}
 
 		if (isValidPhase(phase)) {

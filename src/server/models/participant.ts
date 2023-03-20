@@ -12,11 +12,6 @@ export class Participant extends Model {
 	@IsNotEmpty()
 	@Column()
 	@IsString()
-		email: string = '';
-
-	@IsNotEmpty()
-	@Column()
-	@IsString()
 		code: string = '';
 
 	@Column()

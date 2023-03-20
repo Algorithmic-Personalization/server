@@ -59,8 +59,8 @@ export type AdminApi = {
 	getAdmin: () => Admin | undefined;
 	getAuthTest: () => Promise<Maybe<Admin>>;
 	uploadParticipants: (file: File) => Promise<Maybe<string>>;
-	getParticipants: (page: number, emailLike: string, pageSize?: number) => Promise<Maybe<Page<Participant>>>;
-	getParticipantOverview: (participantEmail: string) => Promise<Maybe<ParticipantOverview>>;
+	getParticipants: (page: number, codeLike: string, pageSize?: number) => Promise<Maybe<Page<Participant>>>;
+	getParticipantOverview: (participantCode: string) => Promise<Maybe<ParticipantOverview>>;
 	getEventOverviews: (sessionUuid: string) => Promise<Maybe<EventOverview[]>>;
 	getEvents: (page: number, pageSize?: number) => Promise<Maybe<Page<Event>>>;
 	getExperimentConfig: () => Promise<Maybe<ExperimentConfig>>;
@@ -72,7 +72,7 @@ export type AdminApi = {
 	getActivityReport: () => Promise<Maybe<ActivityReport>>;
 	createTransitionSetting: (setting: TransitionSetting) => Promise<Maybe<TransitionSetting>>;
 	getTransitionSetting: (from: number, to: number) => Promise<Maybe<TransitionSetting>>;
-	updateParticipantPhase: (participantEmail: string, phase: number) => Promise<Maybe<Participant>>;
+	updateParticipantPhase: (participantCode: string, phase: number) => Promise<Maybe<Participant>>;
 };
 
 const loadItem = <T>(key: string): T | undefined => {
@@ -195,16 +195,16 @@ export const createAdminApi = (serverUrl: string, showLoginModal?: () => void): 
 			};
 		},
 
-		async getParticipants(page: number, emailLike: string, pageSize = 15) {
+		async getParticipants(page: number, codeLike: string, pageSize = 15) {
 			return get<Page<Participant>>(
 				`${getParticipants}/${page}`,
-				{pageSize, emailLike},
+				{pageSize, codeLike},
 				headers(),
 			);
 		},
 
-		async getParticipantOverview(participantEmail: string) {
-			return get<ParticipantOverview>(`${getParticipantOverview}/${participantEmail}`, {}, headers());
+		async getParticipantOverview(participantCode: string) {
+			return get<ParticipantOverview>(`${getParticipantOverview}/${participantCode}`, {}, headers());
 		},
 
 		async getEventOverviews(sessionUuid: string) {
@@ -252,10 +252,10 @@ export const createAdminApi = (serverUrl: string, showLoginModal?: () => void): 
 			return get<TransitionSetting>(path, {from, to}, headers());
 		},
 
-		async updateParticipantPhase(participantEmail: string, phase: number) {
+		async updateParticipantPhase(participantCode: string, phase: number) {
 			const {path} = updateParticipantDefinition;
 			return put<Participant>(
-				path.replace(':email', participantEmail),
+				path.replace(':code', participantCode),
 				{phase},
 				headers(),
 			);

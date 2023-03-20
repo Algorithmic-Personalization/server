@@ -54,16 +54,14 @@ export const createUploadParticipantsRoute: RouteCreator = ({createLogger, dataS
 			}
 
 			const participant = new Participant();
-			participant.email = record.email;
 			participant.code = record.code;
 			participant.arm = record.arm === 'control' ? ExperimentArm.CONTROL : ExperimentArm.TREATMENT;
 
 			// eslint-disable-next-line no-await-in-loop
-			const existingParticipant = await participantRepo.findOneBy({email: participant.email});
+			const existingParticipant = await participantRepo.findOneBy({code: participant.code});
 
 			if (existingParticipant) {
-				if (existingParticipant.code !== participant.code || existingParticipant.arm !== participant.arm) {
-					existingParticipant.code = participant.code;
+				if (existingParticipant.arm !== participant.arm) {
 					existingParticipant.arm = participant.arm;
 					existingParticipant.updatedAt = new Date();
 

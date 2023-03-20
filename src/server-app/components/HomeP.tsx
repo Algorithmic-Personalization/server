@@ -49,7 +49,7 @@ const tableDescriptor: TableDescriptor<DailyActivityTime> = {
 		elements: [
 			new Date(a.createdAt).toLocaleDateString(),
 			// eslint-disable-next-line react/jsx-key
-			<Link to={`/participants/${a.participant?.email ?? 'unknown'}`}>{a.participant?.email ?? '<unknown>'}</Link>,
+			<Link to={`/participants/${a.participant?.code ?? 'unknown'}`}>{a.participant?.code ?? '<unknown, this is a bug>'}</Link>,
 			a.pagesViewed,
 			a.videoPagesViewed,
 			a.sidebarRecommendationsClicked,
