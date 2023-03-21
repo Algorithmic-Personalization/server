@@ -305,7 +305,7 @@ var getOrCreateActivity = function (repo, participantId, day) { return __awaiter
 var createUpdateActivity = function (_a) {
     var activityRepo = _a.activityRepo, eventRepo = _a.eventRepo, log = _a.log;
     return function (participant, event) { return __awaiter(void 0, void 0, void 0, function () {
-        var day, activity, latestSessionEvent, dt;
+        var day, activity, latestSessionEvent, dt, dtS;
         return __generator(this, function (_a) {
             switch (_a.label) {
                 case 0:
@@ -314,11 +314,12 @@ var createUpdateActivity = function (_a) {
                     return [4 /*yield*/, getOrCreateActivity(activityRepo, participant.id, day)];
                 case 1:
                     activity = _a.sent();
+                    if (!(event.type === event_1.EventType.PAGE_VIEW)) return [3 /*break*/, 3];
                     return [4 /*yield*/, eventRepo
                             .findOne({
                             where: {
                                 sessionUuid: event.sessionUuid,
-                                type: event_1.EventType.PAGE_VIEW
+                                createdAt: (0, typeorm_1.LessThan)(event.createdAt)
                             },
                             order: {
                                 createdAt: 'DESC'
@@ -329,10 +330,13 @@ var createUpdateActivity = function (_a) {
                     dt = latestSessionEvent
                         ? Number(event.createdAt) - Number(latestSessionEvent.createdAt)
                         : 0;
-                    log('Time since last event:', dt / 1000);
                     if (dt < updateCounters_1.timeSpentEventDiffLimit && dt > 0) {
-                        activity.timeSpentOnYoutubeSeconds += dt / 1000;
+                        dtS = dt / 1000;
+                        log('Time since last event:', dtS);
+                        activity.timeSpentOnYoutubeSeconds += dtS;
                     }
+                    _a.label = 3;
+                case 3:
                     if (event.type === event_1.EventType.WATCH_TIME) {
                         activity.videoTimeViewedSeconds += event.secondsWatched;
                     }
@@ -349,7 +353,7 @@ var createUpdateActivity = function (_a) {
                     }
                     activity.updatedAt = new Date();
                     return [4 /*yield*/, activityRepo.save(activity)];
-                case 3:
+                case 4:
                     _a.sent();
                     return [2 /*return*/];
             }
