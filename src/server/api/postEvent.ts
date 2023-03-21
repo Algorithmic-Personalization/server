@@ -1,4 +1,4 @@
-import {type DataSource, type Repository, MoreThan} from 'typeorm';
+import {type DataSource, type Repository, MoreThan, LessThan} from 'typeorm';
 
 import {type RouteCreator} from '../lib/routeCreation';
 import {type LogFunction} from '../lib/logger';
@@ -179,25 +179,27 @@ const createUpdateActivity = ({activityRepo, eventRepo, log}: {
 
 	const activity = await getOrCreateActivity(activityRepo, participant.id, day);
 
-	const latestSessionEvent = await eventRepo
-		.findOne({
-			where: {
-				sessionUuid: event.sessionUuid,
-				type: EventType.PAGE_VIEW,
-			},
-			order: {
-				createdAt: 'DESC',
-			},
-		});
+	if (event.type === EventType.PAGE_VIEW) {
+		const latestSessionEvent = await eventRepo
+			.findOne({
+				where: {
+					sessionUuid: event.sessionUuid,
+					createdAt: LessThan(event.createdAt),
+				},
+				order: {
+					createdAt: 'DESC',
+				},
+			});
 
-	const dt = latestSessionEvent
-		? Number(event.createdAt) - Number(latestSessionEvent.createdAt)
-		: 0;
+		const dt = latestSessionEvent
+			? Number(event.createdAt) - Number(latestSessionEvent.createdAt)
+			: 0;
 
-	log('Time since last event:', dt / 1000);
-
-	if (dt < timeSpentEventDiffLimit && dt > 0) {
-		activity.timeSpentOnYoutubeSeconds += dt / 1000;
+		if (dt < timeSpentEventDiffLimit && dt > 0) {
+			const dtS = dt / 1000;
+			log('Time since last event:', dtS);
+			activity.timeSpentOnYoutubeSeconds += dtS;
+		}
 	}
 
 	if (event.type === EventType.WATCH_TIME) {
