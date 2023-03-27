@@ -20,6 +20,7 @@ import {parse} from 'yaml';
 import {validate} from 'class-validator';
 
 import nodemailer from 'nodemailer';
+import monitor from 'express-status-monitor';
 
 import {getInteger, getString, has, findPackageJsonDir} from '../common/util';
 
@@ -299,6 +300,10 @@ const start = async () => {
 	const defineAdminRoute = <T>(def: RouteDefinition<T>) => {
 		app[def.verb](def.path, authMiddleware, makeHandler(def));
 	};
+
+	app.use(monitor({
+		path: '/status',
+	}));
 
 	defineAdminRoute(createParticipantDefinition);
 	defineAdminRoute(createGetActivityReportDefinition);

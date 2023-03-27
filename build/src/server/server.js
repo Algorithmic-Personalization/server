@@ -92,6 +92,7 @@ var postgres_migrations_1 = require("postgres-migrations");
 var yaml_1 = require("yaml");
 var class_validator_1 = require("class-validator");
 var nodemailer_1 = __importDefault(require("nodemailer"));
+var express_status_monitor_1 = __importDefault(require("express-status-monitor"));
 var util_1 = require("../common/util");
 var admin_1 = __importDefault(require("../common/models/admin"));
 var token_1 = __importDefault(require("./models/token"));
@@ -320,6 +321,9 @@ var start = function () { return __awaiter(void 0, void 0, void 0, function () {
                 defineAdminRoute = function (def) {
                     app[def.verb](def.path, authMiddleware, makeHandler(def));
                 };
+                app.use((0, express_status_monitor_1["default"])({
+                    path: '/status'
+                }));
                 defineAdminRoute(createParticipant_1["default"]);
                 defineAdminRoute(getActivityReport_1["default"]);
                 defineAdminRoute(createTransitionSetting_1["default"]);

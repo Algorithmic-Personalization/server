@@ -14,6 +14,18 @@ This assumes you have docker and docker-compose installed.
 - set correct manifest permissions for domains in `webpack.config.extension.json` and rebuild
 - adjust the ports in Dockerfile if needed
 
+Create an apache user to protect the status page:
+
+```bash
+sudo htpasswd -c /etc/apache2/.htpasswd <username>
+```
+
+or on EC2 probably:
+
+```bash
+sudo htpasswd -c /etc/httpd/.htpasswd <username>
+```
+
 # Installation
 
 ## Development
