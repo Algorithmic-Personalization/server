@@ -22,6 +22,8 @@ import {validate} from 'class-validator';
 import nodemailer from 'nodemailer';
 import monitor from 'express-status-monitor';
 
+import io from '@pm2/io';
+
 import {getInteger, getString, has, findPackageJsonDir} from '../common/util';
 
 import Admin from '../common/models/admin';
@@ -124,6 +126,11 @@ if (env !== 'production' && env !== 'development') {
 }
 
 const upload = multer();
+
+const currentRequests = io.counter({
+	name: 'Realtime request count',
+	id: 'app/realtime/request',
+});
 
 const start = async () => {
 	const root = await findPackageJsonDir(__dirname);
@@ -292,6 +299,10 @@ const start = async () => {
 	let requestId = 0;
 
 	app.use((req, _res, next) => {
+		currentRequests.inc();
+		req.on('end', () => {
+			currentRequests.dec();
+		});
 		++requestId;
 		req.requestId = requestId;
 		createLogger(req.requestId)(req.method, req.url, req.headers);

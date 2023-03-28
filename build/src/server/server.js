@@ -93,6 +93,7 @@ var yaml_1 = require("yaml");
 var class_validator_1 = require("class-validator");
 var nodemailer_1 = __importDefault(require("nodemailer"));
 var express_status_monitor_1 = __importDefault(require("express-status-monitor"));
+var io_1 = __importDefault(require("@pm2/io"));
 var util_1 = require("../common/util");
 var admin_1 = __importDefault(require("../common/models/admin"));
 var token_1 = __importDefault(require("./models/token"));
@@ -161,6 +162,10 @@ if (env !== 'production' && env !== 'development') {
     throw new Error('NODE_ENV must be set to "production" or "development"');
 }
 var upload = (0, multer_1.default)();
+var currentRequests = io_1.default.counter({
+    name: 'Realtime request count',
+    id: 'app/realtime/request',
+});
 var start = function () { return __awaiter(void 0, void 0, void 0, function () {
     var root, logsPath, logStream, configJson, config, dockerComposeJson, dockerComposeConfig, smtpConfig, smtpConfigErrors, mailer, portKey, port, dbPortString, _a, dbHostPort, dbDockerPort, dbPort, dbConfigPath, dbHost, dbUser, dbPassword, dbDatabase, dbConfig, pgClient, err_1, migrated, err_2, ds, err_3, createLogger, err_4, privateKey, tokenTools, routeContext, makeHandler, tokenRepo, authMiddleware, participantMw, app, staticRouter, compiler, requestId, defineAdminRoute;
     return __generator(this, function (_b) {
@@ -305,6 +310,7 @@ var start = function () { return __awaiter(void 0, void 0, void 0, function () {
                         throw new Error('Invalid webpack config, missing output path');
                     }
                     staticRouter.use((0, webpack_dev_middleware_1.default)(compiler));
+                    // eslint-disable-next-line @typescript-eslint/no-unsafe-argument
                     staticRouter.use((0, webpack_hot_middleware_1.default)(compiler));
                 }
                 staticRouter.use(express_1.default.static((0, path_1.join)(root, 'public')));
@@ -313,6 +319,10 @@ var start = function () { return __awaiter(void 0, void 0, void 0, function () {
                 app.use((0, cors_1.default)());
                 requestId = 0;
                 app.use(function (req, _res, next) {
+                    currentRequests.inc();
+                    req.on('end', function () {
+                        currentRequests.dec();
+                    });
                     ++requestId;
                     req.requestId = requestId;
                     createLogger(req.requestId)(req.method, req.url, req.headers);
