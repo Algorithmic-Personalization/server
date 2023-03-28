@@ -1,7 +1,7 @@
 FROM node:latest
 
-ENV PM2_PUBLIC_KEY
-ENV PM2_SECRET_KEY
+ENV PM2_PUBLIC_KEY ""
+ENV PM2_SECRET_KEY ""
 
 COPY . /root/ytdpnl
 WORKDIR /root/ytdpnl
