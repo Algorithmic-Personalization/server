@@ -11,29 +11,29 @@ var __metadata = (this && this.__metadata) || function (k, v) {
 };
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.WatchTime = void 0;
-var class_validator_1 = require("class-validator");
-var typeorm_1 = require("typeorm");
-var WatchTime = exports.WatchTime = /** @class */ (function () {
-    function WatchTime() {
+const class_validator_1 = require("class-validator");
+const typeorm_1 = require("typeorm");
+let WatchTime = class WatchTime {
+    constructor() {
         this.eventId = 0;
         this.secondsWatched = 0;
     }
-    __decorate([
-        (0, class_validator_1.IsInt)(),
-        (0, class_validator_1.IsPositive)(),
-        (0, typeorm_1.PrimaryColumn)(),
-        __metadata("design:type", Number)
-    ], WatchTime.prototype, "eventId", void 0);
-    __decorate([
-        (0, class_validator_1.IsNumber)(),
-        (0, class_validator_1.IsPositive)(),
-        (0, typeorm_1.Column)(),
-        __metadata("design:type", Number)
-    ], WatchTime.prototype, "secondsWatched", void 0);
-    WatchTime = __decorate([
-        (0, typeorm_1.Entity)()
-    ], WatchTime);
-    return WatchTime;
-}());
+};
+__decorate([
+    (0, class_validator_1.IsInt)(),
+    (0, class_validator_1.IsPositive)(),
+    (0, typeorm_1.PrimaryColumn)(),
+    __metadata("design:type", Number)
+], WatchTime.prototype, "eventId", void 0);
+__decorate([
+    (0, class_validator_1.IsNumber)(),
+    (0, class_validator_1.IsPositive)(),
+    (0, typeorm_1.Column)(),
+    __metadata("design:type", Number)
+], WatchTime.prototype, "secondsWatched", void 0);
+WatchTime = __decorate([
+    (0, typeorm_1.Entity)()
+], WatchTime);
+exports.WatchTime = WatchTime;
 exports.default = WatchTime;
 //# sourceMappingURL=watchTime.js.map

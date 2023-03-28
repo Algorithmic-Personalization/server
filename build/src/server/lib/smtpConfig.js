@@ -10,49 +10,48 @@ var __metadata = (this && this.__metadata) || function (k, v) {
 };
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.SmtpConfig = void 0;
-var class_validator_1 = require("class-validator");
-var SmtpAuth = /** @class */ (function () {
-    function SmtpAuth() {
+const class_validator_1 = require("class-validator");
+class SmtpAuth {
+    constructor() {
         this.user = '';
         this.pass = '';
     }
-    __decorate([
-        (0, class_validator_1.IsNotEmpty)(),
-        (0, class_validator_1.IsString)(),
-        __metadata("design:type", Object)
-    ], SmtpAuth.prototype, "user", void 0);
-    __decorate([
-        (0, class_validator_1.IsNotEmpty)(),
-        (0, class_validator_1.IsString)(),
-        __metadata("design:type", Object)
-    ], SmtpAuth.prototype, "pass", void 0);
-    return SmtpAuth;
-}());
-var SmtpConfig = exports.SmtpConfig = /** @class */ (function () {
-    function SmtpConfig() {
+}
+__decorate([
+    (0, class_validator_1.IsNotEmpty)(),
+    (0, class_validator_1.IsString)(),
+    __metadata("design:type", Object)
+], SmtpAuth.prototype, "user", void 0);
+__decorate([
+    (0, class_validator_1.IsNotEmpty)(),
+    (0, class_validator_1.IsString)(),
+    __metadata("design:type", Object)
+], SmtpAuth.prototype, "pass", void 0);
+class SmtpConfig {
+    constructor() {
         this.auth = new SmtpAuth();
         this.host = '';
         this.port = 0;
         this.secure = true;
     }
-    __decorate([
-        (0, class_validator_1.ValidateNested)(),
-        __metadata("design:type", SmtpAuth)
-    ], SmtpConfig.prototype, "auth", void 0);
-    __decorate([
-        (0, class_validator_1.IsNotEmpty)(),
-        (0, class_validator_1.IsString)(),
-        __metadata("design:type", Object)
-    ], SmtpConfig.prototype, "host", void 0);
-    __decorate([
-        (0, class_validator_1.IsPositive)(),
-        __metadata("design:type", Object)
-    ], SmtpConfig.prototype, "port", void 0);
-    __decorate([
-        (0, class_validator_1.IsBoolean)(),
-        __metadata("design:type", Object)
-    ], SmtpConfig.prototype, "secure", void 0);
-    return SmtpConfig;
-}());
+}
+__decorate([
+    (0, class_validator_1.ValidateNested)(),
+    __metadata("design:type", SmtpAuth)
+], SmtpConfig.prototype, "auth", void 0);
+__decorate([
+    (0, class_validator_1.IsNotEmpty)(),
+    (0, class_validator_1.IsString)(),
+    __metadata("design:type", Object)
+], SmtpConfig.prototype, "host", void 0);
+__decorate([
+    (0, class_validator_1.IsPositive)(),
+    __metadata("design:type", Object)
+], SmtpConfig.prototype, "port", void 0);
+__decorate([
+    (0, class_validator_1.IsBoolean)(),
+    __metadata("design:type", Object)
+], SmtpConfig.prototype, "secure", void 0);
+exports.SmtpConfig = SmtpConfig;
 exports.default = SmtpConfig;
 //# sourceMappingURL=smtpConfig.js.map

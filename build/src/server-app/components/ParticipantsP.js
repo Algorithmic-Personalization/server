@@ -31,67 +31,24 @@ var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, ge
         step((generator = generator.apply(thisArg, _arguments || [])).next());
     });
 };
-var __generator = (this && this.__generator) || function (thisArg, body) {
-    var _ = { label: 0, sent: function() { if (t[0] & 1) throw t[1]; return t[1]; }, trys: [], ops: [] }, f, y, t, g;
-    return g = { next: verb(0), "throw": verb(1), "return": verb(2) }, typeof Symbol === "function" && (g[Symbol.iterator] = function() { return this; }), g;
-    function verb(n) { return function (v) { return step([n, v]); }; }
-    function step(op) {
-        if (f) throw new TypeError("Generator is already executing.");
-        while (g && (g = 0, op[0] && (_ = 0)), _) try {
-            if (f = 1, y && (t = op[0] & 2 ? y["return"] : op[0] ? y["throw"] || ((t = y["return"]) && t.call(y), 0) : y.next) && !(t = t.call(y, op[1])).done) return t;
-            if (y = 0, t) op = [op[0] & 2, t.value];
-            switch (op[0]) {
-                case 0: case 1: t = op; break;
-                case 4: _.label++; return { value: op[1], done: false };
-                case 5: _.label++; y = op[1]; op = [0]; continue;
-                case 7: op = _.ops.pop(); _.trys.pop(); continue;
-                default:
-                    if (!(t = _.trys, t = t.length > 0 && t[t.length - 1]) && (op[0] === 6 || op[0] === 2)) { _ = 0; continue; }
-                    if (op[0] === 3 && (!t || (op[1] > t[0] && op[1] < t[3]))) { _.label = op[1]; break; }
-                    if (op[0] === 6 && _.label < t[1]) { _.label = t[1]; t = op; break; }
-                    if (t && _.label < t[2]) { _.label = t[2]; _.ops.push(op); break; }
-                    if (t[2]) _.ops.pop();
-                    _.trys.pop(); continue;
-            }
-            op = body.call(thisArg, _);
-        } catch (e) { op = [6, e]; y = 0; } finally { f = t = 0; }
-        if (op[0] & 5) throw op[1]; return { value: op[0] ? op[1] : void 0, done: true };
-    }
-};
-var __read = (this && this.__read) || function (o, n) {
-    var m = typeof Symbol === "function" && o[Symbol.iterator];
-    if (!m) return o;
-    var i = m.call(o), r, ar = [], e;
-    try {
-        while ((n === void 0 || n-- > 0) && !(r = i.next()).done) ar.push(r.value);
-    }
-    catch (error) { e = { error: error }; }
-    finally {
-        try {
-            if (r && !r.done && (m = i["return"])) m.call(i);
-        }
-        finally { if (e) throw e.error; }
-    }
-    return ar;
-};
 var __importDefault = (this && this.__importDefault) || function (mod) {
     return (mod && mod.__esModule) ? mod : { "default": mod };
 };
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.ParticipantsC = void 0;
-var react_1 = __importStar(require("react"));
-var material_1 = require("@mui/material");
-var FileUpload_1 = __importDefault(require("@mui/icons-material/FileUpload"));
-var Search_1 = __importDefault(require("@mui/icons-material/Search"));
-var react_router_dom_1 = require("react-router-dom");
-var DownloadLinkC_1 = __importDefault(require("./shared/DownloadLinkC"));
-var NotificationsC_1 = __importDefault(require("./shared/NotificationsC"));
-var TableC_1 = __importDefault(require("./shared/TableC"));
-var adminApiProvider_1 = require("../adminApiProvider");
+const react_1 = __importStar(require("react"));
+const material_1 = require("@mui/material");
+const FileUpload_1 = __importDefault(require("@mui/icons-material/FileUpload"));
+const Search_1 = __importDefault(require("@mui/icons-material/Search"));
+const react_router_dom_1 = require("react-router-dom");
+const DownloadLinkC_1 = __importDefault(require("./shared/DownloadLinkC"));
+const NotificationsC_1 = __importDefault(require("./shared/NotificationsC"));
+const TableC_1 = __importDefault(require("./shared/TableC"));
+const adminApiProvider_1 = require("../adminApiProvider");
 // @ts-expect-error this is a text file, not a module
-var participants_sample_csv_1 = __importDefault(require("../../../public/participants.sample.csv"));
-var transitionSetting_1 = require("../../server/models/transitionSetting");
-var tableDescriptor = {
+const participants_sample_csv_1 = __importDefault(require("../../../public/participants.sample.csv"));
+const transitionSetting_1 = require("../../server/models/transitionSetting");
+const tableDescriptor = {
     headers: [
         {
             key: 'code',
@@ -106,66 +63,57 @@ var tableDescriptor = {
             element: 'Experiment Phase',
         },
     ],
-    rows: function (p) { return ({
+    rows: p => ({
         key: p.code,
         elements: [
             // eslint-disable-next-line react/jsx-key
-            react_1.default.createElement(react_router_dom_1.Link, { to: "/participants/".concat(p.code) }, p.code),
+            react_1.default.createElement(react_router_dom_1.Link, { to: `/participants/${p.code}` }, p.code),
             p.arm,
             p.phase,
         ],
-    }); },
+    }),
 };
-var TableC = (0, TableC_1.default)(tableDescriptor);
-var UploadFormC = function () {
-    var exampleString = participants_sample_csv_1.default;
-    var _a = __read((0, react_1.useState)(), 2), message = _a[0], setMessage = _a[1];
-    var form = (0, react_1.useRef)(null);
-    var api = (0, adminApiProvider_1.useAdminApi)();
-    var onFileChange = function (e) {
+const TableC = (0, TableC_1.default)(tableDescriptor);
+const UploadFormC = () => {
+    const exampleString = participants_sample_csv_1.default;
+    const [message, setMessage] = (0, react_1.useState)();
+    const form = (0, react_1.useRef)(null);
+    const api = (0, adminApiProvider_1.useAdminApi)();
+    const onFileChange = (e) => {
         var _a, _b;
-        var file = (_b = (_a = e.target) === null || _a === void 0 ? void 0 : _a.files) === null || _b === void 0 ? void 0 : _b[0];
+        const file = (_b = (_a = e.target) === null || _a === void 0 ? void 0 : _a.files) === null || _b === void 0 ? void 0 : _b[0];
         if (!file) {
             return;
         }
-        (function () { return __awaiter(void 0, void 0, void 0, function () {
-            var res;
-            return __generator(this, function (_a) {
-                switch (_a.label) {
-                    case 0:
-                        setMessage({
-                            text: 'Uploading participants file...',
-                        });
-                        return [4 /*yield*/, api.uploadParticipants(file)];
-                    case 1:
-                        res = _a.sent();
-                        if (res.kind === 'Success') {
-                            setMessage({
-                                text: res.value,
-                                severity: 'success',
-                            });
-                        }
-                        else {
-                            setMessage({
-                                text: res.message,
-                                severity: 'error',
-                            });
-                        }
-                        if (form.current) {
-                            form.current.reset();
-                        }
-                        return [2 /*return*/];
-                }
+        (() => __awaiter(void 0, void 0, void 0, function* () {
+            setMessage({
+                text: 'Uploading participants file...',
             });
-        }); })();
+            const res = yield api.uploadParticipants(file);
+            if (res.kind === 'Success') {
+                setMessage({
+                    text: res.value,
+                    severity: 'success',
+                });
+            }
+            else {
+                setMessage({
+                    text: res.message,
+                    severity: 'error',
+                });
+            }
+            if (form.current) {
+                form.current.reset();
+            }
+        }))();
     };
-    var example = (react_1.default.createElement(material_1.Box, { sx: { mb: 4 } },
+    const example = (react_1.default.createElement(material_1.Box, { sx: { mb: 4 } },
         react_1.default.createElement(material_1.Typography, null,
             react_1.default.createElement("strong", null, "Example file:"),
             "\u00A0",
             react_1.default.createElement(DownloadLinkC_1.default, { href: '/participants.sample.csv' }, "(download)")),
         react_1.default.createElement("pre", { style: { marginTop: 0, maxWidth: '100%', overflow: 'auto' } }, exampleString)));
-    var ui = (react_1.default.createElement(material_1.Box, { component: 'section', sx: { mb: 4 } },
+    const ui = (react_1.default.createElement(material_1.Box, { component: 'section', sx: { mb: 4 } },
         react_1.default.createElement(material_1.Typography, { variant: 'h2', sx: { mb: 2 } }, "Add Participants"),
         react_1.default.createElement(material_1.Typography, { variant: 'body1', component: 'div', sx: { mb: 2 } },
             "You can add participants to the experiment by uploading a CSV file, it should have at least the following 2 columns:",
@@ -186,43 +134,35 @@ var UploadFormC = function () {
             react_1.default.createElement(NotificationsC_1.default, { message: message }))));
     return ui;
 };
-var ListC = function () {
+const ListC = () => {
     var _a;
-    var _b = __read((0, react_1.useState)(), 2), participants = _b[0], setParticipants = _b[1];
-    var _c = __read((0, react_1.useState)('1'), 2), pageInput = _c[0], setPageInput = _c[1];
-    var pTmp = Math.min(Math.max(parseInt(pageInput, 10), 0), (_a = participants === null || participants === void 0 ? void 0 : participants.pageCount) !== null && _a !== void 0 ? _a : 1);
-    var pageInputOk = Number.isInteger(pTmp);
-    var page = pageInputOk ? pTmp : 1;
-    var _d = __read((0, react_1.useState)(), 2), message = _d[0], setMessage = _d[1];
-    var _e = __read((0, react_1.useState)(''), 2), codeLike = _e[0], setCodeLike = _e[1];
-    var _f = __read((0, react_1.useState)(-1), 2), phase = _f[0], setPhase = _f[1];
-    var api = (0, adminApiProvider_1.useAdminApi)();
-    (0, react_1.useEffect)(function () {
-        (function () { return __awaiter(void 0, void 0, void 0, function () {
-            var res;
-            return __generator(this, function (_a) {
-                switch (_a.label) {
-                    case 0: return [4 /*yield*/, api.getParticipants(page - 1, codeLike, phase)];
-                    case 1:
-                        res = _a.sent();
-                        if (res.kind === 'Success') {
-                            setParticipants(res.value);
-                        }
-                        else {
-                            setMessage({
-                                text: res.message,
-                                severity: 'error',
-                            });
-                        }
-                        return [2 /*return*/];
-                }
-            });
-        }); })();
+    const [participants, setParticipants] = (0, react_1.useState)();
+    const [pageInput, setPageInput] = (0, react_1.useState)('1');
+    const pTmp = Math.min(Math.max(parseInt(pageInput, 10), 0), (_a = participants === null || participants === void 0 ? void 0 : participants.pageCount) !== null && _a !== void 0 ? _a : 1);
+    const pageInputOk = Number.isInteger(pTmp);
+    const page = pageInputOk ? pTmp : 1;
+    const [message, setMessage] = (0, react_1.useState)();
+    const [codeLike, setCodeLike] = (0, react_1.useState)('');
+    const [phase, setPhase] = (0, react_1.useState)(-1);
+    const api = (0, adminApiProvider_1.useAdminApi)();
+    (0, react_1.useEffect)(() => {
+        (() => __awaiter(void 0, void 0, void 0, function* () {
+            const res = yield api.getParticipants(page - 1, codeLike, phase);
+            if (res.kind === 'Success') {
+                setParticipants(res.value);
+            }
+            else {
+                setMessage({
+                    text: res.message,
+                    severity: 'error',
+                });
+            }
+        }))();
     }, [page, codeLike, phase]);
     if (participants === undefined) {
         return react_1.default.createElement(material_1.Typography, null, "Loading...");
     }
-    var list = (react_1.default.createElement(material_1.Box, null,
+    const list = (react_1.default.createElement(material_1.Box, null,
         react_1.default.createElement(material_1.Box, { sx: {
                 mb: 2,
                 display: 'flex',
@@ -231,7 +171,7 @@ var ListC = function () {
                 width: 'max-content',
                 gap: 1,
             } },
-            react_1.default.createElement(material_1.TextField, { value: codeLike, onChange: function (e) {
+            react_1.default.createElement(material_1.TextField, { value: codeLike, onChange: e => {
                     setCodeLike(e.target.value);
                     setPageInput('1');
                 }, sx: { display: 'block' }, label: 'Search participant by email', InputProps: {
@@ -240,7 +180,7 @@ var ListC = function () {
                 } }),
             react_1.default.createElement(material_1.FormControl, null,
                 react_1.default.createElement(material_1.InputLabel, { id: 'participant-phase-search' }, "Filter by phase"),
-                react_1.default.createElement(material_1.Select, { labelId: 'participant-phase-search', label: 'Filter by phase', onChange: function (e) {
+                react_1.default.createElement(material_1.Select, { labelId: 'participant-phase-search', label: 'Filter by phase', onChange: e => {
                         setPhase(e.target.value);
                         setPageInput('1');
                     }, value: phase },
@@ -250,7 +190,7 @@ var ListC = function () {
                     react_1.default.createElement(material_1.MenuItem, { value: transitionSetting_1.Phase.POST_EXPERIMENT }, "Post-Experiment"))),
             react_1.default.createElement(material_1.Box, { sx: { display: 'flex', alignItems: 'center' } },
                 react_1.default.createElement(material_1.Typography, { variant: 'body2' }, "Page\u00A0"),
-                react_1.default.createElement("input", { type: 'number', value: pageInputOk ? page : pageInput, min: 1, max: participants.pageCount, step: 1, onChange: function (e) {
+                react_1.default.createElement("input", { type: 'number', value: pageInputOk ? page : pageInput, min: 1, max: participants.pageCount, step: 1, onChange: e => {
                         setPageInput(e.target.value);
                     } }),
                 react_1.default.createElement(material_1.Typography, { variant: 'body2' }, "\u00A0/\u00A0"),
@@ -261,10 +201,10 @@ var ListC = function () {
         react_1.default.createElement(NotificationsC_1.default, { message: message }),
         list));
 };
-var ParticipantsC = function () { return (react_1.default.createElement("div", null,
+const ParticipantsC = () => (react_1.default.createElement("div", null,
     react_1.default.createElement(material_1.Typography, { variant: 'h1', sx: { mb: 4 } }, "Participants"),
     react_1.default.createElement(ListC, null),
-    react_1.default.createElement(UploadFormC, null))); };
+    react_1.default.createElement(UploadFormC, null)));
 exports.ParticipantsC = ParticipantsC;
 exports.default = exports.ParticipantsC;
 //# sourceMappingURL=ParticipantsP.js.map

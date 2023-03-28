@@ -1,15 +1,4 @@
 "use strict";
-var __assign = (this && this.__assign) || function () {
-    __assign = Object.assign || function(t) {
-        for (var s, i = 1, n = arguments.length; i < n; i++) {
-            s = arguments[i];
-            for (var p in s) if (Object.prototype.hasOwnProperty.call(s, p))
-                t[p] = s[p];
-        }
-        return t;
-    };
-    return __assign.apply(this, arguments);
-};
 var __createBinding = (this && this.__createBinding) || (Object.create ? (function(o, m, k, k2) {
     if (k2 === undefined) k2 = k;
     var desc = Object.getOwnPropertyDescriptor(m, k);
@@ -33,48 +22,12 @@ var __importStar = (this && this.__importStar) || function (mod) {
     __setModuleDefault(result, mod);
     return result;
 };
-var __read = (this && this.__read) || function (o, n) {
-    var m = typeof Symbol === "function" && o[Symbol.iterator];
-    if (!m) return o;
-    var i = m.call(o), r, ar = [], e;
-    try {
-        while ((n === void 0 || n-- > 0) && !(r = i.next()).done) ar.push(r.value);
-    }
-    catch (error) { e = { error: error }; }
-    finally {
-        try {
-            if (r && !r.done && (m = i["return"])) m.call(i);
-        }
-        finally { if (e) throw e.error; }
-    }
-    return ar;
-};
-var __spreadArray = (this && this.__spreadArray) || function (to, from, pack) {
-    if (pack || arguments.length === 2) for (var i = 0, l = from.length, ar; i < l; i++) {
-        if (ar || !(i in from)) {
-            if (!ar) ar = Array.prototype.slice.call(from, 0, i);
-            ar[i] = from[i];
-        }
-    }
-    return to.concat(ar || Array.prototype.slice.call(from));
-};
-var __values = (this && this.__values) || function(o) {
-    var s = typeof Symbol === "function" && Symbol.iterator, m = s && o[s], i = 0;
-    if (m) return m.call(o);
-    if (o && typeof o.length === "number") return {
-        next: function () {
-            if (o && i >= o.length) o = void 0;
-            return { value: o && o[i++], done: !o };
-        }
-    };
-    throw new TypeError(s ? "Object is not iterable." : "Symbol.iterator is not defined.");
-};
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.NotificationsC = exports.FadeC = void 0;
-var react_1 = __importStar(require("react"));
-var material_1 = require("@mui/material");
-var defaultSeverity = 'info';
-var getColor = function (severity) {
+const react_1 = __importStar(require("react"));
+const material_1 = require("@mui/material");
+const defaultSeverity = 'info';
+const getColor = (severity) => {
     switch (severity) {
         case 'error':
             return 'error.main';
@@ -88,78 +41,66 @@ var getColor = function (severity) {
             return 'info.main';
     }
 };
-var displayDuration = function (_severity) { return 10000; };
-var FadeC = function (_a) {
-    var displayForMs = _a.displayForMs, children = _a.children, permanent = _a.permanent;
-    var _b = __read((0, react_1.useState)(true), 2), show = _b[0], setShow = _b[1];
-    var timeout = 1000;
-    (0, react_1.useEffect)(function () {
+const displayDuration = (_severity) => 10000;
+const FadeC = ({ displayForMs, children, permanent }) => {
+    const [show, setShow] = (0, react_1.useState)(true);
+    const timeout = 1000;
+    (0, react_1.useEffect)(() => {
         if (permanent) {
             return;
         }
-        setTimeout(function () {
+        setTimeout(() => {
             setShow(false);
         }, displayForMs - timeout);
     }, [children]);
     return react_1.default.createElement(material_1.Fade, { in: show, timeout: timeout }, children);
 };
 exports.FadeC = FadeC;
-var NotificationsC = function (_a) {
-    var message = _a.message;
-    var _b = __read((0, react_1.useState)([]), 2), messages = _b[0], setMessages = _b[1];
-    var _c = __read((0, react_1.useState)(0), 2), maxId = _c[0], setMaxId = _c[1];
-    var _d = __read((0, react_1.useState)([]), 2), toKill = _d[0], setToKill = _d[1];
-    var getId = function () {
-        var id = maxId + 1;
+const NotificationsC = ({ message }) => {
+    const [messages, setMessages] = (0, react_1.useState)([]);
+    const [maxId, setMaxId] = (0, react_1.useState)(0);
+    const [toKill, setToKill] = (0, react_1.useState)([]);
+    const getId = () => {
+        const id = maxId + 1;
         setMaxId(id);
         return id;
     };
-    (0, react_1.useEffect)(function () {
-        var e_1, _a;
-        var _b;
+    (0, react_1.useEffect)(() => {
+        var _a;
         if (!message) {
             return;
         }
-        var newMessages = __spreadArray([], __read(messages), false);
-        var severity = (_b = message.severity) !== null && _b !== void 0 ? _b : defaultSeverity;
-        var base = {
-            severity: severity,
+        const newMessages = [...messages];
+        const severity = (_a = message.severity) !== null && _a !== void 0 ? _a : defaultSeverity;
+        const base = {
+            severity,
             displayForMs: displayDuration(severity),
             permanent: message.permanent,
         };
-        var newIds = [];
+        const newIds = [];
         if (typeof message.text === 'string') {
-            var id = getId();
-            newMessages.push(__assign(__assign({}, base), { text: message.text, id: id }));
+            const id = getId();
+            newMessages.push(Object.assign(Object.assign({}, base), { text: message.text, id }));
             newIds.push(id);
         }
         else {
-            try {
-                for (var _c = __values(message.text), _d = _c.next(); !_d.done; _d = _c.next()) {
-                    var text = _d.value;
-                    var id = getId();
-                    newMessages.push(__assign(__assign({}, base), { text: text, id: id }));
-                    newIds.push(id);
-                }
-            }
-            catch (e_1_1) { e_1 = { error: e_1_1 }; }
-            finally {
-                try {
-                    if (_d && !_d.done && (_a = _c.return)) _a.call(_c);
-                }
-                finally { if (e_1) throw e_1.error; }
+            for (const text of message.text) {
+                const id = getId();
+                newMessages.push(Object.assign(Object.assign({}, base), { text,
+                    id }));
+                newIds.push(id);
             }
         }
         setMessages(newMessages);
-        setTimeout(function () {
-            setToKill(__spreadArray(__spreadArray([], __read(toKill), false), __read(newIds), false));
+        setTimeout(() => {
+            setToKill([...toKill, ...newIds]);
         }, base.displayForMs);
     }, [message]);
-    (0, react_1.useEffect)(function () {
+    (0, react_1.useEffect)(() => {
         if (toKill.length === 0) {
             return;
         }
-        setMessages(messages.filter(function (m) { return !toKill.includes(m.id); }));
+        setMessages(messages.filter(m => !toKill.includes(m.id)));
         setToKill([]);
     }, [toKill]);
     if (messages.length === 0) {
@@ -171,13 +112,13 @@ var NotificationsC = function (_a) {
             alignItems: 'stretch',
             gap: 1,
             my: 2,
-        } }, messages.map(function (m) { return (react_1.default.createElement(exports.FadeC, { key: m.id, displayForMs: m.displayForMs, permanent: m.permanent },
+        } }, messages.map(m => (react_1.default.createElement(exports.FadeC, { key: m.id, displayForMs: m.displayForMs, permanent: m.permanent },
         react_1.default.createElement(material_1.Typography, { variant: 'body2', color: getColor(m.severity), sx: {
                 border: 1,
                 borderColor: getColor(m.severity),
                 borderRadius: 1,
                 p: 2,
-            } }, m.text))); })));
+            } }, m.text))))));
 };
 exports.NotificationsC = NotificationsC;
 exports.default = exports.NotificationsC;

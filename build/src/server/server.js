@@ -1,15 +1,4 @@
 "use strict";
-var __assign = (this && this.__assign) || function () {
-    __assign = Object.assign || function(t) {
-        for (var s, i = 1, n = arguments.length; i < n; i++) {
-            s = arguments[i];
-            for (var p in s) if (Object.prototype.hasOwnProperty.call(s, p))
-                t[p] = s[p];
-        }
-        return t;
-    };
-    return __assign.apply(this, arguments);
-};
 var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, generator) {
     function adopt(value) { return value instanceof P ? value : new P(function (resolve) { resolve(value); }); }
     return new (P || (P = Promise))(function (resolve, reject) {
@@ -19,131 +8,80 @@ var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, ge
         step((generator = generator.apply(thisArg, _arguments || [])).next());
     });
 };
-var __generator = (this && this.__generator) || function (thisArg, body) {
-    var _ = { label: 0, sent: function() { if (t[0] & 1) throw t[1]; return t[1]; }, trys: [], ops: [] }, f, y, t, g;
-    return g = { next: verb(0), "throw": verb(1), "return": verb(2) }, typeof Symbol === "function" && (g[Symbol.iterator] = function() { return this; }), g;
-    function verb(n) { return function (v) { return step([n, v]); }; }
-    function step(op) {
-        if (f) throw new TypeError("Generator is already executing.");
-        while (g && (g = 0, op[0] && (_ = 0)), _) try {
-            if (f = 1, y && (t = op[0] & 2 ? y["return"] : op[0] ? y["throw"] || ((t = y["return"]) && t.call(y), 0) : y.next) && !(t = t.call(y, op[1])).done) return t;
-            if (y = 0, t) op = [op[0] & 2, t.value];
-            switch (op[0]) {
-                case 0: case 1: t = op; break;
-                case 4: _.label++; return { value: op[1], done: false };
-                case 5: _.label++; y = op[1]; op = [0]; continue;
-                case 7: op = _.ops.pop(); _.trys.pop(); continue;
-                default:
-                    if (!(t = _.trys, t = t.length > 0 && t[t.length - 1]) && (op[0] === 6 || op[0] === 2)) { _ = 0; continue; }
-                    if (op[0] === 3 && (!t || (op[1] > t[0] && op[1] < t[3]))) { _.label = op[1]; break; }
-                    if (op[0] === 6 && _.label < t[1]) { _.label = t[1]; t = op; break; }
-                    if (t && _.label < t[2]) { _.label = t[2]; _.ops.push(op); break; }
-                    if (t[2]) _.ops.pop();
-                    _.trys.pop(); continue;
-            }
-            op = body.call(thisArg, _);
-        } catch (e) { op = [6, e]; y = 0; } finally { f = t = 0; }
-        if (op[0] & 5) throw op[1]; return { value: op[0] ? op[1] : void 0, done: true };
-    }
-};
-var __read = (this && this.__read) || function (o, n) {
-    var m = typeof Symbol === "function" && o[Symbol.iterator];
-    if (!m) return o;
-    var i = m.call(o), r, ar = [], e;
-    try {
-        while ((n === void 0 || n-- > 0) && !(r = i.next()).done) ar.push(r.value);
-    }
-    catch (error) { e = { error: error }; }
-    finally {
-        try {
-            if (r && !r.done && (m = i["return"])) m.call(i);
-        }
-        finally { if (e) throw e.error; }
-    }
-    return ar;
-};
-var __spreadArray = (this && this.__spreadArray) || function (to, from, pack) {
-    if (pack || arguments.length === 2) for (var i = 0, l = from.length, ar; i < l; i++) {
-        if (ar || !(i in from)) {
-            if (!ar) ar = Array.prototype.slice.call(from, 0, i);
-            ar[i] = from[i];
-        }
-    }
-    return to.concat(ar || Array.prototype.slice.call(from));
-};
 var __importDefault = (this && this.__importDefault) || function (mod) {
     return (mod && mod.__esModule) ? mod : { "default": mod };
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-var promises_1 = require("fs/promises");
-var fs_1 = require("fs");
-var path_1 = require("path");
-var express_1 = __importDefault(require("express"));
-var body_parser_1 = __importDefault(require("body-parser"));
-var webpack_1 = __importDefault(require("webpack"));
-var webpack_dev_middleware_1 = __importDefault(require("webpack-dev-middleware"));
-var webpack_hot_middleware_1 = __importDefault(require("webpack-hot-middleware"));
-var cors_1 = __importDefault(require("cors"));
-var multer_1 = __importDefault(require("multer"));
-var pg_1 = require("pg");
-var typeorm_1 = require("typeorm");
-var typeorm_naming_strategies_1 = require("typeorm-naming-strategies");
-var postgres_migrations_1 = require("postgres-migrations");
-var yaml_1 = require("yaml");
-var class_validator_1 = require("class-validator");
-var nodemailer_1 = __importDefault(require("nodemailer"));
-var express_status_monitor_1 = __importDefault(require("express-status-monitor"));
-var io_1 = __importDefault(require("@pm2/io"));
-var util_1 = require("../common/util");
-var admin_1 = __importDefault(require("../common/models/admin"));
-var token_1 = __importDefault(require("./models/token"));
-var participant_1 = __importDefault(require("./models/participant"));
-var experimentConfig_1 = __importDefault(require("../common/models/experimentConfig"));
-var session_1 = __importDefault(require("../common/models/session"));
-var event_1 = __importDefault(require("../common/models/event"));
-var video_1 = __importDefault(require("./models/video"));
-var watchTime_1 = __importDefault(require("./models/watchTime"));
-var videoListItem_1 = __importDefault(require("./models/videoListItem"));
-var dailyActivityTime_1 = __importDefault(require("./models/dailyActivityTime"));
-var transitionEvent_1 = __importDefault(require("./models/transitionEvent"));
-var transitionSetting_1 = __importDefault(require("./models/transitionSetting"));
-var smtpConfig_1 = __importDefault(require("./lib/smtpConfig"));
-var webpack_config_1 = __importDefault(require("../../webpack.config"));
-var routeCreation_1 = require("./lib/routeCreation");
-var logger_1 = require("./lib/logger");
-var crypto_1 = require("./lib/crypto");
-var authMiddleware_1 = __importDefault(require("./lib/authMiddleware"));
-var participantMiddleware_1 = __importDefault(require("./lib/participantMiddleware"));
-var updateCounters_1 = __importDefault(require("./lib/updateCounters"));
-var clientRoutes_1 = require("../common/clientRoutes");
-var serverRoutes_1 = require("./serverRoutes");
-var register_1 = __importDefault(require("./api/register"));
-var verifyEmail_1 = __importDefault(require("./api/verifyEmail"));
-var login_1 = __importDefault(require("./api/login"));
-var createApiToken_1 = __importDefault(require("./api/createApiToken"));
-var deleteApiToken_1 = __importDefault(require("./api/deleteApiToken"));
-var getApiTokens_1 = __importDefault(require("./api/getApiTokens"));
-var authTest_1 = __importDefault(require("./api/authTest"));
-var uploadParticipants_1 = __importDefault(require("./api/uploadParticipants"));
-var getParticipants_1 = __importDefault(require("./api/getParticipants"));
-var getParticipantOverview_1 = __importDefault(require("./api/getParticipantOverview"));
-var getEventOverviews_1 = __importDefault(require("./api/getEventOverviews"));
-var getExperimentConfig_1 = __importDefault(require("./api/getExperimentConfig"));
-var postExperimentConfig_1 = __importDefault(require("./api/postExperimentConfig"));
-var getExperimentConfigHistory_1 = __importDefault(require("./api/getExperimentConfigHistory"));
-var checkParticipantCode_1 = __importDefault(require("./api/checkParticipantCode"));
-var createSession_1 = __importDefault(require("./api/createSession"));
-var participantConfig_1 = __importDefault(require("./api/participantConfig"));
-var postEvent_1 = __importDefault(require("./api/postEvent"));
-var getEvents_1 = __importDefault(require("./api/getEvents"));
-var createParticipant_1 = __importDefault(require("./api-2/createParticipant"));
-var updateParticipant_1 = __importDefault(require("./api-2/updateParticipant"));
-var getActivityReport_1 = __importDefault(require("./api-2/getActivityReport"));
-var createTransitionSetting_1 = __importDefault(require("./api-2/createTransitionSetting"));
-var getTransitionSetting_1 = __importDefault(require("./api-2/getTransitionSetting"));
+const promises_1 = require("fs/promises");
+const fs_1 = require("fs");
+const path_1 = require("path");
+const express_1 = __importDefault(require("express"));
+const body_parser_1 = __importDefault(require("body-parser"));
+const webpack_1 = __importDefault(require("webpack"));
+const webpack_dev_middleware_1 = __importDefault(require("webpack-dev-middleware"));
+const webpack_hot_middleware_1 = __importDefault(require("webpack-hot-middleware"));
+const cors_1 = __importDefault(require("cors"));
+const multer_1 = __importDefault(require("multer"));
+const pg_1 = require("pg");
+const typeorm_1 = require("typeorm");
+const typeorm_naming_strategies_1 = require("typeorm-naming-strategies");
+const postgres_migrations_1 = require("postgres-migrations");
+const yaml_1 = require("yaml");
+const class_validator_1 = require("class-validator");
+const nodemailer_1 = __importDefault(require("nodemailer"));
+const express_status_monitor_1 = __importDefault(require("express-status-monitor"));
+const io_1 = __importDefault(require("@pm2/io"));
+const util_1 = require("../common/util");
+const admin_1 = __importDefault(require("../common/models/admin"));
+const token_1 = __importDefault(require("./models/token"));
+const participant_1 = __importDefault(require("./models/participant"));
+const experimentConfig_1 = __importDefault(require("../common/models/experimentConfig"));
+const session_1 = __importDefault(require("../common/models/session"));
+const event_1 = __importDefault(require("../common/models/event"));
+const video_1 = __importDefault(require("./models/video"));
+const watchTime_1 = __importDefault(require("./models/watchTime"));
+const videoListItem_1 = __importDefault(require("./models/videoListItem"));
+const dailyActivityTime_1 = __importDefault(require("./models/dailyActivityTime"));
+const transitionEvent_1 = __importDefault(require("./models/transitionEvent"));
+const transitionSetting_1 = __importDefault(require("./models/transitionSetting"));
+const smtpConfig_1 = __importDefault(require("./lib/smtpConfig"));
+const webpack_config_1 = __importDefault(require("../../webpack.config"));
+const routeCreation_1 = require("./lib/routeCreation");
+const logger_1 = require("./lib/logger");
+const crypto_1 = require("./lib/crypto");
+const authMiddleware_1 = __importDefault(require("./lib/authMiddleware"));
+const participantMiddleware_1 = __importDefault(require("./lib/participantMiddleware"));
+const updateCounters_1 = __importDefault(require("./lib/updateCounters"));
+const databaseLogger_1 = __importDefault(require("./lib/databaseLogger"));
+const clientRoutes_1 = require("../common/clientRoutes");
+const serverRoutes_1 = require("./serverRoutes");
+const register_1 = __importDefault(require("./api/register"));
+const verifyEmail_1 = __importDefault(require("./api/verifyEmail"));
+const login_1 = __importDefault(require("./api/login"));
+const createApiToken_1 = __importDefault(require("./api/createApiToken"));
+const deleteApiToken_1 = __importDefault(require("./api/deleteApiToken"));
+const getApiTokens_1 = __importDefault(require("./api/getApiTokens"));
+const authTest_1 = __importDefault(require("./api/authTest"));
+const uploadParticipants_1 = __importDefault(require("./api/uploadParticipants"));
+const getParticipants_1 = __importDefault(require("./api/getParticipants"));
+const getParticipantOverview_1 = __importDefault(require("./api/getParticipantOverview"));
+const getEventOverviews_1 = __importDefault(require("./api/getEventOverviews"));
+const getExperimentConfig_1 = __importDefault(require("./api/getExperimentConfig"));
+const postExperimentConfig_1 = __importDefault(require("./api/postExperimentConfig"));
+const getExperimentConfigHistory_1 = __importDefault(require("./api/getExperimentConfigHistory"));
+const checkParticipantCode_1 = __importDefault(require("./api/checkParticipantCode"));
+const createSession_1 = __importDefault(require("./api/createSession"));
+const participantConfig_1 = __importDefault(require("./api/participantConfig"));
+const postEvent_1 = __importDefault(require("./api/postEvent"));
+const getEvents_1 = __importDefault(require("./api/getEvents"));
+const createParticipant_1 = __importDefault(require("./api-2/createParticipant"));
+const updateParticipant_1 = __importDefault(require("./api-2/updateParticipant"));
+const getActivityReport_1 = __importDefault(require("./api-2/getActivityReport"));
+const createTransitionSetting_1 = __importDefault(require("./api-2/createTransitionSetting"));
+const getTransitionSetting_1 = __importDefault(require("./api-2/getTransitionSetting"));
 // Add classes used by typeorm as models here
 // so that typeorm can extract the metadata from them.
-var entities = [
+const entities = [
     admin_1.default,
     token_1.default,
     participant_1.default,
@@ -157,223 +95,191 @@ var entities = [
     transitionEvent_1.default,
     transitionSetting_1.default,
 ];
-var env = process.env.NODE_ENV;
+const env = process.env.NODE_ENV;
 if (env !== 'production' && env !== 'development') {
     throw new Error('NODE_ENV must be set to "production" or "development"');
 }
-var upload = (0, multer_1.default)();
-var currentRequests = io_1.default.counter({
+const upload = (0, multer_1.default)();
+const currentRequests = io_1.default.counter({
     name: 'Realtime request count',
     id: 'app/realtime/request',
+    historic: true,
 });
-var start = function () { return __awaiter(void 0, void 0, void 0, function () {
-    var root, logsPath, logStream, configJson, config, dockerComposeJson, dockerComposeConfig, smtpConfig, smtpConfigErrors, mailer, portKey, port, dbPortString, _a, dbHostPort, dbDockerPort, dbPort, dbConfigPath, dbHost, dbUser, dbPassword, dbDatabase, dbConfig, pgClient, err_1, migrated, err_2, ds, err_3, createLogger, err_4, privateKey, tokenTools, routeContext, makeHandler, tokenRepo, authMiddleware, participantMw, app, staticRouter, compiler, requestId, defineAdminRoute;
-    return __generator(this, function (_b) {
-        switch (_b.label) {
-            case 0: return [4 /*yield*/, (0, util_1.findPackageJsonDir)(__dirname)];
-            case 1:
-                root = _b.sent();
-                logsPath = (0, path_1.join)(root, 'logs', 'server.log');
-                logStream = (0, fs_1.createWriteStream)(logsPath, { flags: 'a' });
-                console.log('Package root is:', root);
-                return [4 /*yield*/, (0, promises_1.readFile)((0, path_1.join)(root, 'config.yaml'), 'utf-8')];
-            case 2:
-                configJson = _b.sent();
-                config = (0, yaml_1.parse)(configJson);
-                return [4 /*yield*/, (0, promises_1.readFile)((0, path_1.join)(root, 'docker-compose.yaml'), 'utf-8')];
-            case 3:
-                dockerComposeJson = _b.sent();
-                dockerComposeConfig = (0, yaml_1.parse)(dockerComposeJson);
-                if (!config || typeof config !== 'object') {
-                    throw new Error('Invalid config.yml');
-                }
-                if (!(0, util_1.has)('smtp')(config)) {
-                    throw new Error('Missing smtp config in config.yml');
-                }
-                smtpConfig = new smtpConfig_1.default();
-                Object.assign(smtpConfig, config.smtp);
-                return [4 /*yield*/, (0, class_validator_1.validate)(smtpConfig)];
-            case 4:
-                smtpConfigErrors = _b.sent();
-                if (smtpConfigErrors.length > 0) {
-                    console.error('Invalid smtp config in config.yml', smtpConfigErrors);
-                    process.exit(1);
-                }
-                mailer = nodemailer_1.default.createTransport(smtpConfig);
-                console.log('Mailer created:', mailer.transporter.name);
-                if (!dockerComposeConfig || typeof dockerComposeConfig !== 'object') {
-                    throw new Error('Invalid docker-compose.yaml');
-                }
-                portKey = "".concat(env, "-server-port");
-                port = (0, util_1.getInteger)([portKey])(config);
-                dbPortString = (0, util_1.getString)(['services', "".concat(env, "-db"), 'ports', '0'])(dockerComposeConfig);
-                _a = __read(dbPortString.split(':'), 2), dbHostPort = _a[0], dbDockerPort = _a[1];
-                dbPort = env === 'development' ? Number(dbHostPort) : Number(dbDockerPort);
-                if (!dbPort || !Number.isInteger(dbPort)) {
-                    throw new Error("Invalid db port: ".concat(dbPort));
-                }
-                dbConfigPath = ['services', "".concat(env, "-db"), 'environment'];
-                dbHost = env === 'development' ? 'localhost' : "".concat(env, "-db");
-                dbUser = (0, util_1.getString)(__spreadArray(__spreadArray([], __read(dbConfigPath), false), ['POSTGRES_USER'], false))(dockerComposeConfig);
-                dbPassword = (0, util_1.getString)(__spreadArray(__spreadArray([], __read(dbConfigPath), false), ['POSTGRES_PASSWORD'], false))(dockerComposeConfig);
-                dbDatabase = (0, util_1.getString)(__spreadArray(__spreadArray([], __read(dbConfigPath), false), ['POSTGRES_DB'], false))(dockerComposeConfig);
-                dbConfig = {
-                    host: dbHost,
-                    port: dbPort,
-                    user: dbUser,
-                    password: dbPassword,
-                    database: dbDatabase,
-                };
-                pgClient = new pg_1.Client(dbConfig);
-                _b.label = 5;
-            case 5:
-                _b.trys.push([5, 7, , 8]);
-                return [4 /*yield*/, pgClient.connect()];
-            case 6:
-                _b.sent();
-                return [3 /*break*/, 8];
-            case 7:
-                err_1 = _b.sent();
-                console.error('Error connecting to the database with config', dbConfig, ':', err_1, 'is the db server running?');
-                process.exit(1);
-                return [3 /*break*/, 8];
-            case 8:
-                _b.trys.push([8, 10, , 11]);
-                return [4 /*yield*/, (0, postgres_migrations_1.migrate)({ client: pgClient }, (0, path_1.join)(root, 'migrations'))];
-            case 9:
-                migrated = _b.sent();
-                console.log('Successfully ran migrations:', migrated);
-                return [3 /*break*/, 11];
-            case 10:
-                err_2 = _b.sent();
-                console.error('Error running migrations:', err_2);
-                process.exit(1);
-                return [3 /*break*/, 11];
-            case 11: return [4 /*yield*/, pgClient.end()];
-            case 12:
-                _b.sent();
-                ds = new typeorm_1.DataSource(__assign(__assign({ type: 'postgres' }, dbConfig), { username: dbUser, synchronize: false, entities: entities, namingStrategy: new typeorm_naming_strategies_1.SnakeNamingStrategy() }));
-                _b.label = 13;
-            case 13:
-                _b.trys.push([13, 15, , 16]);
-                return [4 /*yield*/, ds.initialize()];
-            case 14:
-                _b.sent();
-                return [3 /*break*/, 16];
-            case 15:
-                err_3 = _b.sent();
-                console.error('Error initializing data source:', err_3);
-                process.exit(1);
-                return [3 /*break*/, 16];
-            case 16:
-                console.log('Successfully initialized data source');
-                createLogger = (0, logger_1.createDefaultLogger)(logStream);
-                _b.label = 17;
-            case 17:
-                _b.trys.push([17, 19, , 20]);
-                return [4 /*yield*/, (0, updateCounters_1.default)({
-                        dataSource: ds,
-                        log: createLogger(0),
-                    })];
-            case 18:
-                _b.sent();
-                return [3 /*break*/, 20];
-            case 19:
-                err_4 = _b.sent();
-                console.error('Error updating activity counters:', err_4);
-                process.exit(1);
-                return [3 /*break*/, 20];
-            case 20: return [4 /*yield*/, (0, promises_1.readFile)((0, path_1.join)(root, 'private.key'), 'utf-8')];
-            case 21:
-                privateKey = _b.sent();
-                tokenTools = (0, crypto_1.createTokenTools)(privateKey);
-                routeContext = {
-                    dataSource: ds,
-                    mailer: mailer,
-                    mailerFrom: smtpConfig.auth.user,
-                    createLogger: createLogger,
-                    tokenTools: tokenTools,
-                };
-                makeHandler = (0, routeCreation_1.makeRouteConnector)(routeContext);
-                tokenRepo = ds.getRepository(token_1.default);
-                authMiddleware = (0, authMiddleware_1.default)({
-                    tokenRepo: tokenRepo,
-                    tokenTools: tokenTools,
-                    createLogger: createLogger,
-                });
-                participantMw = (0, participantMiddleware_1.default)(createLogger);
-                app = (0, express_1.default)();
-                staticRouter = express_1.default.Router();
-                if (env === 'development') {
-                    compiler = (0, webpack_1.default)(webpack_config_1.default);
-                    if (!webpack_config_1.default.output) {
-                        throw new Error('Invalid webpack config, missing output path');
-                    }
-                    staticRouter.use((0, webpack_dev_middleware_1.default)(compiler));
-                    // eslint-disable-next-line @typescript-eslint/no-unsafe-argument
-                    staticRouter.use((0, webpack_hot_middleware_1.default)(compiler));
-                }
-                staticRouter.use(express_1.default.static((0, path_1.join)(root, 'public')));
-                app.use(staticRouter);
-                app.use(body_parser_1.default.json());
-                app.use((0, cors_1.default)());
-                requestId = 0;
-                app.use(function (req, _res, next) {
-                    currentRequests.inc();
-                    req.on('end', function () {
-                        currentRequests.dec();
-                    });
-                    ++requestId;
-                    req.requestId = requestId;
-                    createLogger(req.requestId)(req.method, req.url, req.headers);
-                    next();
-                });
-                defineAdminRoute = function (def) {
-                    app[def.verb](def.path, authMiddleware, makeHandler(def));
-                };
-                app.use((0, express_status_monitor_1.default)({
-                    path: '/status',
-                }));
-                defineAdminRoute(createParticipant_1.default);
-                defineAdminRoute(getActivityReport_1.default);
-                defineAdminRoute(createTransitionSetting_1.default);
-                defineAdminRoute(getTransitionSetting_1.default);
-                defineAdminRoute(updateParticipant_1.default);
-                app.post(serverRoutes_1.postRegister, (0, register_1.default)(routeContext));
-                app.get(serverRoutes_1.getVerifyEmailToken, (0, verifyEmail_1.default)(routeContext));
-                app.post(serverRoutes_1.postLogin, (0, login_1.default)(routeContext));
-                app.get(serverRoutes_1.getApiTokens, authMiddleware, (0, getApiTokens_1.default)(routeContext));
-                app.post(serverRoutes_1.createApiToken, authMiddleware, (0, createApiToken_1.default)(routeContext));
-                app.delete(serverRoutes_1.deleteApiToken, authMiddleware, (0, deleteApiToken_1.default)(routeContext));
-                app.get(serverRoutes_1.getAuthTest, authMiddleware, (0, authTest_1.default)(routeContext));
-                app.post(serverRoutes_1.postUploadParticipants, authMiddleware, upload.single('participants'), (0, uploadParticipants_1.default)(routeContext));
-                app.get("".concat(serverRoutes_1.getParticipants, "/:page?"), authMiddleware, (0, getParticipants_1.default)(routeContext));
-                app.get("".concat(serverRoutes_1.getParticipantOverview, "/:code"), authMiddleware, (0, getParticipantOverview_1.default)(routeContext));
-                app.get("".concat(serverRoutes_1.getEventOverviews, "/:sessionUuid"), authMiddleware, (0, getEventOverviews_1.default)(routeContext));
-                app.get(serverRoutes_1.getExperimentConfig, authMiddleware, (0, getExperimentConfig_1.default)(routeContext));
-                app.post(serverRoutes_1.postExperimentConfig, authMiddleware, (0, postExperimentConfig_1.default)(routeContext));
-                app.get(serverRoutes_1.getExperimentConfigHistory, authMiddleware, (0, getExperimentConfigHistory_1.default)(routeContext));
-                app.get("".concat(serverRoutes_1.getEvents, "/:page?"), authMiddleware, (0, getEvents_1.default)(routeContext));
-                app.post(clientRoutes_1.postCheckParticipantCode, (0, checkParticipantCode_1.default)(routeContext));
-                app.post(clientRoutes_1.postCreateSession, participantMw, (0, createSession_1.default)(routeContext));
-                app.get(clientRoutes_1.getParticipantConfig, participantMw, (0, participantConfig_1.default)(routeContext));
-                app.post(clientRoutes_1.postEvent, participantMw, (0, postEvent_1.default)(routeContext));
-                app.use(function (req, res, next) {
-                    var _a;
-                    if (req.method === 'GET' && ((_a = req.headers.accept) === null || _a === void 0 ? void 0 : _a.startsWith('text/html'))) {
-                        res.sendFile((0, path_1.join)(root, 'public', 'index.html'));
-                        return;
-                    }
-                    next();
-                });
-                app.listen(port, '0.0.0.0', function () {
-                    console.log("Server in \"".concat(env, "\" mode listening on port ").concat(port));
-                });
-                return [2 /*return*/];
-        }
+const slowQueries = io_1.default.meter({
+    name: 'Slow queries',
+    id: 'app/database/slowQueries',
+    historic: true,
+});
+const start = () => __awaiter(void 0, void 0, void 0, function* () {
+    const root = yield (0, util_1.findPackageJsonDir)(__dirname);
+    const logsPath = (0, path_1.join)(root, 'logs', 'server.log');
+    const logStream = (0, fs_1.createWriteStream)(logsPath, { flags: 'a' });
+    console.log('Package root is:', root);
+    const configJson = yield (0, promises_1.readFile)((0, path_1.join)(root, 'config.yaml'), 'utf-8');
+    const config = (0, yaml_1.parse)(configJson);
+    const dockerComposeJson = yield (0, promises_1.readFile)((0, path_1.join)(root, 'docker-compose.yaml'), 'utf-8');
+    const dockerComposeConfig = (0, yaml_1.parse)(dockerComposeJson);
+    if (!config || typeof config !== 'object') {
+        throw new Error('Invalid config.yml');
+    }
+    if (!(0, util_1.has)('smtp')(config)) {
+        throw new Error('Missing smtp config in config.yml');
+    }
+    const smtpConfig = new smtpConfig_1.default();
+    Object.assign(smtpConfig, config.smtp);
+    const smtpConfigErrors = yield (0, class_validator_1.validate)(smtpConfig);
+    if (smtpConfigErrors.length > 0) {
+        console.error('Invalid smtp config in config.yml', smtpConfigErrors);
+        process.exit(1);
+    }
+    const mailer = nodemailer_1.default.createTransport(smtpConfig);
+    console.log('Mailer created:', mailer.transporter.name);
+    if (!dockerComposeConfig || typeof dockerComposeConfig !== 'object') {
+        throw new Error('Invalid docker-compose.yaml');
+    }
+    const portKey = `${env}-server-port`;
+    const port = (0, util_1.getInteger)([portKey])(config);
+    const dbPortString = (0, util_1.getString)(['services', `${env}-db`, 'ports', '0'])(dockerComposeConfig);
+    const [dbHostPort, dbDockerPort] = dbPortString.split(':');
+    const dbPort = env === 'development' ? Number(dbHostPort) : Number(dbDockerPort);
+    if (!dbPort || !Number.isInteger(dbPort)) {
+        throw new Error(`Invalid db port: ${dbPort}`);
+    }
+    const dbConfigPath = ['services', `${env}-db`, 'environment'];
+    const dbHost = env === 'development' ? 'localhost' : `${env}-db`;
+    const dbUser = (0, util_1.getString)([...dbConfigPath, 'POSTGRES_USER'])(dockerComposeConfig);
+    const dbPassword = (0, util_1.getString)([...dbConfigPath, 'POSTGRES_PASSWORD'])(dockerComposeConfig);
+    const dbDatabase = (0, util_1.getString)([...dbConfigPath, 'POSTGRES_DB'])(dockerComposeConfig);
+    const dbConfig = {
+        host: dbHost,
+        port: dbPort,
+        user: dbUser,
+        password: dbPassword,
+        database: dbDatabase,
+    };
+    const pgClient = new pg_1.Client(dbConfig);
+    try {
+        yield pgClient.connect();
+    }
+    catch (err) {
+        console.error('Error connecting to the database with config', dbConfig, ':', err, 'is the db server running?');
+        process.exit(1);
+    }
+    try {
+        const migrated = yield (0, postgres_migrations_1.migrate)({ client: pgClient }, (0, path_1.join)(root, 'migrations'));
+        console.log('Successfully ran migrations:', migrated);
+    }
+    catch (err) {
+        console.error('Error running migrations:', err);
+        process.exit(1);
+    }
+    yield pgClient.end();
+    const createLogger = (0, logger_1.createDefaultLogger)(logStream);
+    const ds = new typeorm_1.DataSource(Object.assign(Object.assign({ type: 'postgres' }, dbConfig), { username: dbUser, synchronize: false, entities, namingStrategy: new typeorm_naming_strategies_1.SnakeNamingStrategy(), logging: true, maxQueryExecutionTime: 200, logger: new databaseLogger_1.default(createLogger('database'), slowQueries) }));
+    try {
+        yield ds.initialize();
+    }
+    catch (err) {
+        console.error('Error initializing data source:', err);
+        process.exit(1);
+    }
+    console.log('Successfully initialized data source');
+    try {
+        yield (0, updateCounters_1.default)({
+            dataSource: ds,
+            log: createLogger(0),
+        });
+    }
+    catch (err) {
+        console.error('Error updating activity counters:', err);
+        process.exit(1);
+    }
+    const privateKey = yield (0, promises_1.readFile)((0, path_1.join)(root, 'private.key'), 'utf-8');
+    const tokenTools = (0, crypto_1.createTokenTools)(privateKey);
+    const routeContext = {
+        dataSource: ds,
+        mailer,
+        mailerFrom: smtpConfig.auth.user,
+        createLogger,
+        tokenTools,
+    };
+    const makeHandler = (0, routeCreation_1.makeRouteConnector)(routeContext);
+    const tokenRepo = ds.getRepository(token_1.default);
+    const authMiddleware = (0, authMiddleware_1.default)({
+        tokenRepo,
+        tokenTools,
+        createLogger,
     });
-}); };
-start().catch(function (err) {
+    const participantMw = (0, participantMiddleware_1.default)(createLogger);
+    const app = (0, express_1.default)();
+    const staticRouter = express_1.default.Router();
+    if (env === 'development') {
+        const compiler = (0, webpack_1.default)(webpack_config_1.default);
+        if (!webpack_config_1.default.output) {
+            throw new Error('Invalid webpack config, missing output path');
+        }
+        staticRouter.use((0, webpack_dev_middleware_1.default)(compiler));
+        // eslint-disable-next-line @typescript-eslint/no-unsafe-argument
+        staticRouter.use((0, webpack_hot_middleware_1.default)(compiler));
+    }
+    staticRouter.use(express_1.default.static((0, path_1.join)(root, 'public')));
+    app.use(staticRouter);
+    app.use(body_parser_1.default.json());
+    app.use((0, cors_1.default)());
+    let requestId = 0;
+    app.use((req, _res, next) => {
+        currentRequests.inc();
+        req.on('end', () => {
+            currentRequests.dec();
+        });
+        ++requestId;
+        req.requestId = requestId;
+        createLogger(req.requestId)(req.method, req.url, req.headers);
+        next();
+    });
+    const defineAdminRoute = (def) => {
+        app[def.verb](def.path, authMiddleware, makeHandler(def));
+    };
+    app.use((0, express_status_monitor_1.default)({
+        path: '/status',
+    }));
+    defineAdminRoute(createParticipant_1.default);
+    defineAdminRoute(getActivityReport_1.default);
+    defineAdminRoute(createTransitionSetting_1.default);
+    defineAdminRoute(getTransitionSetting_1.default);
+    defineAdminRoute(updateParticipant_1.default);
+    app.post(serverRoutes_1.postRegister, (0, register_1.default)(routeContext));
+    app.get(serverRoutes_1.getVerifyEmailToken, (0, verifyEmail_1.default)(routeContext));
+    app.post(serverRoutes_1.postLogin, (0, login_1.default)(routeContext));
+    app.get(serverRoutes_1.getApiTokens, authMiddleware, (0, getApiTokens_1.default)(routeContext));
+    app.post(serverRoutes_1.createApiToken, authMiddleware, (0, createApiToken_1.default)(routeContext));
+    app.delete(serverRoutes_1.deleteApiToken, authMiddleware, (0, deleteApiToken_1.default)(routeContext));
+    app.get(serverRoutes_1.getAuthTest, authMiddleware, (0, authTest_1.default)(routeContext));
+    app.post(serverRoutes_1.postUploadParticipants, authMiddleware, upload.single('participants'), (0, uploadParticipants_1.default)(routeContext));
+    app.get(`${serverRoutes_1.getParticipants}/:page?`, authMiddleware, (0, getParticipants_1.default)(routeContext));
+    app.get(`${serverRoutes_1.getParticipantOverview}/:code`, authMiddleware, (0, getParticipantOverview_1.default)(routeContext));
+    app.get(`${serverRoutes_1.getEventOverviews}/:sessionUuid`, authMiddleware, (0, getEventOverviews_1.default)(routeContext));
+    app.get(serverRoutes_1.getExperimentConfig, authMiddleware, (0, getExperimentConfig_1.default)(routeContext));
+    app.post(serverRoutes_1.postExperimentConfig, authMiddleware, (0, postExperimentConfig_1.default)(routeContext));
+    app.get(serverRoutes_1.getExperimentConfigHistory, authMiddleware, (0, getExperimentConfigHistory_1.default)(routeContext));
+    app.get(`${serverRoutes_1.getEvents}/:page?`, authMiddleware, (0, getEvents_1.default)(routeContext));
+    app.post(clientRoutes_1.postCheckParticipantCode, (0, checkParticipantCode_1.default)(routeContext));
+    app.post(clientRoutes_1.postCreateSession, participantMw, (0, createSession_1.default)(routeContext));
+    app.get(clientRoutes_1.getParticipantConfig, participantMw, (0, participantConfig_1.default)(routeContext));
+    app.post(clientRoutes_1.postEvent, participantMw, (0, postEvent_1.default)(routeContext));
+    app.use((req, res, next) => {
+        var _a;
+        if (req.method === 'GET' && ((_a = req.headers.accept) === null || _a === void 0 ? void 0 : _a.startsWith('text/html'))) {
+            res.sendFile((0, path_1.join)(root, 'public', 'index.html'));
+            return;
+        }
+        next();
+    });
+    app.listen(port, '0.0.0.0', () => {
+        console.log(`Server in "${env}" mode listening on port ${port}`);
+    });
+});
+start().catch(err => {
     console.error(err);
     process.exit(1);
 });

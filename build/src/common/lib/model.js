@@ -10,31 +10,31 @@ var __metadata = (this && this.__metadata) || function (k, v) {
 };
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.Model = void 0;
-var typeorm_1 = require("typeorm");
-var class_validator_1 = require("class-validator");
-var Model = exports.Model = /** @class */ (function () {
-    function Model() {
+const typeorm_1 = require("typeorm");
+const class_validator_1 = require("class-validator");
+class Model {
+    constructor() {
         this.id = 0;
         this.createdAt = new Date();
         this.updatedAt = new Date();
     }
-    __decorate([
-        (0, typeorm_1.PrimaryGeneratedColumn)(),
-        (0, class_validator_1.IsInt)(),
-        (0, class_validator_1.IsPositive)(),
-        __metadata("design:type", Object)
-    ], Model.prototype, "id", void 0);
-    __decorate([
-        (0, typeorm_1.Column)(),
-        (0, class_validator_1.IsDate)(),
-        __metadata("design:type", Date)
-    ], Model.prototype, "createdAt", void 0);
-    __decorate([
-        (0, typeorm_1.Column)(),
-        (0, class_validator_1.IsDate)(),
-        __metadata("design:type", Date)
-    ], Model.prototype, "updatedAt", void 0);
-    return Model;
-}());
+}
+__decorate([
+    (0, typeorm_1.PrimaryGeneratedColumn)(),
+    (0, class_validator_1.IsInt)(),
+    (0, class_validator_1.IsPositive)(),
+    __metadata("design:type", Object)
+], Model.prototype, "id", void 0);
+__decorate([
+    (0, typeorm_1.Column)(),
+    (0, class_validator_1.IsDate)(),
+    __metadata("design:type", Date)
+], Model.prototype, "createdAt", void 0);
+__decorate([
+    (0, typeorm_1.Column)(),
+    (0, class_validator_1.IsDate)(),
+    __metadata("design:type", Date)
+], Model.prototype, "updatedAt", void 0);
+exports.Model = Model;
 exports.default = Model;
 //# sourceMappingURL=model.js.map

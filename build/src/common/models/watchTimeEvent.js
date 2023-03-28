@@ -1,19 +1,4 @@
 "use strict";
-var __extends = (this && this.__extends) || (function () {
-    var extendStatics = function (d, b) {
-        extendStatics = Object.setPrototypeOf ||
-            ({ __proto__: [] } instanceof Array && function (d, b) { d.__proto__ = b; }) ||
-            function (d, b) { for (var p in b) if (Object.prototype.hasOwnProperty.call(b, p)) d[p] = b[p]; };
-        return extendStatics(d, b);
-    };
-    return function (d, b) {
-        if (typeof b !== "function" && b !== null)
-            throw new TypeError("Class extends value " + String(b) + " is not a constructor or null");
-        extendStatics(d, b);
-        function __() { this.constructor = d; }
-        d.prototype = b === null ? Object.create(b) : (__.prototype = b.prototype, new __());
-    };
-})();
 var __createBinding = (this && this.__createBinding) || (Object.create ? (function(o, m, k, k2) {
     if (k2 === undefined) k2 = k;
     var desc = Object.getOwnPropertyDescriptor(m, k);
@@ -39,17 +24,14 @@ var __importStar = (this && this.__importStar) || function (mod) {
 };
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.WatchTimeEvent = void 0;
-var event_1 = __importStar(require("./event"));
-var WatchTimeEvent = /** @class */ (function (_super) {
-    __extends(WatchTimeEvent, _super);
-    function WatchTimeEvent(secondsWatched) {
-        var _this = _super.call(this) || this;
-        _this.secondsWatched = secondsWatched;
-        _this.type = event_1.EventType.WATCH_TIME;
-        return _this;
+const event_1 = __importStar(require("./event"));
+class WatchTimeEvent extends event_1.default {
+    constructor(secondsWatched) {
+        super();
+        this.secondsWatched = secondsWatched;
+        this.type = event_1.EventType.WATCH_TIME;
     }
-    return WatchTimeEvent;
-}(event_1.default));
+}
 exports.WatchTimeEvent = WatchTimeEvent;
 exports.default = WatchTimeEvent;
 //# sourceMappingURL=watchTimeEvent.js.map

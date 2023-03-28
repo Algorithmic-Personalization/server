@@ -1,20 +1,5 @@
 "use strict";
 /* eslint-disable @typescript-eslint/no-inferrable-types */
-var __extends = (this && this.__extends) || (function () {
-    var extendStatics = function (d, b) {
-        extendStatics = Object.setPrototypeOf ||
-            ({ __proto__: [] } instanceof Array && function (d, b) { d.__proto__ = b; }) ||
-            function (d, b) { for (var p in b) if (Object.prototype.hasOwnProperty.call(b, p)) d[p] = b[p]; };
-        return extendStatics(d, b);
-    };
-    return function (d, b) {
-        if (typeof b !== "function" && b !== null)
-            throw new TypeError("Class extends value " + String(b) + " is not a constructor or null");
-        extendStatics(d, b);
-        function __() { this.constructor = d; }
-        d.prototype = b === null ? Object.create(b) : (__.prototype = b.prototype, new __());
-    };
-})();
 var __decorate = (this && this.__decorate) || function (decorators, target, key, desc) {
     var c = arguments.length, r = c < 3 ? target : desc === null ? desc = Object.getOwnPropertyDescriptor(target, key) : desc, d;
     if (typeof Reflect === "object" && typeof Reflect.decorate === "function") r = Reflect.decorate(decorators, target, key, desc);
@@ -29,49 +14,47 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
 };
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.Token = void 0;
-var typeorm_1 = require("typeorm");
-var class_validator_1 = require("class-validator");
-var model_1 = __importDefault(require("../../common/lib/model"));
-var Token = exports.Token = /** @class */ (function (_super) {
-    __extends(Token, _super);
-    function Token() {
-        var _this = _super !== null && _super.apply(this, arguments) || this;
-        _this.token = '';
-        _this.adminId = 0;
-        _this.wasInvalidated = false;
-        _this.api = false;
-        return _this;
+const typeorm_1 = require("typeorm");
+const class_validator_1 = require("class-validator");
+const model_1 = __importDefault(require("../../common/lib/model"));
+let Token = class Token extends model_1.default {
+    constructor() {
+        super(...arguments);
+        this.token = '';
+        this.adminId = 0;
+        this.wasInvalidated = false;
+        this.api = false;
     }
-    __decorate([
-        (0, class_validator_1.IsNotEmpty)(),
-        (0, typeorm_1.Column)(),
-        (0, class_validator_1.IsString)(),
-        __metadata("design:type", String)
-    ], Token.prototype, "token", void 0);
-    __decorate([
-        (0, typeorm_1.Column)(),
-        (0, class_validator_1.IsInt)(),
-        (0, class_validator_1.IsPositive)(),
-        __metadata("design:type", Number)
-    ], Token.prototype, "adminId", void 0);
-    __decorate([
-        (0, typeorm_1.Column)(),
-        (0, class_validator_1.IsBoolean)(),
-        __metadata("design:type", Boolean)
-    ], Token.prototype, "wasInvalidated", void 0);
-    __decorate([
-        (0, typeorm_1.Column)(),
-        __metadata("design:type", String)
-    ], Token.prototype, "name", void 0);
-    __decorate([
-        (0, typeorm_1.Column)(),
-        (0, class_validator_1.IsBoolean)(),
-        __metadata("design:type", Boolean)
-    ], Token.prototype, "api", void 0);
-    Token = __decorate([
-        (0, typeorm_1.Entity)()
-    ], Token);
-    return Token;
-}(model_1.default));
+};
+__decorate([
+    (0, class_validator_1.IsNotEmpty)(),
+    (0, typeorm_1.Column)(),
+    (0, class_validator_1.IsString)(),
+    __metadata("design:type", String)
+], Token.prototype, "token", void 0);
+__decorate([
+    (0, typeorm_1.Column)(),
+    (0, class_validator_1.IsInt)(),
+    (0, class_validator_1.IsPositive)(),
+    __metadata("design:type", Number)
+], Token.prototype, "adminId", void 0);
+__decorate([
+    (0, typeorm_1.Column)(),
+    (0, class_validator_1.IsBoolean)(),
+    __metadata("design:type", Boolean)
+], Token.prototype, "wasInvalidated", void 0);
+__decorate([
+    (0, typeorm_1.Column)(),
+    __metadata("design:type", String)
+], Token.prototype, "name", void 0);
+__decorate([
+    (0, typeorm_1.Column)(),
+    (0, class_validator_1.IsBoolean)(),
+    __metadata("design:type", Boolean)
+], Token.prototype, "api", void 0);
+Token = __decorate([
+    (0, typeorm_1.Entity)()
+], Token);
+exports.Token = Token;
 exports.default = Token;
 //# sourceMappingURL=token.js.map

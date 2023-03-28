@@ -1,15 +1,4 @@
 "use strict";
-var __assign = (this && this.__assign) || function () {
-    __assign = Object.assign || function(t) {
-        for (var s, i = 1, n = arguments.length; i < n; i++) {
-            s = arguments[i];
-            for (var p in s) if (Object.prototype.hasOwnProperty.call(s, p))
-                t[p] = s[p];
-        }
-        return t;
-    };
-    return __assign.apply(this, arguments);
-};
 var __createBinding = (this && this.__createBinding) || (Object.create ? (function(o, m, k, k2) {
     if (k2 === undefined) k2 = k;
     var desc = Object.getOwnPropertyDescriptor(m, k);
@@ -33,41 +22,25 @@ var __importStar = (this && this.__importStar) || function (mod) {
     __setModuleDefault(result, mod);
     return result;
 };
-var __read = (this && this.__read) || function (o, n) {
-    var m = typeof Symbol === "function" && o[Symbol.iterator];
-    if (!m) return o;
-    var i = m.call(o), r, ar = [], e;
-    try {
-        while ((n === void 0 || n-- > 0) && !(r = i.next()).done) ar.push(r.value);
-    }
-    catch (error) { e = { error: error }; }
-    finally {
-        try {
-            if (r && !r.done && (m = i["return"])) m.call(i);
-        }
-        finally { if (e) throw e.error; }
-    }
-    return ar;
-};
 var __importDefault = (this && this.__importDefault) || function (mod) {
     return (mod && mod.__esModule) ? mod : { "default": mod };
 };
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.Server = void 0;
-var react_1 = __importStar(require("react"));
-var react_router_dom_1 = require("react-router-dom");
-var RequireAuthC_1 = __importDefault(require("./components/shared/RequireAuthC"));
-var LoginP_1 = __importDefault(require("./components/LoginP"));
-var RegisterP_1 = __importDefault(require("./components/RegisterP"));
-var LayoutP_1 = __importDefault(require("./components/LayoutP"));
-var Server = function () {
-    var _a = __read((0, react_1.useState)(''), 2), email = _a[0], setEmail = _a[1];
-    var _b = __read((0, react_1.useState)(''), 2), password = _b[0], setPassword = _b[1];
+const react_1 = __importStar(require("react"));
+const react_router_dom_1 = require("react-router-dom");
+const RequireAuthC_1 = __importDefault(require("./components/shared/RequireAuthC"));
+const LoginP_1 = __importDefault(require("./components/LoginP"));
+const RegisterP_1 = __importDefault(require("./components/RegisterP"));
+const LayoutP_1 = __importDefault(require("./components/LayoutP"));
+const Server = () => {
+    const [email, setEmail] = (0, react_1.useState)('');
+    const [password, setPassword] = (0, react_1.useState)('');
     return (react_1.default.createElement(react_router_dom_1.Routes, null,
         react_1.default.createElement(react_router_dom_1.Route, { path: '*', element: react_1.default.createElement(RequireAuthC_1.default, null,
                 react_1.default.createElement(LayoutP_1.default, null)) }),
-        react_1.default.createElement(react_router_dom_1.Route, { path: '/login', element: react_1.default.createElement(LoginP_1.default, __assign({}, { email: email, setEmail: setEmail, password: password, setPassword: setPassword })) }),
-        react_1.default.createElement(react_router_dom_1.Route, { path: '/register', element: react_1.default.createElement(RegisterP_1.default, __assign({}, { email: email, setEmail: setEmail, password: password, setPassword: setPassword })) })));
+        react_1.default.createElement(react_router_dom_1.Route, { path: '/login', element: react_1.default.createElement(LoginP_1.default, Object.assign({}, { email, setEmail, password, setPassword })) }),
+        react_1.default.createElement(react_router_dom_1.Route, { path: '/register', element: react_1.default.createElement(RegisterP_1.default, Object.assign({}, { email, setEmail, password, setPassword })) })));
 };
 exports.Server = Server;
 exports.default = exports.Server;

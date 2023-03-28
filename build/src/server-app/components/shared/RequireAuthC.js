@@ -4,13 +4,12 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
 };
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.RequireAuthC = void 0;
-var react_1 = __importDefault(require("react"));
-var react_router_dom_1 = require("react-router-dom");
-var adminApiProvider_1 = require("../../adminApiProvider");
-var RequireAuthC = function (_a) {
-    var children = _a.children;
-    var api = (0, adminApiProvider_1.useAdminApi)();
-    var location = (0, react_router_dom_1.useLocation)();
+const react_1 = __importDefault(require("react"));
+const react_router_dom_1 = require("react-router-dom");
+const adminApiProvider_1 = require("../../adminApiProvider");
+const RequireAuthC = ({ children }) => {
+    const api = (0, adminApiProvider_1.useAdminApi)();
+    const location = (0, react_router_dom_1.useLocation)();
     if (!api.isLoggedIn()) {
         console.log('not logged in, redirecting to /login');
         console.log('should redirect to', location, 'after login');

@@ -1,39 +1,10 @@
 "use strict";
-var __read = (this && this.__read) || function (o, n) {
-    var m = typeof Symbol === "function" && o[Symbol.iterator];
-    if (!m) return o;
-    var i = m.call(o), r, ar = [], e;
-    try {
-        while ((n === void 0 || n-- > 0) && !(r = i.next()).done) ar.push(r.value);
-    }
-    catch (error) { e = { error: error }; }
-    finally {
-        try {
-            if (r && !r.done && (m = i["return"])) m.call(i);
-        }
-        finally { if (e) throw e.error; }
-    }
-    return ar;
-};
-var __spreadArray = (this && this.__spreadArray) || function (to, from, pack) {
-    if (pack || arguments.length === 2) for (var i = 0, l = from.length, ar; i < l; i++) {
-        if (ar || !(i in from)) {
-            if (!ar) ar = Array.prototype.slice.call(from, 0, i);
-            ar[i] = from[i];
-        }
-    }
-    return to.concat(ar || Array.prototype.slice.call(from));
-};
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.createDefaultLogger = void 0;
-var util_1 = require("util");
-var createDefaultLogger = function (f) { return function (requestId) {
-    return function () {
-        var args = [];
-        for (var _i = 0; _i < arguments.length; _i++) {
-            args[_i] = arguments[_i];
-        }
-        var parts = __spreadArray(["\u001B[94m[request #".concat(requestId, " at ").concat(new Date().toISOString(), "]\u001B[0m")], __read(args.map(function (arg, i) {
+const util_1 = require("util");
+const createDefaultLogger = (f) => (requestIdOrId) => (...args) => {
+    const id = typeof requestIdOrId === 'number' ? `request #${requestIdOrId}` : requestIdOrId;
+    const parts = [`\x1b[94m[${id} at ${new Date().toISOString()}]\x1b[0m`, ...args.map((arg, i) => {
             if (typeof arg === 'string' && i === 0) {
                 return arg.toLowerCase();
             }
@@ -41,11 +12,10 @@ var createDefaultLogger = function (f) { return function (requestId) {
                 return arg;
             }
             return (0, util_1.inspect)(arg, { depth: null, colors: true });
-        })), false);
-        console.log.apply(console, __spreadArray([], __read(parts), false));
-        f.write("".concat(parts.join(' '), "\n"));
-    };
-}; };
+        })];
+    console.log(...parts);
+    f.write(`${parts.join(' ')}\n`);
+};
 exports.createDefaultLogger = createDefaultLogger;
 exports.default = exports.createDefaultLogger;
 //# sourceMappingURL=logger.js.map

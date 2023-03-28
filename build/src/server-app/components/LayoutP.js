@@ -22,40 +22,24 @@ var __importStar = (this && this.__importStar) || function (mod) {
     __setModuleDefault(result, mod);
     return result;
 };
-var __read = (this && this.__read) || function (o, n) {
-    var m = typeof Symbol === "function" && o[Symbol.iterator];
-    if (!m) return o;
-    var i = m.call(o), r, ar = [], e;
-    try {
-        while ((n === void 0 || n-- > 0) && !(r = i.next()).done) ar.push(r.value);
-    }
-    catch (error) { e = { error: error }; }
-    finally {
-        try {
-            if (r && !r.done && (m = i["return"])) m.call(i);
-        }
-        finally { if (e) throw e.error; }
-    }
-    return ar;
-};
 var __importDefault = (this && this.__importDefault) || function (mod) {
     return (mod && mod.__esModule) ? mod : { "default": mod };
 };
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.LayoutC = void 0;
-var react_1 = __importStar(require("react"));
-var material_1 = require("@mui/material");
-var Menu_1 = __importDefault(require("@mui/icons-material/Menu"));
-var react_router_dom_1 = require("react-router-dom");
-var HomeP_1 = __importDefault(require("./HomeP"));
-var ParticipantsP_1 = __importDefault(require("./ParticipantsP"));
-var ParticipantOverviewP_1 = __importDefault(require("./ParticipantOverviewP"));
-var ExperimentConfigP_1 = __importDefault(require("./ExperimentConfigP"));
-var EventsP_1 = __importDefault(require("./EventsP"));
-var ApiTokenCreationP_1 = __importDefault(require("./ApiTokenCreationP"));
-var NotFoundP_1 = __importDefault(require("./NotFoundP"));
-var UserWidgetC_1 = __importDefault(require("./shared/UserWidgetC"));
-var navItems = [
+const react_1 = __importStar(require("react"));
+const material_1 = require("@mui/material");
+const Menu_1 = __importDefault(require("@mui/icons-material/Menu"));
+const react_router_dom_1 = require("react-router-dom");
+const HomeP_1 = __importDefault(require("./HomeP"));
+const ParticipantsP_1 = __importDefault(require("./ParticipantsP"));
+const ParticipantOverviewP_1 = __importDefault(require("./ParticipantOverviewP"));
+const ExperimentConfigP_1 = __importDefault(require("./ExperimentConfigP"));
+const EventsP_1 = __importDefault(require("./EventsP"));
+const ApiTokenCreationP_1 = __importDefault(require("./ApiTokenCreationP"));
+const NotFoundP_1 = __importDefault(require("./NotFoundP"));
+const UserWidgetC_1 = __importDefault(require("./shared/UserWidgetC"));
+const navItems = [
     {
         label: 'Home',
         link: '/',
@@ -82,22 +66,22 @@ var navItems = [
         component: ApiTokenCreationP_1.default,
     },
 ];
-var LayoutC = function () {
-    var _a = __read((0, react_1.useState)(false), 2), drawerOpen = _a[0], setDrawerOpen = _a[1];
-    var navigate = (0, react_router_dom_1.useNavigate)();
-    var handleDrawerToggle = function () {
+const LayoutC = () => {
+    const [drawerOpen, setDrawerOpen] = (0, react_1.useState)(false);
+    const navigate = (0, react_router_dom_1.useNavigate)();
+    const handleDrawerToggle = () => {
         setDrawerOpen(!drawerOpen);
     };
-    var drawerWidth = 240;
-    var drawer = (react_1.default.createElement(material_1.Box, { onClick: handleDrawerToggle, sx: { textAlign: 'center' } },
+    const drawerWidth = 240;
+    const drawer = (react_1.default.createElement(material_1.Box, { onClick: handleDrawerToggle, sx: { textAlign: 'center' } },
         react_1.default.createElement(material_1.Typography, { variant: 'h6', sx: { my: 2 } }, "YTDPNL"),
         react_1.default.createElement(material_1.Divider, null),
-        react_1.default.createElement(material_1.List, null, navItems.map(function (item) { return (react_1.default.createElement(material_1.ListItem, { key: item.link, disablePadding: true },
-            react_1.default.createElement(material_1.ListItemButton, { sx: { textAlign: 'center' }, onClick: function () {
+        react_1.default.createElement(material_1.List, null, navItems.map(item => (react_1.default.createElement(material_1.ListItem, { key: item.link, disablePadding: true },
+            react_1.default.createElement(material_1.ListItemButton, { sx: { textAlign: 'center' }, onClick: () => {
                     navigate(item.link);
                     setDrawerOpen(false);
                 } },
-                react_1.default.createElement(material_1.ListItemText, { primary: item.label })))); }))));
+                react_1.default.createElement(material_1.ListItemText, { primary: item.label }))))))));
     return (react_1.default.createElement(material_1.Box, { sx: { display: 'flex' } },
         react_1.default.createElement(material_1.CssBaseline, null),
         react_1.default.createElement(material_1.AppBar, { component: 'nav' },
@@ -109,9 +93,9 @@ var LayoutC = function () {
                         display: { xs: 'none', sm: 'block' },
                     } }, "YTDPNL"),
                 react_1.default.createElement(material_1.Box, { sx: { display: { xs: 'none', sm: 'block' } } },
-                    navItems.map(function (item) { return (react_1.default.createElement(material_1.Button, { onClick: function () {
+                    navItems.map(item => (react_1.default.createElement(material_1.Button, { onClick: () => {
                             navigate(item.link);
-                        }, key: item.link, sx: { color: 'primary.contrastText' } }, item.label)); }),
+                        }, key: item.link, sx: { color: 'primary.contrastText' } }, item.label))),
                     react_1.default.createElement(material_1.Box, { sx: {
                             display: 'inline-block',
                             ml: 2,
@@ -127,7 +111,7 @@ var LayoutC = function () {
                 } }, drawer)),
         react_1.default.createElement(material_1.Box, { component: 'main', sx: { p: 3, mt: 6, width: '100%' } },
             react_1.default.createElement(react_router_dom_1.Routes, null,
-                navItems.map(function (item) { return (react_1.default.createElement(react_router_dom_1.Route, { element: react_1.default.createElement(item.component, null), key: item.link, path: item.link })); }),
+                navItems.map(item => (react_1.default.createElement(react_router_dom_1.Route, { element: react_1.default.createElement(item.component, null), key: item.link, path: item.link }))),
                 react_1.default.createElement(react_router_dom_1.Route, { element: react_1.default.createElement(ParticipantOverviewP_1.default, null), path: '/participants/:code' }),
                 react_1.default.createElement(react_router_dom_1.Route, { element: react_1.default.createElement(NotFoundP_1.default, null), path: '*' })))));
 };

@@ -22,35 +22,18 @@ var __importStar = (this && this.__importStar) || function (mod) {
     __setModuleDefault(result, mod);
     return result;
 };
-var __read = (this && this.__read) || function (o, n) {
-    var m = typeof Symbol === "function" && o[Symbol.iterator];
-    if (!m) return o;
-    var i = m.call(o), r, ar = [], e;
-    try {
-        while ((n === void 0 || n-- > 0) && !(r = i.next()).done) ar.push(r.value);
-    }
-    catch (error) { e = { error: error }; }
-    finally {
-        try {
-            if (r && !r.done && (m = i["return"])) m.call(i);
-        }
-        finally { if (e) throw e.error; }
-    }
-    return ar;
-};
 var __importDefault = (this && this.__importDefault) || function (mod) {
     return (mod && mod.__esModule) ? mod : { "default": mod };
 };
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.RedirectMessageC = void 0;
-var react_1 = __importStar(require("react"));
-var NotificationsC_1 = __importDefault(require("./NotificationsC"));
-var RedirectMessageC = function (_a) {
-    var ignore = _a.ignore;
-    var _b = __read((0, react_1.useState)(), 2), message = _b[0], setMessage = _b[1];
-    (0, react_1.useEffect)(function () {
-        var params = new URLSearchParams(window.location.search);
-        var message = params.get('message');
+const react_1 = __importStar(require("react"));
+const NotificationsC_1 = __importDefault(require("./NotificationsC"));
+const RedirectMessageC = ({ ignore }) => {
+    const [message, setMessage] = (0, react_1.useState)();
+    (0, react_1.useEffect)(() => {
+        const params = new URLSearchParams(window.location.search);
+        const message = params.get('message');
         if (message) {
             setMessage({
                 text: message,

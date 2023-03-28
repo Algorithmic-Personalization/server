@@ -1,20 +1,5 @@
 "use strict";
 /* eslint-disable @typescript-eslint/no-inferrable-types */
-var __extends = (this && this.__extends) || (function () {
-    var extendStatics = function (d, b) {
-        extendStatics = Object.setPrototypeOf ||
-            ({ __proto__: [] } instanceof Array && function (d, b) { d.__proto__ = b; }) ||
-            function (d, b) { for (var p in b) if (Object.prototype.hasOwnProperty.call(b, p)) d[p] = b[p]; };
-        return extendStatics(d, b);
-    };
-    return function (d, b) {
-        if (typeof b !== "function" && b !== null)
-            throw new TypeError("Class extends value " + String(b) + " is not a constructor or null");
-        extendStatics(d, b);
-        function __() { this.constructor = d; }
-        d.prototype = b === null ? Object.create(b) : (__.prototype = b.prototype, new __());
-    };
-})();
 var __decorate = (this && this.__decorate) || function (decorators, target, key, desc) {
     var c = arguments.length, r = c < 3 ? target : desc === null ? desc = Object.getOwnPropertyDescriptor(target, key) : desc, d;
     if (typeof Reflect === "object" && typeof Reflect.decorate === "function") r = Reflect.decorate(decorators, target, key, desc);
@@ -29,9 +14,9 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
 };
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.TransitionSetting = exports.OperatorType = exports.Phase = void 0;
-var typeorm_1 = require("typeorm");
-var class_validator_1 = require("class-validator");
-var model_1 = __importDefault(require("../../common/lib/model"));
+const typeorm_1 = require("typeorm");
+const class_validator_1 = require("class-validator");
+const model_1 = __importDefault(require("../../common/lib/model"));
 var Phase;
 (function (Phase) {
     Phase[Phase["PRE_EXPERIMENT"] = 0] = "PRE_EXPERIMENT";
@@ -43,85 +28,83 @@ var OperatorType;
     OperatorType["ANY"] = "ANY";
     OperatorType["ALL"] = "ALL";
 })(OperatorType = exports.OperatorType || (exports.OperatorType = {}));
-var TransitionSetting = exports.TransitionSetting = /** @class */ (function (_super) {
-    __extends(TransitionSetting, _super);
-    function TransitionSetting() {
-        var _this = _super !== null && _super.apply(this, arguments) || this;
-        _this.fromPhase = 0;
-        _this.toPhase = 0;
-        _this.isCurrent = true;
-        _this.operator = OperatorType.ANY;
-        _this.minPagesViewed = 0;
-        _this.minVideoPagesViewed = 0;
-        _this.minVideoTimeViewedSeconds = 0;
-        _this.minTimeSpentOnYoutubeSeconds = 0;
-        _this.minSidebarRecommendationsClicked = 0;
-        _this.minDays = 0;
-        return _this;
+let TransitionSetting = class TransitionSetting extends model_1.default {
+    constructor() {
+        super(...arguments);
+        this.fromPhase = 0;
+        this.toPhase = 0;
+        this.isCurrent = true;
+        this.operator = OperatorType.ANY;
+        this.minPagesViewed = 0;
+        this.minVideoPagesViewed = 0;
+        this.minVideoTimeViewedSeconds = 0;
+        this.minTimeSpentOnYoutubeSeconds = 0;
+        this.minSidebarRecommendationsClicked = 0;
+        this.minDays = 0;
     }
-    __decorate([
-        (0, typeorm_1.Column)(),
-        (0, class_validator_1.IsInt)(),
-        (0, class_validator_1.Min)(0),
-        (0, class_validator_1.Max)(2),
-        __metadata("design:type", Number)
-    ], TransitionSetting.prototype, "fromPhase", void 0);
-    __decorate([
-        (0, typeorm_1.Column)(),
-        (0, class_validator_1.IsInt)(),
-        (0, class_validator_1.Min)(0),
-        (0, class_validator_1.Max)(2),
-        __metadata("design:type", Number)
-    ], TransitionSetting.prototype, "toPhase", void 0);
-    __decorate([
-        (0, typeorm_1.Column)(),
-        (0, class_validator_1.IsBoolean)(),
-        __metadata("design:type", Boolean)
-    ], TransitionSetting.prototype, "isCurrent", void 0);
-    __decorate([
-        (0, typeorm_1.Column)(),
-        __metadata("design:type", String)
-    ], TransitionSetting.prototype, "operator", void 0);
-    __decorate([
-        (0, typeorm_1.Column)(),
-        (0, class_validator_1.IsInt)(),
-        (0, class_validator_1.Min)(0),
-        __metadata("design:type", Number)
-    ], TransitionSetting.prototype, "minPagesViewed", void 0);
-    __decorate([
-        (0, typeorm_1.Column)(),
-        (0, class_validator_1.IsInt)(),
-        (0, class_validator_1.Min)(0),
-        __metadata("design:type", Number)
-    ], TransitionSetting.prototype, "minVideoPagesViewed", void 0);
-    __decorate([
-        (0, typeorm_1.Column)(),
-        (0, class_validator_1.IsNumber)(),
-        (0, class_validator_1.Min)(0),
-        __metadata("design:type", Number)
-    ], TransitionSetting.prototype, "minVideoTimeViewedSeconds", void 0);
-    __decorate([
-        (0, typeorm_1.Column)(),
-        (0, class_validator_1.IsNumber)(),
-        (0, class_validator_1.Min)(0),
-        __metadata("design:type", Number)
-    ], TransitionSetting.prototype, "minTimeSpentOnYoutubeSeconds", void 0);
-    __decorate([
-        (0, typeorm_1.Column)(),
-        (0, class_validator_1.IsInt)(),
-        (0, class_validator_1.Min)(0),
-        __metadata("design:type", Number)
-    ], TransitionSetting.prototype, "minSidebarRecommendationsClicked", void 0);
-    __decorate([
-        (0, typeorm_1.Column)(),
-        (0, class_validator_1.IsInt)(),
-        (0, class_validator_1.Min)(0),
-        __metadata("design:type", Number)
-    ], TransitionSetting.prototype, "minDays", void 0);
-    TransitionSetting = __decorate([
-        (0, typeorm_1.Entity)()
-    ], TransitionSetting);
-    return TransitionSetting;
-}(model_1.default));
+};
+__decorate([
+    (0, typeorm_1.Column)(),
+    (0, class_validator_1.IsInt)(),
+    (0, class_validator_1.Min)(0),
+    (0, class_validator_1.Max)(2),
+    __metadata("design:type", Number)
+], TransitionSetting.prototype, "fromPhase", void 0);
+__decorate([
+    (0, typeorm_1.Column)(),
+    (0, class_validator_1.IsInt)(),
+    (0, class_validator_1.Min)(0),
+    (0, class_validator_1.Max)(2),
+    __metadata("design:type", Number)
+], TransitionSetting.prototype, "toPhase", void 0);
+__decorate([
+    (0, typeorm_1.Column)(),
+    (0, class_validator_1.IsBoolean)(),
+    __metadata("design:type", Boolean)
+], TransitionSetting.prototype, "isCurrent", void 0);
+__decorate([
+    (0, typeorm_1.Column)(),
+    __metadata("design:type", String)
+], TransitionSetting.prototype, "operator", void 0);
+__decorate([
+    (0, typeorm_1.Column)(),
+    (0, class_validator_1.IsInt)(),
+    (0, class_validator_1.Min)(0),
+    __metadata("design:type", Number)
+], TransitionSetting.prototype, "minPagesViewed", void 0);
+__decorate([
+    (0, typeorm_1.Column)(),
+    (0, class_validator_1.IsInt)(),
+    (0, class_validator_1.Min)(0),
+    __metadata("design:type", Number)
+], TransitionSetting.prototype, "minVideoPagesViewed", void 0);
+__decorate([
+    (0, typeorm_1.Column)(),
+    (0, class_validator_1.IsNumber)(),
+    (0, class_validator_1.Min)(0),
+    __metadata("design:type", Number)
+], TransitionSetting.prototype, "minVideoTimeViewedSeconds", void 0);
+__decorate([
+    (0, typeorm_1.Column)(),
+    (0, class_validator_1.IsNumber)(),
+    (0, class_validator_1.Min)(0),
+    __metadata("design:type", Number)
+], TransitionSetting.prototype, "minTimeSpentOnYoutubeSeconds", void 0);
+__decorate([
+    (0, typeorm_1.Column)(),
+    (0, class_validator_1.IsInt)(),
+    (0, class_validator_1.Min)(0),
+    __metadata("design:type", Number)
+], TransitionSetting.prototype, "minSidebarRecommendationsClicked", void 0);
+__decorate([
+    (0, typeorm_1.Column)(),
+    (0, class_validator_1.IsInt)(),
+    (0, class_validator_1.Min)(0),
+    __metadata("design:type", Number)
+], TransitionSetting.prototype, "minDays", void 0);
+TransitionSetting = __decorate([
+    (0, typeorm_1.Entity)()
+], TransitionSetting);
+exports.TransitionSetting = TransitionSetting;
 exports.default = TransitionSetting;
 //# sourceMappingURL=transitionSetting.js.map
