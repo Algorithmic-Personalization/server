@@ -1,5 +1,5 @@
 import React, {useState} from 'react';
-import {useLocation, useNavigate} from 'react-router-dom';
+import {type To, useLocation, useNavigate} from 'react-router-dom';
 import {Box, Modal, Typography} from '@mui/material';
 
 import LoginC from './LoginP';
@@ -33,7 +33,7 @@ export const LoginModalC: React.FC<{
 
 						if (location.state.from) {
 							console.log('redirecting to', location.state.from);
-							navigate(location.state.from);
+							navigate(location.state.from as To);
 						} else {
 							console.log('redirecting to /');
 							navigate('/');

@@ -278,6 +278,7 @@ const start = async () => {
 		}
 
 		staticRouter.use(webpackDevMiddleware(compiler));
+		// eslint-disable-next-line @typescript-eslint/no-unsafe-argument
 		staticRouter.use(webpackHotMiddleware(compiler as any));
 	}
 
