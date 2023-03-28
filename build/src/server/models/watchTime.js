@@ -9,11 +9,11 @@ var __decorate = (this && this.__decorate) || function (decorators, target, key,
 var __metadata = (this && this.__metadata) || function (k, v) {
     if (typeof Reflect === "object" && typeof Reflect.metadata === "function") return Reflect.metadata(k, v);
 };
-exports.__esModule = true;
+Object.defineProperty(exports, "__esModule", { value: true });
 exports.WatchTime = void 0;
 var class_validator_1 = require("class-validator");
 var typeorm_1 = require("typeorm");
-var WatchTime = /** @class */ (function () {
+var WatchTime = exports.WatchTime = /** @class */ (function () {
     function WatchTime() {
         this.eventId = 0;
         this.secondsWatched = 0;
@@ -23,18 +23,17 @@ var WatchTime = /** @class */ (function () {
         (0, class_validator_1.IsPositive)(),
         (0, typeorm_1.PrimaryColumn)(),
         __metadata("design:type", Number)
-    ], WatchTime.prototype, "eventId");
+    ], WatchTime.prototype, "eventId", void 0);
     __decorate([
         (0, class_validator_1.IsNumber)(),
         (0, class_validator_1.IsPositive)(),
         (0, typeorm_1.Column)(),
         __metadata("design:type", Number)
-    ], WatchTime.prototype, "secondsWatched");
+    ], WatchTime.prototype, "secondsWatched", void 0);
     WatchTime = __decorate([
         (0, typeorm_1.Entity)()
     ], WatchTime);
     return WatchTime;
 }());
-exports.WatchTime = WatchTime;
-exports["default"] = WatchTime;
+exports.default = WatchTime;
 //# sourceMappingURL=watchTime.js.map

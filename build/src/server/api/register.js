@@ -38,7 +38,7 @@ var __generator = (this && this.__generator) || function (thisArg, body) {
 var __importDefault = (this && this.__importDefault) || function (mod) {
     return (mod && mod.__esModule) ? mod : { "default": mod };
 };
-exports.__esModule = true;
+Object.defineProperty(exports, "__esModule", { value: true });
 exports.createRegisterRoute = void 0;
 var admin_1 = __importDefault(require("../../common/models/admin"));
 var util_1 = require("../../common/util");
@@ -47,12 +47,12 @@ var crypto_1 = require("../lib/crypto");
 var adminsWhitelist_1 = __importDefault(require("../../../adminsWhitelist"));
 var config_extension_1 = __importDefault(require("../../../config.extension"));
 var env = process.env.NODE_ENV === 'production' ? 'production' : 'development';
-if (!(0, util_1.has)("".concat(env, "-server-url"))(config_extension_1["default"])) {
+if (!(0, util_1.has)("".concat(env, "-server-url"))(config_extension_1.default)) {
     throw new Error("Missing ".concat(env, "-server-url in config"));
 }
 console.log('NODE_ENV:', process.env.NODE_ENV);
-console.log('API URL:', config_extension_1["default"]["".concat(env, "-server-url")]);
-var serverUrl = config_extension_1["default"]["".concat(env, "-server-url")];
+console.log('API URL:', config_extension_1.default["".concat(env, "-server-url")]);
+var serverUrl = config_extension_1.default["".concat(env, "-server-url")];
 var createRegisterRoute = function (_a) {
     var dataSource = _a.dataSource, mailer = _a.mailer, mailerFrom = _a.mailerFrom, createLogger = _a.createLogger;
     return function (req, res) { return __awaiter(void 0, void 0, void 0, function () {
@@ -61,7 +61,7 @@ var createRegisterRoute = function (_a) {
             switch (_b.label) {
                 case 0:
                     log = createLogger(req.requestId);
-                    admin = new admin_1["default"]();
+                    admin = new admin_1.default();
                     Object.assign(admin, req.body);
                     admin.createdAt = new Date();
                     admin.updatedAt = new Date();
@@ -76,27 +76,27 @@ var createRegisterRoute = function (_a) {
                     if (errors.length > 0) {
                         err = {
                             kind: 'Failure',
-                            message: "Invalid entity received from client: ".concat(errors.join(', '))
+                            message: "Invalid entity received from client: ".concat(errors.join(', ')),
                         };
                         res.status(400).json(err);
                         return [2 /*return*/];
                     }
-                    if (!adminsWhitelist_1["default"].has(admin.email)) {
+                    if (!adminsWhitelist_1.default.has(admin.email)) {
                         err = {
                             kind: 'Failure',
-                            message: 'Email not whitelisted'
+                            message: 'Email not whitelisted',
                         };
                         res.status(403).json(err);
                         return [2 /*return*/];
                     }
-                    repo = dataSource.getRepository(admin_1["default"]);
+                    repo = dataSource.getRepository(admin_1.default);
                     return [4 /*yield*/, repo.findOneBy({ email: admin.email })];
                 case 3:
                     existing = _b.sent();
                     if (existing) {
                         res.status(400).json({
                             kind: 'Failure',
-                            message: 'Email already registered'
+                            message: 'Email already registered',
                         });
                         return [2 /*return*/];
                     }
@@ -113,7 +113,7 @@ var createRegisterRoute = function (_a) {
                     e_1 = _b.sent();
                     res.status(500).json({
                         kind: 'Failure',
-                        message: (0, util_1.getMessage)(e_1, 'Unknown database error')
+                        message: (0, util_1.getMessage)(e_1, 'Unknown database error'),
                     });
                     return [2 /*return*/];
                 case 7:
@@ -126,21 +126,21 @@ var createRegisterRoute = function (_a) {
                             to: admin.email,
                             subject: 'Please verify your email address for YTDNPL admin',
                             text: "Please past the following link in your browser to verify your email address: ".concat(link),
-                            html: "Please click <a href=\"".concat(link, "\">here</a> to verify your email address.")
+                            html: "Please click <a href=\"".concat(link, "\">here</a> to verify your email address."),
                         })];
                 case 9:
                     mailInfo = _b.sent();
                     log('E-mail sent:', mailInfo);
                     res.status(200).json({
                         kind: 'Success',
-                        value: 'Admin registered, please validate your account by clicking the link in the email you should receive shortly. Please check your spam folder if you don\'t see it in your inbox.'
+                        value: 'Admin registered, please validate your account by clicking the link in the email you should receive shortly. Please check your spam folder if you don\'t see it in your inbox.',
                     });
                     return [3 /*break*/, 11];
                 case 10:
                     e_2 = _b.sent();
                     res.status(500).json({
                         kind: 'Failure',
-                        message: (0, util_1.getMessage)(e_2, 'Unknown mailer error')
+                        message: (0, util_1.getMessage)(e_2, 'Unknown mailer error'),
                     });
                     return [3 /*break*/, 11];
                 case 11: return [2 /*return*/];
@@ -149,5 +149,5 @@ var createRegisterRoute = function (_a) {
     }); };
 };
 exports.createRegisterRoute = createRegisterRoute;
-exports["default"] = exports.createRegisterRoute;
+exports.default = exports.createRegisterRoute;
 //# sourceMappingURL=register.js.map

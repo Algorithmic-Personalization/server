@@ -77,7 +77,7 @@ var __read = (this && this.__read) || function (o, n) {
 var __importDefault = (this && this.__importDefault) || function (mod) {
     return (mod && mod.__esModule) ? mod : { "default": mod };
 };
-exports.__esModule = true;
+Object.defineProperty(exports, "__esModule", { value: true });
 exports.ParticipantPageC = void 0;
 var react_1 = __importStar(require("react"));
 var react_router_1 = require("react-router");
@@ -108,43 +108,43 @@ var RecommendationsListC = function (_a) {
         }
         return 'm: ';
     };
-    return (react_1["default"].createElement("ul", { style: { listStyle: 'none' } }, data.map(function (item) { return (react_1["default"].createElement("li", { key: item.id },
-        react_1["default"].createElement(util_1.UrlC, { url: item.url, prefix: getDetails(item) }))); })));
+    return (react_1.default.createElement("ul", { style: { listStyle: 'none' } }, data.map(function (item) { return (react_1.default.createElement("li", { key: item.id },
+        react_1.default.createElement(util_1.UrlC, { url: item.url, prefix: getDetails(item) }))); })));
 };
 var RecommendationsC = function (_a) {
     var data = _a.data;
-    return (react_1["default"].createElement(material_1.Grid, { container: true, sx: { pl: 8, mb: 2 } },
-        react_1["default"].createElement(material_1.Grid, { item: true, xs: 12, sm: 4, lg: 3 },
-            react_1["default"].createElement(material_1.Typography, { variant: 'body1', color: 'grey' },
+    return (react_1.default.createElement(material_1.Grid, { container: true, sx: { pl: 8, mb: 2 } },
+        react_1.default.createElement(material_1.Grid, { item: true, xs: 12, sm: 4, lg: 3 },
+            react_1.default.createElement(material_1.Typography, { variant: 'body1', color: 'grey' },
                 "Non-Personalized (",
                 data.nonPersonalized.length,
                 ")"),
-            react_1["default"].createElement(RecommendationsListC, { data: data.nonPersonalized })),
-        react_1["default"].createElement(material_1.Grid, { item: true, xs: 12, sm: 4, lg: 3 },
-            react_1["default"].createElement(material_1.Typography, { variant: 'body1', color: 'grey' },
+            react_1.default.createElement(RecommendationsListC, { data: data.nonPersonalized })),
+        react_1.default.createElement(material_1.Grid, { item: true, xs: 12, sm: 4, lg: 3 },
+            react_1.default.createElement(material_1.Typography, { variant: 'body1', color: 'grey' },
                 "Personalized (",
                 data.personalized.length,
                 ")"),
-            react_1["default"].createElement(RecommendationsListC, { data: data.personalized })),
-        react_1["default"].createElement(material_1.Grid, { item: true, xs: 12, sm: 4, lg: 3 },
-            react_1["default"].createElement(material_1.Typography, { variant: 'body1', color: 'grey', sx: { position: { md: 'relative' } } },
+            react_1.default.createElement(RecommendationsListC, { data: data.personalized })),
+        react_1.default.createElement(material_1.Grid, { item: true, xs: 12, sm: 4, lg: 3 },
+            react_1.default.createElement(material_1.Typography, { variant: 'body1', color: 'grey', sx: { position: { md: 'relative' } } },
                 "Shown (",
                 data.shown.length,
                 ")",
-                react_1["default"].createElement("small", { style: { position: 'absolute', left: 0, top: '1.2rem' } }, "p: personalized, np: non personalized, m: mixed")),
-            react_1["default"].createElement(RecommendationsListC, { data: data.shown, details: true }))));
+                react_1.default.createElement("small", { style: { position: 'absolute', left: 0, top: '1.2rem' } }, "p: personalized, np: non personalized, m: mixed")),
+            react_1.default.createElement(RecommendationsListC, { data: data.shown, details: true }))));
 };
 var LegendC = function (_a) {
     var label = _a.label;
     if (!label) {
         return null;
     }
-    return (react_1["default"].createElement(material_1.Typography, { variant: 'body1', sx: {
+    return (react_1.default.createElement(material_1.Typography, { variant: 'body1', sx: {
             display: 'block',
             fontSize: '0.8rem',
-            color: 'grey'
+            color: 'grey',
         } },
-        react_1["default"].createElement("strong", null, label)));
+        react_1.default.createElement("strong", null, label)));
 };
 var EventC = function (_a) {
     var _b;
@@ -158,28 +158,28 @@ var EventC = function (_a) {
         }
         return 'context';
     };
-    return (react_1["default"].createElement(react_1["default"].Fragment, null,
-        react_1["default"].createElement(material_1.Grid, { container: true, sx: { pl: 4 } },
-            react_1["default"].createElement(material_1.Grid, { item: true, xs: 12, md: 2 },
-                react_1["default"].createElement(material_1.Typography, { variant: 'body1', sx: { mb: 2 } },
-                    react_1["default"].createElement("strong", null, position),
+    return (react_1.default.createElement(react_1.default.Fragment, null,
+        react_1.default.createElement(material_1.Grid, { container: true, sx: { pl: 4 } },
+            react_1.default.createElement(material_1.Grid, { item: true, xs: 12, md: 2 },
+                react_1.default.createElement(material_1.Typography, { variant: 'body1', sx: { mb: 2 } },
+                    react_1.default.createElement("strong", null, position),
                     ") ",
                     (0, util_1.showDate)(overview.createdAt))),
-            react_1["default"].createElement(material_1.Grid, { item: true, xs: 12, md: 3 },
-                react_1["default"].createElement(LegendC, { label: 'event type' }),
-                react_1["default"].createElement(material_1.Typography, { variant: 'body1', sx: { mb: 2 } }, overview.type)),
-            react_1["default"].createElement(material_1.Grid, { item: true, xs: 12, md: 2 },
-                react_1["default"].createElement(LegendC, { label: contextLegend() }),
-                react_1["default"].createElement(material_1.Typography, { variant: 'body1', sx: { mb: 2 } },
-                    react_1["default"].createElement(util_1.UrlC, { url: showWatchtimeOrContextUrl(overview) }))),
-            react_1["default"].createElement(material_1.Grid, { item: true, xs: 12, md: 2 },
-                react_1["default"].createElement(LegendC, { label: 'url' }),
-                react_1["default"].createElement(material_1.Typography, { variant: 'body1', sx: { mb: 2 } },
-                    react_1["default"].createElement(util_1.UrlC, { url: overview.url }))),
-            react_1["default"].createElement(material_1.Grid, { item: true, xs: 12, md: 3 },
-                react_1["default"].createElement(LegendC, { label: 'extension version' }),
-                react_1["default"].createElement(material_1.Typography, { variant: 'body1', sx: { mb: 2 } }, overview.extensionVersion))),
-        react_1["default"].createElement(material_1.Box, { sx: { display: 'flex', alignItems: 'center' } }, ((_b = overview === null || overview === void 0 ? void 0 : overview.data) === null || _b === void 0 ? void 0 : _b.kind) === 'recommendations' && react_1["default"].createElement(RecommendationsC, { data: overview.data.recommendations }))));
+            react_1.default.createElement(material_1.Grid, { item: true, xs: 12, md: 3 },
+                react_1.default.createElement(LegendC, { label: 'event type' }),
+                react_1.default.createElement(material_1.Typography, { variant: 'body1', sx: { mb: 2 } }, overview.type)),
+            react_1.default.createElement(material_1.Grid, { item: true, xs: 12, md: 2 },
+                react_1.default.createElement(LegendC, { label: contextLegend() }),
+                react_1.default.createElement(material_1.Typography, { variant: 'body1', sx: { mb: 2 } },
+                    react_1.default.createElement(util_1.UrlC, { url: showWatchtimeOrContextUrl(overview) }))),
+            react_1.default.createElement(material_1.Grid, { item: true, xs: 12, md: 2 },
+                react_1.default.createElement(LegendC, { label: 'url' }),
+                react_1.default.createElement(material_1.Typography, { variant: 'body1', sx: { mb: 2 } },
+                    react_1.default.createElement(util_1.UrlC, { url: overview.url }))),
+            react_1.default.createElement(material_1.Grid, { item: true, xs: 12, md: 3 },
+                react_1.default.createElement(LegendC, { label: 'extension version' }),
+                react_1.default.createElement(material_1.Typography, { variant: 'body1', sx: { mb: 2 } }, overview.extensionVersion))),
+        react_1.default.createElement(material_1.Box, { sx: { display: 'flex', alignItems: 'center' } }, ((_b = overview === null || overview === void 0 ? void 0 : overview.data) === null || _b === void 0 ? void 0 : _b.kind) === 'recommendations' && react_1.default.createElement(RecommendationsC, { data: overview.data.recommendations }))));
 };
 var EventsListC = function (_a) {
     var count = _a.count, sessionUuid = _a.sessionUuid;
@@ -194,14 +194,14 @@ var EventsListC = function (_a) {
             if (data.kind === 'Success') {
                 setEvents(data.value);
             }
-        })["catch"](console.error);
+        }).catch(console.error);
     }, [sessionUuid, folded]);
     if (count === 0) {
-        return react_1["default"].createElement(material_1.Typography, { variant: 'body1' }, "No events");
+        return react_1.default.createElement(material_1.Typography, { variant: 'body1' }, "No events");
     }
     if (folded) {
-        return (react_1["default"].createElement(material_1.Button, { variant: 'outlined', color: 'primary', sx: {
-                m: 1
+        return (react_1.default.createElement(material_1.Button, { variant: 'outlined', color: 'primary', sx: {
+                m: 1,
             }, onClick: function () {
                 setFolded(false);
             } },
@@ -210,13 +210,13 @@ var EventsListC = function (_a) {
             " events"));
     }
     if (events.length === 0) {
-        return react_1["default"].createElement(material_1.Typography, { variant: 'body1' }, "Loading events...");
+        return react_1.default.createElement(material_1.Typography, { variant: 'body1' }, "Loading events...");
     }
-    return (react_1["default"].createElement(material_1.Box, null,
-        react_1["default"].createElement(material_1.Typography, { variant: 'body1', sx: { mb: 2, fontWeight: 'bold' } }, "Events (latest first)"),
-        events.map(function (event, index) { return react_1["default"].createElement(EventC, { key: event.id, data: event, position: events.length - index }); }),
-        react_1["default"].createElement(material_1.Button, { variant: 'outlined', color: 'primary', sx: {
-                m: 1
+    return (react_1.default.createElement(material_1.Box, null,
+        react_1.default.createElement(material_1.Typography, { variant: 'body1', sx: { mb: 2, fontWeight: 'bold' } }, "Events (latest first)"),
+        events.map(function (event, index) { return react_1.default.createElement(EventC, { key: event.id, data: event, position: events.length - index }); }),
+        react_1.default.createElement(material_1.Button, { variant: 'outlined', color: 'primary', sx: {
+                m: 1,
             }, onClick: function () {
                 setFolded(true);
             } },
@@ -226,20 +226,20 @@ var EventsListC = function (_a) {
 };
 var SessionC = function (_a) {
     var data = _a.data;
-    return (react_1["default"].createElement(material_1.Paper, { component: 'section', sx: { mb: 4, ml: 2, p: 2 } },
-        react_1["default"].createElement(material_1.Typography, { variant: 'h4', sx: { mb: 2 } },
+    return (react_1.default.createElement(material_1.Paper, { component: 'section', sx: { mb: 4, ml: 2, p: 2 } },
+        react_1.default.createElement(material_1.Typography, { variant: 'h4', sx: { mb: 2 } },
             "Session #",
             data.id),
-        react_1["default"].createElement(material_1.Typography, { variant: 'body1', sx: { mb: 2 } },
+        react_1.default.createElement(material_1.Typography, { variant: 'body1', sx: { mb: 2 } },
             "Session UUID: ",
             data.uuid),
-        react_1["default"].createElement(material_1.Typography, { variant: 'body1', sx: { mb: 2 } },
+        react_1.default.createElement(material_1.Typography, { variant: 'body1', sx: { mb: 2 } },
             "Started on: ",
             (0, util_1.showDate)(data.startedAt)),
-        react_1["default"].createElement(material_1.Typography, { variant: 'body1', sx: { mb: 2 } },
+        react_1.default.createElement(material_1.Typography, { variant: 'body1', sx: { mb: 2 } },
             "Ended on: ",
             (0, util_1.showDate)(data.endedAt)),
-        react_1["default"].createElement(EventsListC, { count: data.eventCount, sessionUuid: data.uuid })));
+        react_1.default.createElement(EventsListC, { count: data.eventCount, sessionUuid: data.uuid })));
 };
 var OverviewC = function (_a) {
     var data = _a.data;
@@ -265,39 +265,39 @@ var OverviewC = function (_a) {
             }
         });
     }); };
-    return (react_1["default"].createElement(react_1["default"].Fragment, null,
-        react_1["default"].createElement(material_1.Paper, { component: 'section', sx: { mb: 4, p: 2 } },
-            react_1["default"].createElement(NotificationsC_1["default"], { message: message }),
-            react_1["default"].createElement(material_1.Typography, { variant: 'h3', sx: { mb: 2 } }, "Basic info"),
-            react_1["default"].createElement(material_1.Typography, { variant: 'body1', sx: { mb: 2 } },
-                react_1["default"].createElement("strong", null, "Code:"),
+    return (react_1.default.createElement(react_1.default.Fragment, null,
+        react_1.default.createElement(material_1.Paper, { component: 'section', sx: { mb: 4, p: 2 } },
+            react_1.default.createElement(NotificationsC_1.default, { message: message }),
+            react_1.default.createElement(material_1.Typography, { variant: 'h3', sx: { mb: 2 } }, "Basic info"),
+            react_1.default.createElement(material_1.Typography, { variant: 'body1', sx: { mb: 2 } },
+                react_1.default.createElement("strong", null, "Code:"),
                 " ",
                 data.code),
-            react_1["default"].createElement(material_1.FormControl, { sx: { mb: 2 } },
-                react_1["default"].createElement(material_1.InputLabel, { id: 'phase-label' }, "Phase"),
-                react_1["default"].createElement(material_1.Select, { labelId: 'phase-label', value: phase, label: 'Phase', onChange: handlePhaseChange },
-                    react_1["default"].createElement(material_1.MenuItem, { value: 0 }, "Pre-Experiment"),
-                    react_1["default"].createElement(material_1.MenuItem, { value: 1 }, "Experiment"),
-                    react_1["default"].createElement(material_1.MenuItem, { value: 2 }, "Post-Experiment Observation"))),
-            react_1["default"].createElement(material_1.Typography, { variant: 'body1', sx: { mb: 2 } },
-                react_1["default"].createElement("strong", null, "Added on:"),
+            react_1.default.createElement(material_1.FormControl, { sx: { mb: 2 } },
+                react_1.default.createElement(material_1.InputLabel, { id: 'phase-label' }, "Phase"),
+                react_1.default.createElement(material_1.Select, { labelId: 'phase-label', value: phase, label: 'Phase', onChange: handlePhaseChange },
+                    react_1.default.createElement(material_1.MenuItem, { value: 0 }, "Pre-Experiment"),
+                    react_1.default.createElement(material_1.MenuItem, { value: 1 }, "Experiment"),
+                    react_1.default.createElement(material_1.MenuItem, { value: 2 }, "Post-Experiment Observation"))),
+            react_1.default.createElement(material_1.Typography, { variant: 'body1', sx: { mb: 2 } },
+                react_1.default.createElement("strong", null, "Added on:"),
                 " ",
                 (0, util_1.showDate)(data.createdAt)),
-            react_1["default"].createElement(material_1.Typography, { variant: 'body1', sx: { mb: 2 } },
-                react_1["default"].createElement("strong", null, "Last seen:"),
+            react_1.default.createElement(material_1.Typography, { variant: 'body1', sx: { mb: 2 } },
+                react_1.default.createElement("strong", null, "Last seen:"),
                 " ",
                 (0, util_1.showDate)(data.latestSessionDate)),
-            react_1["default"].createElement(material_1.Typography, { variant: 'body1', sx: { mb: 2 } },
-                react_1["default"].createElement("strong", null, "First seen:"),
+            react_1.default.createElement(material_1.Typography, { variant: 'body1', sx: { mb: 2 } },
+                react_1.default.createElement("strong", null, "First seen:"),
                 " ",
                 (0, util_1.showDate)(data.firstSessionDate)),
-            react_1["default"].createElement(material_1.Typography, { variant: 'body1', sx: { mb: 2 } },
-                react_1["default"].createElement("strong", null, "Number of sessions:"),
+            react_1.default.createElement(material_1.Typography, { variant: 'body1', sx: { mb: 2 } },
+                react_1.default.createElement("strong", null, "Number of sessions:"),
                 " ",
                 data.sessionCount)),
-        react_1["default"].createElement(material_1.Box, { component: 'section', sx: { mb: 4 } },
-            react_1["default"].createElement(material_1.Typography, { variant: 'h3', sx: { mb: 2 } }, "Sessions (most recent first)"),
-            data.sessions.length === 0 ? 'No sessions' : data.sessions.map(function (session) { return react_1["default"].createElement(SessionC, { key: session.id, data: session }); }))));
+        react_1.default.createElement(material_1.Box, { component: 'section', sx: { mb: 4 } },
+            react_1.default.createElement(material_1.Typography, { variant: 'h3', sx: { mb: 2 } }, "Sessions (most recent first)"),
+            data.sessions.length === 0 ? 'No sessions' : data.sessions.map(function (session) { return react_1.default.createElement(SessionC, { key: session.id, data: session }); }))));
 };
 var ParticipantPageC = function () {
     var code = (0, react_router_1.useParams)().code;
@@ -312,17 +312,17 @@ var ParticipantPageC = function () {
             if (res.kind === 'Success') {
                 setOverview(res.value);
             }
-        })["catch"](function (err) {
+        }).catch(function (err) {
             console.error(err);
         });
     }, [code]);
-    var ui = (react_1["default"].createElement(material_1.Box, { component: 'section', sx: { mb: 4 } },
-        react_1["default"].createElement(material_1.Typography, { variant: 'h2', sx: { mb: 2 } },
+    var ui = (react_1.default.createElement(material_1.Box, { component: 'section', sx: { mb: 4 } },
+        react_1.default.createElement(material_1.Typography, { variant: 'h2', sx: { mb: 2 } },
             "Participant: ",
             code),
-        overview === undefined ? 'Loading...' : react_1["default"].createElement(OverviewC, { data: overview })));
+        overview === undefined ? 'Loading...' : react_1.default.createElement(OverviewC, { data: overview })));
     return ui;
 };
 exports.ParticipantPageC = ParticipantPageC;
-exports["default"] = exports.ParticipantPageC;
+exports.default = exports.ParticipantPageC;
 //# sourceMappingURL=ParticipantOverviewP.js.map

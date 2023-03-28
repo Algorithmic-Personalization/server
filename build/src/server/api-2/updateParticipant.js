@@ -58,7 +58,7 @@ var __generator = (this && this.__generator) || function (thisArg, body) {
         if (op[0] & 5) throw op[1]; return { value: op[0] ? op[1] : void 0, done: true };
     }
 };
-exports.__esModule = true;
+Object.defineProperty(exports, "__esModule", { value: true });
 exports.updateParticipantDefinition = void 0;
 var participant_1 = __importStar(require("../models/participant"));
 var event_1 = require("../../common/models/event");
@@ -75,14 +75,14 @@ var updateParticipantPhase = function (dataSource, log) {
                         return [2 /*return*/, participant];
                     }
                     return [4 /*yield*/, dataSource
-                            .getRepository(transitionEvent_1["default"])
+                            .getRepository(transitionEvent_1.default)
                             .findOne({
                             where: {
-                                participantId: participant.id
+                                participantId: participant.id,
                             },
                             order: {
-                                createdAt: 'DESC'
-                            }
+                                createdAt: 'DESC',
+                            },
                         })];
                 case 1:
                     latestTransition = _b.sent();
@@ -93,7 +93,7 @@ var updateParticipantPhase = function (dataSource, log) {
                     else {
                         log('no previous transition for participant, using is creation date as entry into previous phase', startOfLatestPhase);
                     }
-                    transition = new transitionEvent_1["default"]();
+                    transition = new transitionEvent_1.default();
                     transition.fromPhase = fromPhase;
                     transition.toPhase = toPhase;
                     transition.participantId = participant.id;
@@ -136,7 +136,7 @@ exports.updateParticipantDefinition = {
                         if (!code || typeof code !== 'string') {
                             throw new Error('Invalid participant email');
                         }
-                        participantRepo = dataSource.getRepository(participant_1["default"]);
+                        participantRepo = dataSource.getRepository(participant_1.default);
                         return [4 /*yield*/, participantRepo.findOneBy({ code: code })];
                     case 1:
                         participantEntity = _b.sent();
@@ -157,7 +157,7 @@ exports.updateParticipantDefinition = {
                 }
             });
         }); };
-    }
+    },
 };
-exports["default"] = exports.updateParticipantDefinition;
+exports.default = exports.updateParticipantDefinition;
 //# sourceMappingURL=updateParticipant.js.map

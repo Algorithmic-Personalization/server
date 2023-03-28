@@ -37,7 +37,7 @@ var __importStar = (this && this.__importStar) || function (mod) {
     __setModuleDefault(result, mod);
     return result;
 };
-exports.__esModule = true;
+Object.defineProperty(exports, "__esModule", { value: true });
 exports.RecommendationsEvent = void 0;
 var event_1 = __importStar(require("./event"));
 var RecommendationsEvent = /** @class */ (function (_super) {
@@ -51,7 +51,7 @@ var RecommendationsEvent = /** @class */ (function (_super) {
         return _this;
     }
     return RecommendationsEvent;
-}(event_1["default"]));
+}(event_1.default));
 exports.RecommendationsEvent = RecommendationsEvent;
-exports["default"] = RecommendationsEvent;
+exports.default = RecommendationsEvent;
 //# sourceMappingURL=recommendationsEvent.js.map

@@ -49,7 +49,7 @@ var __values = (this && this.__values) || function(o) {
 var __importDefault = (this && this.__importDefault) || function (mod) {
     return (mod && mod.__esModule) ? mod : { "default": mod };
 };
-exports.__esModule = true;
+Object.defineProperty(exports, "__esModule", { value: true });
 exports.createUploadParticipantsRoute = void 0;
 var csv_1 = require("../lib/csv");
 var participant_1 = __importDefault(require("../models/participant"));
@@ -72,7 +72,7 @@ var createUploadParticipantsRoute = function (_a) {
                         res.status(400).json({ kind: 'Failure', message: 'No participants file' });
                         return [2 /*return*/];
                     }
-                    participantRepo = dataSource.getRepository(participant_1["default"]);
+                    participantRepo = dataSource.getRepository(participant_1.default);
                     nUpdated = 0;
                     nCreated = 0;
                     line = 1;
@@ -108,7 +108,7 @@ var createUploadParticipantsRoute = function (_a) {
                         errorLines.push(line);
                         return [3 /*break*/, 13];
                     }
-                    participant = new participant_1["default"]();
+                    participant = new participant_1.default();
                     participant.code = record.code;
                     participant.arm = record.arm === 'control' ? event_1.ExperimentArm.CONTROL : event_1.ExperimentArm.TREATMENT;
                     return [4 /*yield*/, participantRepo.findOneBy({ code: participant.code })];
@@ -158,7 +158,7 @@ var createUploadParticipantsRoute = function (_a) {
                     return [3 /*break*/, 17];
                 case 16:
                     try {
-                        if (records_1_1 && !records_1_1.done && (_a = records_1["return"])) _a.call(records_1);
+                        if (records_1_1 && !records_1_1.done && (_a = records_1.return)) _a.call(records_1);
                     }
                     finally { if (e_1) throw e_1.error; }
                     return [7 /*endfinally*/];
@@ -176,5 +176,5 @@ var createUploadParticipantsRoute = function (_a) {
     }); };
 };
 exports.createUploadParticipantsRoute = createUploadParticipantsRoute;
-exports["default"] = exports.createUploadParticipantsRoute;
+exports.default = exports.createUploadParticipantsRoute;
 //# sourceMappingURL=uploadParticipants.js.map

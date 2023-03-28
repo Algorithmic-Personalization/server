@@ -77,7 +77,7 @@ var __read = (this && this.__read) || function (o, n) {
 var __importDefault = (this && this.__importDefault) || function (mod) {
     return (mod && mod.__esModule) ? mod : { "default": mod };
 };
-exports.__esModule = true;
+Object.defineProperty(exports, "__esModule", { value: true });
 exports.ParticipantsC = void 0;
 var react_1 = __importStar(require("react"));
 var material_1 = require("@mui/material");
@@ -95,30 +95,30 @@ var tableDescriptor = {
     headers: [
         {
             key: 'code',
-            element: 'Participant Code'
+            element: 'Participant Code',
         },
         {
             key: 'experiment-arm',
-            element: 'Experiment arm'
+            element: 'Experiment arm',
         },
         {
             key: 'phase',
-            element: 'Experiment Phase'
+            element: 'Experiment Phase',
         },
     ],
     rows: function (p) { return ({
         key: p.code,
         elements: [
             // eslint-disable-next-line react/jsx-key
-            react_1["default"].createElement(react_router_dom_1.Link, { to: "/participants/".concat(p.code) }, p.code),
+            react_1.default.createElement(react_router_dom_1.Link, { to: "/participants/".concat(p.code) }, p.code),
             p.arm,
             p.phase,
-        ]
-    }); }
+        ],
+    }); },
 };
-var TableC = (0, TableC_1["default"])(tableDescriptor);
+var TableC = (0, TableC_1.default)(tableDescriptor);
 var UploadFormC = function () {
-    var exampleString = participants_sample_csv_1["default"];
+    var exampleString = participants_sample_csv_1.default;
     var _a = __read((0, react_1.useState)(), 2), message = _a[0], setMessage = _a[1];
     var form = (0, react_1.useRef)(null);
     var api = (0, adminApiProvider_1.useAdminApi)();
@@ -134,7 +134,7 @@ var UploadFormC = function () {
                 switch (_a.label) {
                     case 0:
                         setMessage({
-                            text: 'Uploading participants file...'
+                            text: 'Uploading participants file...',
                         });
                         return [4 /*yield*/, api.uploadParticipants(file)];
                     case 1:
@@ -142,13 +142,13 @@ var UploadFormC = function () {
                         if (res.kind === 'Success') {
                             setMessage({
                                 text: res.value,
-                                severity: 'success'
+                                severity: 'success',
                             });
                         }
                         else {
                             setMessage({
                                 text: res.message,
-                                severity: 'error'
+                                severity: 'error',
                             });
                         }
                         if (form.current) {
@@ -159,31 +159,31 @@ var UploadFormC = function () {
             });
         }); })();
     };
-    var example = (react_1["default"].createElement(material_1.Box, { sx: { mb: 4 } },
-        react_1["default"].createElement(material_1.Typography, null,
-            react_1["default"].createElement("strong", null, "Example file:"),
+    var example = (react_1.default.createElement(material_1.Box, { sx: { mb: 4 } },
+        react_1.default.createElement(material_1.Typography, null,
+            react_1.default.createElement("strong", null, "Example file:"),
             "\u00A0",
-            react_1["default"].createElement(DownloadLinkC_1["default"], { href: '/participants.sample.csv' }, "(download)")),
-        react_1["default"].createElement("pre", { style: { marginTop: 0, maxWidth: '100%', overflow: 'auto' } }, exampleString)));
-    var ui = (react_1["default"].createElement(material_1.Box, { component: 'section', sx: { mb: 4 } },
-        react_1["default"].createElement(material_1.Typography, { variant: 'h2', sx: { mb: 2 } }, "Add Participants"),
-        react_1["default"].createElement(material_1.Typography, { variant: 'body1', component: 'div', sx: { mb: 2 } },
+            react_1.default.createElement(DownloadLinkC_1.default, { href: '/participants.sample.csv' }, "(download)")),
+        react_1.default.createElement("pre", { style: { marginTop: 0, maxWidth: '100%', overflow: 'auto' } }, exampleString)));
+    var ui = (react_1.default.createElement(material_1.Box, { component: 'section', sx: { mb: 4 } },
+        react_1.default.createElement(material_1.Typography, { variant: 'h2', sx: { mb: 2 } }, "Add Participants"),
+        react_1.default.createElement(material_1.Typography, { variant: 'body1', component: 'div', sx: { mb: 2 } },
             "You can add participants to the experiment by uploading a CSV file, it should have at least the following 2 columns:",
-            react_1["default"].createElement("ul", null,
-                react_1["default"].createElement("li", null, "code"),
-                react_1["default"].createElement("li", null, "arm")),
+            react_1.default.createElement("ul", null,
+                react_1.default.createElement("li", null, "code"),
+                react_1.default.createElement("li", null, "arm")),
             "where \"arm\" is either \"control\" or \"treatment\".",
-            react_1["default"].createElement("br", null),
-            react_1["default"].createElement("strong", null, "Note:"),
+            react_1.default.createElement("br", null),
+            react_1.default.createElement("strong", null, "Note:"),
             " The \"code\" column should contain large random values so that participant codes cannot be guessed."),
         example,
-        react_1["default"].createElement("form", { ref: form },
-            react_1["default"].createElement(material_1.FormControl, { sx: { mb: 2 } },
-                react_1["default"].createElement(material_1.Button, { component: 'label', variant: 'outlined', htmlFor: 'list', endIcon: react_1["default"].createElement(FileUpload_1["default"], null) },
+        react_1.default.createElement("form", { ref: form },
+            react_1.default.createElement(material_1.FormControl, { sx: { mb: 2 } },
+                react_1.default.createElement(material_1.Button, { component: 'label', variant: 'outlined', htmlFor: 'list', endIcon: react_1.default.createElement(FileUpload_1.default, null) },
                     "Upload CSV",
-                    react_1["default"].createElement("input", { hidden: true, type: 'file', id: 'list', name: 'list', accept: '.csv', onChange: onFileChange })),
-                react_1["default"].createElement(material_1.FormHelperText, null, "The separator must be a comma.")),
-            react_1["default"].createElement(NotificationsC_1["default"], { message: message }))));
+                    react_1.default.createElement("input", { hidden: true, type: 'file', id: 'list', name: 'list', accept: '.csv', onChange: onFileChange })),
+                react_1.default.createElement(material_1.FormHelperText, null, "The separator must be a comma.")),
+            react_1.default.createElement(NotificationsC_1.default, { message: message }))));
     return ui;
 };
 var ListC = function () {
@@ -211,7 +211,7 @@ var ListC = function () {
                         else {
                             setMessage({
                                 text: res.message,
-                                severity: 'error'
+                                severity: 'error',
                             });
                         }
                         return [2 /*return*/];
@@ -220,51 +220,51 @@ var ListC = function () {
         }); })();
     }, [page, codeLike, phase]);
     if (participants === undefined) {
-        return react_1["default"].createElement(material_1.Typography, null, "Loading...");
+        return react_1.default.createElement(material_1.Typography, null, "Loading...");
     }
-    var list = (react_1["default"].createElement(material_1.Box, null,
-        react_1["default"].createElement(material_1.Box, { sx: {
+    var list = (react_1.default.createElement(material_1.Box, null,
+        react_1.default.createElement(material_1.Box, { sx: {
                 mb: 2,
                 display: 'flex',
                 alignItems: 'stretch',
                 flexDirection: 'column',
                 width: 'max-content',
-                gap: 1
+                gap: 1,
             } },
-            react_1["default"].createElement(material_1.TextField, { value: codeLike, onChange: function (e) {
+            react_1.default.createElement(material_1.TextField, { value: codeLike, onChange: function (e) {
                     setCodeLike(e.target.value);
                     setPageInput('1');
                 }, sx: { display: 'block' }, label: 'Search participant by email', InputProps: {
-                    endAdornment: (react_1["default"].createElement(material_1.InputAdornment, { position: 'end' },
-                        react_1["default"].createElement(Search_1["default"], null)))
+                    endAdornment: (react_1.default.createElement(material_1.InputAdornment, { position: 'end' },
+                        react_1.default.createElement(Search_1.default, null))),
                 } }),
-            react_1["default"].createElement(material_1.FormControl, null,
-                react_1["default"].createElement(material_1.InputLabel, { id: 'participant-phase-search' }, "Filter by phase"),
-                react_1["default"].createElement(material_1.Select, { labelId: 'participant-phase-search', label: 'Filter by phase', onChange: function (e) {
+            react_1.default.createElement(material_1.FormControl, null,
+                react_1.default.createElement(material_1.InputLabel, { id: 'participant-phase-search' }, "Filter by phase"),
+                react_1.default.createElement(material_1.Select, { labelId: 'participant-phase-search', label: 'Filter by phase', onChange: function (e) {
                         setPhase(e.target.value);
                         setPageInput('1');
                     }, value: phase },
-                    react_1["default"].createElement(material_1.MenuItem, { value: -1 }, "Any"),
-                    react_1["default"].createElement(material_1.MenuItem, { value: transitionSetting_1.Phase.PRE_EXPERIMENT }, "Pre-Experiment"),
-                    react_1["default"].createElement(material_1.MenuItem, { value: transitionSetting_1.Phase.EXPERIMENT }, "Experiment"),
-                    react_1["default"].createElement(material_1.MenuItem, { value: transitionSetting_1.Phase.POST_EXPERIMENT }, "Post-Experiment"))),
-            react_1["default"].createElement(material_1.Box, { sx: { display: 'flex', alignItems: 'center' } },
-                react_1["default"].createElement(material_1.Typography, { variant: 'body2' }, "Page\u00A0"),
-                react_1["default"].createElement("input", { type: 'number', value: pageInputOk ? page : pageInput, min: 1, max: participants.pageCount, step: 1, onChange: function (e) {
+                    react_1.default.createElement(material_1.MenuItem, { value: -1 }, "Any"),
+                    react_1.default.createElement(material_1.MenuItem, { value: transitionSetting_1.Phase.PRE_EXPERIMENT }, "Pre-Experiment"),
+                    react_1.default.createElement(material_1.MenuItem, { value: transitionSetting_1.Phase.EXPERIMENT }, "Experiment"),
+                    react_1.default.createElement(material_1.MenuItem, { value: transitionSetting_1.Phase.POST_EXPERIMENT }, "Post-Experiment"))),
+            react_1.default.createElement(material_1.Box, { sx: { display: 'flex', alignItems: 'center' } },
+                react_1.default.createElement(material_1.Typography, { variant: 'body2' }, "Page\u00A0"),
+                react_1.default.createElement("input", { type: 'number', value: pageInputOk ? page : pageInput, min: 1, max: participants.pageCount, step: 1, onChange: function (e) {
                         setPageInput(e.target.value);
                     } }),
-                react_1["default"].createElement(material_1.Typography, { variant: 'body2' }, "\u00A0/\u00A0"),
-                react_1["default"].createElement(material_1.Typography, { variant: 'body2' }, participants.pageCount))),
-        react_1["default"].createElement(TableC, { items: participants.results })));
-    return (react_1["default"].createElement(material_1.Box, { component: 'section', sx: { mb: 4 } },
-        react_1["default"].createElement(material_1.Typography, { variant: 'h2', sx: { mb: 2 } }, "Participants list"),
-        react_1["default"].createElement(NotificationsC_1["default"], { message: message }),
+                react_1.default.createElement(material_1.Typography, { variant: 'body2' }, "\u00A0/\u00A0"),
+                react_1.default.createElement(material_1.Typography, { variant: 'body2' }, participants.pageCount))),
+        react_1.default.createElement(TableC, { items: participants.results })));
+    return (react_1.default.createElement(material_1.Box, { component: 'section', sx: { mb: 4 } },
+        react_1.default.createElement(material_1.Typography, { variant: 'h2', sx: { mb: 2 } }, "Participants list"),
+        react_1.default.createElement(NotificationsC_1.default, { message: message }),
         list));
 };
-var ParticipantsC = function () { return (react_1["default"].createElement("div", null,
-    react_1["default"].createElement(material_1.Typography, { variant: 'h1', sx: { mb: 4 } }, "Participants"),
-    react_1["default"].createElement(ListC, null),
-    react_1["default"].createElement(UploadFormC, null))); };
+var ParticipantsC = function () { return (react_1.default.createElement("div", null,
+    react_1.default.createElement(material_1.Typography, { variant: 'h1', sx: { mb: 4 } }, "Participants"),
+    react_1.default.createElement(ListC, null),
+    react_1.default.createElement(UploadFormC, null))); };
 exports.ParticipantsC = ParticipantsC;
-exports["default"] = exports.ParticipantsC;
+exports.default = exports.ParticipantsC;
 //# sourceMappingURL=ParticipantsP.js.map

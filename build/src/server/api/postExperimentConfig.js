@@ -49,7 +49,7 @@ var __rest = (this && this.__rest) || function (s, e) {
 var __importDefault = (this && this.__importDefault) || function (mod) {
     return (mod && mod.__esModule) ? mod : { "default": mod };
 };
-exports.__esModule = true;
+Object.defineProperty(exports, "__esModule", { value: true });
 exports.createPostExperimentConfigRoute = void 0;
 var experimentConfig_1 = __importDefault(require("../../common/models/experimentConfig"));
 var util_1 = require("../../common/util");
@@ -66,7 +66,7 @@ var createPostExperimentConfigRoute = function (_a) {
                         res.status(401).json({ kind: 'Failure', message: 'You must be logged in to create a configuration' });
                         return [2 /*return*/];
                     }
-                    config = new experimentConfig_1["default"]();
+                    config = new experimentConfig_1.default();
                     _a = req.body, _id = _a.id, _createdAt = _a.createdAt, _updatedAt = _a.updatedAt, data = __rest(_a, ["id", "createdAt", "updatedAt"]);
                     Object.assign(config, data);
                     config.adminId = req.adminId;
@@ -83,12 +83,12 @@ var createPostExperimentConfigRoute = function (_a) {
                             return __generator(this, function (_a) {
                                 switch (_a.label) {
                                     case 0:
-                                        repo = transaction.getRepository(experimentConfig_1["default"]);
+                                        repo = transaction.getRepository(experimentConfig_1.default);
                                         _a.label = 1;
                                     case 1:
                                         _a.trys.push([1, 6, , 7]);
                                         return [4 /*yield*/, repo.findOneBy({
-                                                isCurrent: true
+                                                isCurrent: true,
                                             })];
                                     case 2:
                                         currentConfig = _a.sent();
@@ -123,5 +123,5 @@ var createPostExperimentConfigRoute = function (_a) {
     }); };
 };
 exports.createPostExperimentConfigRoute = createPostExperimentConfigRoute;
-exports["default"] = exports.createPostExperimentConfigRoute;
+exports.default = exports.createPostExperimentConfigRoute;
 //# sourceMappingURL=postExperimentConfig.js.map

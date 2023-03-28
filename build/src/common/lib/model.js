@@ -8,11 +8,11 @@ var __decorate = (this && this.__decorate) || function (decorators, target, key,
 var __metadata = (this && this.__metadata) || function (k, v) {
     if (typeof Reflect === "object" && typeof Reflect.metadata === "function") return Reflect.metadata(k, v);
 };
-exports.__esModule = true;
+Object.defineProperty(exports, "__esModule", { value: true });
 exports.Model = void 0;
 var typeorm_1 = require("typeorm");
 var class_validator_1 = require("class-validator");
-var Model = /** @class */ (function () {
+var Model = exports.Model = /** @class */ (function () {
     function Model() {
         this.id = 0;
         this.createdAt = new Date();
@@ -23,19 +23,18 @@ var Model = /** @class */ (function () {
         (0, class_validator_1.IsInt)(),
         (0, class_validator_1.IsPositive)(),
         __metadata("design:type", Object)
-    ], Model.prototype, "id");
+    ], Model.prototype, "id", void 0);
     __decorate([
         (0, typeorm_1.Column)(),
         (0, class_validator_1.IsDate)(),
         __metadata("design:type", Date)
-    ], Model.prototype, "createdAt");
+    ], Model.prototype, "createdAt", void 0);
     __decorate([
         (0, typeorm_1.Column)(),
         (0, class_validator_1.IsDate)(),
         __metadata("design:type", Date)
-    ], Model.prototype, "updatedAt");
+    ], Model.prototype, "updatedAt", void 0);
     return Model;
 }());
-exports.Model = Model;
-exports["default"] = Model;
+exports.default = Model;
 //# sourceMappingURL=model.js.map

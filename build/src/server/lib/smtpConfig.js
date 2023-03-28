@@ -8,7 +8,7 @@ var __decorate = (this && this.__decorate) || function (decorators, target, key,
 var __metadata = (this && this.__metadata) || function (k, v) {
     if (typeof Reflect === "object" && typeof Reflect.metadata === "function") return Reflect.metadata(k, v);
 };
-exports.__esModule = true;
+Object.defineProperty(exports, "__esModule", { value: true });
 exports.SmtpConfig = void 0;
 var class_validator_1 = require("class-validator");
 var SmtpAuth = /** @class */ (function () {
@@ -20,15 +20,15 @@ var SmtpAuth = /** @class */ (function () {
         (0, class_validator_1.IsNotEmpty)(),
         (0, class_validator_1.IsString)(),
         __metadata("design:type", Object)
-    ], SmtpAuth.prototype, "user");
+    ], SmtpAuth.prototype, "user", void 0);
     __decorate([
         (0, class_validator_1.IsNotEmpty)(),
         (0, class_validator_1.IsString)(),
         __metadata("design:type", Object)
-    ], SmtpAuth.prototype, "pass");
+    ], SmtpAuth.prototype, "pass", void 0);
     return SmtpAuth;
 }());
-var SmtpConfig = /** @class */ (function () {
+var SmtpConfig = exports.SmtpConfig = /** @class */ (function () {
     function SmtpConfig() {
         this.auth = new SmtpAuth();
         this.host = '';
@@ -38,22 +38,21 @@ var SmtpConfig = /** @class */ (function () {
     __decorate([
         (0, class_validator_1.ValidateNested)(),
         __metadata("design:type", SmtpAuth)
-    ], SmtpConfig.prototype, "auth");
+    ], SmtpConfig.prototype, "auth", void 0);
     __decorate([
         (0, class_validator_1.IsNotEmpty)(),
         (0, class_validator_1.IsString)(),
         __metadata("design:type", Object)
-    ], SmtpConfig.prototype, "host");
+    ], SmtpConfig.prototype, "host", void 0);
     __decorate([
         (0, class_validator_1.IsPositive)(),
         __metadata("design:type", Object)
-    ], SmtpConfig.prototype, "port");
+    ], SmtpConfig.prototype, "port", void 0);
     __decorate([
         (0, class_validator_1.IsBoolean)(),
         __metadata("design:type", Object)
-    ], SmtpConfig.prototype, "secure");
+    ], SmtpConfig.prototype, "secure", void 0);
     return SmtpConfig;
 }());
-exports.SmtpConfig = SmtpConfig;
-exports["default"] = SmtpConfig;
+exports.default = SmtpConfig;
 //# sourceMappingURL=smtpConfig.js.map

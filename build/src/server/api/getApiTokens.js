@@ -38,7 +38,7 @@ var __generator = (this && this.__generator) || function (thisArg, body) {
 var __importDefault = (this && this.__importDefault) || function (mod) {
     return (mod && mod.__esModule) ? mod : { "default": mod };
 };
-exports.__esModule = true;
+Object.defineProperty(exports, "__esModule", { value: true });
 exports.createGetApiTokensRoute = void 0;
 var token_1 = __importDefault(require("../models/token"));
 var createGetApiTokensRoute = function (_a) {
@@ -50,18 +50,18 @@ var createGetApiTokensRoute = function (_a) {
                 case 0:
                     log = createLogger(req.requestId);
                     log('received get api tokens request');
-                    repo = dataSource.getRepository(token_1["default"]);
+                    repo = dataSource.getRepository(token_1.default);
                     _a.label = 1;
                 case 1:
                     _a.trys.push([1, 3, , 4]);
                     return [4 /*yield*/, repo
                             .find({
                             where: {
-                                api: true
+                                api: true,
                             },
                             order: {
-                                id: 'DESC'
-                            }
+                                id: 'DESC',
+                            },
                         })];
                 case 2:
                     value = _a.sent();
@@ -78,5 +78,5 @@ var createGetApiTokensRoute = function (_a) {
     }); };
 };
 exports.createGetApiTokensRoute = createGetApiTokensRoute;
-exports["default"] = exports.createGetApiTokensRoute;
+exports.default = exports.createGetApiTokensRoute;
 //# sourceMappingURL=getApiTokens.js.map

@@ -26,14 +26,14 @@ var __metadata = (this && this.__metadata) || function (k, v) {
 var __importDefault = (this && this.__importDefault) || function (mod) {
     return (mod && mod.__esModule) ? mod : { "default": mod };
 };
-exports.__esModule = true;
+Object.defineProperty(exports, "__esModule", { value: true });
 exports.DailyActivityTime = void 0;
 /* eslint-disable @typescript-eslint/no-inferrable-types */
 var typeorm_1 = require("typeorm");
 var class_validator_1 = require("class-validator");
 var model_1 = __importDefault(require("../../common/lib/model"));
 var participant_1 = __importDefault(require("./participant"));
-var DailyActivityTime = /** @class */ (function (_super) {
+var DailyActivityTime = exports.DailyActivityTime = /** @class */ (function (_super) {
     __extends(DailyActivityTime, _super);
     function DailyActivityTime() {
         var _this = _super !== null && _super.apply(this, arguments) || this;
@@ -48,47 +48,46 @@ var DailyActivityTime = /** @class */ (function (_super) {
     __decorate([
         (0, typeorm_1.Column)(),
         __metadata("design:type", Number)
-    ], DailyActivityTime.prototype, "participantId");
+    ], DailyActivityTime.prototype, "participantId", void 0);
     __decorate([
         (0, typeorm_1.Column)(),
         (0, class_validator_1.IsInt)(),
         (0, class_validator_1.Min)(0),
         __metadata("design:type", Number)
-    ], DailyActivityTime.prototype, "pagesViewed");
+    ], DailyActivityTime.prototype, "pagesViewed", void 0);
     __decorate([
         (0, typeorm_1.Column)(),
         (0, class_validator_1.IsInt)(),
         (0, class_validator_1.Min)(0),
         __metadata("design:type", Number)
-    ], DailyActivityTime.prototype, "videoPagesViewed");
+    ], DailyActivityTime.prototype, "videoPagesViewed", void 0);
     __decorate([
         (0, typeorm_1.Column)(),
         (0, class_validator_1.IsNumber)(),
         (0, class_validator_1.Min)(0),
         __metadata("design:type", Number)
-    ], DailyActivityTime.prototype, "videoTimeViewedSeconds");
+    ], DailyActivityTime.prototype, "videoTimeViewedSeconds", void 0);
     __decorate([
         (0, typeorm_1.Column)(),
         (0, class_validator_1.IsNumber)(),
         (0, class_validator_1.Min)(0),
         __metadata("design:type", Number)
-    ], DailyActivityTime.prototype, "timeSpentOnYoutubeSeconds");
+    ], DailyActivityTime.prototype, "timeSpentOnYoutubeSeconds", void 0);
     __decorate([
         (0, typeorm_1.Column)(),
         (0, class_validator_1.IsInt)(),
         (0, class_validator_1.Min)(0),
         __metadata("design:type", Number)
-    ], DailyActivityTime.prototype, "sidebarRecommendationsClicked");
+    ], DailyActivityTime.prototype, "sidebarRecommendationsClicked", void 0);
     __decorate([
-        (0, typeorm_1.ManyToOne)(function () { return participant_1["default"]; }),
+        (0, typeorm_1.ManyToOne)(function () { return participant_1.default; }),
         (0, typeorm_1.JoinColumn)({ name: 'participant_id' }),
-        __metadata("design:type", participant_1["default"])
-    ], DailyActivityTime.prototype, "participant");
+        __metadata("design:type", participant_1.default)
+    ], DailyActivityTime.prototype, "participant", void 0);
     DailyActivityTime = __decorate([
         (0, typeorm_1.Entity)()
     ], DailyActivityTime);
     return DailyActivityTime;
-}(model_1["default"]));
-exports.DailyActivityTime = DailyActivityTime;
-exports["default"] = DailyActivityTime;
+}(model_1.default));
+exports.default = DailyActivityTime;
 //# sourceMappingURL=dailyActivityTime.js.map

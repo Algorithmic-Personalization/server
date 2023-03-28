@@ -27,7 +27,7 @@ var __metadata = (this && this.__metadata) || function (k, v) {
 var __importDefault = (this && this.__importDefault) || function (mod) {
     return (mod && mod.__esModule) ? mod : { "default": mod };
 };
-exports.__esModule = true;
+Object.defineProperty(exports, "__esModule", { value: true });
 exports.TransitionSetting = exports.OperatorType = exports.Phase = void 0;
 var typeorm_1 = require("typeorm");
 var class_validator_1 = require("class-validator");
@@ -43,7 +43,7 @@ var OperatorType;
     OperatorType["ANY"] = "ANY";
     OperatorType["ALL"] = "ALL";
 })(OperatorType = exports.OperatorType || (exports.OperatorType = {}));
-var TransitionSetting = /** @class */ (function (_super) {
+var TransitionSetting = exports.TransitionSetting = /** @class */ (function (_super) {
     __extends(TransitionSetting, _super);
     function TransitionSetting() {
         var _this = _super !== null && _super.apply(this, arguments) || this;
@@ -65,64 +65,63 @@ var TransitionSetting = /** @class */ (function (_super) {
         (0, class_validator_1.Min)(0),
         (0, class_validator_1.Max)(2),
         __metadata("design:type", Number)
-    ], TransitionSetting.prototype, "fromPhase");
+    ], TransitionSetting.prototype, "fromPhase", void 0);
     __decorate([
         (0, typeorm_1.Column)(),
         (0, class_validator_1.IsInt)(),
         (0, class_validator_1.Min)(0),
         (0, class_validator_1.Max)(2),
         __metadata("design:type", Number)
-    ], TransitionSetting.prototype, "toPhase");
+    ], TransitionSetting.prototype, "toPhase", void 0);
     __decorate([
         (0, typeorm_1.Column)(),
         (0, class_validator_1.IsBoolean)(),
         __metadata("design:type", Boolean)
-    ], TransitionSetting.prototype, "isCurrent");
+    ], TransitionSetting.prototype, "isCurrent", void 0);
     __decorate([
         (0, typeorm_1.Column)(),
         __metadata("design:type", String)
-    ], TransitionSetting.prototype, "operator");
+    ], TransitionSetting.prototype, "operator", void 0);
     __decorate([
         (0, typeorm_1.Column)(),
         (0, class_validator_1.IsInt)(),
         (0, class_validator_1.Min)(0),
         __metadata("design:type", Number)
-    ], TransitionSetting.prototype, "minPagesViewed");
+    ], TransitionSetting.prototype, "minPagesViewed", void 0);
     __decorate([
         (0, typeorm_1.Column)(),
         (0, class_validator_1.IsInt)(),
         (0, class_validator_1.Min)(0),
         __metadata("design:type", Number)
-    ], TransitionSetting.prototype, "minVideoPagesViewed");
+    ], TransitionSetting.prototype, "minVideoPagesViewed", void 0);
     __decorate([
         (0, typeorm_1.Column)(),
         (0, class_validator_1.IsNumber)(),
         (0, class_validator_1.Min)(0),
         __metadata("design:type", Number)
-    ], TransitionSetting.prototype, "minVideoTimeViewedSeconds");
+    ], TransitionSetting.prototype, "minVideoTimeViewedSeconds", void 0);
     __decorate([
         (0, typeorm_1.Column)(),
         (0, class_validator_1.IsNumber)(),
         (0, class_validator_1.Min)(0),
         __metadata("design:type", Number)
-    ], TransitionSetting.prototype, "minTimeSpentOnYoutubeSeconds");
+    ], TransitionSetting.prototype, "minTimeSpentOnYoutubeSeconds", void 0);
     __decorate([
         (0, typeorm_1.Column)(),
         (0, class_validator_1.IsInt)(),
         (0, class_validator_1.Min)(0),
         __metadata("design:type", Number)
-    ], TransitionSetting.prototype, "minSidebarRecommendationsClicked");
+    ], TransitionSetting.prototype, "minSidebarRecommendationsClicked", void 0);
     __decorate([
         (0, typeorm_1.Column)(),
         (0, class_validator_1.IsInt)(),
         (0, class_validator_1.Min)(0),
         __metadata("design:type", Number)
-    ], TransitionSetting.prototype, "minDays");
+    ], TransitionSetting.prototype, "minDays", void 0);
     TransitionSetting = __decorate([
         (0, typeorm_1.Entity)()
     ], TransitionSetting);
     return TransitionSetting;
-}(model_1["default"]));
-exports.TransitionSetting = TransitionSetting;
-exports["default"] = TransitionSetting;
+}(model_1.default));
+exports.default = TransitionSetting;
 //# sourceMappingURL=transitionSetting.js.map

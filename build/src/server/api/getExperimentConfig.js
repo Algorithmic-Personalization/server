@@ -38,7 +38,7 @@ var __generator = (this && this.__generator) || function (thisArg, body) {
 var __importDefault = (this && this.__importDefault) || function (mod) {
     return (mod && mod.__esModule) ? mod : { "default": mod };
 };
-exports.__esModule = true;
+Object.defineProperty(exports, "__esModule", { value: true });
 exports.createGetExperimentConfigRoute = void 0;
 var experimentConfig_1 = __importDefault(require("../../common/models/experimentConfig"));
 var createGetExperimentConfigRoute = function (_a) {
@@ -50,9 +50,9 @@ var createGetExperimentConfigRoute = function (_a) {
                 case 0:
                     log = createLogger(req.requestId);
                     log('Received experiment config request');
-                    repo = dataSource.getRepository(experimentConfig_1["default"]);
+                    repo = dataSource.getRepository(experimentConfig_1.default);
                     return [4 /*yield*/, repo.findOneBy({
-                            isCurrent: true
+                            isCurrent: true,
                         })];
                 case 1:
                     config = _a.sent();
@@ -60,7 +60,7 @@ var createGetExperimentConfigRoute = function (_a) {
                     if (config) {
                         res.status(200).json({
                             kind: 'Success',
-                            value: config
+                            value: config,
                         });
                         return [2 /*return*/];
                     }
@@ -71,5 +71,5 @@ var createGetExperimentConfigRoute = function (_a) {
     }); };
 };
 exports.createGetExperimentConfigRoute = createGetExperimentConfigRoute;
-exports["default"] = exports.createGetExperimentConfigRoute;
+exports.default = exports.createGetExperimentConfigRoute;
 //# sourceMappingURL=getExperimentConfig.js.map

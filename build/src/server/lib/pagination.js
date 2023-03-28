@@ -1,5 +1,5 @@
 "use strict";
-exports.__esModule = true;
+Object.defineProperty(exports, "__esModule", { value: true });
 exports.extractPaginationRequest = void 0;
 var extractPaginationRequest = function (req, defaultPageSize) {
     if (defaultPageSize === void 0) { defaultPageSize = 15; }
@@ -11,7 +11,7 @@ var extractPaginationRequest = function (req, defaultPageSize) {
         ? defaultPageSize : Math.max(0, Math.min(Number(pageSize), defaultPageSize));
     return {
         page: pageNumber,
-        pageSize: pageSizeNumber
+        pageSize: pageSizeNumber,
     };
 };
 exports.extractPaginationRequest = extractPaginationRequest;

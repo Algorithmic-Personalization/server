@@ -27,7 +27,7 @@ var __spreadArray = (this && this.__spreadArray) || function (to, from, pack) {
 var __importDefault = (this && this.__importDefault) || function (mod) {
     return (mod && mod.__esModule) ? mod : { "default": mod };
 };
-exports.__esModule = true;
+Object.defineProperty(exports, "__esModule", { value: true });
 var path_1 = __importDefault(require("path"));
 var webpack_1 = __importDefault(require("webpack"));
 var react_refresh_webpack_plugin_1 = __importDefault(require("@pmmmwh/react-refresh-webpack-plugin"));
@@ -40,8 +40,8 @@ var conf = {
     entry: __spreadArray(__spreadArray([], __read(entry), false), ['./src/server-app/index.tsx'], false),
     output: {
         filename: 'bundle.js',
-        path: path_1["default"].resolve(__dirname, 'public'),
-        publicPath: '/'
+        path: path_1.default.resolve(__dirname, 'public'),
+        publicPath: '/',
     },
     resolve: {
         extensions: ['.ts', '.tsx', '.js'],
@@ -50,28 +50,28 @@ var conf = {
             path: false,
             fs: false,
             assert: false,
-            process: false
-        }
+            process: false,
+        },
     },
     module: {
         rules: [
             {
                 test: /\.tsx?$/,
                 use: 'ts-loader',
-                exclude: /node_modules/
+                exclude: /node_modules/,
             },
             {
                 test: /\.csv$/,
-                type: 'asset/source'
+                type: 'asset/source',
             },
-        ]
+        ],
     },
     devtool: 'source-map',
     plugins: [
-        isDevelopment && new webpack_1["default"].HotModuleReplacementPlugin(),
-        isDevelopment && new react_refresh_webpack_plugin_1["default"](),
-        new webpack_1["default"].EnvironmentPlugin(['NODE_ENV']),
-    ].filter(Boolean)
+        isDevelopment && new webpack_1.default.HotModuleReplacementPlugin(),
+        isDevelopment && new react_refresh_webpack_plugin_1.default(),
+        new webpack_1.default.EnvironmentPlugin(['NODE_ENV']),
+    ].filter(Boolean),
 };
-exports["default"] = conf;
+exports.default = conf;
 //# sourceMappingURL=webpack.config.js.map

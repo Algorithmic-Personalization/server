@@ -35,7 +35,7 @@ var __generator = (this && this.__generator) || function (thisArg, body) {
         if (op[0] & 5) throw op[1]; return { value: op[0] ? op[1] : void 0, done: true };
     }
 };
-exports.__esModule = true;
+Object.defineProperty(exports, "__esModule", { value: true });
 exports.createAuthMiddleWare = void 0;
 var createAuthMiddleWare = function (_a) {
     var createLogger = _a.createLogger, tokenTools = _a.tokenTools, tokenRepo = _a.tokenRepo;
@@ -83,5 +83,5 @@ var createAuthMiddleWare = function (_a) {
     };
 };
 exports.createAuthMiddleWare = createAuthMiddleWare;
-exports["default"] = exports.createAuthMiddleWare;
+exports.default = exports.createAuthMiddleWare;
 //# sourceMappingURL=authMiddleware.js.map

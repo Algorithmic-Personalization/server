@@ -1,5 +1,5 @@
 "use strict";
-exports.__esModule = true;
+Object.defineProperty(exports, "__esModule", { value: true });
 exports.isParticipantRecord = void 0;
 var util_1 = require("../../common/util");
 var isParticipantRecord = function (record) {

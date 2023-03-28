@@ -77,7 +77,7 @@ var __read = (this && this.__read) || function (o, n) {
 var __importDefault = (this && this.__importDefault) || function (mod) {
     return (mod && mod.__esModule) ? mod : { "default": mod };
 };
-exports.__esModule = true;
+Object.defineProperty(exports, "__esModule", { value: true });
 exports.EventsC = void 0;
 var react_1 = __importStar(require("react"));
 var material_1 = require("@mui/material");
@@ -88,23 +88,23 @@ var tableDescriptor = {
     headers: [
         {
             key: 'id',
-            element: 'Event ID'
+            element: 'Event ID',
         },
         {
             key: 'type',
-            element: 'Event type'
+            element: 'Event type',
         },
         {
             key: 'timestamp',
-            element: 'Timestamp'
+            element: 'Timestamp',
         },
         {
             key: 'sessionUuid',
-            element: 'Session UUID'
+            element: 'Session UUID',
         },
         {
             key: 'url',
-            element: 'URL'
+            element: 'URL',
         },
     ],
     rows: function (e) { return ({
@@ -115,11 +115,11 @@ var tableDescriptor = {
             new Date(e.createdAt),
             e.sessionUuid,
             // eslint-disable-next-line react/jsx-key
-            react_1["default"].createElement(util_1.UrlC, { url: e.url }),
-        ]
-    }); }
+            react_1.default.createElement(util_1.UrlC, { url: e.url }),
+        ],
+    }); },
 };
-var TableC = (0, TableC_1["default"])(tableDescriptor);
+var TableC = (0, TableC_1.default)(tableDescriptor);
 var EventsC = function () {
     var _a = __read((0, react_1.useState)('1'), 2), pageNumberControl = _a[0], setPageNumberControl = _a[1];
     var _b = __read((0, react_1.useState)(1), 2), pageNumber = _b[0], setPageNumber = _b[1];
@@ -150,16 +150,16 @@ var EventsC = function () {
             });
         }); })();
     }, [pageNumber]);
-    var ui = (react_1["default"].createElement(material_1.Box, { component: 'main' },
-        react_1["default"].createElement(material_1.Typography, { variant: 'h1', sx: { mb: 4 } }, "Events"),
-        react_1["default"].createElement(material_1.Typography, { sx: { display: 'flex', alignItems: 'center', mb: 2 } },
-            react_1["default"].createElement("span", null, "Page\u00A0"),
-            react_1["default"].createElement("input", { type: 'number', value: pageNumberControl, onChange: handlePageNumberChange, min: 1, max: pageCount, step: 1 }),
-            react_1["default"].createElement("span", null, "\u00A0/\u00A0"),
-            react_1["default"].createElement("span", null, pageCount)),
-        react_1["default"].createElement(TableC, { items: events })));
+    var ui = (react_1.default.createElement(material_1.Box, { component: 'main' },
+        react_1.default.createElement(material_1.Typography, { variant: 'h1', sx: { mb: 4 } }, "Events"),
+        react_1.default.createElement(material_1.Typography, { sx: { display: 'flex', alignItems: 'center', mb: 2 } },
+            react_1.default.createElement("span", null, "Page\u00A0"),
+            react_1.default.createElement("input", { type: 'number', value: pageNumberControl, onChange: handlePageNumberChange, min: 1, max: pageCount, step: 1 }),
+            react_1.default.createElement("span", null, "\u00A0/\u00A0"),
+            react_1.default.createElement("span", null, pageCount)),
+        react_1.default.createElement(TableC, { items: events })));
     return ui;
 };
 exports.EventsC = EventsC;
-exports["default"] = exports.EventsC;
+exports.default = exports.EventsC;
 //# sourceMappingURL=EventsP.js.map

@@ -35,7 +35,7 @@ var __generator = (this && this.__generator) || function (thisArg, body) {
         if (op[0] & 5) throw op[1]; return { value: op[0] ? op[1] : void 0, done: true };
     }
 };
-exports.__esModule = true;
+Object.defineProperty(exports, "__esModule", { value: true });
 exports.daysElapsed = exports.withLock = void 0;
 var locks = new Map();
 var unstackLock = function (id, log) { return __awaiter(void 0, void 0, void 0, function () {
@@ -74,7 +74,7 @@ var unstackLock = function (id, log) { return __awaiter(void 0, void 0, void 0, 
             case 6:
                 newStack = locks.get(id);
                 if (newStack && newStack.queue.length === 0) {
-                    locks["delete"](id);
+                    locks.delete(id);
                 }
                 _a.label = 7;
             case 7: return [2 /*return*/];

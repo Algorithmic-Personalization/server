@@ -27,13 +27,13 @@ var __metadata = (this && this.__metadata) || function (k, v) {
 var __importDefault = (this && this.__importDefault) || function (mod) {
     return (mod && mod.__esModule) ? mod : { "default": mod };
 };
-exports.__esModule = true;
+Object.defineProperty(exports, "__esModule", { value: true });
 exports.ExperimentConfig = void 0;
 var typeorm_1 = require("typeorm");
 var class_validator_1 = require("class-validator");
 var model_1 = __importDefault(require("../../common/lib/model"));
 var admin_1 = __importDefault(require("./admin"));
-var ExperimentConfig = /** @class */ (function (_super) {
+var ExperimentConfig = exports.ExperimentConfig = /** @class */ (function (_super) {
     __extends(ExperimentConfig, _super);
     function ExperimentConfig() {
         var _this = _super !== null && _super.apply(this, arguments) || this;
@@ -49,31 +49,30 @@ var ExperimentConfig = /** @class */ (function (_super) {
         (0, class_validator_1.Min)(0),
         (0, class_validator_1.Max)(1),
         __metadata("design:type", Number)
-    ], ExperimentConfig.prototype, "nonPersonalizedProbability");
+    ], ExperimentConfig.prototype, "nonPersonalizedProbability", void 0);
     __decorate([
         (0, typeorm_1.Column)(),
         (0, class_validator_1.IsString)(),
         __metadata("design:type", String)
-    ], ExperimentConfig.prototype, "comment");
+    ], ExperimentConfig.prototype, "comment", void 0);
     __decorate([
         (0, typeorm_1.Column)(),
         __metadata("design:type", Boolean)
-    ], ExperimentConfig.prototype, "isCurrent");
+    ], ExperimentConfig.prototype, "isCurrent", void 0);
     __decorate([
         (0, typeorm_1.Column)(),
         (0, class_validator_1.IsInt)(),
         __metadata("design:type", Number)
-    ], ExperimentConfig.prototype, "adminId");
+    ], ExperimentConfig.prototype, "adminId", void 0);
     __decorate([
-        (0, typeorm_1.ManyToOne)(function () { return admin_1["default"]; }, function (admin) { return admin.experimentConfigs; }),
+        (0, typeorm_1.ManyToOne)(function () { return admin_1.default; }, function (admin) { return admin.experimentConfigs; }),
         (0, typeorm_1.JoinColumn)({ name: 'admin_id' }),
-        __metadata("design:type", admin_1["default"])
-    ], ExperimentConfig.prototype, "admin");
+        __metadata("design:type", admin_1.default)
+    ], ExperimentConfig.prototype, "admin", void 0);
     ExperimentConfig = __decorate([
         (0, typeorm_1.Entity)()
     ], ExperimentConfig);
     return ExperimentConfig;
-}(model_1["default"]));
-exports.ExperimentConfig = ExperimentConfig;
-exports["default"] = ExperimentConfig;
+}(model_1.default));
+exports.default = ExperimentConfig;
 //# sourceMappingURL=experimentConfig.js.map

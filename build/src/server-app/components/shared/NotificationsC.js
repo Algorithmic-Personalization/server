@@ -69,7 +69,7 @@ var __values = (this && this.__values) || function(o) {
     };
     throw new TypeError(s ? "Object is not iterable." : "Symbol.iterator is not defined.");
 };
-exports.__esModule = true;
+Object.defineProperty(exports, "__esModule", { value: true });
 exports.NotificationsC = exports.FadeC = void 0;
 var react_1 = __importStar(require("react"));
 var material_1 = require("@mui/material");
@@ -101,7 +101,7 @@ var FadeC = function (_a) {
             setShow(false);
         }, displayForMs - timeout);
     }, [children]);
-    return react_1["default"].createElement(material_1.Fade, { "in": show, timeout: timeout }, children);
+    return react_1.default.createElement(material_1.Fade, { in: show, timeout: timeout }, children);
 };
 exports.FadeC = FadeC;
 var NotificationsC = function (_a) {
@@ -125,7 +125,7 @@ var NotificationsC = function (_a) {
         var base = {
             severity: severity,
             displayForMs: displayDuration(severity),
-            permanent: message.permanent
+            permanent: message.permanent,
         };
         var newIds = [];
         if (typeof message.text === 'string') {
@@ -145,7 +145,7 @@ var NotificationsC = function (_a) {
             catch (e_1_1) { e_1 = { error: e_1_1 }; }
             finally {
                 try {
-                    if (_d && !_d.done && (_a = _c["return"])) _a.call(_c);
+                    if (_d && !_d.done && (_a = _c.return)) _a.call(_c);
                 }
                 finally { if (e_1) throw e_1.error; }
             }
@@ -165,20 +165,20 @@ var NotificationsC = function (_a) {
     if (messages.length === 0) {
         return null;
     }
-    return (react_1["default"].createElement(material_1.Box, { sx: {
+    return (react_1.default.createElement(material_1.Box, { sx: {
             display: 'flex',
             flexDirection: 'column',
             alignItems: 'stretch',
             gap: 1,
-            my: 2
-        } }, messages.map(function (m) { return (react_1["default"].createElement(exports.FadeC, { key: m.id, displayForMs: m.displayForMs, permanent: m.permanent },
-        react_1["default"].createElement(material_1.Typography, { variant: 'body2', color: getColor(m.severity), sx: {
+            my: 2,
+        } }, messages.map(function (m) { return (react_1.default.createElement(exports.FadeC, { key: m.id, displayForMs: m.displayForMs, permanent: m.permanent },
+        react_1.default.createElement(material_1.Typography, { variant: 'body2', color: getColor(m.severity), sx: {
                 border: 1,
                 borderColor: getColor(m.severity),
                 borderRadius: 1,
-                p: 2
+                p: 2,
             } }, m.text))); })));
 };
 exports.NotificationsC = NotificationsC;
-exports["default"] = exports.NotificationsC;
+exports.default = exports.NotificationsC;
 //# sourceMappingURL=NotificationsC.js.map

@@ -35,7 +35,7 @@ var __generator = (this && this.__generator) || function (thisArg, body) {
         if (op[0] & 5) throw op[1]; return { value: op[0] ? op[1] : void 0, done: true };
     }
 };
-exports.__esModule = true;
+Object.defineProperty(exports, "__esModule", { value: true });
 exports.createAdminApi = void 0;
 var serverRoutes_1 = require("../server/serverRoutes");
 var getActivityReport_1 = require("../server/api-2/getActivityReport");
@@ -89,7 +89,7 @@ var createAdminApi = function (serverUrl, showLoginModal) {
         return ({
             'Content-Type': 'application/json',
             // eslint-disable-next-line @typescript-eslint/naming-convention
-            Authorization: "".concat((_a = token === null || token === void 0 ? void 0 : token.token) !== null && _a !== void 0 ? _a : '')
+            Authorization: "".concat((_a = token === null || token === void 0 ? void 0 : token.token) !== null && _a !== void 0 ? _a : ''),
         });
     };
     return {
@@ -144,8 +144,8 @@ var createAdminApi = function (serverUrl, showLoginModal) {
                                     body: formData,
                                     headers: {
                                         // eslint-disable-next-line @typescript-eslint/naming-convention
-                                        Authorization: "".concat((_a = token === null || token === void 0 ? void 0 : token.token) !== null && _a !== void 0 ? _a : '')
-                                    }
+                                        Authorization: "".concat((_a = token === null || token === void 0 ? void 0 : token.token) !== null && _a !== void 0 ? _a : ''),
+                                    },
                                 })];
                         case 1:
                             result = _b.sent();
@@ -164,11 +164,11 @@ var createAdminApi = function (serverUrl, showLoginModal) {
                             console.error(e_1);
                             return [2 /*return*/, {
                                     kind: 'Failure',
-                                    message: "Invalid response from server: ".concat((0, util_1.getMessage)(e_1, 'unknown error'))
+                                    message: "Invalid response from server: ".concat((0, util_1.getMessage)(e_1, 'unknown error')),
                                 }];
                         case 5: return [2 /*return*/, {
                                 kind: 'Failure',
-                                message: 'Invalid response from server'
+                                message: 'Invalid response from server',
                             }];
                     }
                 });
@@ -278,7 +278,7 @@ var createAdminApi = function (serverUrl, showLoginModal) {
                     return [2 /*return*/, put(path.replace(':code', participantCode), { phase: phase }, headers())];
                 });
             });
-        }
+        },
     };
 };
 exports.createAdminApi = createAdminApi;

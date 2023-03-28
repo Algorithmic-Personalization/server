@@ -27,7 +27,7 @@ var __metadata = (this && this.__metadata) || function (k, v) {
 var __importDefault = (this && this.__importDefault) || function (mod) {
     return (mod && mod.__esModule) ? mod : { "default": mod };
 };
-exports.__esModule = true;
+Object.defineProperty(exports, "__esModule", { value: true });
 exports.Event = exports.isValidExperimentArm = exports.ExperimentArm = exports.EventType = void 0;
 var typeorm_1 = require("typeorm");
 var class_validator_1 = require("class-validator");
@@ -53,7 +53,7 @@ var isValidExperimentArm = function (arm) {
     return arm === ExperimentArm.TREATMENT || arm === ExperimentArm.CONTROL;
 };
 exports.isValidExperimentArm = isValidExperimentArm;
-var Event = /** @class */ (function (_super) {
+var Event = exports.Event = /** @class */ (function (_super) {
     __extends(Event, _super);
     function Event() {
         var _this = _super !== null && _super.apply(this, arguments) || this;
@@ -71,59 +71,58 @@ var Event = /** @class */ (function (_super) {
         (0, class_validator_1.IsNotEmpty)(),
         (0, class_validator_1.IsString)(),
         __metadata("design:type", String)
-    ], Event.prototype, "sessionUuid");
+    ], Event.prototype, "sessionUuid", void 0);
     __decorate([
         (0, typeorm_1.Column)(),
         (0, class_validator_1.IsInt)(),
         (0, class_validator_1.IsPositive)(),
         __metadata("design:type", Number)
-    ], Event.prototype, "experimentConfigId");
+    ], Event.prototype, "experimentConfigId", void 0);
     __decorate([
         (0, typeorm_1.Column)(),
         __metadata("design:type", String)
-    ], Event.prototype, "arm");
+    ], Event.prototype, "arm", void 0);
     __decorate([
         (0, typeorm_1.Column)(),
         __metadata("design:type", String)
-    ], Event.prototype, "type");
+    ], Event.prototype, "type", void 0);
     __decorate([
         (0, typeorm_1.Column)(),
         (0, class_validator_1.IsNotEmpty)(),
         (0, class_validator_1.IsString)(),
         __metadata("design:type", String)
-    ], Event.prototype, "url");
+    ], Event.prototype, "url", void 0);
     __decorate([
         (0, typeorm_1.Column)(),
         (0, class_validator_1.IsString)(),
         (0, class_validator_1.IsOptional)(),
         __metadata("design:type", String)
-    ], Event.prototype, "context");
+    ], Event.prototype, "context", void 0);
     __decorate([
         (0, typeorm_1.Column)(),
         (0, class_validator_1.IsNotEmpty)(),
         (0, class_validator_1.IsString)(),
         __metadata("design:type", String)
-    ], Event.prototype, "localUuid");
+    ], Event.prototype, "localUuid", void 0);
     __decorate([
         (0, typeorm_1.Column)(),
         __metadata("design:type", String)
-    ], Event.prototype, "extensionVersion");
+    ], Event.prototype, "extensionVersion", void 0);
     __decorate([
         (0, typeorm_1.Column)(),
         (0, class_validator_1.IsInt)(),
         (0, class_validator_1.Min)(0),
         (0, class_validator_1.Max)(2),
         __metadata("design:type", Number)
-    ], Event.prototype, "phase");
+    ], Event.prototype, "phase", void 0);
     __decorate([
         (0, typeorm_1.Column)(),
         __metadata("design:type", Boolean)
-    ], Event.prototype, "tabActive");
+    ], Event.prototype, "tabActive", void 0);
     Event = __decorate([
         (0, typeorm_1.Entity)()
     ], Event);
     return Event;
-}(model_1["default"]));
-exports.Event = Event;
-exports["default"] = Event;
+}(model_1.default));
+exports.default = Event;
 //# sourceMappingURL=event.js.map

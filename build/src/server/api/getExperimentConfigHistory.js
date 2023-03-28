@@ -38,7 +38,7 @@ var __generator = (this && this.__generator) || function (thisArg, body) {
 var __importDefault = (this && this.__importDefault) || function (mod) {
     return (mod && mod.__esModule) ? mod : { "default": mod };
 };
-exports.__esModule = true;
+Object.defineProperty(exports, "__esModule", { value: true });
 exports.createGetExperimentConfigHistoryRoute = void 0;
 var experimentConfig_1 = __importDefault(require("../../common/models/experimentConfig"));
 var createGetExperimentConfigHistoryRoute = function (_a) {
@@ -50,7 +50,7 @@ var createGetExperimentConfigHistoryRoute = function (_a) {
                 case 0:
                     log = createLogger(req.requestId);
                     log('Received experiment config history request');
-                    repo = dataSource.getRepository(experimentConfig_1["default"]);
+                    repo = dataSource.getRepository(experimentConfig_1.default);
                     take = 30;
                     _a.label = 1;
                 case 1:
@@ -58,15 +58,15 @@ var createGetExperimentConfigHistoryRoute = function (_a) {
                     return [4 /*yield*/, repo.find({
                             take: take,
                             order: {
-                                createdAt: 'DESC'
+                                createdAt: 'DESC',
                             },
-                            relations: ['admin']
+                            relations: ['admin'],
                         })];
                 case 2:
                     configs = _a.sent();
                     res.status(200).json({
                         kind: 'Success',
-                        value: configs
+                        value: configs,
                     });
                     return [3 /*break*/, 4];
                 case 3:
@@ -80,5 +80,5 @@ var createGetExperimentConfigHistoryRoute = function (_a) {
     }); };
 };
 exports.createGetExperimentConfigHistoryRoute = createGetExperimentConfigHistoryRoute;
-exports["default"] = exports.createGetExperimentConfigHistoryRoute;
+exports.default = exports.createGetExperimentConfigHistoryRoute;
 //# sourceMappingURL=getExperimentConfigHistory.js.map

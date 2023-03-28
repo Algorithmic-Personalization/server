@@ -41,7 +41,7 @@ var __read = (this && this.__read) || function (o, n) {
 var __importDefault = (this && this.__importDefault) || function (mod) {
     return (mod && mod.__esModule) ? mod : { "default": mod };
 };
-exports.__esModule = true;
+Object.defineProperty(exports, "__esModule", { value: true });
 exports.LayoutC = void 0;
 var react_1 = __importStar(require("react"));
 var material_1 = require("@mui/material");
@@ -59,27 +59,27 @@ var navItems = [
     {
         label: 'Home',
         link: '/',
-        component: HomeP_1["default"]
+        component: HomeP_1.default,
     },
     {
         label: 'Participants',
         link: '/participants',
-        component: ParticipantsP_1["default"]
+        component: ParticipantsP_1.default,
     },
     {
         label: 'Experiment Config',
         link: '/experiment-config',
-        component: ExperimentConfigP_1["default"]
+        component: ExperimentConfigP_1.default,
     },
     {
         label: 'Events',
         link: '/events',
-        component: EventsP_1["default"]
+        component: EventsP_1.default,
     },
     {
         label: 'API Tokens',
         link: '/tokens',
-        component: ApiTokenCreationP_1["default"]
+        component: ApiTokenCreationP_1.default,
     },
 ];
 var LayoutC = function () {
@@ -89,48 +89,48 @@ var LayoutC = function () {
         setDrawerOpen(!drawerOpen);
     };
     var drawerWidth = 240;
-    var drawer = (react_1["default"].createElement(material_1.Box, { onClick: handleDrawerToggle, sx: { textAlign: 'center' } },
-        react_1["default"].createElement(material_1.Typography, { variant: 'h6', sx: { my: 2 } }, "YTDPNL"),
-        react_1["default"].createElement(material_1.Divider, null),
-        react_1["default"].createElement(material_1.List, null, navItems.map(function (item) { return (react_1["default"].createElement(material_1.ListItem, { key: item.link, disablePadding: true },
-            react_1["default"].createElement(material_1.ListItemButton, { sx: { textAlign: 'center' }, onClick: function () {
+    var drawer = (react_1.default.createElement(material_1.Box, { onClick: handleDrawerToggle, sx: { textAlign: 'center' } },
+        react_1.default.createElement(material_1.Typography, { variant: 'h6', sx: { my: 2 } }, "YTDPNL"),
+        react_1.default.createElement(material_1.Divider, null),
+        react_1.default.createElement(material_1.List, null, navItems.map(function (item) { return (react_1.default.createElement(material_1.ListItem, { key: item.link, disablePadding: true },
+            react_1.default.createElement(material_1.ListItemButton, { sx: { textAlign: 'center' }, onClick: function () {
                     navigate(item.link);
                     setDrawerOpen(false);
                 } },
-                react_1["default"].createElement(material_1.ListItemText, { primary: item.label })))); }))));
-    return (react_1["default"].createElement(material_1.Box, { sx: { display: 'flex' } },
-        react_1["default"].createElement(material_1.CssBaseline, null),
-        react_1["default"].createElement(material_1.AppBar, { component: 'nav' },
-            react_1["default"].createElement(material_1.Toolbar, null,
-                react_1["default"].createElement(material_1.IconButton, { color: 'inherit', "aria-label": 'open menu', edge: 'start', onClick: handleDrawerToggle, sx: { mr: 2, display: { sm: 'none' } } },
-                    react_1["default"].createElement(Menu_1["default"], null)),
-                react_1["default"].createElement(material_1.Typography, { variant: 'h6', component: 'div', sx: {
+                react_1.default.createElement(material_1.ListItemText, { primary: item.label })))); }))));
+    return (react_1.default.createElement(material_1.Box, { sx: { display: 'flex' } },
+        react_1.default.createElement(material_1.CssBaseline, null),
+        react_1.default.createElement(material_1.AppBar, { component: 'nav' },
+            react_1.default.createElement(material_1.Toolbar, null,
+                react_1.default.createElement(material_1.IconButton, { color: 'inherit', "aria-label": 'open menu', edge: 'start', onClick: handleDrawerToggle, sx: { mr: 2, display: { sm: 'none' } } },
+                    react_1.default.createElement(Menu_1.default, null)),
+                react_1.default.createElement(material_1.Typography, { variant: 'h6', component: 'div', sx: {
                         flexGrow: 1,
-                        display: { xs: 'none', sm: 'block' }
+                        display: { xs: 'none', sm: 'block' },
                     } }, "YTDPNL"),
-                react_1["default"].createElement(material_1.Box, { sx: { display: { xs: 'none', sm: 'block' } } },
-                    navItems.map(function (item) { return (react_1["default"].createElement(material_1.Button, { onClick: function () {
+                react_1.default.createElement(material_1.Box, { sx: { display: { xs: 'none', sm: 'block' } } },
+                    navItems.map(function (item) { return (react_1.default.createElement(material_1.Button, { onClick: function () {
                             navigate(item.link);
                         }, key: item.link, sx: { color: 'primary.contrastText' } }, item.label)); }),
-                    react_1["default"].createElement(material_1.Box, { sx: {
+                    react_1.default.createElement(material_1.Box, { sx: {
                             display: 'inline-block',
                             ml: 2,
-                            color: 'primary.contrastText2'
+                            color: 'primary.contrastText2',
                         } },
-                        react_1["default"].createElement(UserWidgetC_1["default"], null))))),
-        react_1["default"].createElement(material_1.Box, { component: 'nav' },
-            react_1["default"].createElement(material_1.Drawer, { variant: 'temporary', container: window.document.body, open: drawerOpen, onClose: handleDrawerToggle, ModalProps: {
-                    keepMounted: true
+                        react_1.default.createElement(UserWidgetC_1.default, null))))),
+        react_1.default.createElement(material_1.Box, { component: 'nav' },
+            react_1.default.createElement(material_1.Drawer, { variant: 'temporary', container: window.document.body, open: drawerOpen, onClose: handleDrawerToggle, ModalProps: {
+                    keepMounted: true,
                 }, sx: {
                     display: { xs: 'block', sm: 'none' },
-                    '& .MuiDrawer-paper': { boxSizing: 'border-box', width: drawerWidth }
+                    '& .MuiDrawer-paper': { boxSizing: 'border-box', width: drawerWidth },
                 } }, drawer)),
-        react_1["default"].createElement(material_1.Box, { component: 'main', sx: { p: 3, mt: 6, width: '100%' } },
-            react_1["default"].createElement(react_router_dom_1.Routes, null,
-                navItems.map(function (item) { return (react_1["default"].createElement(react_router_dom_1.Route, { element: react_1["default"].createElement(item.component, null), key: item.link, path: item.link })); }),
-                react_1["default"].createElement(react_router_dom_1.Route, { element: react_1["default"].createElement(ParticipantOverviewP_1["default"], null), path: '/participants/:code' }),
-                react_1["default"].createElement(react_router_dom_1.Route, { element: react_1["default"].createElement(NotFoundP_1["default"], null), path: '*' })))));
+        react_1.default.createElement(material_1.Box, { component: 'main', sx: { p: 3, mt: 6, width: '100%' } },
+            react_1.default.createElement(react_router_dom_1.Routes, null,
+                navItems.map(function (item) { return (react_1.default.createElement(react_router_dom_1.Route, { element: react_1.default.createElement(item.component, null), key: item.link, path: item.link })); }),
+                react_1.default.createElement(react_router_dom_1.Route, { element: react_1.default.createElement(ParticipantOverviewP_1.default, null), path: '/participants/:code' }),
+                react_1.default.createElement(react_router_dom_1.Route, { element: react_1.default.createElement(NotFoundP_1.default, null), path: '*' })))));
 };
 exports.LayoutC = LayoutC;
-exports["default"] = exports.LayoutC;
+exports.default = exports.LayoutC;
 //# sourceMappingURL=LayoutP.js.map

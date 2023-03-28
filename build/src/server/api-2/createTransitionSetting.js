@@ -38,7 +38,7 @@ var __generator = (this && this.__generator) || function (thisArg, body) {
 var __importDefault = (this && this.__importDefault) || function (mod) {
     return (mod && mod.__esModule) ? mod : { "default": mod };
 };
-exports.__esModule = true;
+Object.defineProperty(exports, "__esModule", { value: true });
 exports.createTransitionSettingDefinition = void 0;
 var transitionSetting_1 = __importDefault(require("../models/transitionSetting"));
 var util_1 = require("../../common/util");
@@ -55,9 +55,9 @@ exports.createTransitionSettingDefinition = {
                         log = createLogger(req.requestId);
                         log('Received create transitionSetting request');
                         payload = req.body;
-                        setting = new transitionSetting_1["default"]();
+                        setting = new transitionSetting_1.default();
                         Object.assign(setting, payload);
-                        return [4 /*yield*/, (0, util_1.validateNew)(transitionSetting_1["default"])];
+                        return [4 /*yield*/, (0, util_1.validateNew)(transitionSetting_1.default)];
                     case 1:
                         errors = _a.sent();
                         if (errors.length > 0) {
@@ -68,11 +68,11 @@ exports.createTransitionSettingDefinition = {
                                 return __generator(this, function (_a) {
                                     switch (_a.label) {
                                         case 0:
-                                            repo = transaction.getRepository(transitionSetting_1["default"]);
+                                            repo = transaction.getRepository(transitionSetting_1.default);
                                             return [4 /*yield*/, repo.findOneBy({
                                                     isCurrent: true,
                                                     fromPhase: setting.fromPhase,
-                                                    toPhase: setting.toPhase
+                                                    toPhase: setting.toPhase,
                                                 })];
                                         case 1:
                                             current = _a.sent();
@@ -95,7 +95,7 @@ exports.createTransitionSettingDefinition = {
                 }
             });
         }); };
-    }
+    },
 };
-exports["default"] = exports.createTransitionSettingDefinition;
+exports.default = exports.createTransitionSettingDefinition;
 //# sourceMappingURL=createTransitionSetting.js.map

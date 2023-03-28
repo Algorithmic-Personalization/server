@@ -38,7 +38,7 @@ var __generator = (this && this.__generator) || function (thisArg, body) {
 var __importDefault = (this && this.__importDefault) || function (mod) {
     return (mod && mod.__esModule) ? mod : { "default": mod };
 };
-exports.__esModule = true;
+Object.defineProperty(exports, "__esModule", { value: true });
 exports.createGetActivityReportDefinition = void 0;
 var dailyActivityTime_1 = __importDefault(require("../models/dailyActivityTime"));
 exports.createGetActivityReportDefinition = {
@@ -53,24 +53,24 @@ exports.createGetActivityReportDefinition = {
                     case 0:
                         log = createLogger(req.requestId);
                         log('Received get activity report request');
-                        activityRepo = dataSource.getRepository(dailyActivityTime_1["default"]);
+                        activityRepo = dataSource.getRepository(dailyActivityTime_1.default);
                         return [4 /*yield*/, activityRepo.find({
                                 order: {
                                     createdAt: 'DESC',
-                                    updatedAt: 'DESC'
+                                    updatedAt: 'DESC',
                                 },
                                 relations: ['participant'],
-                                take: 100
+                                take: 100,
                             })];
                     case 1:
                         latestActivity = _a.sent();
                         return [2 /*return*/, {
-                                latest: latestActivity
+                                latest: latestActivity,
                             }];
                 }
             });
         }); };
-    }
+    },
 };
-exports["default"] = exports.createGetActivityReportDefinition;
+exports.default = exports.createGetActivityReportDefinition;
 //# sourceMappingURL=getActivityReport.js.map

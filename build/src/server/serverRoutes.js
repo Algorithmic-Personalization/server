@@ -1,5 +1,5 @@
 "use strict";
-exports.__esModule = true;
+Object.defineProperty(exports, "__esModule", { value: true });
 exports.getEvents = exports.getExperimentConfigHistory = exports.postExperimentConfig = exports.getExperimentConfig = exports.getParticipantOverview = exports.getEventOverviews = exports.getParticipants = exports.postUploadParticipants = exports.getAuthTest = exports.postLogin = exports.getVerifyEmailToken = exports.postRegister = exports.deleteApiToken = exports.createApiToken = exports.getApiTokens = void 0;
 exports.getApiTokens = '/api/tokens';
 exports.createApiToken = '/api/tokens';

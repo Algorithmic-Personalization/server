@@ -1,6 +1,11 @@
 import {randomToken} from '../server/lib/crypto';
 
-const count = process.argv[2] || 1000;
+const count = process.argv[2] ? Number(process.argv[2]) : 1000;
+
+if (isNaN(count)) {
+	console.error('Invalid count');
+	process.exit(1);
+}
 
 console.log('email,code,arm');
 

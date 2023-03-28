@@ -38,7 +38,7 @@ var __generator = (this && this.__generator) || function (thisArg, body) {
 var __importDefault = (this && this.__importDefault) || function (mod) {
     return (mod && mod.__esModule) ? mod : { "default": mod };
 };
-exports.__esModule = true;
+Object.defineProperty(exports, "__esModule", { value: true });
 exports.createTokenTools = exports.checkPassword = exports.hashPassword = exports.randomToken = void 0;
 var bcrypt_1 = __importDefault(require("bcrypt"));
 var crypto_1 = __importDefault(require("crypto"));
@@ -46,13 +46,13 @@ var jsonwebtoken_1 = __importDefault(require("jsonwebtoken"));
 var util_1 = require("../../common/util");
 var randomToken = function (size) {
     if (size === void 0) { size = 128; }
-    return crypto_1["default"].randomBytes(size).toString('hex');
+    return crypto_1.default.randomBytes(size).toString('hex');
 };
 exports.randomToken = randomToken;
 var hashPassword = function (password) { return __awaiter(void 0, void 0, void 0, function () {
     return __generator(this, function (_a) {
         return [2 /*return*/, new Promise(function (resolve, reject) {
-                bcrypt_1["default"].hash(password, 10, function (err, hash) {
+                bcrypt_1.default.hash(password, 10, function (err, hash) {
                     if (err) {
                         reject(err);
                         return;
@@ -66,7 +66,7 @@ exports.hashPassword = hashPassword;
 var checkPassword = function (password, hash) { return __awaiter(void 0, void 0, void 0, function () {
     return __generator(this, function (_a) {
         return [2 /*return*/, new Promise(function (resolve, reject) {
-                bcrypt_1["default"].compare(password, hash, function (err, result) {
+                bcrypt_1.default.compare(password, hash, function (err, result) {
                     if (err) {
                         reject(err);
                         return;
@@ -78,20 +78,20 @@ var checkPassword = function (password, hash) { return __awaiter(void 0, void 0,
 }); };
 exports.checkPassword = checkPassword;
 var createTokenTools = function (secretKey) { return ({
-    sign: function (expiresIn, adminId) { return jsonwebtoken_1["default"].sign({ adminId: adminId }, secretKey, { expiresIn: expiresIn, algorithm: 'RS256' }); },
+    sign: function (expiresIn, adminId) { return jsonwebtoken_1.default.sign({ adminId: adminId }, secretKey, { expiresIn: expiresIn, algorithm: 'RS256' }); },
     verify: function (token) {
         try {
-            var json = jsonwebtoken_1["default"].verify(token, secretKey, { algorithms: ['RS256'] });
+            var json = jsonwebtoken_1.default.verify(token, secretKey, { algorithms: ['RS256'] });
             if (!(0, util_1.has)('iat')(json) || !(0, util_1.has)('exp')(json) || typeof json.iat !== 'number' || typeof json.exp !== 'number') {
                 return {
                     kind: 'Failure',
-                    message: 'Invalid token contents'
+                    message: 'Invalid token contents',
                 };
             }
             if (!(0, util_1.has)('adminId')(json) || typeof json.adminId !== 'number') {
                 return {
                     kind: 'Failure',
-                    message: 'Missing adminId in token'
+                    message: 'Missing adminId in token',
                 };
             }
             var iat = new Date(json.iat * 1000);
@@ -99,7 +99,7 @@ var createTokenTools = function (secretKey) { return ({
             if (iat > exp) {
                 return {
                     kind: 'Failure',
-                    message: 'Token expired'
+                    message: 'Token expired',
                 };
             }
             var adminId = json.adminId;
@@ -108,10 +108,10 @@ var createTokenTools = function (secretKey) { return ({
         catch (err) {
             return {
                 kind: 'Failure',
-                message: 'Invalid token'
+                message: 'Invalid token',
             };
         }
-    }
+    },
 }); };
 exports.createTokenTools = createTokenTools;
 //# sourceMappingURL=crypto.js.map

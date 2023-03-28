@@ -1,7 +1,11 @@
 "use strict";
-exports.__esModule = true;
+Object.defineProperty(exports, "__esModule", { value: true });
 var crypto_1 = require("../server/lib/crypto");
-var count = process.argv[2] || 1000;
+var count = process.argv[2] ? Number(process.argv[2]) : 1000;
+if (isNaN(count)) {
+    console.error('Invalid count');
+    process.exit(1);
+}
 console.log('email,code,arm');
 for (var i = 0; i < count; i++) {
     var email = "".concat((0, crypto_1.randomToken)(10), "@example.com");

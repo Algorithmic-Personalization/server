@@ -13,11 +13,11 @@ var __assign = (this && this.__assign) || function () {
 var __importDefault = (this && this.__importDefault) || function (mod) {
     return (mod && mod.__esModule) ? mod : { "default": mod };
 };
-exports.__esModule = true;
+Object.defineProperty(exports, "__esModule", { value: true });
 exports.DownloadLinkC = void 0;
 var react_1 = __importDefault(require("react"));
 var material_1 = require("@mui/material");
-var DownloadLinkC = function (props) { return (react_1["default"].createElement(material_1.Link, __assign({}, props))); };
+var DownloadLinkC = function (props) { return (react_1.default.createElement(material_1.Link, __assign({}, props))); };
 exports.DownloadLinkC = DownloadLinkC;
-exports["default"] = exports.DownloadLinkC;
+exports.default = exports.DownloadLinkC;
 //# sourceMappingURL=DownloadLinkC.js.map

@@ -38,7 +38,7 @@ var __generator = (this && this.__generator) || function (thisArg, body) {
 var __importDefault = (this && this.__importDefault) || function (mod) {
     return (mod && mod.__esModule) ? mod : { "default": mod };
 };
-exports.__esModule = true;
+Object.defineProperty(exports, "__esModule", { value: true });
 exports.createGetEventsRoute = void 0;
 var event_1 = __importDefault(require("../../common/models/event"));
 var pagination_1 = require("../lib/pagination");
@@ -51,7 +51,7 @@ var createGetEventsRoute = function (_a) {
                 case 0:
                     log = createLogger(req.requestId);
                     log('received get event request');
-                    repo = dataSource.getRepository(event_1["default"]);
+                    repo = dataSource.getRepository(event_1.default);
                     _a = (0, pagination_1.extractPaginationRequest)(req), page = _a.page, pageSize = _a.pageSize;
                     _b.label = 1;
                 case 1:
@@ -61,8 +61,8 @@ var createGetEventsRoute = function (_a) {
                             skip: page * pageSize,
                             take: pageSize,
                             order: {
-                                id: 'DESC'
-                            }
+                                id: 'DESC',
+                            },
                         })];
                 case 2:
                     results = _b.sent();
@@ -73,7 +73,7 @@ var createGetEventsRoute = function (_a) {
                         results: results,
                         page: page,
                         pageSize: pageSize,
-                        pageCount: Math.ceil(count / pageSize)
+                        pageCount: Math.ceil(count / pageSize),
                     };
                     res.status(200).json({ kind: 'Success', value: data });
                     return [3 /*break*/, 5];
@@ -88,5 +88,5 @@ var createGetEventsRoute = function (_a) {
     }); };
 };
 exports.createGetEventsRoute = createGetEventsRoute;
-exports["default"] = exports.createGetEventsRoute;
+exports.default = exports.createGetEventsRoute;
 //# sourceMappingURL=getEvents.js.map

@@ -74,7 +74,7 @@ var __read = (this && this.__read) || function (o, n) {
     }
     return ar;
 };
-exports.__esModule = true;
+Object.defineProperty(exports, "__esModule", { value: true });
 exports.UserWidgetC = void 0;
 var react_1 = __importStar(require("react"));
 var material_1 = require("@mui/material");
@@ -103,13 +103,13 @@ var UserWidgetC = function () {
         }); })();
     }, []);
     if (error) {
-        return react_1["default"].createElement(material_1.Typography, { color: 'error.main' }, error);
+        return react_1.default.createElement(material_1.Typography, { color: 'error.main' }, error);
     }
     if (!admin) {
         return null;
     }
-    return react_1["default"].createElement(material_1.Typography, null, admin.email);
+    return react_1.default.createElement(material_1.Typography, null, admin.email);
 };
 exports.UserWidgetC = UserWidgetC;
-exports["default"] = exports.UserWidgetC;
+exports.default = exports.UserWidgetC;
 //# sourceMappingURL=UserWidgetC.js.map

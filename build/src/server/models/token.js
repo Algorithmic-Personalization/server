@@ -27,12 +27,12 @@ var __metadata = (this && this.__metadata) || function (k, v) {
 var __importDefault = (this && this.__importDefault) || function (mod) {
     return (mod && mod.__esModule) ? mod : { "default": mod };
 };
-exports.__esModule = true;
+Object.defineProperty(exports, "__esModule", { value: true });
 exports.Token = void 0;
 var typeorm_1 = require("typeorm");
 var class_validator_1 = require("class-validator");
 var model_1 = __importDefault(require("../../common/lib/model"));
-var Token = /** @class */ (function (_super) {
+var Token = exports.Token = /** @class */ (function (_super) {
     __extends(Token, _super);
     function Token() {
         var _this = _super !== null && _super.apply(this, arguments) || this;
@@ -47,32 +47,31 @@ var Token = /** @class */ (function (_super) {
         (0, typeorm_1.Column)(),
         (0, class_validator_1.IsString)(),
         __metadata("design:type", String)
-    ], Token.prototype, "token");
+    ], Token.prototype, "token", void 0);
     __decorate([
         (0, typeorm_1.Column)(),
         (0, class_validator_1.IsInt)(),
         (0, class_validator_1.IsPositive)(),
         __metadata("design:type", Number)
-    ], Token.prototype, "adminId");
+    ], Token.prototype, "adminId", void 0);
     __decorate([
         (0, typeorm_1.Column)(),
         (0, class_validator_1.IsBoolean)(),
         __metadata("design:type", Boolean)
-    ], Token.prototype, "wasInvalidated");
+    ], Token.prototype, "wasInvalidated", void 0);
     __decorate([
         (0, typeorm_1.Column)(),
         __metadata("design:type", String)
-    ], Token.prototype, "name");
+    ], Token.prototype, "name", void 0);
     __decorate([
         (0, typeorm_1.Column)(),
         (0, class_validator_1.IsBoolean)(),
         __metadata("design:type", Boolean)
-    ], Token.prototype, "api");
+    ], Token.prototype, "api", void 0);
     Token = __decorate([
         (0, typeorm_1.Entity)()
     ], Token);
     return Token;
-}(model_1["default"]));
-exports.Token = Token;
-exports["default"] = Token;
+}(model_1.default));
+exports.default = Token;
 //# sourceMappingURL=token.js.map

@@ -27,13 +27,13 @@ var __metadata = (this && this.__metadata) || function (k, v) {
 var __importDefault = (this && this.__importDefault) || function (mod) {
     return (mod && mod.__esModule) ? mod : { "default": mod };
 };
-exports.__esModule = true;
+Object.defineProperty(exports, "__esModule", { value: true });
 exports.Admin = void 0;
 var typeorm_1 = require("typeorm");
 var class_validator_1 = require("class-validator");
 var model_1 = __importDefault(require("../lib/model"));
 var experimentConfig_1 = __importDefault(require("./experimentConfig"));
-var Admin = /** @class */ (function (_super) {
+var Admin = exports.Admin = /** @class */ (function (_super) {
     __extends(Admin, _super);
     function Admin() {
         var _this = _super !== null && _super.apply(this, arguments) || this;
@@ -49,39 +49,38 @@ var Admin = /** @class */ (function (_super) {
         (0, typeorm_1.Column)(),
         (0, class_validator_1.IsString)(),
         __metadata("design:type", String)
-    ], Admin.prototype, "name");
+    ], Admin.prototype, "name", void 0);
     __decorate([
         (0, class_validator_1.IsNotEmpty)(),
         (0, typeorm_1.Column)(),
         (0, class_validator_1.IsString)(),
         __metadata("design:type", String)
-    ], Admin.prototype, "email");
+    ], Admin.prototype, "email", void 0);
     __decorate([
         (0, class_validator_1.IsNotEmpty)(),
         (0, class_validator_1.MinLength)(8),
         (0, typeorm_1.Column)(),
         (0, class_validator_1.IsString)(),
         __metadata("design:type", String)
-    ], Admin.prototype, "password");
+    ], Admin.prototype, "password", void 0);
     __decorate([
         (0, typeorm_1.Column)(),
         (0, class_validator_1.IsString)(),
         (0, class_validator_1.Length)(128, 128),
         __metadata("design:type", String)
-    ], Admin.prototype, "verificationToken");
+    ], Admin.prototype, "verificationToken", void 0);
     __decorate([
         (0, typeorm_1.Column)(),
         __metadata("design:type", Boolean)
-    ], Admin.prototype, "emailVerified");
+    ], Admin.prototype, "emailVerified", void 0);
     __decorate([
-        (0, typeorm_1.OneToMany)(function () { return experimentConfig_1["default"]; }, function (experimentConfig) { return experimentConfig.admin; }),
+        (0, typeorm_1.OneToMany)(function () { return experimentConfig_1.default; }, function (experimentConfig) { return experimentConfig.admin; }),
         __metadata("design:type", Array)
-    ], Admin.prototype, "experimentConfigs");
+    ], Admin.prototype, "experimentConfigs", void 0);
     Admin = __decorate([
         (0, typeorm_1.Entity)()
     ], Admin);
     return Admin;
-}(model_1["default"]));
-exports.Admin = Admin;
-exports["default"] = Admin;
+}(model_1.default));
+exports.default = Admin;
 //# sourceMappingURL=admin.js.map

@@ -38,7 +38,7 @@ var __generator = (this && this.__generator) || function (thisArg, body) {
 var __importDefault = (this && this.__importDefault) || function (mod) {
     return (mod && mod.__esModule) ? mod : { "default": mod };
 };
-exports.__esModule = true;
+Object.defineProperty(exports, "__esModule", { value: true });
 exports.createPostCheckParticipantCodeRoute = void 0;
 var participant_1 = __importDefault(require("../models/participant"));
 var createPostCheckParticipantCodeRoute = function (_a) {
@@ -55,9 +55,9 @@ var createPostCheckParticipantCodeRoute = function (_a) {
                         res.status(400).send('Missing participant code');
                         return [2 /*return*/];
                     }
-                    repo = dataSource.getRepository(participant_1["default"]);
+                    repo = dataSource.getRepository(participant_1.default);
                     return [4 /*yield*/, repo.findOneBy({
-                            code: code
+                            code: code,
                         })];
                 case 1:
                     exists = _a.sent();
@@ -72,5 +72,5 @@ var createPostCheckParticipantCodeRoute = function (_a) {
     }); };
 };
 exports.createPostCheckParticipantCodeRoute = createPostCheckParticipantCodeRoute;
-exports["default"] = exports.createPostCheckParticipantCodeRoute;
+exports.default = exports.createPostCheckParticipantCodeRoute;
 //# sourceMappingURL=checkParticipantCode.js.map

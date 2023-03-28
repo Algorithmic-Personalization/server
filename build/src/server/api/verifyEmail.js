@@ -38,7 +38,7 @@ var __generator = (this && this.__generator) || function (thisArg, body) {
 var __importDefault = (this && this.__importDefault) || function (mod) {
     return (mod && mod.__esModule) ? mod : { "default": mod };
 };
-exports.__esModule = true;
+Object.defineProperty(exports, "__esModule", { value: true });
 exports.createVerifyEmailRoute = void 0;
 var urlencode_1 = require("urlencode");
 var admin_1 = __importDefault(require("../../common/models/admin"));
@@ -56,7 +56,7 @@ var createVerifyEmailRoute = function (_a) {
                         return [2 /*return*/];
                     }
                     log('Received verify email verification token:', token);
-                    adminRepo = dataSource.getRepository(admin_1["default"]);
+                    adminRepo = dataSource.getRepository(admin_1.default);
                     return [4 /*yield*/, adminRepo.findOneBy({ verificationToken: token })];
                 case 1:
                     admin = _a.sent();
@@ -86,5 +86,5 @@ var createVerifyEmailRoute = function (_a) {
     }); };
 };
 exports.createVerifyEmailRoute = createVerifyEmailRoute;
-exports["default"] = exports.createVerifyEmailRoute;
+exports.default = exports.createVerifyEmailRoute;
 //# sourceMappingURL=verifyEmail.js.map

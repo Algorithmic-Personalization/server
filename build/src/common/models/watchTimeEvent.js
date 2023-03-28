@@ -37,7 +37,7 @@ var __importStar = (this && this.__importStar) || function (mod) {
     __setModuleDefault(result, mod);
     return result;
 };
-exports.__esModule = true;
+Object.defineProperty(exports, "__esModule", { value: true });
 exports.WatchTimeEvent = void 0;
 var event_1 = __importStar(require("./event"));
 var WatchTimeEvent = /** @class */ (function (_super) {
@@ -49,7 +49,7 @@ var WatchTimeEvent = /** @class */ (function (_super) {
         return _this;
     }
     return WatchTimeEvent;
-}(event_1["default"]));
+}(event_1.default));
 exports.WatchTimeEvent = WatchTimeEvent;
-exports["default"] = WatchTimeEvent;
+exports.default = WatchTimeEvent;
 //# sourceMappingURL=watchTimeEvent.js.map

@@ -65,7 +65,7 @@ var __values = (this && this.__values) || function(o) {
 var __importDefault = (this && this.__importDefault) || function (mod) {
     return (mod && mod.__esModule) ? mod : { "default": mod };
 };
-exports.__esModule = true;
+Object.defineProperty(exports, "__esModule", { value: true });
 exports.updateCounters = exports.timeSpentEventDiffLimit = exports.wholeDate = exports.toDate = exports.wholeDateAsNumber = void 0;
 var participant_1 = __importDefault(require("../models/participant"));
 var session_1 = __importDefault(require("../../common/models/session"));
@@ -125,7 +125,7 @@ var mergeCounterKeys = function () {
             catch (e_2_1) { e_2 = { error: e_2_1 }; }
             finally {
                 try {
-                    if (_d && !_d.done && (_b = _c["return"])) _b.call(_c);
+                    if (_d && !_d.done && (_b = _c.return)) _b.call(_c);
                 }
                 finally { if (e_2) throw e_2.error; }
             }
@@ -134,7 +134,7 @@ var mergeCounterKeys = function () {
     catch (e_1_1) { e_1 = { error: e_1_1 }; }
     finally {
         try {
-            if (counters_1_1 && !counters_1_1.done && (_a = counters_1["return"])) _a.call(counters_1);
+            if (counters_1_1 && !counters_1_1.done && (_a = counters_1.return)) _a.call(counters_1);
         }
         finally { if (e_1) throw e_1.error; }
     }
@@ -174,9 +174,9 @@ var updateCounters = function (_a) {
             switch (_f.label) {
                 case 0:
                     log('Updating counters...');
-                    atRepo = dataSource.getRepository(dailyActivityTime_1["default"]);
+                    atRepo = dataSource.getRepository(dailyActivityTime_1.default);
                     return [4 /*yield*/, dataSource
-                            .getRepository(participant_1["default"])
+                            .getRepository(participant_1.default)
                             .createQueryBuilder('participant')
                             .select('participant.id', 'id')
                             .where("participant.id not in (\n\t\t\t\tselect participant_id from daily_activity_time\n\t\t)")
@@ -193,16 +193,16 @@ var updateCounters = function (_a) {
                     if (!!participants_1_1.done) return [3 /*break*/, 25];
                     id = participants_1_1.value.id;
                     return [4 /*yield*/, dataSource
-                            .getRepository(participant_1["default"])
+                            .getRepository(participant_1.default)
                             .findOneByOrFail({ id: id })];
                 case 4:
                     participant = _f.sent();
                     return [4 /*yield*/, dataSource
-                            .getRepository(session_1["default"])
+                            .getRepository(session_1.default)
                             .find({
                             where: {
-                                participantCode: participant.code
-                            }
+                                participantCode: participant.code,
+                            },
                         })];
                 case 5:
                     sessions = _f.sent();
@@ -220,14 +220,14 @@ var updateCounters = function (_a) {
                     if (!!sessions_1_1.done) return [3 /*break*/, 17];
                     session = sessions_1_1.value;
                     return [4 /*yield*/, dataSource
-                            .getRepository(event_1["default"])
+                            .getRepository(event_1.default)
                             .find({
                             where: {
-                                sessionUuid: session.uuid
+                                sessionUuid: session.uuid,
                             },
                             order: {
-                                createdAt: 'ASC'
-                            }
+                                createdAt: 'ASC',
+                            },
                         })];
                 case 8:
                     events = _f.sent();
@@ -257,11 +257,11 @@ var updateCounters = function (_a) {
                         sideBarClicked.add(event_2.createdAt, 1);
                     }
                     if (!(event_2.type === 'WATCH_TIME')) return [3 /*break*/, 12];
-                    repo = dataSource.getRepository(watchTime_1["default"]);
+                    repo = dataSource.getRepository(watchTime_1.default);
                     return [4 /*yield*/, repo.findOneOrFail({
                             where: {
-                                eventId: event_2.id
-                            }
+                                eventId: event_2.id,
+                            },
                         })];
                 case 11:
                     watchTime = _f.sent();
@@ -277,7 +277,7 @@ var updateCounters = function (_a) {
                     return [3 /*break*/, 16];
                 case 15:
                     try {
-                        if (events_1_1 && !events_1_1.done && (_d = events_1["return"])) _d.call(events_1);
+                        if (events_1_1 && !events_1_1.done && (_d = events_1.return)) _d.call(events_1);
                     }
                     finally { if (e_3) throw e_3.error; }
                     return [7 /*endfinally*/];
@@ -291,7 +291,7 @@ var updateCounters = function (_a) {
                     return [3 /*break*/, 20];
                 case 19:
                     try {
-                        if (sessions_1_1 && !sessions_1_1.done && (_c = sessions_1["return"])) _c.call(sessions_1);
+                        if (sessions_1_1 && !sessions_1_1.done && (_c = sessions_1.return)) _c.call(sessions_1);
                     }
                     finally { if (e_4) throw e_4.error; }
                     return [7 /*endfinally*/];
@@ -301,7 +301,7 @@ var updateCounters = function (_a) {
                     try {
                         for (days_1 = (e_6 = void 0, __values(days)), days_1_1 = days_1.next(); !days_1_1.done; days_1_1 = days_1.next()) {
                             day = days_1_1.value;
-                            activity = new dailyActivityTime_1["default"]();
+                            activity = new dailyActivityTime_1.default();
                             activity.pagesViewed = pagesViewed.get(day);
                             activity.videoTimeViewedSeconds = watchTimes.get(day);
                             activity.videoPagesViewed = videoPagesViewed.get(day);
@@ -315,7 +315,7 @@ var updateCounters = function (_a) {
                     catch (e_6_1) { e_6 = { error: e_6_1 }; }
                     finally {
                         try {
-                            if (days_1_1 && !days_1_1.done && (_e = days_1["return"])) _e.call(days_1);
+                            if (days_1_1 && !days_1_1.done && (_e = days_1.return)) _e.call(days_1);
                         }
                         finally { if (e_6) throw e_6.error; }
                     }
@@ -344,7 +344,7 @@ var updateCounters = function (_a) {
                     return [3 /*break*/, 28];
                 case 27:
                     try {
-                        if (participants_1_1 && !participants_1_1.done && (_b = participants_1["return"])) _b.call(participants_1);
+                        if (participants_1_1 && !participants_1_1.done && (_b = participants_1.return)) _b.call(participants_1);
                     }
                     finally { if (e_5) throw e_5.error; }
                     return [7 /*endfinally*/];
@@ -354,5 +354,5 @@ var updateCounters = function (_a) {
     });
 };
 exports.updateCounters = updateCounters;
-exports["default"] = exports.updateCounters;
+exports.default = exports.updateCounters;
 //# sourceMappingURL=updateCounters.js.map

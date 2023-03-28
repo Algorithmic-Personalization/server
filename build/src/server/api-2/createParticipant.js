@@ -49,7 +49,7 @@ var __rest = (this && this.__rest) || function (s, e) {
 var __importDefault = (this && this.__importDefault) || function (mod) {
     return (mod && mod.__esModule) ? mod : { "default": mod };
 };
-exports.__esModule = true;
+Object.defineProperty(exports, "__esModule", { value: true });
 exports.createParticipantDefinition = void 0;
 var participant_1 = require("../lib/participant");
 var participant_2 = __importDefault(require("../models/participant"));
@@ -69,19 +69,19 @@ exports.createParticipantDefinition = {
                         if (!(0, participant_1.isParticipantRecord)(participantPayload)) {
                             throw new Error('Invalid participant record');
                         }
-                        participantRepo = dataSource.getRepository(participant_2["default"]);
+                        participantRepo = dataSource.getRepository(participant_2.default);
                         return [4 /*yield*/, participantRepo.findOneBy({ code: participantPayload.code })];
                     case 1:
                         if (_b.sent()) {
                             throw new Error('Participant with that code already exists, use the update endpoint (PUT method) if you want to update it');
                         }
-                        participantEntity = new participant_2["default"]();
+                        participantEntity = new participant_2.default();
                         Object.assign(participantEntity, participantPayload);
                         return [2 /*return*/, participantRepo.save(participantEntity)];
                 }
             });
         }); };
-    }
+    },
 };
-exports["default"] = exports.createParticipantDefinition;
+exports.default = exports.createParticipantDefinition;
 //# sourceMappingURL=createParticipant.js.map

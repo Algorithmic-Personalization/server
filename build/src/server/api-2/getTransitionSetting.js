@@ -38,7 +38,7 @@ var __generator = (this && this.__generator) || function (thisArg, body) {
 var __importDefault = (this && this.__importDefault) || function (mod) {
     return (mod && mod.__esModule) ? mod : { "default": mod };
 };
-exports.__esModule = true;
+Object.defineProperty(exports, "__esModule", { value: true });
 exports.getTransitionSettingDefinition = void 0;
 var notFoundError_1 = __importDefault(require("../lib/notFoundError"));
 var transitionSetting_1 = __importDefault(require("../models/transitionSetting"));
@@ -66,22 +66,22 @@ exports.getTransitionSettingDefinition = {
                         if (fromNumber > 2 || toNumber > 2) {
                             throw new Error('Invalid phase numbers');
                         }
-                        repo = dataSource.getRepository(transitionSetting_1["default"]);
+                        repo = dataSource.getRepository(transitionSetting_1.default);
                         return [4 /*yield*/, repo.findOneBy({
                                 isCurrent: true,
                                 fromPhase: fromNumber,
-                                toPhase: toNumber
+                                toPhase: toNumber,
                             })];
                     case 1:
                         setting = _b.sent();
                         if (!setting) {
-                            throw new notFoundError_1["default"]('No transition setting found');
+                            throw new notFoundError_1.default('No transition setting found');
                         }
                         return [2 /*return*/, setting];
                 }
             });
         }); };
-    }
+    },
 };
-exports["default"] = exports.getTransitionSettingDefinition;
+exports.default = exports.getTransitionSettingDefinition;
 //# sourceMappingURL=getTransitionSetting.js.map

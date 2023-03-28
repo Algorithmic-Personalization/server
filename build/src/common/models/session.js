@@ -27,12 +27,12 @@ var __metadata = (this && this.__metadata) || function (k, v) {
 var __importDefault = (this && this.__importDefault) || function (mod) {
     return (mod && mod.__esModule) ? mod : { "default": mod };
 };
-exports.__esModule = true;
+Object.defineProperty(exports, "__esModule", { value: true });
 exports.Session = void 0;
 var typeorm_1 = require("typeorm");
 var class_validator_1 = require("class-validator");
 var model_1 = __importDefault(require("../lib/model"));
-var Session = /** @class */ (function (_super) {
+var Session = exports.Session = /** @class */ (function (_super) {
     __extends(Session, _super);
     function Session() {
         var _this = _super !== null && _super.apply(this, arguments) || this;
@@ -44,18 +44,17 @@ var Session = /** @class */ (function (_super) {
         (0, typeorm_1.Column)(),
         (0, typeorm_1.Generated)(),
         __metadata("design:type", String)
-    ], Session.prototype, "uuid");
+    ], Session.prototype, "uuid", void 0);
     __decorate([
         (0, typeorm_1.Column)(),
         (0, class_validator_1.IsNotEmpty)(),
         (0, class_validator_1.IsString)(),
         __metadata("design:type", String)
-    ], Session.prototype, "participantCode");
+    ], Session.prototype, "participantCode", void 0);
     Session = __decorate([
         (0, typeorm_1.Entity)()
     ], Session);
     return Session;
-}(model_1["default"]));
-exports.Session = Session;
-exports["default"] = Session;
+}(model_1.default));
+exports.default = Session;
 //# sourceMappingURL=session.js.map

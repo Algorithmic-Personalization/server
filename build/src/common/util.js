@@ -10,17 +10,6 @@ var __assign = (this && this.__assign) || function () {
     };
     return __assign.apply(this, arguments);
 };
-var __createBinding = (this && this.__createBinding) || (Object.create ? (function(o, m, k, k2) {
-    if (k2 === undefined) k2 = k;
-    var desc = Object.getOwnPropertyDescriptor(m, k);
-    if (!desc || ("get" in desc ? !m.__esModule : desc.writable || desc.configurable)) {
-      desc = { enumerable: true, get: function() { return m[k]; } };
-    }
-    Object.defineProperty(o, k2, desc);
-}) : (function(o, m, k, k2) {
-    if (k2 === undefined) k2 = k;
-    o[k2] = m[k];
-}));
 var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, generator) {
     function adopt(value) { return value instanceof P ? value : new P(function (resolve) { resolve(value); }); }
     return new (P || (P = Promise))(function (resolve, reject) {
@@ -93,12 +82,12 @@ var __spreadArray = (this && this.__spreadArray) || function (to, from, pack) {
     }
     return to.concat(ar || Array.prototype.slice.call(from));
 };
-exports.__esModule = true;
+Object.defineProperty(exports, "__esModule", { value: true });
 exports.findPackageJsonDir = exports.makeApiVerbCreator = exports.restoreInnerInstance = exports.isMaybe = exports.validateExisting = exports.validateNew = exports.validateExcept = exports.getInteger = exports.getMessage = exports.getNumber = exports.getString = exports.get = exports.retryOnError = exports.wait = exports.memoizeTemporarily = exports.has = exports.removeDuplicates = exports.shuffleArray = exports.setPersonalizedFlags = exports.uuidv4 = void 0;
 var path_1 = require("path");
 var promises_1 = require("fs/promises");
 var uuid_1 = require("uuid");
-__createBinding(exports, uuid_1, "v4", "uuidv4");
+Object.defineProperty(exports, "uuidv4", { enumerable: true, get: function () { return uuid_1.v4; } });
 var class_validator_1 = require("class-validator");
 var setPersonalizedFlags = function (nonPersonalized, personalized) {
     var e_1, _a, e_2, _b, e_3, _c, e_4, _d;
@@ -116,7 +105,7 @@ var setPersonalizedFlags = function (nonPersonalized, personalized) {
     catch (e_1_1) { e_1 = { error: e_1_1 }; }
     finally {
         try {
-            if (nonPersonalized_1_1 && !nonPersonalized_1_1.done && (_a = nonPersonalized_1["return"])) _a.call(nonPersonalized_1);
+            if (nonPersonalized_1_1 && !nonPersonalized_1_1.done && (_a = nonPersonalized_1.return)) _a.call(nonPersonalized_1);
         }
         finally { if (e_1) throw e_1.error; }
     }
@@ -130,7 +119,7 @@ var setPersonalizedFlags = function (nonPersonalized, personalized) {
     catch (e_2_1) { e_2 = { error: e_2_1 }; }
     finally {
         try {
-            if (personalized_1_1 && !personalized_1_1.done && (_b = personalized_1["return"])) _b.call(personalized_1);
+            if (personalized_1_1 && !personalized_1_1.done && (_b = personalized_1.return)) _b.call(personalized_1);
         }
         finally { if (e_2) throw e_2.error; }
     }
@@ -148,7 +137,7 @@ var setPersonalizedFlags = function (nonPersonalized, personalized) {
     catch (e_3_1) { e_3 = { error: e_3_1 }; }
     finally {
         try {
-            if (nonPersonalizedOut_1_1 && !nonPersonalizedOut_1_1.done && (_c = nonPersonalizedOut_1["return"])) _c.call(nonPersonalizedOut_1);
+            if (nonPersonalizedOut_1_1 && !nonPersonalizedOut_1_1.done && (_c = nonPersonalizedOut_1.return)) _c.call(nonPersonalizedOut_1);
         }
         finally { if (e_3) throw e_3.error; }
     }
@@ -166,7 +155,7 @@ var setPersonalizedFlags = function (nonPersonalized, personalized) {
     catch (e_4_1) { e_4 = { error: e_4_1 }; }
     finally {
         try {
-            if (personalizedOut_1_1 && !personalizedOut_1_1.done && (_d = personalizedOut_1["return"])) _d.call(personalizedOut_1);
+            if (personalizedOut_1_1 && !personalizedOut_1_1.done && (_d = personalizedOut_1.return)) _d.call(personalizedOut_1);
         }
         finally { if (e_4) throw e_4.error; }
     }
@@ -201,7 +190,7 @@ var removeDuplicates = function (identifier) { return function (array) {
     catch (e_5_1) { e_5 = { error: e_5_1 }; }
     finally {
         try {
-            if (array_1_1 && !array_1_1.done && (_a = array_1["return"])) _a.call(array_1);
+            if (array_1_1 && !array_1_1.done && (_a = array_1.return)) _a.call(array_1);
         }
         finally { if (e_5) throw e_5.error; }
     }
@@ -225,7 +214,7 @@ var memoizeTemporarily = function (ttlMs) { return function (f) {
         var res = f(x);
         cache.set(x, res);
         setTimeout(function () {
-            cache["delete"](x);
+            cache.delete(x);
         }, ttlMs);
         return res;
     };
@@ -289,7 +278,7 @@ var get = function (path) { return function (x) {
     catch (e_6_1) { e_6 = { error: e_6_1 }; }
     finally {
         try {
-            if (path_2_1 && !path_2_1.done && (_a = path_2["return"])) _a.call(path_2);
+            if (path_2_1 && !path_2_1.done && (_a = path_2.return)) _a.call(path_2);
         }
         finally { if (e_6) throw e_6.error; }
     }
@@ -344,7 +333,7 @@ var flattenErrors = function (errors) {
     catch (e_7_1) { e_7 = { error: e_7_1 }; }
     finally {
         try {
-            if (errors_1_1 && !errors_1_1.done && (_a = errors_1["return"])) _a.call(errors_1);
+            if (errors_1_1 && !errors_1_1.done && (_a = errors_1.return)) _a.call(errors_1);
         }
         finally { if (e_7) throw e_7.error; }
     }
@@ -424,7 +413,7 @@ var makeApiVerbCreator = function (serverUrl) {
                     return [4 /*yield*/, fetch("".concat(serverUrl).concat(path).concat(qs), {
                             method: method,
                             body: body,
-                            headers: headers
+                            headers: headers,
                         })];
                 case 2:
                     result = _a.sent();
@@ -440,13 +429,13 @@ var makeApiVerbCreator = function (serverUrl) {
                     console.error(e_8);
                     err = {
                         kind: 'Failure',
-                        message: 'Invalid or no response from server'
+                        message: 'Invalid or no response from server',
                     };
                     return [2 /*return*/, err];
                 case 5:
                     res = {
                         kind: 'Failure',
-                        message: 'Invalid response from server'
+                        message: 'Invalid response from server',
                     };
                     return [2 /*return*/, res];
             }

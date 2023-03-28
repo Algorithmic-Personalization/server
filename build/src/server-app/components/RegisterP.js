@@ -88,7 +88,7 @@ var __read = (this && this.__read) || function (o, n) {
 var __importDefault = (this && this.__importDefault) || function (mod) {
     return (mod && mod.__esModule) ? mod : { "default": mod };
 };
-exports.__esModule = true;
+Object.defineProperty(exports, "__esModule", { value: true });
 exports.RegisterC = void 0;
 var react_1 = __importStar(require("react"));
 var material_1 = require("@mui/material");
@@ -112,11 +112,11 @@ var RegisterC = function (_a) {
             return __generator(this, function (_a) {
                 switch (_a.label) {
                     case 0:
-                        admin = new admin_1["default"]();
+                        admin = new admin_1.default();
                         Object.assign(admin, {
                             name: name,
                             email: email,
-                            password: password
+                            password: password,
                         });
                         return [4 /*yield*/, validate(admin)];
                     case 1:
@@ -127,7 +127,7 @@ var RegisterC = function (_a) {
                         if (validationErrors.length > 0) {
                             setMessage({
                                 text: validationErrors,
-                                severity: 'error'
+                                severity: 'error',
                             });
                             return [2 /*return*/];
                         }
@@ -139,13 +139,13 @@ var RegisterC = function (_a) {
                         if (result.kind === 'Success') {
                             setMessage({
                                 text: result.value,
-                                severity: 'success'
+                                severity: 'success',
                             });
                         }
                         else {
                             setMessage({
                                 text: result.message,
-                                severity: 'error'
+                                severity: 'error',
                             });
                         }
                         return [2 /*return*/];
@@ -153,36 +153,36 @@ var RegisterC = function (_a) {
             });
         }); })();
     };
-    var ui = (react_1["default"].createElement(material_1.Box, { sx: {
+    var ui = (react_1.default.createElement(material_1.Box, { sx: {
             display: 'flex',
             justifyContent: 'center',
             alignItems: 'top',
-            mt: 6
+            mt: 6,
         } },
-        react_1["default"].createElement("form", { onSubmit: function (e) {
+        react_1.default.createElement("form", { onSubmit: function (e) {
                 console.log('submit');
                 tryToRegister();
                 e.preventDefault();
             } },
-            react_1["default"].createElement("h1", null, "Admin registration"),
-            react_1["default"].createElement(NotificationsC_1["default"], { message: message }),
-            react_1["default"].createElement(material_1.FormControl, { sx: { mb: 2, display: 'block' } },
-                react_1["default"].createElement(material_1.InputLabel, { htmlFor: 'name' }, "Name"),
-                react_1["default"].createElement(material_1.Input, __assign({ id: 'name', type: 'text' }, (0, util_1.bind)(name, setName)))),
-            react_1["default"].createElement(material_1.FormControl, { sx: { mb: 2, display: 'block' } },
-                react_1["default"].createElement(material_1.InputLabel, { htmlFor: 'email' }, "Email"),
-                react_1["default"].createElement(material_1.Input, __assign({ id: 'email', type: 'email' }, (0, util_1.bind)(email, setEmail)))),
-            react_1["default"].createElement(material_1.FormControl, { sx: { mb: 2, display: 'block' } },
-                react_1["default"].createElement(material_1.InputLabel, { htmlFor: 'password' }, "Password"),
-                react_1["default"].createElement(material_1.Input, __assign({ id: 'password', type: 'password' }, (0, util_1.bind)(password, setPassword)))),
-            react_1["default"].createElement(material_1.FormControl, { sx: { mb: 2, display: 'block' } },
-                react_1["default"].createElement(material_1.InputLabel, { htmlFor: 'confirm' }, "Password confirmation"),
-                react_1["default"].createElement(material_1.Input, __assign({ id: 'confirm', type: 'password' }, (0, util_1.bind)(confirm, setConfirm)))),
-            react_1["default"].createElement(material_1.Button, { type: 'submit', variant: 'contained', sx: { mt: 2 }, disabled: isSubmitting }, "Register"),
-            react_1["default"].createElement(material_1.Box, { sx: { mt: 2 } },
-                react_1["default"].createElement(react_router_dom_1.Link, { to: '/' }, "Login instead")))));
+            react_1.default.createElement("h1", null, "Admin registration"),
+            react_1.default.createElement(NotificationsC_1.default, { message: message }),
+            react_1.default.createElement(material_1.FormControl, { sx: { mb: 2, display: 'block' } },
+                react_1.default.createElement(material_1.InputLabel, { htmlFor: 'name' }, "Name"),
+                react_1.default.createElement(material_1.Input, __assign({ id: 'name', type: 'text' }, (0, util_1.bind)(name, setName)))),
+            react_1.default.createElement(material_1.FormControl, { sx: { mb: 2, display: 'block' } },
+                react_1.default.createElement(material_1.InputLabel, { htmlFor: 'email' }, "Email"),
+                react_1.default.createElement(material_1.Input, __assign({ id: 'email', type: 'email' }, (0, util_1.bind)(email, setEmail)))),
+            react_1.default.createElement(material_1.FormControl, { sx: { mb: 2, display: 'block' } },
+                react_1.default.createElement(material_1.InputLabel, { htmlFor: 'password' }, "Password"),
+                react_1.default.createElement(material_1.Input, __assign({ id: 'password', type: 'password' }, (0, util_1.bind)(password, setPassword)))),
+            react_1.default.createElement(material_1.FormControl, { sx: { mb: 2, display: 'block' } },
+                react_1.default.createElement(material_1.InputLabel, { htmlFor: 'confirm' }, "Password confirmation"),
+                react_1.default.createElement(material_1.Input, __assign({ id: 'confirm', type: 'password' }, (0, util_1.bind)(confirm, setConfirm)))),
+            react_1.default.createElement(material_1.Button, { type: 'submit', variant: 'contained', sx: { mt: 2 }, disabled: isSubmitting }, "Register"),
+            react_1.default.createElement(material_1.Box, { sx: { mt: 2 } },
+                react_1.default.createElement(react_router_dom_1.Link, { to: '/' }, "Login instead")))));
     return ui;
 };
 exports.RegisterC = RegisterC;
-exports["default"] = exports.RegisterC;
+exports.default = exports.RegisterC;
 //# sourceMappingURL=RegisterP.js.map

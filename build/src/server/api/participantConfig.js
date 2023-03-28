@@ -38,7 +38,7 @@ var __generator = (this && this.__generator) || function (thisArg, body) {
 var __importDefault = (this && this.__importDefault) || function (mod) {
     return (mod && mod.__esModule) ? mod : { "default": mod };
 };
-exports.__esModule = true;
+Object.defineProperty(exports, "__esModule", { value: true });
 exports.createGetParticipantConfigRoute = void 0;
 var participant_1 = __importDefault(require("../models/participant"));
 var experimentConfig_1 = __importDefault(require("../../common/models/experimentConfig"));
@@ -51,10 +51,10 @@ var createGetParticipantConfigRoute = function (_a) {
                 case 0:
                     log = createLogger(req.requestId);
                     log('Received get participant config request');
-                    participantRepo = dataSource.getRepository(participant_1["default"]);
-                    configRepo = dataSource.getRepository(experimentConfig_1["default"]);
+                    participantRepo = dataSource.getRepository(participant_1.default);
+                    configRepo = dataSource.getRepository(experimentConfig_1.default);
                     return [4 /*yield*/, configRepo.findOneBy({
-                            isCurrent: true
+                            isCurrent: true,
                         })];
                 case 1:
                     config = _a.sent();
@@ -64,7 +64,7 @@ var createGetParticipantConfigRoute = function (_a) {
                         return [2 /*return*/];
                     }
                     return [4 /*yield*/, participantRepo.findOneBy({
-                            code: req.participantCode
+                            code: req.participantCode,
                         })];
                 case 2:
                     participant = _a.sent();
@@ -81,7 +81,7 @@ var createGetParticipantConfigRoute = function (_a) {
                     result = {
                         arm: arm,
                         nonPersonalizedProbability: nonPersonalizedProbability,
-                        experimentConfigId: config.id
+                        experimentConfigId: config.id,
                     };
                     log('Sending participant config', result);
                     res.send({ kind: 'Success', value: result });
@@ -91,5 +91,5 @@ var createGetParticipantConfigRoute = function (_a) {
     }); };
 };
 exports.createGetParticipantConfigRoute = createGetParticipantConfigRoute;
-exports["default"] = exports.createGetParticipantConfigRoute;
+exports.default = exports.createGetParticipantConfigRoute;
 //# sourceMappingURL=participantConfig.js.map

@@ -24,7 +24,7 @@ var __spreadArray = (this && this.__spreadArray) || function (to, from, pack) {
     }
     return to.concat(ar || Array.prototype.slice.call(from));
 };
-exports.__esModule = true;
+Object.defineProperty(exports, "__esModule", { value: true });
 exports.createDefaultLogger = void 0;
 var util_1 = require("util");
 var createDefaultLogger = function (f) { return function (requestId) {
@@ -47,5 +47,5 @@ var createDefaultLogger = function (f) { return function (requestId) {
     };
 }; };
 exports.createDefaultLogger = createDefaultLogger;
-exports["default"] = exports.createDefaultLogger;
+exports.default = exports.createDefaultLogger;
 //# sourceMappingURL=logger.js.map

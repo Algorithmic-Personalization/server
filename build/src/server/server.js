@@ -74,7 +74,7 @@ var __spreadArray = (this && this.__spreadArray) || function (to, from, pack) {
 var __importDefault = (this && this.__importDefault) || function (mod) {
     return (mod && mod.__esModule) ? mod : { "default": mod };
 };
-exports.__esModule = true;
+Object.defineProperty(exports, "__esModule", { value: true });
 var promises_1 = require("fs/promises");
 var fs_1 = require("fs");
 var path_1 = require("path");
@@ -143,24 +143,24 @@ var getTransitionSetting_1 = __importDefault(require("./api-2/getTransitionSetti
 // Add classes used by typeorm as models here
 // so that typeorm can extract the metadata from them.
 var entities = [
-    admin_1["default"],
-    token_1["default"],
-    participant_1["default"],
-    experimentConfig_1["default"],
-    session_1["default"],
-    event_1["default"],
-    video_1["default"],
-    videoListItem_1["default"],
-    watchTime_1["default"],
-    dailyActivityTime_1["default"],
-    transitionEvent_1["default"],
-    transitionSetting_1["default"],
+    admin_1.default,
+    token_1.default,
+    participant_1.default,
+    experimentConfig_1.default,
+    session_1.default,
+    event_1.default,
+    video_1.default,
+    videoListItem_1.default,
+    watchTime_1.default,
+    dailyActivityTime_1.default,
+    transitionEvent_1.default,
+    transitionSetting_1.default,
 ];
 var env = process.env.NODE_ENV;
 if (env !== 'production' && env !== 'development') {
     throw new Error('NODE_ENV must be set to "production" or "development"');
 }
-var upload = (0, multer_1["default"])();
+var upload = (0, multer_1.default)();
 var start = function () { return __awaiter(void 0, void 0, void 0, function () {
     var root, logsPath, logStream, configJson, config, dockerComposeJson, dockerComposeConfig, smtpConfig, smtpConfigErrors, mailer, portKey, port, dbPortString, _a, dbHostPort, dbDockerPort, dbPort, dbConfigPath, dbHost, dbUser, dbPassword, dbDatabase, dbConfig, pgClient, err_1, migrated, err_2, ds, err_3, createLogger, err_4, privateKey, tokenTools, routeContext, makeHandler, tokenRepo, authMiddleware, participantMw, app, staticRouter, compiler, requestId, defineAdminRoute;
     return __generator(this, function (_b) {
@@ -185,7 +185,7 @@ var start = function () { return __awaiter(void 0, void 0, void 0, function () {
                 if (!(0, util_1.has)('smtp')(config)) {
                     throw new Error('Missing smtp config in config.yml');
                 }
-                smtpConfig = new smtpConfig_1["default"]();
+                smtpConfig = new smtpConfig_1.default();
                 Object.assign(smtpConfig, config.smtp);
                 return [4 /*yield*/, (0, class_validator_1.validate)(smtpConfig)];
             case 4:
@@ -194,7 +194,7 @@ var start = function () { return __awaiter(void 0, void 0, void 0, function () {
                     console.error('Invalid smtp config in config.yml', smtpConfigErrors);
                     process.exit(1);
                 }
-                mailer = nodemailer_1["default"].createTransport(smtpConfig);
+                mailer = nodemailer_1.default.createTransport(smtpConfig);
                 console.log('Mailer created:', mailer.transporter.name);
                 if (!dockerComposeConfig || typeof dockerComposeConfig !== 'object') {
                     throw new Error('Invalid docker-compose.yaml');
@@ -217,7 +217,7 @@ var start = function () { return __awaiter(void 0, void 0, void 0, function () {
                     port: dbPort,
                     user: dbUser,
                     password: dbPassword,
-                    database: dbDatabase
+                    database: dbDatabase,
                 };
                 pgClient = new pg_1.Client(dbConfig);
                 _b.label = 5;
@@ -266,9 +266,9 @@ var start = function () { return __awaiter(void 0, void 0, void 0, function () {
                 _b.label = 17;
             case 17:
                 _b.trys.push([17, 19, , 20]);
-                return [4 /*yield*/, (0, updateCounters_1["default"])({
+                return [4 /*yield*/, (0, updateCounters_1.default)({
                         dataSource: ds,
-                        log: createLogger(0)
+                        log: createLogger(0),
                     })];
             case 18:
                 _b.sent();
@@ -287,30 +287,30 @@ var start = function () { return __awaiter(void 0, void 0, void 0, function () {
                     mailer: mailer,
                     mailerFrom: smtpConfig.auth.user,
                     createLogger: createLogger,
-                    tokenTools: tokenTools
+                    tokenTools: tokenTools,
                 };
                 makeHandler = (0, routeCreation_1.makeRouteConnector)(routeContext);
-                tokenRepo = ds.getRepository(token_1["default"]);
-                authMiddleware = (0, authMiddleware_1["default"])({
+                tokenRepo = ds.getRepository(token_1.default);
+                authMiddleware = (0, authMiddleware_1.default)({
                     tokenRepo: tokenRepo,
                     tokenTools: tokenTools,
-                    createLogger: createLogger
+                    createLogger: createLogger,
                 });
-                participantMw = (0, participantMiddleware_1["default"])(createLogger);
-                app = (0, express_1["default"])();
-                staticRouter = express_1["default"].Router();
+                participantMw = (0, participantMiddleware_1.default)(createLogger);
+                app = (0, express_1.default)();
+                staticRouter = express_1.default.Router();
                 if (env === 'development') {
-                    compiler = (0, webpack_1["default"])(webpack_config_1["default"]);
-                    if (!webpack_config_1["default"].output) {
+                    compiler = (0, webpack_1.default)(webpack_config_1.default);
+                    if (!webpack_config_1.default.output) {
                         throw new Error('Invalid webpack config, missing output path');
                     }
-                    staticRouter.use((0, webpack_dev_middleware_1["default"])(compiler));
-                    staticRouter.use((0, webpack_hot_middleware_1["default"])(compiler));
+                    staticRouter.use((0, webpack_dev_middleware_1.default)(compiler));
+                    staticRouter.use((0, webpack_hot_middleware_1.default)(compiler));
                 }
-                staticRouter.use(express_1["default"].static((0, path_1.join)(root, 'public')));
+                staticRouter.use(express_1.default.static((0, path_1.join)(root, 'public')));
                 app.use(staticRouter);
-                app.use(body_parser_1["default"].json());
-                app.use((0, cors_1["default"])());
+                app.use(body_parser_1.default.json());
+                app.use((0, cors_1.default)());
                 requestId = 0;
                 app.use(function (req, _res, next) {
                     ++requestId;
@@ -321,33 +321,33 @@ var start = function () { return __awaiter(void 0, void 0, void 0, function () {
                 defineAdminRoute = function (def) {
                     app[def.verb](def.path, authMiddleware, makeHandler(def));
                 };
-                app.use((0, express_status_monitor_1["default"])({
-                    path: '/status'
+                app.use((0, express_status_monitor_1.default)({
+                    path: '/status',
                 }));
-                defineAdminRoute(createParticipant_1["default"]);
-                defineAdminRoute(getActivityReport_1["default"]);
-                defineAdminRoute(createTransitionSetting_1["default"]);
-                defineAdminRoute(getTransitionSetting_1["default"]);
-                defineAdminRoute(updateParticipant_1["default"]);
-                app.post(serverRoutes_1.postRegister, (0, register_1["default"])(routeContext));
-                app.get(serverRoutes_1.getVerifyEmailToken, (0, verifyEmail_1["default"])(routeContext));
-                app.post(serverRoutes_1.postLogin, (0, login_1["default"])(routeContext));
-                app.get(serverRoutes_1.getApiTokens, authMiddleware, (0, getApiTokens_1["default"])(routeContext));
-                app.post(serverRoutes_1.createApiToken, authMiddleware, (0, createApiToken_1["default"])(routeContext));
-                app["delete"](serverRoutes_1.deleteApiToken, authMiddleware, (0, deleteApiToken_1["default"])(routeContext));
-                app.get(serverRoutes_1.getAuthTest, authMiddleware, (0, authTest_1["default"])(routeContext));
-                app.post(serverRoutes_1.postUploadParticipants, authMiddleware, upload.single('participants'), (0, uploadParticipants_1["default"])(routeContext));
-                app.get("".concat(serverRoutes_1.getParticipants, "/:page?"), authMiddleware, (0, getParticipants_1["default"])(routeContext));
-                app.get("".concat(serverRoutes_1.getParticipantOverview, "/:code"), authMiddleware, (0, getParticipantOverview_1["default"])(routeContext));
-                app.get("".concat(serverRoutes_1.getEventOverviews, "/:sessionUuid"), authMiddleware, (0, getEventOverviews_1["default"])(routeContext));
-                app.get(serverRoutes_1.getExperimentConfig, authMiddleware, (0, getExperimentConfig_1["default"])(routeContext));
-                app.post(serverRoutes_1.postExperimentConfig, authMiddleware, (0, postExperimentConfig_1["default"])(routeContext));
-                app.get(serverRoutes_1.getExperimentConfigHistory, authMiddleware, (0, getExperimentConfigHistory_1["default"])(routeContext));
-                app.get("".concat(serverRoutes_1.getEvents, "/:page?"), authMiddleware, (0, getEvents_1["default"])(routeContext));
-                app.post(clientRoutes_1.postCheckParticipantCode, (0, checkParticipantCode_1["default"])(routeContext));
-                app.post(clientRoutes_1.postCreateSession, participantMw, (0, createSession_1["default"])(routeContext));
-                app.get(clientRoutes_1.getParticipantConfig, participantMw, (0, participantConfig_1["default"])(routeContext));
-                app.post(clientRoutes_1.postEvent, participantMw, (0, postEvent_1["default"])(routeContext));
+                defineAdminRoute(createParticipant_1.default);
+                defineAdminRoute(getActivityReport_1.default);
+                defineAdminRoute(createTransitionSetting_1.default);
+                defineAdminRoute(getTransitionSetting_1.default);
+                defineAdminRoute(updateParticipant_1.default);
+                app.post(serverRoutes_1.postRegister, (0, register_1.default)(routeContext));
+                app.get(serverRoutes_1.getVerifyEmailToken, (0, verifyEmail_1.default)(routeContext));
+                app.post(serverRoutes_1.postLogin, (0, login_1.default)(routeContext));
+                app.get(serverRoutes_1.getApiTokens, authMiddleware, (0, getApiTokens_1.default)(routeContext));
+                app.post(serverRoutes_1.createApiToken, authMiddleware, (0, createApiToken_1.default)(routeContext));
+                app.delete(serverRoutes_1.deleteApiToken, authMiddleware, (0, deleteApiToken_1.default)(routeContext));
+                app.get(serverRoutes_1.getAuthTest, authMiddleware, (0, authTest_1.default)(routeContext));
+                app.post(serverRoutes_1.postUploadParticipants, authMiddleware, upload.single('participants'), (0, uploadParticipants_1.default)(routeContext));
+                app.get("".concat(serverRoutes_1.getParticipants, "/:page?"), authMiddleware, (0, getParticipants_1.default)(routeContext));
+                app.get("".concat(serverRoutes_1.getParticipantOverview, "/:code"), authMiddleware, (0, getParticipantOverview_1.default)(routeContext));
+                app.get("".concat(serverRoutes_1.getEventOverviews, "/:sessionUuid"), authMiddleware, (0, getEventOverviews_1.default)(routeContext));
+                app.get(serverRoutes_1.getExperimentConfig, authMiddleware, (0, getExperimentConfig_1.default)(routeContext));
+                app.post(serverRoutes_1.postExperimentConfig, authMiddleware, (0, postExperimentConfig_1.default)(routeContext));
+                app.get(serverRoutes_1.getExperimentConfigHistory, authMiddleware, (0, getExperimentConfigHistory_1.default)(routeContext));
+                app.get("".concat(serverRoutes_1.getEvents, "/:page?"), authMiddleware, (0, getEvents_1.default)(routeContext));
+                app.post(clientRoutes_1.postCheckParticipantCode, (0, checkParticipantCode_1.default)(routeContext));
+                app.post(clientRoutes_1.postCreateSession, participantMw, (0, createSession_1.default)(routeContext));
+                app.get(clientRoutes_1.getParticipantConfig, participantMw, (0, participantConfig_1.default)(routeContext));
+                app.post(clientRoutes_1.postEvent, participantMw, (0, postEvent_1.default)(routeContext));
                 app.use(function (req, res, next) {
                     var _a;
                     if (req.method === 'GET' && ((_a = req.headers.accept) === null || _a === void 0 ? void 0 : _a.startsWith('text/html'))) {
@@ -363,7 +363,7 @@ var start = function () { return __awaiter(void 0, void 0, void 0, function () {
         }
     });
 }); };
-start()["catch"](function (err) {
+start().catch(function (err) {
     console.error(err);
     process.exit(1);
 });

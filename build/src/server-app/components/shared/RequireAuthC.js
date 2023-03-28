@@ -2,7 +2,7 @@
 var __importDefault = (this && this.__importDefault) || function (mod) {
     return (mod && mod.__esModule) ? mod : { "default": mod };
 };
-exports.__esModule = true;
+Object.defineProperty(exports, "__esModule", { value: true });
 exports.RequireAuthC = void 0;
 var react_1 = __importDefault(require("react"));
 var react_router_dom_1 = require("react-router-dom");
@@ -14,10 +14,10 @@ var RequireAuthC = function (_a) {
     if (!api.isLoggedIn()) {
         console.log('not logged in, redirecting to /login');
         console.log('should redirect to', location, 'after login');
-        return react_1["default"].createElement(react_router_dom_1.Navigate, { to: '/login', state: { from: location }, replace: true });
+        return react_1.default.createElement(react_router_dom_1.Navigate, { to: '/login', state: { from: location }, replace: true });
     }
-    return react_1["default"].createElement(react_1["default"].Fragment, null, children);
+    return react_1.default.createElement(react_1.default.Fragment, null, children);
 };
 exports.RequireAuthC = RequireAuthC;
-exports["default"] = exports.RequireAuthC;
+exports.default = exports.RequireAuthC;
 //# sourceMappingURL=RequireAuthC.js.map

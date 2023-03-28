@@ -58,7 +58,7 @@ var __generator = (this && this.__generator) || function (thisArg, body) {
         if (op[0] & 5) throw op[1]; return { value: op[0] ? op[1] : void 0, done: true };
     }
 };
-exports.__esModule = true;
+Object.defineProperty(exports, "__esModule", { value: true });
 exports.createGetParticipantsRoute = void 0;
 var pagination_1 = require("../lib/pagination");
 var participant_1 = __importStar(require("../models/participant"));
@@ -74,7 +74,7 @@ var createGetParticipantsRoute = function (_a) {
                     log('Received participants request');
                     _a = (0, pagination_1.extractPaginationRequest)(req), page = _a.page, pageSize = _a.pageSize;
                     _b = req.query, codeLike = _b.codeLike, phase = _b.phase;
-                    participantRepo = dataSource.getRepository(participant_1["default"]);
+                    participantRepo = dataSource.getRepository(participant_1.default);
                     _c.label = 1;
                 case 1:
                     _c.trys.push([1, 4, , 5]);
@@ -83,12 +83,12 @@ var createGetParticipantsRoute = function (_a) {
                             skip: page * pageSize,
                             take: pageSize,
                             order: {
-                                createdAt: 'DESC'
+                                createdAt: 'DESC',
                             },
                             where: {
                                 code: (typeof codeLike === 'string') ? (0, typeorm_1.Like)("%".concat(codeLike, "%")) : undefined,
-                                phase: (0, participant_1.isValidPhase)(Number(phase)) ? Number(phase) : undefined
-                            }
+                                phase: (0, participant_1.isValidPhase)(Number(phase)) ? Number(phase) : undefined,
+                            },
                         })];
                 case 2:
                     participants = _c.sent();
@@ -99,7 +99,7 @@ var createGetParticipantsRoute = function (_a) {
                         results: participants,
                         page: page,
                         pageSize: pageSize,
-                        pageCount: Math.ceil(count / pageSize)
+                        pageCount: Math.ceil(count / pageSize),
                     };
                     res.status(200).json({ kind: 'Success', value: data });
                     return [3 /*break*/, 5];
@@ -114,5 +114,5 @@ var createGetParticipantsRoute = function (_a) {
     }); };
 };
 exports.createGetParticipantsRoute = createGetParticipantsRoute;
-exports["default"] = exports.createGetParticipantsRoute;
+exports.default = exports.createGetParticipantsRoute;
 //# sourceMappingURL=getParticipants.js.map

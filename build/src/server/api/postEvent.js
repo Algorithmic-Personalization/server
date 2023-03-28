@@ -83,7 +83,7 @@ var __values = (this && this.__values) || function(o) {
 var __importDefault = (this && this.__importDefault) || function (mod) {
     return (mod && mod.__esModule) ? mod : { "default": mod };
 };
-exports.__esModule = true;
+Object.defineProperty(exports, "__esModule", { value: true });
 exports.createPostEventRoute = void 0;
 var typeorm_1 = require("typeorm");
 var participant_1 = __importDefault(require("../models/participant"));
@@ -114,7 +114,7 @@ var storeVideos = function (repo, videos) { return __awaiter(void 0, void 0, voi
                 if (!!videos_1_1.done) return [3 /*break*/, 8];
                 video = videos_1_1.value;
                 return [4 /*yield*/, repo.findOneBy({
-                        youtubeId: video.youtubeId
+                        youtubeId: video.youtubeId,
                     })];
             case 3:
                 existing = _b.sent();
@@ -122,7 +122,7 @@ var storeVideos = function (repo, videos) { return __awaiter(void 0, void 0, voi
                 ids.push(existing.id);
                 return [3 /*break*/, 7];
             case 4:
-                newVideo = new video_1["default"]();
+                newVideo = new video_1.default();
                 Object.assign(newVideo, video);
                 // eslint-disable-next-line no-await-in-loop
                 return [4 /*yield*/, (0, util_1.validateNew)(newVideo)];
@@ -144,7 +144,7 @@ var storeVideos = function (repo, videos) { return __awaiter(void 0, void 0, voi
                 return [3 /*break*/, 11];
             case 10:
                 try {
-                    if (videos_1_1 && !videos_1_1.done && (_a = videos_1["return"])) _a.call(videos_1);
+                    if (videos_1_1 && !videos_1_1.done && (_a = videos_1.return)) _a.call(videos_1);
                 }
                 finally { if (e_1) throw e_1.error; }
                 return [7 /*endfinally*/];
@@ -154,7 +154,7 @@ var storeVideos = function (repo, videos) { return __awaiter(void 0, void 0, voi
 }); };
 var makeVideos = function (recommendations) {
     return recommendations.map(function (r) {
-        var v = new video_1["default"]();
+        var v = new video_1.default();
         v.youtubeId = r.videoId;
         v.title = r.title;
         v.url = r.url;
@@ -170,7 +170,7 @@ var storeItems = function (repo, eventId) { return function (videoIds, listType,
                 _a.label = 1;
             case 1:
                 if (!(i < videoIds.length)) return [3 /*break*/, 5];
-                item = new videoListItem_1["default"]();
+                item = new videoListItem_1.default();
                 item.videoId = videoIds[i];
                 item.listType = listType;
                 item.videoType = videoTypes[i];
@@ -200,7 +200,7 @@ var storeRecommendationsShown = function (log, dataSource, event) { return __awa
         switch (_a.label) {
             case 0:
                 log('Storing recommendations shown event meta-data');
-                videoRepo = dataSource.getRepository(video_1["default"]);
+                videoRepo = dataSource.getRepository(video_1.default);
                 return [4 /*yield*/, storeVideos(videoRepo, makeVideos(event.nonPersonalized))];
             case 1:
                 nonPersonalized = _a.sent();
@@ -227,7 +227,7 @@ var storeRecommendationsShown = function (log, dataSource, event) { return __awa
                     }
                     throw new Error("Invalid personalization type: ".concat(r.personalization));
                 });
-                itemRepo = dataSource.getRepository(videoListItem_1["default"]);
+                itemRepo = dataSource.getRepository(videoListItem_1.default);
                 store = storeItems(itemRepo, event.id);
                 _a.label = 4;
             case 4:
@@ -255,8 +255,8 @@ var storeWatchTime = function (log, dataSource, event) { return __awaiter(void 0
     return __generator(this, function (_a) {
         switch (_a.label) {
             case 0:
-                eventRepo = dataSource.getRepository(watchTime_1["default"]);
-                watchTime = new watchTime_1["default"]();
+                eventRepo = dataSource.getRepository(watchTime_1.default);
+                watchTime = new watchTime_1.default();
                 watchTime.eventId = event.id;
                 watchTime.secondsWatched = event.secondsWatched;
                 _a.label = 1;
@@ -288,14 +288,14 @@ var getOrCreateActivity = function (repo, participantId, day) { return __awaiter
         switch (_a.label) {
             case 0: return [4 /*yield*/, repo.findOneBy({
                     participantId: participantId,
-                    createdAt: day
+                    createdAt: day,
                 })];
             case 1:
                 existing = _a.sent();
                 if (existing) {
                     return [2 /*return*/, existing];
                 }
-                newActivity = new dailyActivityTime_1["default"]();
+                newActivity = new dailyActivityTime_1.default();
                 newActivity.participantId = participantId;
                 newActivity.createdAt = day;
                 return [2 /*return*/, repo.save(newActivity)];
@@ -319,11 +319,11 @@ var createUpdateActivity = function (_a) {
                             .findOne({
                             where: {
                                 sessionUuid: event.sessionUuid,
-                                createdAt: (0, typeorm_1.LessThan)(event.createdAt)
+                                createdAt: (0, typeorm_1.LessThan)(event.createdAt),
                             },
                             order: {
-                                createdAt: 'DESC'
-                            }
+                                createdAt: 'DESC',
+                            },
                         })];
                 case 2:
                     latestSessionEvent = _a.sent();
@@ -386,7 +386,7 @@ var activityMatches = function (setting, activity) {
 var shouldTriggerPhaseTransition = function (setting, activities) {
     var e_2, _a;
     var matchingDays = 0;
-    var transition = new transitionEvent_1["default"]();
+    var transition = new transitionEvent_1.default();
     try {
         for (var activities_1 = __values(activities), activities_1_1 = activities_1.next(); !activities_1_1.done; activities_1_1 = activities_1.next()) {
             var activity = activities_1_1.value;
@@ -404,7 +404,7 @@ var shouldTriggerPhaseTransition = function (setting, activities) {
     catch (e_2_1) { e_2 = { error: e_2_1 }; }
     finally {
         try {
-            if (activities_1_1 && !activities_1_1.done && (_a = activities_1["return"])) _a.call(activities_1);
+            if (activities_1_1 && !activities_1_1.done && (_a = activities_1.return)) _a.call(activities_1);
         }
         finally { if (e_2) throw e_2.error; }
     }
@@ -430,11 +430,11 @@ var createUpdatePhase = function (_a) {
                     toPhase = fromPhase === transitionSetting_1.Phase.PRE_EXPERIMENT
                         ? transitionSetting_1.Phase.EXPERIMENT
                         : transitionSetting_1.Phase.POST_EXPERIMENT;
-                    transitionSettingRepo = dataSource.getRepository(transitionSetting_1["default"]);
+                    transitionSettingRepo = dataSource.getRepository(transitionSetting_1.default);
                     return [4 /*yield*/, transitionSettingRepo.findOneBy({
                             fromPhase: fromPhase,
                             toPhase: toPhase,
-                            isCurrent: true
+                            isCurrent: true,
                         })];
                 case 1:
                     setting = _a.sent();
@@ -443,25 +443,25 @@ var createUpdatePhase = function (_a) {
                         return [2 /*return*/];
                     }
                     log('transition setting from phase', fromPhase, 'to phase', toPhase, 'found:', setting);
-                    transitionRepo = dataSource.getRepository(transitionEvent_1["default"]);
+                    transitionRepo = dataSource.getRepository(transitionEvent_1.default);
                     return [4 /*yield*/, transitionRepo.findOne({
                             where: {
                                 toPhase: participant.phase,
-                                participantId: participant.id
+                                participantId: participant.id,
                             },
                             order: {
-                                id: 'DESC'
-                            }
+                                id: 'DESC',
+                            },
                         })];
                 case 2:
                     latestTransition = _a.sent();
                     entryDate = latestTransition ? latestTransition.createdAt : participant.createdAt;
-                    activityRepo = dataSource.getRepository(dailyActivityTime_1["default"]);
+                    activityRepo = dataSource.getRepository(dailyActivityTime_1.default);
                     return [4 /*yield*/, activityRepo.find({
                             where: {
                                 participantId: participant.id,
-                                createdAt: (0, typeorm_1.MoreThan)(entryDate)
-                            }
+                                createdAt: (0, typeorm_1.MoreThan)(entryDate),
+                            },
                         })];
                 case 3:
                     activities = _a.sent();
@@ -469,7 +469,7 @@ var createUpdatePhase = function (_a) {
                     transitionEvent = shouldTriggerPhaseTransition(setting, activities);
                     if (!transitionEvent) return [3 /*break*/, 5];
                     log('triggering transition from phase', fromPhase, 'to phase', toPhase);
-                    triggerEvent_1 = new event_1["default"]();
+                    triggerEvent_1 = new event_1.default();
                     Object.assign(triggerEvent_1, latestEvent);
                     triggerEvent_1.id = 0;
                     triggerEvent_1.type = event_1.EventType.PHASE_TRANSITION;
@@ -538,24 +538,24 @@ var createPostEventRoute = function (_a) {
                         res.status(500).json({ kind: 'Failure', message: 'No participant code found' });
                         return [2 /*return*/];
                     }
-                    event = new event_1["default"]();
+                    event = new event_1.default();
                     Object.assign(event, req.body);
                     event.createdAt = new Date(event.createdAt);
                     event.updatedAt = new Date(event.updatedAt);
-                    participantRepo = dataSource.getRepository(participant_1["default"]);
-                    activityRepo = dataSource.getRepository(dailyActivityTime_1["default"]);
-                    eventRepo = dataSource.getRepository(event_1["default"]);
+                    participantRepo = dataSource.getRepository(participant_1.default);
+                    activityRepo = dataSource.getRepository(dailyActivityTime_1.default);
+                    eventRepo = dataSource.getRepository(event_1.default);
                     updateActivity = createUpdateActivity({
                         activityRepo: activityRepo,
                         eventRepo: eventRepo,
-                        log: log
+                        log: log,
                     });
                     updatePhase = createUpdatePhase({
                         dataSource: dataSource,
-                        log: log
+                        log: log,
                     });
                     return [4 /*yield*/, participantRepo.findOneBy({
-                            code: participantCode
+                            code: participantCode,
                         })];
                 case 1:
                     participant = _a.sent();
@@ -568,9 +568,9 @@ var createPostEventRoute = function (_a) {
                     event.arm = participant.arm;
                     event.phase = participant.phase;
                     if (!!event.experimentConfigId) return [3 /*break*/, 3];
-                    configRepo = dataSource.getRepository(experimentConfig_1["default"]);
+                    configRepo = dataSource.getRepository(experimentConfig_1.default);
                     return [4 /*yield*/, configRepo.findOneBy({
-                            isCurrent: true
+                            isCurrent: true,
                         })];
                 case 2:
                     config = _a.sent();
@@ -648,5 +648,5 @@ var createPostEventRoute = function (_a) {
     }); };
 };
 exports.createPostEventRoute = createPostEventRoute;
-exports["default"] = exports.createPostEventRoute;
+exports.default = exports.createPostEventRoute;
 //# sourceMappingURL=postEvent.js.map

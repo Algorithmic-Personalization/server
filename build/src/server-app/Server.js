@@ -52,7 +52,7 @@ var __read = (this && this.__read) || function (o, n) {
 var __importDefault = (this && this.__importDefault) || function (mod) {
     return (mod && mod.__esModule) ? mod : { "default": mod };
 };
-exports.__esModule = true;
+Object.defineProperty(exports, "__esModule", { value: true });
 exports.Server = void 0;
 var react_1 = __importStar(require("react"));
 var react_router_dom_1 = require("react-router-dom");
@@ -63,12 +63,12 @@ var LayoutP_1 = __importDefault(require("./components/LayoutP"));
 var Server = function () {
     var _a = __read((0, react_1.useState)(''), 2), email = _a[0], setEmail = _a[1];
     var _b = __read((0, react_1.useState)(''), 2), password = _b[0], setPassword = _b[1];
-    return (react_1["default"].createElement(react_router_dom_1.Routes, null,
-        react_1["default"].createElement(react_router_dom_1.Route, { path: '*', element: react_1["default"].createElement(RequireAuthC_1["default"], null,
-                react_1["default"].createElement(LayoutP_1["default"], null)) }),
-        react_1["default"].createElement(react_router_dom_1.Route, { path: '/login', element: react_1["default"].createElement(LoginP_1["default"], __assign({}, { email: email, setEmail: setEmail, password: password, setPassword: setPassword })) }),
-        react_1["default"].createElement(react_router_dom_1.Route, { path: '/register', element: react_1["default"].createElement(RegisterP_1["default"], __assign({}, { email: email, setEmail: setEmail, password: password, setPassword: setPassword })) })));
+    return (react_1.default.createElement(react_router_dom_1.Routes, null,
+        react_1.default.createElement(react_router_dom_1.Route, { path: '*', element: react_1.default.createElement(RequireAuthC_1.default, null,
+                react_1.default.createElement(LayoutP_1.default, null)) }),
+        react_1.default.createElement(react_router_dom_1.Route, { path: '/login', element: react_1.default.createElement(LoginP_1.default, __assign({}, { email: email, setEmail: setEmail, password: password, setPassword: setPassword })) }),
+        react_1.default.createElement(react_router_dom_1.Route, { path: '/register', element: react_1.default.createElement(RegisterP_1.default, __assign({}, { email: email, setEmail: setEmail, password: password, setPassword: setPassword })) })));
 };
 exports.Server = Server;
-exports["default"] = exports.Server;
+exports.default = exports.Server;
 //# sourceMappingURL=Server.js.map

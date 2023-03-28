@@ -41,7 +41,7 @@ var __read = (this && this.__read) || function (o, n) {
 var __importDefault = (this && this.__importDefault) || function (mod) {
     return (mod && mod.__esModule) ? mod : { "default": mod };
 };
-exports.__esModule = true;
+Object.defineProperty(exports, "__esModule", { value: true });
 var react_1 = __importStar(require("react"));
 var client_1 = require("react-dom/client");
 var material_1 = require("@mui/material");
@@ -57,14 +57,14 @@ if (!elt) {
 }
 var App = function () {
     var _a = __read((0, react_1.useState)(false), 2), loginModalOpen = _a[0], setLoginModalOpen = _a[1];
-    return (react_1["default"].createElement(react_1["default"].StrictMode, null,
-        react_1["default"].createElement(material_1.ThemeProvider, { theme: theme_1["default"] },
-            react_1["default"].createElement(react_router_dom_1.BrowserRouter, null,
-                react_1["default"].createElement(adminApiProvider_1["default"], { value: (0, adminApi_1.createAdminApi)(adminApiProvider_1.serverUrl, function () {
+    return (react_1.default.createElement(react_1.default.StrictMode, null,
+        react_1.default.createElement(material_1.ThemeProvider, { theme: theme_1.default },
+            react_1.default.createElement(react_router_dom_1.BrowserRouter, null,
+                react_1.default.createElement(adminApiProvider_1.default, { value: (0, adminApi_1.createAdminApi)(adminApiProvider_1.serverUrl, function () {
                         setLoginModalOpen(true);
                     }) },
-                    react_1["default"].createElement(LoginModalP_1["default"], { open: loginModalOpen, setOpen: setLoginModalOpen }),
-                    react_1["default"].createElement(Server_1["default"], null))))));
+                    react_1.default.createElement(LoginModalP_1.default, { open: loginModalOpen, setOpen: setLoginModalOpen }),
+                    react_1.default.createElement(Server_1.default, null))))));
 };
-(0, client_1.createRoot)(elt).render(react_1["default"].createElement(App, null));
+(0, client_1.createRoot)(elt).render(react_1.default.createElement(App, null));
 //# sourceMappingURL=index.js.map

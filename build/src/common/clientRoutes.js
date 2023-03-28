@@ -1,5 +1,5 @@
 "use strict";
-exports.__esModule = true;
+Object.defineProperty(exports, "__esModule", { value: true });
 exports.postEvent = exports.getParticipantConfig = exports.postCheckParticipantCode = exports.postCreateSession = void 0;
 exports.postCreateSession = '/api/session';
 exports.postCheckParticipantCode = '/api/check-participant-code';

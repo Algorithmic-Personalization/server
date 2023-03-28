@@ -27,14 +27,14 @@ var __metadata = (this && this.__metadata) || function (k, v) {
 var __importDefault = (this && this.__importDefault) || function (mod) {
     return (mod && mod.__esModule) ? mod : { "default": mod };
 };
-exports.__esModule = true;
+Object.defineProperty(exports, "__esModule", { value: true });
 exports.isValidPhase = exports.Participant = void 0;
 var typeorm_1 = require("typeorm");
 var class_validator_1 = require("class-validator");
 var model_1 = __importDefault(require("../../common/lib/model"));
 var event_1 = require("../../common/models/event");
 var dailyActivityTime_1 = __importDefault(require("./dailyActivityTime"));
-var Participant = /** @class */ (function (_super) {
+var Participant = exports.Participant = /** @class */ (function (_super) {
     __extends(Participant, _super);
     function Participant() {
         var _this = _super !== null && _super.apply(this, arguments) || this;
@@ -48,7 +48,7 @@ var Participant = /** @class */ (function (_super) {
         (0, typeorm_1.Column)(),
         (0, class_validator_1.IsString)(),
         __metadata("design:type", String)
-    ], Participant.prototype, "code");
+    ], Participant.prototype, "code", void 0);
     __decorate([
         (0, typeorm_1.Column)(),
         (0, class_validator_1.IsInt)(),
@@ -56,24 +56,23 @@ var Participant = /** @class */ (function (_super) {
         (0, class_validator_1.Min)(0),
         (0, class_validator_1.Max)(2),
         __metadata("design:type", Number)
-    ], Participant.prototype, "phase");
+    ], Participant.prototype, "phase", void 0);
     __decorate([
         (0, typeorm_1.Column)(),
         __metadata("design:type", String)
-    ], Participant.prototype, "arm");
+    ], Participant.prototype, "arm", void 0);
     __decorate([
-        (0, typeorm_1.OneToMany)(function () { return dailyActivityTime_1["default"]; }, function (activityTime) { return activityTime.participant; }),
+        (0, typeorm_1.OneToMany)(function () { return dailyActivityTime_1.default; }, function (activityTime) { return activityTime.participant; }),
         __metadata("design:type", Array)
-    ], Participant.prototype, "activityTimes");
+    ], Participant.prototype, "activityTimes", void 0);
     Participant = __decorate([
         (0, typeorm_1.Entity)()
     ], Participant);
     return Participant;
-}(model_1["default"]));
-exports.Participant = Participant;
+}(model_1.default));
 var isValidPhase = function (phase) {
     return typeof phase === 'number' && phase >= 0 && phase <= 2;
 };
 exports.isValidPhase = isValidPhase;
-exports["default"] = Participant;
+exports.default = Participant;
 //# sourceMappingURL=participant.js.map

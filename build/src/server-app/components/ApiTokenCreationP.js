@@ -97,7 +97,7 @@ var __spreadArray = (this && this.__spreadArray) || function (to, from, pack) {
 var __importDefault = (this && this.__importDefault) || function (mod) {
     return (mod && mod.__esModule) ? mod : { "default": mod };
 };
-exports.__esModule = true;
+Object.defineProperty(exports, "__esModule", { value: true });
 exports.TokenC = void 0;
 var react_1 = __importStar(require("react"));
 var material_1 = require("@mui/material");
@@ -110,17 +110,17 @@ var ConfirmButtonC = function (_a) {
     var _b = __read((0, react_1.useState)(false), 2), clicked = _b[0], setClicked = _b[1];
     var confirmText = confirm !== null && confirm !== void 0 ? confirm : 'Are you sure?';
     if (clicked) {
-        return (react_1["default"].createElement(material_1.Box, { sx: __assign(__assign({}, sx), { display: 'flex', flexDirection: 'column', alignItems: 'center', mr: 2 }) },
-            react_1["default"].createElement(material_1.Typography, { variant: 'body2', sx: {
-                    mb: 1
+        return (react_1.default.createElement(material_1.Box, { sx: __assign(__assign({}, sx), { display: 'flex', flexDirection: 'column', alignItems: 'center', mr: 2 }) },
+            react_1.default.createElement(material_1.Typography, { variant: 'body2', sx: {
+                    mb: 1,
                 } }, confirmText),
-            react_1["default"].createElement(material_1.Box, null,
-                react_1["default"].createElement(material_1.Button, { variant: 'outlined', color: 'warning', onClick: action, sx: { mr: 1 } }, "Yes"),
-                react_1["default"].createElement(material_1.Button, { variant: 'outlined', color: 'success', onClick: function () {
+            react_1.default.createElement(material_1.Box, null,
+                react_1.default.createElement(material_1.Button, { variant: 'outlined', color: 'warning', onClick: action, sx: { mr: 1 } }, "Yes"),
+                react_1.default.createElement(material_1.Button, { variant: 'outlined', color: 'success', onClick: function () {
                         setClicked(false);
                     } }, "No"))));
     }
-    return (react_1["default"].createElement(material_1.Button, { sx: sx, variant: 'outlined', color: 'primary', onClick: function () {
+    return (react_1.default.createElement(material_1.Button, { sx: sx, variant: 'outlined', color: 'primary', onClick: function () {
             setClicked(true);
         } }, label));
 };
@@ -134,41 +134,41 @@ var CopyToClipboardC = function (_a) {
             }, 5000);
         }
     }, [copied]);
-    return (react_1["default"].createElement(react_1["default"].Fragment, null,
-        react_1["default"].createElement(material_1.Button, { variant: 'contained', sx: {
-                mr: 1
+    return (react_1.default.createElement(react_1.default.Fragment, null,
+        react_1.default.createElement(material_1.Button, { variant: 'contained', sx: {
+                mr: 1,
             }, onClick: function () {
-                navigator.clipboard.writeText(text)["catch"](console.error);
+                navigator.clipboard.writeText(text).catch(console.error);
                 setCopied(true);
-            }, endIcon: react_1["default"].createElement(ContentCopy_1["default"], null) }, "Copy to clipboard"),
-        copied && react_1["default"].createElement(material_1.Typography, { variant: 'body2' }, "Token copied to clipboard")));
+            }, endIcon: react_1.default.createElement(ContentCopy_1.default, null) }, "Copy to clipboard"),
+        copied && react_1.default.createElement(material_1.Typography, { variant: 'body2' }, "Token copied to clipboard")));
 };
 var TokenListC = function (_a) {
     var tokens = _a.tokens, deleteToken = _a.deleteToken;
     if (!tokens) {
-        return react_1["default"].createElement(material_1.Typography, { variant: 'body1' }, "Loading...");
+        return react_1.default.createElement(material_1.Typography, { variant: 'body1' }, "Loading...");
     }
     if (tokens.length === 0) {
-        return react_1["default"].createElement(material_1.Typography, { variant: 'body1' }, "No API tokens created yet");
+        return react_1.default.createElement(material_1.Typography, { variant: 'body1' }, "No API tokens created yet");
     }
-    return (react_1["default"].createElement(material_1.Box, null, tokens.map(function (token) { return (react_1["default"].createElement(CardC_1["default"], { key: token.id, sx: { mb: 2 } },
-        react_1["default"].createElement(material_1.Typography, { variant: 'body1', sx: { mb: 1 } },
-            react_1["default"].createElement("strong", null, token.name)),
-        react_1["default"].createElement(material_1.Typography, { variant: 'body2', sx: {
+    return (react_1.default.createElement(material_1.Box, null, tokens.map(function (token) { return (react_1.default.createElement(CardC_1.default, { key: token.id, sx: { mb: 2 } },
+        react_1.default.createElement(material_1.Typography, { variant: 'body1', sx: { mb: 1 } },
+            react_1.default.createElement("strong", null, token.name)),
+        react_1.default.createElement(material_1.Typography, { variant: 'body2', sx: {
                 mb: 1,
                 fontSize: '12px',
                 wordBreak: 'break-all',
-                userSelect: 'none'
+                userSelect: 'none',
             } }, token.token),
-        react_1["default"].createElement(material_1.Box, { sx: {
+        react_1.default.createElement(material_1.Box, { sx: {
                 mt: 1,
                 display: 'flex',
                 flexDirection: { xs: 'column', sm: 'row' },
                 gap: 1,
-                alignItems: { xs: 'stretch', sm: 'center' }
+                alignItems: { xs: 'stretch', sm: 'center' },
             } },
-            react_1["default"].createElement(ConfirmButtonC, { action: deleteToken(token.token), label: 'Delete this token', confirm: 'Are you sure you want to delete this token?' }),
-            react_1["default"].createElement(CopyToClipboardC, { text: token.token })))); })));
+            react_1.default.createElement(ConfirmButtonC, { action: deleteToken(token.token), label: 'Delete this token', confirm: 'Are you sure you want to delete this token?' }),
+            react_1.default.createElement(CopyToClipboardC, { text: token.token })))); })));
 };
 var TokenC = function () {
     var _a = __read((0, react_1.useState)(), 2), tokens = _a[0], setTokens = _a[1];
@@ -189,7 +189,7 @@ var TokenC = function () {
                         else {
                             setMessage({
                                 text: tokens.message,
-                                severity: 'error'
+                                severity: 'error',
                             });
                         }
                         return [2 /*return*/];
@@ -210,13 +210,13 @@ var TokenC = function () {
                         setTokens(__spreadArray(__spreadArray([], __read((tokens !== null && tokens !== void 0 ? tokens : [])), false), [token.value], false));
                         setMessage({
                             text: 'API token created',
-                            severity: 'success'
+                            severity: 'success',
                         });
                     }
                     else {
                         setMessage({
                             text: token.message,
-                            severity: 'error'
+                            severity: 'error',
                         });
                     }
                     return [3 /*break*/, 3];
@@ -225,7 +225,7 @@ var TokenC = function () {
                     console.error(error_1);
                     setMessage({
                         text: 'Failed to create API token, unexpected error',
-                        severity: 'error'
+                        severity: 'error',
                     });
                     return [3 /*break*/, 3];
                 case 3: return [2 /*return*/];
@@ -245,13 +245,13 @@ var TokenC = function () {
                         setTokens((tokens !== null && tokens !== void 0 ? tokens : []).filter(function (t) { return t.token !== token; }));
                         setMessage({
                             text: 'API token deleted',
-                            severity: 'warning'
+                            severity: 'warning',
                         });
                     }
                     else {
                         setMessage({
                             text: res.message,
-                            severity: 'error'
+                            severity: 'error',
                         });
                     }
                     return [3 /*break*/, 3];
@@ -259,30 +259,30 @@ var TokenC = function () {
                     error_2 = _a.sent();
                     setMessage({
                         text: 'Failed to delete API token, unexpected error',
-                        severity: 'error'
+                        severity: 'error',
                     });
                     return [3 /*break*/, 3];
                 case 3: return [2 /*return*/];
             }
         });
     }); }; };
-    var ui = (react_1["default"].createElement(material_1.Box, { component: 'section', sx: { mb: 4 } },
-        react_1["default"].createElement(material_1.Typography, { variant: 'h2', sx: { mb: 2 } }, "API Tokens"),
-        react_1["default"].createElement(NotificationsC_1.NotificationsC, { message: message }),
-        react_1["default"].createElement(material_1.Paper, { sx: { p: 2 } },
-            react_1["default"].createElement(TokenListC, { tokens: tokens, deleteToken: deleteToken })),
-        react_1["default"].createElement(material_1.Box, { sx: {
+    var ui = (react_1.default.createElement(material_1.Box, { component: 'section', sx: { mb: 4 } },
+        react_1.default.createElement(material_1.Typography, { variant: 'h2', sx: { mb: 2 } }, "API Tokens"),
+        react_1.default.createElement(NotificationsC_1.NotificationsC, { message: message }),
+        react_1.default.createElement(material_1.Paper, { sx: { p: 2 } },
+            react_1.default.createElement(TokenListC, { tokens: tokens, deleteToken: deleteToken })),
+        react_1.default.createElement(material_1.Box, { sx: {
                 mt: 2,
                 display: 'flex',
                 flexDirection: 'row',
-                alignItems: 'center'
+                alignItems: 'center',
             } },
-            react_1["default"].createElement(material_1.TextField, { label: 'Token name', value: name, onChange: function (event) {
+            react_1.default.createElement(material_1.TextField, { label: 'Token name', value: name, onChange: function (event) {
                     setName(event.target.value);
                 } }),
-            react_1["default"].createElement(material_1.Button, { variant: 'contained', color: 'primary', onClick: createToken, sx: { mx: 2 } }, "Create new API token"))));
+            react_1.default.createElement(material_1.Button, { variant: 'contained', color: 'primary', onClick: createToken, sx: { mx: 2 } }, "Create new API token"))));
     return ui;
 };
 exports.TokenC = TokenC;
-exports["default"] = exports.TokenC;
+exports.default = exports.TokenC;
 //# sourceMappingURL=ApiTokenCreationP.js.map

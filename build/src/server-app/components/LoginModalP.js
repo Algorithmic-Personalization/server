@@ -52,7 +52,7 @@ var __read = (this && this.__read) || function (o, n) {
 var __importDefault = (this && this.__importDefault) || function (mod) {
     return (mod && mod.__esModule) ? mod : { "default": mod };
 };
-exports.__esModule = true;
+Object.defineProperty(exports, "__esModule", { value: true });
 exports.LoginModalC = void 0;
 var react_1 = __importStar(require("react"));
 var react_router_dom_1 = require("react-router-dom");
@@ -65,10 +65,10 @@ var LoginModalC = function (_a) {
     var location = (0, react_router_dom_1.useLocation)();
     var navigate = (0, react_router_dom_1.useNavigate)();
     console.log('modal says: location', location);
-    return (react_1["default"].createElement(material_1.Modal, { open: open },
-        react_1["default"].createElement(material_1.Box, { sx: { bgcolor: 'background.paper', padding: 4 } },
-            react_1["default"].createElement(material_1.Typography, { sx: { textAlign: 'center' } }, "It seems your session has expired, please log back in."),
-            react_1["default"].createElement(LoginP_1["default"], __assign({}, { email: email, setEmail: setEmail, password: password, setPassword: setPassword }, { onSuccess: function () {
+    return (react_1.default.createElement(material_1.Modal, { open: open },
+        react_1.default.createElement(material_1.Box, { sx: { bgcolor: 'background.paper', padding: 4 } },
+            react_1.default.createElement(material_1.Typography, { sx: { textAlign: 'center' } }, "It seems your session has expired, please log back in."),
+            react_1.default.createElement(LoginP_1.default, __assign({}, { email: email, setEmail: setEmail, password: password, setPassword: setPassword }, { onSuccess: function () {
                     setOpen(false);
                     if (onSuccess) {
                         onSuccess();
@@ -84,5 +84,5 @@ var LoginModalC = function (_a) {
                 }, isModal: true })))));
 };
 exports.LoginModalC = LoginModalC;
-exports["default"] = exports.LoginModalC;
+exports.default = exports.LoginModalC;
 //# sourceMappingURL=LoginModalP.js.map

@@ -1,5 +1,5 @@
 "use strict";
-exports.__esModule = true;
+Object.defineProperty(exports, "__esModule", { value: true });
 exports.createParticipantMiddleWare = void 0;
 var createParticipantMiddleWare = function (createLogger) {
     return function (req, res, next) {
@@ -22,5 +22,5 @@ var createParticipantMiddleWare = function (createLogger) {
     };
 };
 exports.createParticipantMiddleWare = createParticipantMiddleWare;
-exports["default"] = exports.createParticipantMiddleWare;
+exports.default = exports.createParticipantMiddleWare;
 //# sourceMappingURL=participantMiddleware.js.map

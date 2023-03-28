@@ -88,7 +88,7 @@ var __read = (this && this.__read) || function (o, n) {
 var __importDefault = (this && this.__importDefault) || function (mod) {
     return (mod && mod.__esModule) ? mod : { "default": mod };
 };
-exports.__esModule = true;
+Object.defineProperty(exports, "__esModule", { value: true });
 exports.LoginC = void 0;
 var react_1 = __importStar(require("react"));
 var react_router_dom_1 = require("react-router-dom");
@@ -124,7 +124,7 @@ var LoginC = function (_a) {
                         else {
                             setMessage({
                                 text: response.message,
-                                severity: 'error'
+                                severity: 'error',
                             });
                         }
                         return [2 /*return*/];
@@ -132,30 +132,30 @@ var LoginC = function (_a) {
             });
         }); })();
     };
-    var ui = (react_1["default"].createElement(material_1.Box, { sx: {
+    var ui = (react_1.default.createElement(material_1.Box, { sx: {
             display: 'flex',
             justifyContent: 'center',
             alignItems: 'top',
-            mt: 6
+            mt: 6,
         } },
-        react_1["default"].createElement("form", { onSubmit: function (e) {
+        react_1.default.createElement("form", { onSubmit: function (e) {
                 tryToLogin();
                 e.preventDefault();
             } },
-            react_1["default"].createElement("h1", null, "Admin login"),
-            react_1["default"].createElement(RedirectMessageC_1["default"], null),
-            react_1["default"].createElement(NotificationsC_1["default"], { message: message }),
-            react_1["default"].createElement(material_1.FormControl, { sx: { mb: 2, display: 'block' } },
-                react_1["default"].createElement(material_1.InputLabel, { htmlFor: 'email' }, "Email"),
-                react_1["default"].createElement(material_1.Input, __assign({ id: 'email', type: 'email' }, (0, util_1.bind)(email, setEmail)))),
-            react_1["default"].createElement(material_1.FormControl, { sx: { mb: 2, display: 'block' } },
-                react_1["default"].createElement(material_1.InputLabel, { htmlFor: 'password' }, "Password"),
-                react_1["default"].createElement(material_1.Input, __assign({ id: 'password', type: 'password' }, (0, util_1.bind)(password, setPassword)))),
-            react_1["default"].createElement(material_1.Button, { type: 'submit', variant: 'contained', sx: { mt: 2 } }, "Login"),
-            (!isModal) && react_1["default"].createElement(material_1.Box, { sx: { mt: 2 } },
-                react_1["default"].createElement(react_router_dom_1.Link, { to: '/register' }, "Register instead")))));
+            react_1.default.createElement("h1", null, "Admin login"),
+            react_1.default.createElement(RedirectMessageC_1.default, null),
+            react_1.default.createElement(NotificationsC_1.default, { message: message }),
+            react_1.default.createElement(material_1.FormControl, { sx: { mb: 2, display: 'block' } },
+                react_1.default.createElement(material_1.InputLabel, { htmlFor: 'email' }, "Email"),
+                react_1.default.createElement(material_1.Input, __assign({ id: 'email', type: 'email' }, (0, util_1.bind)(email, setEmail)))),
+            react_1.default.createElement(material_1.FormControl, { sx: { mb: 2, display: 'block' } },
+                react_1.default.createElement(material_1.InputLabel, { htmlFor: 'password' }, "Password"),
+                react_1.default.createElement(material_1.Input, __assign({ id: 'password', type: 'password' }, (0, util_1.bind)(password, setPassword)))),
+            react_1.default.createElement(material_1.Button, { type: 'submit', variant: 'contained', sx: { mt: 2 } }, "Login"),
+            (!isModal) && react_1.default.createElement(material_1.Box, { sx: { mt: 2 } },
+                react_1.default.createElement(react_router_dom_1.Link, { to: '/register' }, "Register instead")))));
     return ui;
 };
 exports.LoginC = LoginC;
-exports["default"] = exports.LoginC;
+exports.default = exports.LoginC;
 //# sourceMappingURL=LoginP.js.map

@@ -41,7 +41,7 @@ var __read = (this && this.__read) || function (o, n) {
 var __importDefault = (this && this.__importDefault) || function (mod) {
     return (mod && mod.__esModule) ? mod : { "default": mod };
 };
-exports.__esModule = true;
+Object.defineProperty(exports, "__esModule", { value: true });
 exports.RedirectMessageC = void 0;
 var react_1 = __importStar(require("react"));
 var NotificationsC_1 = __importDefault(require("./NotificationsC"));
@@ -54,15 +54,15 @@ var RedirectMessageC = function (_a) {
         if (message) {
             setMessage({
                 text: message,
-                permanent: true
+                permanent: true,
             });
         }
     }, []);
     if (ignore) {
         return null;
     }
-    return react_1["default"].createElement(NotificationsC_1["default"], { message: message });
+    return react_1.default.createElement(NotificationsC_1.default, { message: message });
 };
 exports.RedirectMessageC = RedirectMessageC;
-exports["default"] = exports.RedirectMessageC;
+exports.default = exports.RedirectMessageC;
 //# sourceMappingURL=RedirectMessageC.js.map

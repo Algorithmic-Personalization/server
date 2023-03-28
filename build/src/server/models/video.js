@@ -26,13 +26,13 @@ var __metadata = (this && this.__metadata) || function (k, v) {
 var __importDefault = (this && this.__importDefault) || function (mod) {
     return (mod && mod.__esModule) ? mod : { "default": mod };
 };
-exports.__esModule = true;
+Object.defineProperty(exports, "__esModule", { value: true });
 exports.Video = void 0;
 /* eslint-disable @typescript-eslint/no-inferrable-types */
 var typeorm_1 = require("typeorm");
 var class_validator_1 = require("class-validator");
 var model_1 = __importDefault(require("../../common/lib/model"));
-var Video = /** @class */ (function (_super) {
+var Video = exports.Video = /** @class */ (function (_super) {
     __extends(Video, _super);
     function Video() {
         var _this = _super !== null && _super.apply(this, arguments) || this;
@@ -46,24 +46,23 @@ var Video = /** @class */ (function (_super) {
         (0, class_validator_1.IsString)(),
         (0, class_validator_1.IsNotEmpty)(),
         __metadata("design:type", String)
-    ], Video.prototype, "title");
+    ], Video.prototype, "title", void 0);
     __decorate([
         (0, typeorm_1.Column)(),
         (0, class_validator_1.IsString)(),
         (0, class_validator_1.IsNotEmpty)(),
         __metadata("design:type", String)
-    ], Video.prototype, "url");
+    ], Video.prototype, "url", void 0);
     __decorate([
         (0, typeorm_1.Column)(),
         (0, class_validator_1.IsString)(),
         (0, class_validator_1.IsNotEmpty)(),
         __metadata("design:type", String)
-    ], Video.prototype, "youtubeId");
+    ], Video.prototype, "youtubeId", void 0);
     Video = __decorate([
         (0, typeorm_1.Entity)()
     ], Video);
     return Video;
-}(model_1["default"]));
-exports.Video = Video;
-exports["default"] = Video;
+}(model_1.default));
+exports.default = Video;
 //# sourceMappingURL=video.js.map

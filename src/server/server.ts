@@ -278,7 +278,7 @@ const start = async () => {
 		}
 
 		staticRouter.use(webpackDevMiddleware(compiler));
-		staticRouter.use(webpackHotMiddleware(compiler));
+		staticRouter.use(webpackHotMiddleware(compiler as any));
 	}
 
 	staticRouter.use(express.static(join(root, 'public')));

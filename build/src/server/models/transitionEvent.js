@@ -27,7 +27,7 @@ var __metadata = (this && this.__metadata) || function (k, v) {
 var __importDefault = (this && this.__importDefault) || function (mod) {
     return (mod && mod.__esModule) ? mod : { "default": mod };
 };
-exports.__esModule = true;
+Object.defineProperty(exports, "__esModule", { value: true });
 exports.TransitionEvent = exports.TransitionReason = void 0;
 var typeorm_1 = require("typeorm");
 var class_validator_1 = require("class-validator");
@@ -37,7 +37,7 @@ var TransitionReason;
     TransitionReason["AUTOMATIC"] = "AUTOMATIC";
     TransitionReason["FORCED"] = "FORCED";
 })(TransitionReason = exports.TransitionReason || (exports.TransitionReason = {}));
-var TransitionEvent = /** @class */ (function (_super) {
+var TransitionEvent = exports.TransitionEvent = /** @class */ (function (_super) {
     __extends(TransitionEvent, _super);
     function TransitionEvent() {
         var _this = _super !== null && _super.apply(this, arguments) || this;
@@ -52,45 +52,44 @@ var TransitionEvent = /** @class */ (function (_super) {
         (0, typeorm_1.Column)(),
         (0, class_validator_1.IsInt)(),
         __metadata("design:type", Number)
-    ], TransitionEvent.prototype, "eventId");
+    ], TransitionEvent.prototype, "eventId", void 0);
     __decorate([
         (0, typeorm_1.Column)(),
         (0, class_validator_1.IsInt)(),
         __metadata("design:type", Number)
-    ], TransitionEvent.prototype, "transitionSettingId");
+    ], TransitionEvent.prototype, "transitionSettingId", void 0);
     __decorate([
         (0, typeorm_1.Column)(),
         __metadata("design:type", String)
-    ], TransitionEvent.prototype, "reason");
+    ], TransitionEvent.prototype, "reason", void 0);
     __decorate([
         (0, typeorm_1.Column)(),
         (0, class_validator_1.IsInt)(),
         (0, class_validator_1.Min)(0),
         (0, class_validator_1.Max)(2),
         __metadata("design:type", Number)
-    ], TransitionEvent.prototype, "fromPhase");
+    ], TransitionEvent.prototype, "fromPhase", void 0);
     __decorate([
         (0, typeorm_1.Column)(),
         (0, class_validator_1.IsInt)(),
         (0, class_validator_1.Min)(0),
         (0, class_validator_1.Max)(2),
         __metadata("design:type", Number)
-    ], TransitionEvent.prototype, "toPhase");
+    ], TransitionEvent.prototype, "toPhase", void 0);
     __decorate([
         (0, typeorm_1.Column)(),
         (0, class_validator_1.IsInt)(),
         __metadata("design:type", Number)
-    ], TransitionEvent.prototype, "sidebarRecommendationsClicked");
+    ], TransitionEvent.prototype, "sidebarRecommendationsClicked", void 0);
     __decorate([
         (0, typeorm_1.Column)(),
         (0, class_validator_1.IsInt)(),
         __metadata("design:type", Number)
-    ], TransitionEvent.prototype, "numDays");
+    ], TransitionEvent.prototype, "numDays", void 0);
     TransitionEvent = __decorate([
         (0, typeorm_1.Entity)()
     ], TransitionEvent);
     return TransitionEvent;
-}(dailyActivityTime_1["default"]));
-exports.TransitionEvent = TransitionEvent;
-exports["default"] = TransitionEvent;
+}(dailyActivityTime_1.default));
+exports.default = TransitionEvent;
 //# sourceMappingURL=transitionEvent.js.map

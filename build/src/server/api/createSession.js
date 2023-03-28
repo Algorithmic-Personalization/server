@@ -38,7 +38,7 @@ var __generator = (this && this.__generator) || function (thisArg, body) {
 var __importDefault = (this && this.__importDefault) || function (mod) {
     return (mod && mod.__esModule) ? mod : { "default": mod };
 };
-exports.__esModule = true;
+Object.defineProperty(exports, "__esModule", { value: true });
 exports.createCreateSessionRoute = void 0;
 var session_1 = __importDefault(require("../../common/models/session"));
 var createCreateSessionRoute = function (_a) {
@@ -55,8 +55,8 @@ var createCreateSessionRoute = function (_a) {
                         res.status(400).json({ kind: 'Failure', message: 'Missing participant code' });
                         return [2 /*return*/];
                     }
-                    repo = dataSource.getRepository(session_1["default"]);
-                    session = new session_1["default"]();
+                    repo = dataSource.getRepository(session_1.default);
+                    session = new session_1.default();
                     session.participantCode = code;
                     _a.label = 1;
                 case 1:
@@ -77,5 +77,5 @@ var createCreateSessionRoute = function (_a) {
     }); };
 };
 exports.createCreateSessionRoute = createCreateSessionRoute;
-exports["default"] = exports.createCreateSessionRoute;
+exports.default = exports.createCreateSessionRoute;
 //# sourceMappingURL=createSession.js.map

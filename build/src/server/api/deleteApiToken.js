@@ -38,7 +38,7 @@ var __generator = (this && this.__generator) || function (thisArg, body) {
 var __importDefault = (this && this.__importDefault) || function (mod) {
     return (mod && mod.__esModule) ? mod : { "default": mod };
 };
-exports.__esModule = true;
+Object.defineProperty(exports, "__esModule", { value: true });
 exports.createDeleteApiTokenRoute = void 0;
 var token_1 = __importDefault(require("../models/token"));
 var createDeleteApiTokenRoute = function (_a) {
@@ -60,11 +60,11 @@ var createDeleteApiTokenRoute = function (_a) {
                         res.status(401).json({ kind: 'Failure', message: 'Unauthorized' });
                         return [2 /*return*/];
                     }
-                    repo = dataSource.getRepository(token_1["default"]);
+                    repo = dataSource.getRepository(token_1.default);
                     _a.label = 1;
                 case 1:
                     _a.trys.push([1, 3, , 4]);
-                    return [4 /*yield*/, repo["delete"]({ token: token })];
+                    return [4 /*yield*/, repo.delete({ token: token })];
                 case 2:
                     _a.sent();
                     res.status(200).json({ kind: 'Success', value: token });
@@ -80,5 +80,5 @@ var createDeleteApiTokenRoute = function (_a) {
     }); };
 };
 exports.createDeleteApiTokenRoute = createDeleteApiTokenRoute;
-exports["default"] = exports.createDeleteApiTokenRoute;
+exports.default = exports.createDeleteApiTokenRoute;
 //# sourceMappingURL=deleteApiToken.js.map

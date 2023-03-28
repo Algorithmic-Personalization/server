@@ -14,7 +14,7 @@ var __extends = (this && this.__extends) || (function () {
         d.prototype = b === null ? Object.create(b) : (__.prototype = b.prototype, new __());
     };
 })();
-exports.__esModule = true;
+Object.defineProperty(exports, "__esModule", { value: true });
 exports.NotFoundError = void 0;
 var NotFoundError = /** @class */ (function (_super) {
     __extends(NotFoundError, _super);
@@ -27,5 +27,5 @@ var NotFoundError = /** @class */ (function (_super) {
     return NotFoundError;
 }(Error));
 exports.NotFoundError = NotFoundError;
-exports["default"] = NotFoundError;
+exports.default = NotFoundError;
 //# sourceMappingURL=notFoundError.js.map

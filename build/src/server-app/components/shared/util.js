@@ -38,7 +38,7 @@ var __read = (this && this.__read) || function (o, n) {
     }
     return ar;
 };
-exports.__esModule = true;
+Object.defineProperty(exports, "__esModule", { value: true });
 exports.createPaginationComponent = exports.bind = exports.takeValue = exports.UrlC = exports.LinkC = exports.showDate = void 0;
 var react_1 = __importStar(require("react"));
 var material_1 = require("@mui/material");
@@ -49,11 +49,11 @@ var showDate = function (d) {
 exports.showDate = showDate;
 var LinkC = function (_c) {
     var href = _c.href, label = _c.label;
-    return (react_1["default"].createElement("a", { target: '_blank', rel: 'noreferrer', href: href, style: {
+    return (react_1.default.createElement("a", { target: '_blank', rel: 'noreferrer', href: href, style: {
             textDecoration: 'none',
-            color: 'inherit'
+            color: 'inherit',
         } },
-        react_1["default"].createElement(material_1.Typography, { variant: 'body1', color: 'blue' }, label)));
+        react_1.default.createElement(material_1.Typography, { variant: 'body1', color: 'blue' }, label)));
 };
 exports.LinkC = LinkC;
 var UrlC = function (_c) {
@@ -64,15 +64,15 @@ var UrlC = function (_c) {
     try {
         var u = new URL(withYtHostName);
         if (u.pathname === '/results') {
-            return react_1["default"].createElement(exports.LinkC, { href: withYtHostName, label: "".concat(p, "search: ").concat((_d = u.searchParams.get('search_query')) !== null && _d !== void 0 ? _d : '') });
+            return react_1.default.createElement(exports.LinkC, { href: withYtHostName, label: "".concat(p, "search: ").concat((_d = u.searchParams.get('search_query')) !== null && _d !== void 0 ? _d : '') });
         }
         if (u.pathname === '/watch') {
-            return react_1["default"].createElement(exports.LinkC, { href: withYtHostName, label: "".concat(p, "video: ").concat((_e = u.searchParams.get('v')) !== null && _e !== void 0 ? _e : '') });
+            return react_1.default.createElement(exports.LinkC, { href: withYtHostName, label: "".concat(p, "video: ").concat((_e = u.searchParams.get('v')) !== null && _e !== void 0 ? _e : '') });
         }
-        return react_1["default"].createElement(exports.LinkC, { href: withYtHostName, label: "".concat(p).concat(u.pathname) });
+        return react_1.default.createElement(exports.LinkC, { href: withYtHostName, label: "".concat(p).concat(u.pathname) });
     }
     catch (e) {
-        return react_1["default"].createElement(react_1["default"].Fragment, null,
+        return react_1.default.createElement(react_1.default.Fragment, null,
             p,
             url);
     }
@@ -87,7 +87,7 @@ exports.takeValue = takeValue;
 function bind(value, setValue) {
     return {
         value: value,
-        onChange: (0, exports.takeValue)(setValue)
+        onChange: (0, exports.takeValue)(setValue),
     };
 }
 exports.bind = bind;
@@ -95,7 +95,7 @@ function createPaginationComponent() {
     var PaginationC = function (_c) {
         var _a = _c.page, _b = _c.onPageChange;
         var _d = __read((0, react_1.useState)(), 2), _pageNumber = _d[0], _setPageNumber = _d[1];
-        return react_1["default"].createElement("div", null);
+        return react_1.default.createElement("div", null);
     };
     return PaginationC;
 }

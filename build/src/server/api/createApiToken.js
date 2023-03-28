@@ -38,7 +38,7 @@ var __generator = (this && this.__generator) || function (thisArg, body) {
 var __importDefault = (this && this.__importDefault) || function (mod) {
     return (mod && mod.__esModule) ? mod : { "default": mod };
 };
-exports.__esModule = true;
+Object.defineProperty(exports, "__esModule", { value: true });
 exports.createCreateApiTokenRoute = void 0;
 var token_1 = __importDefault(require("../models/token"));
 var createCreateApiTokenRoute = function (_a) {
@@ -60,11 +60,11 @@ var createCreateApiTokenRoute = function (_a) {
                         res.status(401).json({ kind: 'Failure', message: 'Unauthorized' });
                         return [2 /*return*/];
                     }
-                    repo = dataSource.getRepository(token_1["default"]);
+                    repo = dataSource.getRepository(token_1.default);
                     _a.label = 1;
                 case 1:
                     _a.trys.push([1, 3, , 4]);
-                    token = new token_1["default"]();
+                    token = new token_1.default();
                     token.token = tokenTools.sign('9999 years', adminId);
                     token.adminId = adminId;
                     token.name = name;
@@ -85,5 +85,5 @@ var createCreateApiTokenRoute = function (_a) {
     }); };
 };
 exports.createCreateApiTokenRoute = createCreateApiTokenRoute;
-exports["default"] = exports.createCreateApiTokenRoute;
+exports.default = exports.createCreateApiTokenRoute;
 //# sourceMappingURL=createApiToken.js.map

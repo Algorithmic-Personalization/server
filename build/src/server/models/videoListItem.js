@@ -26,7 +26,7 @@ var __metadata = (this && this.__metadata) || function (k, v) {
 var __importDefault = (this && this.__importDefault) || function (mod) {
     return (mod && mod.__esModule) ? mod : { "default": mod };
 };
-exports.__esModule = true;
+Object.defineProperty(exports, "__esModule", { value: true });
 exports.VideoListItem = exports.VideoType = exports.ListType = void 0;
 /* eslint-disable @typescript-eslint/no-inferrable-types */
 var typeorm_1 = require("typeorm");
@@ -44,7 +44,7 @@ var VideoType;
     VideoType["NON_PERSONALIZED"] = "NON_PERSONALIZED";
     VideoType["MIXED"] = "MIXED";
 })(VideoType = exports.VideoType || (exports.VideoType = {}));
-var VideoListItem = /** @class */ (function (_super) {
+var VideoListItem = exports.VideoListItem = /** @class */ (function (_super) {
     __extends(VideoListItem, _super);
     function VideoListItem() {
         var _this = _super !== null && _super.apply(this, arguments) || this;
@@ -59,30 +59,29 @@ var VideoListItem = /** @class */ (function (_super) {
         (0, typeorm_1.Column)(),
         (0, class_validator_1.IsInt)(),
         __metadata("design:type", Number)
-    ], VideoListItem.prototype, "eventId");
+    ], VideoListItem.prototype, "eventId", void 0);
     __decorate([
         (0, typeorm_1.Column)(),
         (0, class_validator_1.IsInt)(),
         __metadata("design:type", Number)
-    ], VideoListItem.prototype, "videoId");
+    ], VideoListItem.prototype, "videoId", void 0);
     __decorate([
         (0, typeorm_1.Column)(),
         (0, class_validator_1.IsInt)(),
         __metadata("design:type", Number)
-    ], VideoListItem.prototype, "position");
+    ], VideoListItem.prototype, "position", void 0);
     __decorate([
         (0, typeorm_1.Column)(),
         __metadata("design:type", String)
-    ], VideoListItem.prototype, "listType");
+    ], VideoListItem.prototype, "listType", void 0);
     __decorate([
         (0, typeorm_1.Column)(),
         __metadata("design:type", String)
-    ], VideoListItem.prototype, "videoType");
+    ], VideoListItem.prototype, "videoType", void 0);
     VideoListItem = __decorate([
         (0, typeorm_1.Entity)()
     ], VideoListItem);
     return VideoListItem;
-}(model_1["default"]));
-exports.VideoListItem = VideoListItem;
-exports["default"] = VideoListItem;
+}(model_1.default));
+exports.default = VideoListItem;
 //# sourceMappingURL=videoListItem.js.map

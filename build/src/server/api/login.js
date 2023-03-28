@@ -47,28 +47,27 @@ var __generator = (this && this.__generator) || function (thisArg, body) {
 var __importDefault = (this && this.__importDefault) || function (mod) {
     return (mod && mod.__esModule) ? mod : { "default": mod };
 };
-exports.__esModule = true;
+Object.defineProperty(exports, "__esModule", { value: true });
 exports.createLoginRoute = exports.LoginResponse = void 0;
 var class_validator_1 = require("class-validator");
 var admin_1 = __importDefault(require("../../common/models/admin"));
 var token_1 = __importDefault(require("../models/token"));
 var crypto_1 = require("../lib/crypto");
-var LoginResponse = /** @class */ (function () {
+var LoginResponse = exports.LoginResponse = /** @class */ (function () {
     function LoginResponse(admin, token) {
         this.admin = admin;
         this.token = token;
     }
     __decorate([
         (0, class_validator_1.ValidateNested)(),
-        __metadata("design:type", admin_1["default"])
-    ], LoginResponse.prototype, "admin");
+        __metadata("design:type", admin_1.default)
+    ], LoginResponse.prototype, "admin", void 0);
     __decorate([
         (0, class_validator_1.ValidateNested)(),
-        __metadata("design:type", token_1["default"])
-    ], LoginResponse.prototype, "token");
+        __metadata("design:type", token_1.default)
+    ], LoginResponse.prototype, "token", void 0);
     return LoginResponse;
 }());
-exports.LoginResponse = LoginResponse;
 var createLoginRoute = function (_a) {
     var createLogger = _a.createLogger, dataSource = _a.dataSource, tokenTools = _a.tokenTools;
     return function (req, res) { return __awaiter(void 0, void 0, void 0, function () {
@@ -83,9 +82,9 @@ var createLoginRoute = function (_a) {
                         res.status(400).json({ kind: 'Failure', message: 'Missing or invalid email or password' });
                         return [2 /*return*/];
                     }
-                    adminRepo = dataSource.getRepository(admin_1["default"]);
+                    adminRepo = dataSource.getRepository(admin_1.default);
                     return [4 /*yield*/, adminRepo.findOneBy({
-                            email: email
+                            email: email,
                         })];
                 case 1:
                     admin = _b.sent();
@@ -99,10 +98,10 @@ var createLoginRoute = function (_a) {
                         res.status(401).json({ kind: 'Failure', message: 'Invalid email or password' });
                         return [2 /*return*/];
                     }
-                    token = new token_1["default"]();
+                    token = new token_1.default();
                     token.token = tokenTools.sign('1h', admin.id);
                     token.adminId = admin.id;
-                    tokenRepo = dataSource.getRepository(token_1["default"]);
+                    tokenRepo = dataSource.getRepository(token_1.default);
                     _b.label = 3;
                 case 3:
                     _b.trys.push([3, 5, , 6]);
@@ -118,7 +117,7 @@ var createLoginRoute = function (_a) {
                 case 6:
                     res.json({
                         kind: 'Success',
-                        value: new LoginResponse(admin, token)
+                        value: new LoginResponse(admin, token),
                     });
                     return [2 /*return*/];
             }
@@ -126,5 +125,5 @@ var createLoginRoute = function (_a) {
     }); };
 };
 exports.createLoginRoute = createLoginRoute;
-exports["default"] = exports.createLoginRoute;
+exports.default = exports.createLoginRoute;
 //# sourceMappingURL=login.js.map

@@ -83,7 +83,7 @@ var __values = (this && this.__values) || function(o) {
 var __importDefault = (this && this.__importDefault) || function (mod) {
     return (mod && mod.__esModule) ? mod : { "default": mod };
 };
-exports.__esModule = true;
+Object.defineProperty(exports, "__esModule", { value: true });
 exports.createGetEventOverviewsRoute = void 0;
 var event_1 = __importStar(require("../../common/models/event"));
 var watchTime_1 = __importDefault(require("../models/watchTime"));
@@ -91,7 +91,7 @@ var videoListItem_1 = __importStar(require("../models/videoListItem"));
 var video_1 = __importDefault(require("../models/video"));
 var getParticipantOverview_1 = require("./getParticipantOverview");
 var createVideoListGetter = function (dataSource) {
-    var videoRepo = dataSource.getRepository(video_1["default"]);
+    var videoRepo = dataSource.getRepository(video_1.default);
     var cache = new Map();
     return function (ids) { return __awaiter(void 0, void 0, void 0, function () {
         var result, ids_1, ids_1_1, id, video, e_1_1;
@@ -129,7 +129,7 @@ var createVideoListGetter = function (dataSource) {
                     return [3 /*break*/, 9];
                 case 8:
                     try {
-                        if (ids_1_1 && !ids_1_1.done && (_a = ids_1["return"])) _a.call(ids_1);
+                        if (ids_1_1 && !ids_1_1.done && (_a = ids_1.return)) _a.call(ids_1);
                     }
                     finally { if (e_1) throw e_1.error; }
                     return [7 /*endfinally*/];
@@ -146,27 +146,27 @@ var createEventOverview = function (dataSource) { return function (event) { retu
             case 0:
                 overview = __assign({}, event);
                 if (!(event.type === event_1.EventType.WATCH_TIME)) return [3 /*break*/, 2];
-                watchtimeRepo = dataSource.getRepository(watchTime_1["default"]);
+                watchtimeRepo = dataSource.getRepository(watchTime_1.default);
                 return [4 /*yield*/, watchtimeRepo.findOneBy({ eventId: event.id })];
             case 1:
                 watchtime = _b.sent();
                 if (watchtime) {
                     overview.data = {
                         kind: 'watchtime',
-                        watchtime: watchtime.secondsWatched
+                        watchtime: watchtime.secondsWatched,
                     };
                 }
                 _b.label = 2;
             case 2:
                 if (!(event.type === event_1.EventType.RECOMMENDATIONS_SHOWN)) return [3 /*break*/, 7];
-                videoListItemRepo = dataSource.getRepository(videoListItem_1["default"]);
+                videoListItemRepo = dataSource.getRepository(videoListItem_1.default);
                 return [4 /*yield*/, videoListItemRepo.find({
                         where: {
-                            eventId: event.id
+                            eventId: event.id,
                         },
                         order: {
-                            position: 'ASC'
-                        }
+                            position: 'ASC',
+                        },
                     })];
             case 3:
                 listItems = _b.sent();
@@ -192,7 +192,7 @@ var createEventOverview = function (dataSource) { return function (event) { retu
                 catch (e_2_1) { e_2 = { error: e_2_1 }; }
                 finally {
                     try {
-                        if (listItems_1_1 && !listItems_1_1.done && (_a = listItems_1["return"])) _a.call(listItems_1);
+                        if (listItems_1_1 && !listItems_1_1.done && (_a = listItems_1.return)) _a.call(listItems_1);
                     }
                     finally { if (e_2) throw e_2.error; }
                 }
@@ -209,11 +209,11 @@ var createEventOverview = function (dataSource) { return function (event) { retu
                 recommendations = {
                     nonPersonalized: npVideos.map(function (video) { return (__assign(__assign({}, video), { source: videoListItem_1.VideoType.NON_PERSONALIZED })); }),
                     personalized: pVideos.map(function (video) { return (__assign(__assign({}, video), { source: videoListItem_1.VideoType.PERSONALIZED })); }),
-                    shown: shownVideos.map(function (video, i) { return (__assign(__assign({}, video), { source: shownItems_1[i].videoType })); })
+                    shown: shownVideos.map(function (video, i) { return (__assign(__assign({}, video), { source: shownItems_1[i].videoType })); }),
                 };
                 overview.data = {
                     kind: 'recommendations',
-                    recommendations: recommendations
+                    recommendations: recommendations,
                 };
                 _b.label = 7;
             case 7: return [2 /*return*/, overview];
@@ -234,14 +234,14 @@ var createGetEventOverviewsRoute = function (_a) {
                         res.status(400).json({ kind: 'Error', message: 'Missing sessionUuid' });
                         return [2 /*return*/];
                     }
-                    eventRepo = dataSource.getRepository(event_1["default"]);
+                    eventRepo = dataSource.getRepository(event_1.default);
                     return [4 /*yield*/, eventRepo.find({
                             where: {
-                                sessionUuid: sessionUuid
+                                sessionUuid: sessionUuid,
                             },
                             order: {
-                                createdAt: 'DESC'
-                            }
+                                createdAt: 'DESC',
+                            },
                         })];
                 case 1:
                     events = _a.sent();
@@ -255,5 +255,5 @@ var createGetEventOverviewsRoute = function (_a) {
     }); };
 };
 exports.createGetEventOverviewsRoute = createGetEventOverviewsRoute;
-exports["default"] = exports.createGetEventOverviewsRoute;
+exports.default = exports.createGetEventOverviewsRoute;
 //# sourceMappingURL=getEventOverviews.js.map

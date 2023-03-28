@@ -60,7 +60,7 @@ var __values = (this && this.__values) || function(o) {
 var __importDefault = (this && this.__importDefault) || function (mod) {
     return (mod && mod.__esModule) ? mod : { "default": mod };
 };
-exports.__esModule = true;
+Object.defineProperty(exports, "__esModule", { value: true });
 exports.createGetParticipantOverviewRoute = exports.asyncMap = void 0;
 var participant_1 = __importDefault(require("../models/participant"));
 var event_1 = __importDefault(require("../../common/models/event"));
@@ -109,7 +109,7 @@ var asyncMap = function (array) { return function (fn) { return __awaiter(void 0
                 return [3 /*break*/, 8];
             case 7:
                 try {
-                    if (array_1_1 && !array_1_1.done && (_c = array_1["return"])) _c.call(array_1);
+                    if (array_1_1 && !array_1_1.done && (_c = array_1.return)) _c.call(array_1);
                 }
                 finally { if (e_1) throw e_1.error; }
                 return [7 /*endfinally*/];
@@ -123,7 +123,7 @@ var createSessionOverview = function (dataSource) { return function (session) { 
     return __generator(this, function (_a) {
         switch (_a.label) {
             case 0:
-                eventRepo = dataSource.getRepository(event_1["default"]);
+                eventRepo = dataSource.getRepository(event_1.default);
                 return [4 /*yield*/, eventRepo.createQueryBuilder()
                         .select('MIN(created_at)', 'firstDate')
                         .addSelect('MAX(created_at)', 'lastDate')
@@ -148,7 +148,7 @@ var createGetParticipantOverviewRoute = function (_a) {
                 case 0:
                     log = createLogger(req.requestId);
                     log('Received participant overview request');
-                    participantRepo = dataSource.getRepository(participant_1["default"]);
+                    participantRepo = dataSource.getRepository(participant_1.default);
                     code = req.params.code;
                     if (!code) {
                         res.status(400).json({ kind: 'Error', message: 'Missing email' });
@@ -161,14 +161,14 @@ var createGetParticipantOverviewRoute = function (_a) {
                         res.status(404).json({ kind: 'Error', message: 'Participant not found' });
                         return [2 /*return*/];
                     }
-                    sessionRepo = dataSource.getRepository(session_1["default"]);
+                    sessionRepo = dataSource.getRepository(session_1.default);
                     return [4 /*yield*/, sessionRepo.find({
                             where: {
-                                participantCode: participant.code
+                                participantCode: participant.code,
                             },
                             order: {
-                                createdAt: 'DESC'
-                            }
+                                createdAt: 'DESC',
+                            },
                         })];
                 case 2:
                     sessions = _c.sent();
@@ -185,5 +185,5 @@ var createGetParticipantOverviewRoute = function (_a) {
     }); };
 };
 exports.createGetParticipantOverviewRoute = createGetParticipantOverviewRoute;
-exports["default"] = exports.createGetParticipantOverviewRoute;
+exports.default = exports.createGetParticipantOverviewRoute;
 //# sourceMappingURL=getParticipantOverview.js.map

@@ -38,7 +38,7 @@ var __generator = (this && this.__generator) || function (thisArg, body) {
 var __importDefault = (this && this.__importDefault) || function (mod) {
     return (mod && mod.__esModule) ? mod : { "default": mod };
 };
-exports.__esModule = true;
+Object.defineProperty(exports, "__esModule", { value: true });
 exports.makeRouteConnector = void 0;
 var util_1 = require("../../common/util");
 var notFoundError_1 = __importDefault(require("./notFoundError"));
@@ -59,21 +59,21 @@ var makeRouteConnector = function (context) { return function (definition) { ret
                 value = _a.sent();
                 res.json({
                     kind: 'Success',
-                    value: value
+                    value: value,
                 });
                 return [3 /*break*/, 4];
             case 3:
                 err_1 = _a.sent();
-                if (err_1 instanceof notFoundError_1["default"]) {
+                if (err_1 instanceof notFoundError_1.default) {
                     res.status(404).json({
                         kind: 'Failure',
-                        message: message(err_1)
+                        message: message(err_1),
                     });
                     return [2 /*return*/];
                 }
                 res.status(500).json({
                     kind: 'Failure',
-                    message: message(err_1)
+                    message: message(err_1),
                 });
                 return [3 /*break*/, 4];
             case 4: return [2 /*return*/];

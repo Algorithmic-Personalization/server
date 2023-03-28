@@ -38,7 +38,7 @@ var __generator = (this && this.__generator) || function (thisArg, body) {
 var __importDefault = (this && this.__importDefault) || function (mod) {
     return (mod && mod.__esModule) ? mod : { "default": mod };
 };
-exports.__esModule = true;
+Object.defineProperty(exports, "__esModule", { value: true });
 exports.createAuthTestRoute = void 0;
 var admin_1 = __importDefault(require("../../common/models/admin"));
 var createAuthTestRoute = function (_a) {
@@ -50,7 +50,7 @@ var createAuthTestRoute = function (_a) {
                 case 0:
                     log = createLogger(req.requestId);
                     log('Received auth test request');
-                    adminRepo = dataSource.getRepository(admin_1["default"]);
+                    adminRepo = dataSource.getRepository(admin_1.default);
                     if (req.adminId === undefined) {
                         res.status(401).json({ kind: 'Failure', message: 'Not authenticated' });
                         return [2 /*return*/];
@@ -80,5 +80,5 @@ var createAuthTestRoute = function (_a) {
     }); };
 };
 exports.createAuthTestRoute = createAuthTestRoute;
-exports["default"] = exports.createAuthTestRoute;
+exports.default = exports.createAuthTestRoute;
 //# sourceMappingURL=authTest.js.map
