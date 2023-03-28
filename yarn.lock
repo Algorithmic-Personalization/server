@@ -1835,6 +1835,13 @@ __metadata:
   languageName: node
   linkType: hard
 
+"@types/node@npm:^18.15.10":
+  version: 18.15.10
+  resolution: "@types/node@npm:18.15.10"
+  checksum: 9aeae0b683eda82892def5315812bdee3f1a28c4898b7e70f8e2514564538b16c4dccbe8339c1266f8fc1d707a48f152689264a854f5ebc2eba5011e793612d9
+  languageName: node
+  linkType: hard
+
 "@types/nodemailer@npm:^6.4.7":
   version: 6.4.7
   resolution: "@types/nodemailer@npm:6.4.7"
@@ -10558,6 +10565,7 @@ __metadata:
     "@types/jest": ^29.4.0
     "@types/jsonwebtoken": ^9.0.0
     "@types/multer": ^1.4.7
+    "@types/node": ^18.15.10
     "@types/nodemailer": ^6.4.7
     "@types/pg": ^8.6.5
     "@types/react": ^18.0.26
