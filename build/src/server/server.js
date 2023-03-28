@@ -103,12 +103,10 @@ const upload = (0, multer_1.default)();
 const currentRequests = io_1.default.counter({
     name: 'Realtime request count',
     id: 'app/realtime/request',
-    historic: true,
 });
 const slowQueries = io_1.default.meter({
     name: 'Slow queries',
-    id: 'app/database/slowQueries',
-    historic: true,
+    id: 'app/realtime/slowQueries',
 });
 const start = () => __awaiter(void 0, void 0, void 0, function* () {
     const root = yield (0, util_1.findPackageJsonDir)(__dirname);
@@ -230,6 +228,7 @@ const start = () => __awaiter(void 0, void 0, void 0, function* () {
     app.use((req, _res, next) => {
         currentRequests.inc();
         req.on('end', () => {
+            console.log('end');
             currentRequests.dec();
         });
         ++requestId;

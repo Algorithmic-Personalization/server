@@ -131,13 +131,11 @@ const upload = multer();
 const currentRequests = io.counter({
 	name: 'Realtime request count',
 	id: 'app/realtime/request',
-	historic: true,
 });
 
 const slowQueries = io.meter({
 	name: 'Slow queries',
-	id: 'app/database/slowQueries',
-	historic: true,
+	id: 'app/realtime/slowQueries',
 });
 
 const start = async () => {
@@ -312,6 +310,7 @@ const start = async () => {
 	app.use((req, _res, next) => {
 		currentRequests.inc();
 		req.on('end', () => {
+			console.log('end');
 			currentRequests.dec();
 		});
 		++requestId;
