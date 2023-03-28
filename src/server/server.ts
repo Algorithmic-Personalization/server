@@ -50,6 +50,7 @@ import {createTokenTools} from './lib/crypto';
 import createAuthMiddleWare from './lib/authMiddleware';
 import createParticipantMiddleware from './lib/participantMiddleware';
 import updateCounters from './lib/updateCounters';
+import DatabaseLogger from './lib/databaseLogger';
 
 import {
 	postCheckParticipantCode,
@@ -130,6 +131,13 @@ const upload = multer();
 const currentRequests = io.counter({
 	name: 'Realtime request count',
 	id: 'app/realtime/request',
+	historic: true,
+});
+
+const slowQueries = io.meter({
+	name: 'Slow queries',
+	id: 'app/database/slowQueries',
+	historic: true,
 });
 
 const start = async () => {
@@ -220,6 +228,8 @@ const start = async () => {
 
 	await pgClient.end();
 
+	const createLogger = createDefaultLogger(logStream);
+
 	const ds = new DataSource({
 		type: 'postgres',
 		...dbConfig,
@@ -227,6 +237,9 @@ const start = async () => {
 		synchronize: false,
 		entities,
 		namingStrategy: new SnakeNamingStrategy(),
+		logging: true,
+		maxQueryExecutionTime: 200,
+		logger: new DatabaseLogger(createLogger('database'), slowQueries),
 	});
 
 	try {
@@ -237,8 +250,6 @@ const start = async () => {
 	}
 
 	console.log('Successfully initialized data source');
-
-	const createLogger = createDefaultLogger(logStream);
 
 	try {
 		await updateCounters({
