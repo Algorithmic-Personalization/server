@@ -327,12 +327,13 @@ const start = async () => {
 		staticRouter.use(webpackHotMiddleware(compiler as any));
 	}
 
+	app.use(cors());
+
 	staticRouter.use(express.static(join(root, 'public')));
 
 	app.use(staticRouter);
 
 	app.use(bodyParser.json());
-	app.use(cors());
 
 	let requestId = 0;
 

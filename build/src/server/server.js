@@ -238,10 +238,10 @@ const start = () => __awaiter(void 0, void 0, void 0, function* () {
         // eslint-disable-next-line @typescript-eslint/no-unsafe-argument
         staticRouter.use((0, webpack_hot_middleware_1.default)(compiler));
     }
+    app.use((0, cors_1.default)());
     staticRouter.use(express_1.default.static((0, path_1.join)(root, 'public')));
     app.use(staticRouter);
     app.use(body_parser_1.default.json());
-    app.use((0, cors_1.default)());
     let requestId = 0;
     app.use((req, _res, next) => {
         currentRequests.inc();
