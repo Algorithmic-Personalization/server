@@ -308,9 +308,6 @@ export const ExperimentConfigC = () => {
 					<Typography variant='h1' sx={{mb: 4}}>
 						Phase transitioning
 					</Typography>
-					<Typography variant='body1' sx={{my: 2}}>
-						<strong>This is just a UI proposal, nothing is implemented!!</strong>
-					</Typography>
 					<Typography
 						variant='body1'
 						sx={{
