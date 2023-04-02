@@ -5,6 +5,7 @@ export type Page<T> = {
 	page: number;
 	pageSize: number;
 	pageCount: number;
+	count: number;
 };
 
 export type PaginationRequest = {

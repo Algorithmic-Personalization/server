@@ -44,7 +44,12 @@ import SmtpConfig from './lib/smtpConfig';
 import webpackConfig from '../../webpack.config';
 
 import type RouteContext from './lib/routeCreation';
-import {type RouteDefinition, makeRouteConnector as makeExpressHandlerCreator} from './lib/routeCreation';
+import {
+	type RouteDefinition,
+	makeRouteConnector as makeExpressHandlerCreator,
+	type InstalledEventConfig,
+} from './lib/routeCreation';
+
 import {createDefaultLogger} from './lib/logger';
 import {createTokenTools} from './lib/crypto';
 import createAuthMiddleWare from './lib/authMiddleware';
@@ -137,6 +142,27 @@ const slowQueries = io.meter({
 	name: 'Slow queries',
 	id: 'app/realtime/slowQueries',
 });
+
+const getInstalledEventConfig = (conf: Record<string, unknown>): InstalledEventConfig => {
+	if (!has('installed-event')(conf) || typeof conf['installed-event'] !== 'object') {
+		throw new Error('Missing or invalid installed-event config key in config.yaml');
+	}
+
+	const installedEvent = conf['installed-event'] as Record<string, unknown>;
+
+	if (!has('url')(installedEvent) || typeof installedEvent.url !== 'string') {
+		throw new Error('Missing or invalid url key in installed-event config');
+	}
+
+	if (!has('token')(installedEvent) || typeof installedEvent.token !== 'string') {
+		throw new Error('Missing or invalid token key in installed-event config');
+	}
+
+	return {
+		url: installedEvent.url,
+		token: installedEvent.token,
+	};
+};
 
 const start = async () => {
 	const root = await findPackageJsonDir(__dirname);
@@ -262,12 +288,15 @@ const start = async () => {
 	const privateKey = await readFile(join(root, 'private.key'), 'utf-8');
 	const tokenTools = createTokenTools(privateKey);
 
+	const installedEventConfig = getInstalledEventConfig(config);
+
 	const routeContext: RouteContext = {
 		dataSource: ds,
 		mailer,
 		mailerFrom: smtpConfig.auth.user,
 		createLogger,
 		tokenTools,
+		installedEventConfig,
 	};
 
 	const makeHandler = makeExpressHandlerCreator(routeContext);

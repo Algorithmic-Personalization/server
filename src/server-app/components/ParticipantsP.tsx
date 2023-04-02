@@ -32,6 +32,22 @@ import type Participant from '../../server/models/participant';
 import {Phase} from '../../server/models/transitionSetting';
 import type {Page} from '../../server/lib/pagination';
 
+const translatePhase = (p: Phase): string => {
+	if (p === Phase.PRE_EXPERIMENT) {
+		return 'Pre-Experiment';
+	}
+
+	if (p === Phase.EXPERIMENT) {
+		return 'Experiment';
+	}
+
+	if (p === Phase.POST_EXPERIMENT) {
+		return 'Post-Experiment';
+	}
+
+	return 'Unknown';
+};
+
 const tableDescriptor: TableDescriptor<Participant> = {
 	headers: [
 		{
@@ -41,6 +57,10 @@ const tableDescriptor: TableDescriptor<Participant> = {
 		{
 			key: 'experiment-arm',
 			element: 'Experiment arm',
+		},
+		{
+			key: 'extension-installed',
+			element: 'Extension installed',
 		},
 		{
 			key: 'phase',
@@ -53,7 +73,8 @@ const tableDescriptor: TableDescriptor<Participant> = {
 			// eslint-disable-next-line react/jsx-key
 			<Link to={`/participants/${p.code}`}>{p.code}</Link>,
 			p.arm,
-			p.phase,
+			p.extensionInstalled ? 'yes' : 'no',
+			translatePhase(p.phase),
 		],
 	}),
 };
@@ -168,12 +189,20 @@ const ListC: React.FC = () => {
 	const [message, setMessage] = useState<Message>();
 	const [codeLike, setCodeLike] = useState('');
 	const [phase, setPhase] = useState<Phase | number>(-1);
+	const [extensionInstalled, setExtensionInstalled] = useState<'yes' | 'no' | 'any'>('any');
 
 	const api = useAdminApi();
 
 	useEffect(() => {
 		(async () => {
-			const res = await api.getParticipants(page - 1, codeLike, phase);
+			const res = await api.getParticipants(
+				{
+					codeLike,
+					phase,
+					extensionInstalled,
+				},
+				page - 1,
+			);
 
 			if (res.kind === 'Success') {
 				setParticipants(res.value);
@@ -184,7 +213,7 @@ const ListC: React.FC = () => {
 				});
 			}
 		})();
-	}, [page, codeLike, phase]);
+	}, [page, codeLike, phase, extensionInstalled]);
 
 	if (participants === undefined) {
 		return <Typography>Loading...</Typography>;
@@ -233,6 +262,22 @@ const ListC: React.FC = () => {
 						<MenuItem value={Phase.POST_EXPERIMENT}>Post-Experiment</MenuItem>
 					</Select>
 				</FormControl>
+				<FormControl>
+					<InputLabel id='participant-extension-installed-search'>Extension installed</InputLabel>
+					<Select
+						labelId='participant-extension-installed-search'
+						label='Extension installed'
+						onChange={e => {
+							setExtensionInstalled(e.target.value as 'yes' | 'no' | 'any');
+							setPageInput('1');
+						}}
+						value={extensionInstalled}
+					>
+						<MenuItem value='any'>Any</MenuItem>
+						<MenuItem value='yes'>Yes</MenuItem>
+						<MenuItem value='no'>No</MenuItem>
+					</Select>
+				</FormControl>
 				<Box sx={{display: 'flex', alignItems: 'center'}}>
 					<Typography variant='body2'>Page&nbsp;</Typography>
 					<input
@@ -246,7 +291,7 @@ const ListC: React.FC = () => {
 						}}
 					/>
 					<Typography variant='body2'>&nbsp;/&nbsp;</Typography>
-					<Typography variant='body2'>{participants.pageCount}</Typography>
+					<Typography variant='body2'>{participants.pageCount}&nbsp;({participants.count} total)</Typography>
 				</Box>
 			</Box>
 			<TableC items={participants.results}/>

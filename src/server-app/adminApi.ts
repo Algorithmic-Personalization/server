@@ -50,6 +50,12 @@ import {
 	makeApiVerbCreator,
 } from '../common/util';
 
+export type ParticipantFilters = {
+	codeLike: string;
+	phase: number;
+	extensionInstalled: 'yes' | 'no' | 'any';
+};
+
 export type AdminApi = {
 	isLoggedIn: () => boolean;
 	wasLoggedIn: () => boolean;
@@ -59,7 +65,7 @@ export type AdminApi = {
 	getAdmin: () => Admin | undefined;
 	getAuthTest: () => Promise<Maybe<Admin>>;
 	uploadParticipants: (file: File) => Promise<Maybe<string>>;
-	getParticipants: (page: number, codeLike: string, phase: number, pageSize?: number) => Promise<Maybe<Page<Participant>>>;
+	getParticipants: (filters: ParticipantFilters, page: number, pageSize?: number) => Promise<Maybe<Page<Participant>>>;
 	getParticipantOverview: (participantCode: string) => Promise<Maybe<ParticipantOverview>>;
 	getEventOverviews: (sessionUuid: string) => Promise<Maybe<EventOverview[]>>;
 	getEvents: (page: number, pageSize?: number) => Promise<Maybe<Page<Event>>>;
@@ -195,10 +201,10 @@ export const createAdminApi = (serverUrl: string, showLoginModal?: () => void): 
 			};
 		},
 
-		async getParticipants(page: number, codeLike: string, phase: number, pageSize = 15) {
+		async getParticipants(filters: ParticipantFilters, page: number, pageSize = 15) {
 			return get<Page<Participant>>(
 				`${getParticipants}/${page}`,
-				{pageSize, codeLike, phase},
+				{...filters, pageSize},
 				headers(),
 			);
 		},

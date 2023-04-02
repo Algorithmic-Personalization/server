@@ -214,8 +214,6 @@ const ExperimentConfigC = () => {
         react_1.default.createElement(material_1.Grid, { container: true, spacing: 8 },
             react_1.default.createElement(material_1.Grid, { item: true, xs: 12, component: 'section' },
                 react_1.default.createElement(material_1.Typography, { variant: 'h1', sx: { mb: 4 } }, "Phase transitioning"),
-                react_1.default.createElement(material_1.Typography, { variant: 'body1', sx: { my: 2 } },
-                    react_1.default.createElement("strong", null, "This is just a UI proposal, nothing is implemented!!")),
                 react_1.default.createElement(material_1.Typography, { variant: 'body1', sx: {
                         mb: 2,
                         '& a:visited': { color: 'inherit' },

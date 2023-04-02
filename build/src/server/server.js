@@ -108,6 +108,22 @@ const slowQueries = io_1.default.meter({
     name: 'Slow queries',
     id: 'app/realtime/slowQueries',
 });
+const getInstalledEventConfig = (conf) => {
+    if (!(0, util_1.has)('installed-event')(conf) || typeof conf['installed-event'] !== 'object') {
+        throw new Error('Missing or invalid installed-event config key in config.yaml');
+    }
+    const installedEvent = conf['installed-event'];
+    if (!(0, util_1.has)('url')(installedEvent) || typeof installedEvent.url !== 'string') {
+        throw new Error('Missing or invalid url key in installed-event config');
+    }
+    if (!(0, util_1.has)('token')(installedEvent) || typeof installedEvent.token !== 'string') {
+        throw new Error('Missing or invalid token key in installed-event config');
+    }
+    return {
+        url: installedEvent.url,
+        token: installedEvent.token,
+    };
+};
 const start = () => __awaiter(void 0, void 0, void 0, function* () {
     const root = yield (0, util_1.findPackageJsonDir)(__dirname);
     const logsPath = (0, path_1.join)(root, 'logs', 'server.log');
@@ -194,12 +210,14 @@ const start = () => __awaiter(void 0, void 0, void 0, function* () {
     }
     const privateKey = yield (0, promises_1.readFile)((0, path_1.join)(root, 'private.key'), 'utf-8');
     const tokenTools = (0, crypto_1.createTokenTools)(privateKey);
+    const installedEventConfig = getInstalledEventConfig(config);
     const routeContext = {
         dataSource: ds,
         mailer,
         mailerFrom: smtpConfig.auth.user,
         createLogger,
         tokenTools,
+        installedEventConfig,
     };
     const makeHandler = (0, routeCreation_1.makeRouteConnector)(routeContext);
     const tokenRepo = ds.getRepository(token_1.default);

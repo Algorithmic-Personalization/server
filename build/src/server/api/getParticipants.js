@@ -36,12 +36,26 @@ exports.createGetParticipantsRoute = void 0;
 const pagination_1 = require("../lib/pagination");
 const participant_1 = __importStar(require("../models/participant"));
 const typeorm_1 = require("typeorm");
+const translateExtensionInstalledFilter = (extensionInstalled) => {
+    if (extensionInstalled === 'yes') {
+        return true;
+    }
+    if (extensionInstalled === 'no') {
+        return false;
+    }
+    return undefined;
+};
 const createGetParticipantsRoute = ({ createLogger, dataSource }) => (req, res) => __awaiter(void 0, void 0, void 0, function* () {
     const log = createLogger(req.requestId);
     log('Received participants request');
     const { page, pageSize } = (0, pagination_1.extractPaginationRequest)(req);
-    const { codeLike, phase } = req.query;
+    const { codeLike, phase, extensionInstalled } = req.query;
     const participantRepo = dataSource.getRepository(participant_1.default);
+    const where = {
+        code: (typeof codeLike === 'string') ? (0, typeorm_1.Like)(`%${codeLike}%`) : undefined,
+        phase: (0, participant_1.isValidPhase)(Number(phase)) ? Number(phase) : undefined,
+        extensionInstalled: translateExtensionInstalledFilter(extensionInstalled),
+    };
     try {
         const participants = yield participantRepo
             .find({
@@ -50,17 +64,15 @@ const createGetParticipantsRoute = ({ createLogger, dataSource }) => (req, res) 
             order: {
                 createdAt: 'DESC',
             },
-            where: {
-                code: (typeof codeLike === 'string') ? (0, typeorm_1.Like)(`%${codeLike}%`) : undefined,
-                phase: (0, participant_1.isValidPhase)(Number(phase)) ? Number(phase) : undefined,
-            },
+            where,
         });
-        const count = yield participantRepo.count();
+        const count = yield participantRepo.count({ where });
         const data = {
             results: participants,
             page,
             pageSize,
             pageCount: Math.ceil(count / pageSize),
+            count,
         };
         res.status(200).json({ kind: 'Success', value: data });
     }

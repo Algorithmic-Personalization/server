@@ -11,12 +11,18 @@ import NotFoundError from './notFoundError';
 const hasMessage = has('message');
 const message = (x: unknown) => (hasMessage(x) ? x.message : 'An unknown error occurred');
 
+export type InstalledEventConfig = {
+	url: string;
+	token: string;
+};
+
 export type RouteContext = {
 	dataSource: DataSource;
 	mailer: Transporter;
 	mailerFrom: string;
 	createLogger: CreateLogger;
 	tokenTools: TokenTools;
+	installedEventConfig: InstalledEventConfig;
 };
 
 export type RouteCreator = (context: RouteContext) => (req: Request, res: Response) => Promise<void>;

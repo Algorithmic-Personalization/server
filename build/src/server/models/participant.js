@@ -25,6 +25,7 @@ let Participant = class Participant extends model_1.default {
         this.code = '';
         this.phase = 0;
         this.arm = event_1.ExperimentArm.TREATMENT;
+        this.extensionInstalled = false;
     }
 };
 __decorate([
@@ -49,6 +50,11 @@ __decorate([
     (0, typeorm_1.OneToMany)(() => dailyActivityTime_1.default, activityTime => activityTime.participant),
     __metadata("design:type", Array)
 ], Participant.prototype, "activityTimes", void 0);
+__decorate([
+    (0, typeorm_1.Column)(),
+    (0, class_validator_1.IsBoolean)(),
+    __metadata("design:type", Boolean)
+], Participant.prototype, "extensionInstalled", void 0);
 Participant = __decorate([
     (0, typeorm_1.Entity)()
 ], Participant);

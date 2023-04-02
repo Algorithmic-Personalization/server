@@ -28,6 +28,7 @@ var EventType;
     EventType["WATCH_TIME"] = "WATCH_TIME";
     EventType["SESSION_END"] = "SESSION_END";
     EventType["PHASE_TRANSITION"] = "PHASE_TRANSITION";
+    EventType["EXTENSION_INSTALLED"] = "EXTENSION_INSTALLED";
 })(EventType = exports.EventType || (exports.EventType = {}));
 var ExperimentArm;
 (function (ExperimentArm) {

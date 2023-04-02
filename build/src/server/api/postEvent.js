@@ -36,6 +36,7 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
 };
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.createPostEventRoute = void 0;
+const node_fetch_1 = __importDefault(require("node-fetch"));
 const typeorm_1 = require("typeorm");
 const participant_1 = __importDefault(require("../models/participant"));
 const event_1 = __importStar(require("../../common/models/event"));
@@ -316,7 +317,54 @@ const summarizeForDisplay = (event) => {
     }
     return summary;
 };
-const createPostEventRoute = ({ createLogger, dataSource }) => (req, res) => __awaiter(void 0, void 0, void 0, function* () {
+const createHandleExtensionInstalledEvent = (dataSource, installedEventConfig, log) => (participantId, event) => __awaiter(void 0, void 0, void 0, function* () {
+    log('handling extension installed event...');
+    const eventRepo = dataSource.getRepository(event_1.default);
+    const queryRunner = dataSource.createQueryRunner();
+    try {
+        yield queryRunner.startTransaction();
+        const participant = yield queryRunner.manager.getRepository(participant_1.default)
+            .createQueryBuilder('participant')
+            .useTransaction(true)
+            .setLock('pessimistic_write')
+            .where({ id: participantId })
+            .getOne();
+        if (!participant) {
+            throw new Error('Participant not found');
+        }
+        if (participant.extensionInstalled) {
+            log('participant extension already installed, skipping');
+        }
+        else {
+            log('participant extension not installed, calling API to notify installation...');
+            yield (0, node_fetch_1.default)(installedEventConfig.url, {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'X-API-TOKEN': installedEventConfig.token,
+                },
+                body: JSON.stringify({
+                    code: participant.code,
+                }),
+            });
+            log('remote server notified, updating local participant...');
+            participant.extensionInstalled = true;
+            yield queryRunner.manager.save(participant);
+            const e = yield eventRepo.save(event);
+            log('event saved', e);
+            yield queryRunner.commitTransaction();
+            log('participant updated, transaction committed');
+        }
+    }
+    catch (err) {
+        log('error handling EXTENSION_INSTALLED event:', err);
+        yield queryRunner.rollbackTransaction();
+    }
+    finally {
+        yield queryRunner.release();
+    }
+});
+const createPostEventRoute = ({ createLogger, dataSource, installedEventConfig, }) => (req, res) => __awaiter(void 0, void 0, void 0, function* () {
     const log = createLogger(req.requestId);
     log('Received post event request');
     const { participantCode } = req;
@@ -346,6 +394,7 @@ const createPostEventRoute = ({ createLogger, dataSource }) => (req, res) => __a
         dataSource,
         log,
     });
+    const handleExtensionInstalledEvent = createHandleExtensionInstalledEvent(dataSource, installedEventConfig, log);
     const participant = yield participantRepo.findOneBy({
         code: participantCode,
     });
@@ -386,14 +435,20 @@ const createPostEventRoute = ({ createLogger, dataSource }) => (req, res) => __a
         log('activity update failed', e);
     }
     try {
-        const e = yield eventRepo.save(event);
-        log('event saved', summarizeForDisplay(e));
-        res.send({ kind: 'Success', value: e });
-        if (event.type === event_1.EventType.RECOMMENDATIONS_SHOWN) {
-            yield storeRecommendationsShown(log, dataSource, event);
+        if (event.type === event_1.EventType.EXTENSION_INSTALLED) {
+            yield handleExtensionInstalledEvent(participant.id, event);
+            res.send({ kind: 'Success', value: 'Extension installed event handled' });
         }
-        else if (event.type === event_1.EventType.WATCH_TIME) {
-            yield storeWatchTime(log, dataSource, event);
+        else {
+            const e = yield eventRepo.save(event);
+            log('event saved', summarizeForDisplay(e));
+            res.send({ kind: 'Success', value: e });
+            if (event.type === event_1.EventType.RECOMMENDATIONS_SHOWN) {
+                yield storeRecommendationsShown(log, dataSource, event);
+            }
+            else if (event.type === event_1.EventType.WATCH_TIME) {
+                yield storeWatchTime(log, dataSource, event);
+            }
         }
     }
     catch (e) {

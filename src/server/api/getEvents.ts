@@ -30,6 +30,7 @@ export const createGetEventsRoute: RouteCreator = ({createLogger, dataSource}) =
 			page,
 			pageSize,
 			pageCount: Math.ceil(count / pageSize),
+			count,
 		};
 
 		res.status(200).json({kind: 'Success', value: data});

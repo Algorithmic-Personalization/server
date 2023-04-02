@@ -8,3 +8,7 @@ smtp:
   auth:
     user: fm.de.jouvencel@gmail.com
     pass: application password if you have 2-FA or e-mail password otherwise (discouraged)
+
+installed-event:
+  url: https://some_url.com
+  token: some_authorization_token

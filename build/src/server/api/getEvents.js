@@ -35,6 +35,7 @@ const createGetEventsRoute = ({ createLogger, dataSource }) => (req, res) => __a
             page,
             pageSize,
             pageCount: Math.ceil(count / pageSize),
+            count,
         };
         res.status(200).json({ kind: 'Success', value: data });
     }

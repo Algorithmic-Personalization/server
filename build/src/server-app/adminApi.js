@@ -122,9 +122,9 @@ const createAdminApi = (serverUrl, showLoginModal) => {
                 };
             });
         },
-        getParticipants(page, codeLike, phase, pageSize = 15) {
+        getParticipants(filters, page, pageSize = 15) {
             return __awaiter(this, void 0, void 0, function* () {
-                return get(`${serverRoutes_1.getParticipants}/${page}`, { pageSize, codeLike, phase }, headers());
+                return get(`${serverRoutes_1.getParticipants}/${page}`, Object.assign(Object.assign({}, filters), { pageSize }), headers());
             });
         },
         getParticipantOverview(participantCode) {

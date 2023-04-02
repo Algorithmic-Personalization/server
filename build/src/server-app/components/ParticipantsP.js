@@ -48,6 +48,18 @@ const adminApiProvider_1 = require("../adminApiProvider");
 // @ts-expect-error this is a text file, not a module
 const participants_sample_csv_1 = __importDefault(require("../../../public/participants.sample.csv"));
 const transitionSetting_1 = require("../../server/models/transitionSetting");
+const translatePhase = (p) => {
+    if (p === transitionSetting_1.Phase.PRE_EXPERIMENT) {
+        return 'Pre-Experiment';
+    }
+    if (p === transitionSetting_1.Phase.EXPERIMENT) {
+        return 'Experiment';
+    }
+    if (p === transitionSetting_1.Phase.POST_EXPERIMENT) {
+        return 'Post-Experiment';
+    }
+    return 'Unknown';
+};
 const tableDescriptor = {
     headers: [
         {
@@ -57,6 +69,10 @@ const tableDescriptor = {
         {
             key: 'experiment-arm',
             element: 'Experiment arm',
+        },
+        {
+            key: 'extension-installed',
+            element: 'Extension installed',
         },
         {
             key: 'phase',
@@ -69,7 +85,8 @@ const tableDescriptor = {
             // eslint-disable-next-line react/jsx-key
             react_1.default.createElement(react_router_dom_1.Link, { to: `/participants/${p.code}` }, p.code),
             p.arm,
-            p.phase,
+            p.extensionInstalled ? 'yes' : 'no',
+            translatePhase(p.phase),
         ],
     }),
 };
@@ -144,10 +161,15 @@ const ListC = () => {
     const [message, setMessage] = (0, react_1.useState)();
     const [codeLike, setCodeLike] = (0, react_1.useState)('');
     const [phase, setPhase] = (0, react_1.useState)(-1);
+    const [extensionInstalled, setExtensionInstalled] = (0, react_1.useState)('any');
     const api = (0, adminApiProvider_1.useAdminApi)();
     (0, react_1.useEffect)(() => {
         (() => __awaiter(void 0, void 0, void 0, function* () {
-            const res = yield api.getParticipants(page - 1, codeLike, phase);
+            const res = yield api.getParticipants({
+                codeLike,
+                phase,
+                extensionInstalled,
+            }, page - 1);
             if (res.kind === 'Success') {
                 setParticipants(res.value);
             }
@@ -158,7 +180,7 @@ const ListC = () => {
                 });
             }
         }))();
-    }, [page, codeLike, phase]);
+    }, [page, codeLike, phase, extensionInstalled]);
     if (participants === undefined) {
         return react_1.default.createElement(material_1.Typography, null, "Loading...");
     }
@@ -188,13 +210,26 @@ const ListC = () => {
                     react_1.default.createElement(material_1.MenuItem, { value: transitionSetting_1.Phase.PRE_EXPERIMENT }, "Pre-Experiment"),
                     react_1.default.createElement(material_1.MenuItem, { value: transitionSetting_1.Phase.EXPERIMENT }, "Experiment"),
                     react_1.default.createElement(material_1.MenuItem, { value: transitionSetting_1.Phase.POST_EXPERIMENT }, "Post-Experiment"))),
+            react_1.default.createElement(material_1.FormControl, null,
+                react_1.default.createElement(material_1.InputLabel, { id: 'participant-extension-installed-search' }, "Extension installed"),
+                react_1.default.createElement(material_1.Select, { labelId: 'participant-extension-installed-search', label: 'Extension installed', onChange: e => {
+                        setExtensionInstalled(e.target.value);
+                        setPageInput('1');
+                    }, value: extensionInstalled },
+                    react_1.default.createElement(material_1.MenuItem, { value: 'any' }, "Any"),
+                    react_1.default.createElement(material_1.MenuItem, { value: 'yes' }, "Yes"),
+                    react_1.default.createElement(material_1.MenuItem, { value: 'no' }, "No"))),
             react_1.default.createElement(material_1.Box, { sx: { display: 'flex', alignItems: 'center' } },
                 react_1.default.createElement(material_1.Typography, { variant: 'body2' }, "Page\u00A0"),
                 react_1.default.createElement("input", { type: 'number', value: pageInputOk ? page : pageInput, min: 1, max: participants.pageCount, step: 1, onChange: e => {
                         setPageInput(e.target.value);
                     } }),
                 react_1.default.createElement(material_1.Typography, { variant: 'body2' }, "\u00A0/\u00A0"),
-                react_1.default.createElement(material_1.Typography, { variant: 'body2' }, participants.pageCount))),
+                react_1.default.createElement(material_1.Typography, { variant: 'body2' },
+                    participants.pageCount,
+                    "\u00A0(",
+                    participants.count,
+                    " total)"))),
         react_1.default.createElement(TableC, { items: participants.results })));
     return (react_1.default.createElement(material_1.Box, { component: 'section', sx: { mb: 4 } },
         react_1.default.createElement(material_1.Typography, { variant: 'h2', sx: { mb: 2 } }, "Participants list"),
