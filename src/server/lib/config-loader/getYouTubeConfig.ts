@@ -6,15 +6,15 @@ import ensureRecord from './ensureRecord';
 export const getYouTubeConfig = (conf: unknown): YouTubeConfig => {
 	ensureRecord(conf);
 
-	if (!has('youtube')(conf) || typeof conf.youtube !== 'object' || conf.youtube === null) {
+	if (!has('YouTube')(conf) || typeof conf.YouTube !== 'object' || conf.YouTube === null) {
 		throw new Error('Missing or invalid youtube config key in config.yaml');
 	}
 
-	if (!has('key')(conf.youtube) || typeof conf.youtube.key !== 'string') {
+	if (!has('api-key')(conf.YouTube) || typeof conf.YouTube['api-key'] !== 'string') {
 		throw new Error('Missing or invalid key key in youtube config');
 	}
 
-	const {key} = conf.youtube;
+	const {'api-key': key} = conf.YouTube;
 
 	if (typeof key !== 'string') {
 		throw new Error('Missing or invalid key key in youtube config');

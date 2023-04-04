@@ -12,3 +12,7 @@ smtp:
 installed-event:
   url: https://some_url.com
   token: some_authorization_token
+
+YouTube:
+  # Obtain a key on https://console.cloud.google.com/apis/credentials
+  api-key:
