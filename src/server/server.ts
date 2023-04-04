@@ -47,7 +47,6 @@ import type RouteContext from './lib/routeCreation';
 import {
 	type RouteDefinition,
 	makeRouteConnector as makeExpressHandlerCreator,
-	type InstalledEventConfig,
 } from './lib/routeCreation';
 
 import {createDefaultLogger} from './lib/logger';
@@ -107,6 +106,8 @@ import updateParticipantDefinition from './api-2/updateParticipant';
 import createGetActivityReportDefinition from './api-2/getActivityReport';
 import createTransitionSettingDefinition from './api-2/createTransitionSetting';
 import getTransitionSettingDefinition from './api-2/getTransitionSetting';
+import getInstalledEventConfig from './lib/config-loader/getInstalledEventConfig';
+import getYouTubeConfig from './lib/config-loader/getYouTubeConfig';
 
 // Add classes used by typeorm as models here
 // so that typeorm can extract the metadata from them.
@@ -142,27 +143,6 @@ const slowQueries = io.meter({
 	name: 'Slow queries',
 	id: 'app/realtime/slowQueries',
 });
-
-const getInstalledEventConfig = (conf: Record<string, unknown>): InstalledEventConfig => {
-	if (!has('installed-event')(conf) || typeof conf['installed-event'] !== 'object') {
-		throw new Error('Missing or invalid installed-event config key in config.yaml');
-	}
-
-	const installedEvent = conf['installed-event'] as Record<string, unknown>;
-
-	if (!has('url')(installedEvent) || typeof installedEvent.url !== 'string') {
-		throw new Error('Missing or invalid url key in installed-event config');
-	}
-
-	if (!has('token')(installedEvent) || typeof installedEvent.token !== 'string') {
-		throw new Error('Missing or invalid token key in installed-event config');
-	}
-
-	return {
-		url: installedEvent.url,
-		token: installedEvent.token,
-	};
-};
 
 const start = async () => {
 	const root = await findPackageJsonDir(__dirname);
@@ -297,6 +277,7 @@ const start = async () => {
 		createLogger,
 		tokenTools,
 		installedEventConfig,
+		youTubeConfig: getYouTubeConfig(config),
 	};
 
 	const makeHandler = makeExpressHandlerCreator(routeContext);

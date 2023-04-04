@@ -16,6 +16,10 @@ export type InstalledEventConfig = {
 	token: string;
 };
 
+export type YouTubeConfig = {
+	apiKey: string;
+};
+
 export type RouteContext = {
 	dataSource: DataSource;
 	mailer: Transporter;
@@ -23,6 +27,7 @@ export type RouteContext = {
 	createLogger: CreateLogger;
 	tokenTools: TokenTools;
 	installedEventConfig: InstalledEventConfig;
+	youTubeConfig: YouTubeConfig;
 };
 
 export type RouteCreator = (context: RouteContext) => (req: Request, res: Response) => Promise<void>;

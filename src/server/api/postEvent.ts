@@ -1,7 +1,6 @@
-import fetch from 'node-fetch';
 import {type DataSource, type Repository, MoreThan, LessThan} from 'typeorm';
 
-import {type RouteCreator, type InstalledEventConfig} from '../lib/routeCreation';
+import {type RouteCreator} from '../lib/routeCreation';
 import {type LogFunction} from '../lib/logger';
 
 import Participant from '../models/participant';
@@ -20,6 +19,8 @@ import DailyActivityTime from '../models/dailyActivityTime';
 import {timeSpentEventDiffLimit, wholeDate} from '../lib/updateCounters';
 import TransitionSetting, {OperatorType, Phase} from '../models/transitionSetting';
 import TransitionEvent, {TransitionReason} from '../models/transitionEvent';
+
+import createHandleExtensionInstalledEvent from './postEvent/handleExtensionInstalledEvent';
 
 import {withLock} from '../../util';
 
@@ -399,56 +400,6 @@ const summarizeForDisplay = (event: Event): Record<string, unknown> => {
 
 	return summary;
 };
-
-const createHandleExtensionInstalledEvent = (dataSource: DataSource, installedEventConfig: InstalledEventConfig, log: LogFunction) =>
-	async (participantId: number, event: Event) => {
-		log('handling extension installed event...');
-		const eventRepo = dataSource.getRepository(Event);
-		const queryRunner = dataSource.createQueryRunner();
-
-		try {
-			await queryRunner.startTransaction();
-			const participant = await queryRunner.manager.getRepository(Participant)
-				.createQueryBuilder('participant')
-				.useTransaction(true)
-				.setLock('pessimistic_write')
-				.where({id: participantId})
-				.getOne();
-
-			if (!participant) {
-				throw new Error('Participant not found');
-			}
-
-			if (participant.extensionInstalled) {
-				log('participant extension already installed, skipping');
-			} else {
-				log('participant extension not installed, calling API to notify installation...');
-				await fetch(installedEventConfig.url, {
-					method: 'POST',
-					headers: {
-						'Content-Type': 'application/json',
-						'X-API-TOKEN': installedEventConfig.token,
-					},
-					body: JSON.stringify({
-						code: participant.code,
-					}),
-				});
-
-				log('remote server notified, updating local participant...');
-				participant.extensionInstalled = true;
-				await queryRunner.manager.save(participant);
-				const e = await eventRepo.save(event);
-				log('event saved', e);
-				await queryRunner.commitTransaction();
-				log('participant updated, transaction committed');
-			}
-		} catch (err) {
-			log('error handling EXTENSION_INSTALLED event:', err);
-			await queryRunner.rollbackTransaction();
-		} finally {
-			await queryRunner.release();
-		}
-	};
 
 export const createPostEventRoute: RouteCreator = ({
 	createLogger,
