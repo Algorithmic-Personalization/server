@@ -16,7 +16,18 @@ export type InstalledEventConfig = {
 	token: string;
 };
 
+// From the documentation at: https://developers.google.com/youtube/v3/docs/videos/list
 export type YouTubeConfig = {
+	// The base URL for the YouTube API's `videos` endpoint,
+	// always pass the 'Accept: application/json' header.
+	//
+	// To get the topicDetails pass ?part=topicDetails in a GET request,
+	// and pass the YouTube Video IDs in the `id` query parameter,
+	// you can pass many of them in one single request.
+	videosEndPoint: string;
+
+	// Use it in a header like this: `Authorization: Bearer ${apiKey}`
+	// or as a key query parameter like this: `?key=${apiKey}`
 	apiKey: string;
 };
 

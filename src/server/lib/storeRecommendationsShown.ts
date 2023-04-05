@@ -5,6 +5,8 @@ import Video from '../models/video';
 import VideoListItem, {ListType, VideoType} from '../models/videoListItem';
 import {validateNew} from '../../common/util';
 import {makeVideosFromRecommendations, storeVideos} from './video/storeVideos';
+import {createApi as createYouTubeApi} from './youTubeApi';
+import {type YouTubeConfig} from './routeCreation';
 
 const storeItems = (repo: Repository<VideoListItem>, eventId: number) => async (
 	videoIds: number[],
@@ -27,12 +29,22 @@ const storeItems = (repo: Repository<VideoListItem>, eventId: number) => async (
 	await repo.save(videoListItems);
 };
 
-export const storeRecommendationsShown = async (
-	log: LogFunction,
-	dataSource: DataSource,
-	event: RecommendationsEvent,
-) => {
+type StoreRecommendationsShownParams = {
+	log: LogFunction;
+	dataSource: DataSource;
+	event: RecommendationsEvent;
+	youTubeConfig: YouTubeConfig;
+};
+
+export const storeRecommendationsShown = async ({
+	log,
+	dataSource,
+	event,
+	youTubeConfig,
+}: StoreRecommendationsShownParams) => {
 	log('Storing recommendations shown event meta-data');
+
+	const youTubeApi = createYouTubeApi(youTubeConfig, log);
 
 	const videoRepo = dataSource.getRepository(Video);
 
@@ -41,6 +53,15 @@ export const storeRecommendationsShown = async (
 		storeVideos(videoRepo, makeVideosFromRecommendations(event.personalized)),
 		storeVideos(videoRepo, makeVideosFromRecommendations(event.shown)),
 	]);
+
+	log('Retrieving category information for videos...');
+	const youTubeIds = [...new Set([
+		...event.nonPersonalized.map(v => v.videoId),
+		...event.personalized.map(v => v.videoId),
+		...event.shown.map(v => v.videoId),
+	])];
+	const categories = await youTubeApi.getTopicCategories(youTubeIds);
+	log(`Fetched ${categories.size} topic meta-data for ${youTubeIds.length} videos.`, {categories});
 
 	const nonPersonalizedTypes = nonPersonalized.map(() => VideoType.NON_PERSONALIZED);
 	const personalizedTypes = personalized.map(() => VideoType.PERSONALIZED);

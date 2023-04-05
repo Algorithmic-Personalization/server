@@ -110,6 +110,7 @@ export const createPostEventRoute: RouteCreator = ({
 	createLogger,
 	dataSource,
 	installedEventConfig,
+	youTubeConfig,
 }) => async (req, res) => {
 	const log = createLogger(req.requestId);
 
@@ -218,7 +219,12 @@ export const createPostEventRoute: RouteCreator = ({
 			res.send({kind: 'Success', value: e});
 
 			if (event.type === EventType.RECOMMENDATIONS_SHOWN) {
-				await storeRecommendationsShown(log, dataSource, event as RecommendationsEvent);
+				await storeRecommendationsShown({
+					dataSource,
+					youTubeConfig,
+					event: event as RecommendationsEvent,
+					log,
+				});
 			} else if (event.type === EventType.WATCH_TIME) {
 				await storeWatchTime(event as WatchTimeEvent);
 			}

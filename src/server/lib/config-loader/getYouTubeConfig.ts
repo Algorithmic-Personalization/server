@@ -21,6 +21,7 @@ export const getYouTubeConfig = (conf: unknown): YouTubeConfig => {
 	}
 
 	return {
+		videosEndPoint: 'https://youtube.googleapis.com/youtube/v3/videos',
 		apiKey: key,
 	};
 };
