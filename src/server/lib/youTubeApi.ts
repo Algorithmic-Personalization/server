@@ -47,6 +47,11 @@ class Item {
 		topicDetails = new TopicDetails();
 }
 
+export type YouTubeResponseMeta = {
+	hitRate: number;
+	topicCategories: YouTubeTopicCategories;
+};
+
 // TODO: check db to see if we have the topic categories for these videos
 export const createApi = (config: YouTubeConfig, log: LogFunction) => {
 	const fetching = new Map<string, Promise<Response>>();
@@ -55,17 +60,19 @@ export const createApi = (config: YouTubeConfig, log: LogFunction) => {
 	const url = `${config.videosEndPoint}/?key=${config.apiKey}&part=topicDetails`;
 
 	return {
-		async getTopicCategories(youTubeIds: string[]): Promise<YouTubeTopicCategories> {
-			const res: YouTubeTopicCategories = new Map();
+		async getTopicCategories(youTubeIds: string[]): Promise<YouTubeResponseMeta> {
+			const topicCategories: YouTubeTopicCategories = new Map();
 
 			const ids = youTubeIds.filter(id => !fetching.has(id) && !cache.has(id)).map(id => `id=${id}`).join('&');
 
 			for (const id of youTubeIds) {
 				const cached = cache.get(id);
 				if (cached) {
-					res.set(id, cached);
+					topicCategories.set(id, cached);
 				}
 			}
+
+			const hits = topicCategories.size;
 
 			const finalUrl = `${url}&${ids}`;
 			const responseP = fetch(finalUrl, {
@@ -87,7 +94,7 @@ export const createApi = (config: YouTubeConfig, log: LogFunction) => {
 
 			if (thisBatchErrors.length === 0) {
 				for (const item of youTubeResponse.items) {
-					res.set(item.id, item.topicDetails.topicCategories);
+					topicCategories.set(item.id, item.topicDetails.topicCategories);
 				}
 			} else {
 				log('error getting category information for videos:', thisBatchErrors);
@@ -115,20 +122,23 @@ export const createApi = (config: YouTubeConfig, log: LogFunction) => {
 			previousErrors.forEach((errors, i) => {
 				if (errors.length === 0) {
 					for (const item of previousResponses[i].items) {
-						res.set(item.id, item.topicDetails.topicCategories);
+						topicCategories.set(item.id, item.topicDetails.topicCategories);
 					}
 				}
 			});
 
 			for (const id of youTubeIds) {
-				if (!res.has(id)) {
+				if (!topicCategories.has(id)) {
 					log('no category information found for video', id);
 				}
 
 				fetching.delete(id);
 			}
 
-			return res;
+			return {
+				hitRate: Number(Math.round(100 * hits / youTubeIds.length).toFixed(2)),
+				topicCategories,
+			};
 		},
 	};
 };
