@@ -5,7 +5,7 @@ import Video from '../models/video';
 import VideoListItem, {ListType, VideoType} from '../models/videoListItem';
 import {validateNew} from '../../common/util';
 import {makeVideosFromRecommendations, storeVideos} from './video/storeVideos';
-import {createApi as createYouTubeApi} from './youTubeApi';
+import makeCreateYoyTubeApi from './youTubeApi';
 import {type YouTubeConfig} from './routeCreation';
 
 const storeItems = (repo: Repository<VideoListItem>, eventId: number) => async (
@@ -35,6 +35,8 @@ type StoreRecommendationsShownParams = {
 	event: RecommendationsEvent;
 	youTubeConfig: YouTubeConfig;
 };
+
+const createYouTubeApi = makeCreateYoyTubeApi();
 
 export const storeRecommendationsShown = async ({
 	log,
