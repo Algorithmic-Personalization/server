@@ -1,5 +1,5 @@
 import fetch, {type Response} from 'node-fetch';
-import {validate, IsString, IsInt, ValidateNested} from 'class-validator';
+import {validate, IsString, IsInt, ValidateNested, type ValidationError} from 'class-validator';
 
 import {type YouTubeConfig} from './routeCreation';
 import {type LogFunction} from './logger';
@@ -64,35 +64,60 @@ class Item {
 		snippet = new Snippet();
 }
 
+// Compute a percentage from 0 to 100 as a number, with two decimal places
+const pct = (numerator: number, denominator: number): number =>
+	Number(Math.round(100 * numerator / denominator).toFixed(2));
+
 export type YouTubeResponseMeta = {
+	requestTimeMs: number;
 	hitRate: number;
+	failRate: number;
 	data: MetaMap;
 };
 
-// TODO: check db to see if we already have the data categories for these videos in db to prevent
-// unnecessary calls to YouTube API
+// TODO:
+// - fetch category names (we only have the ID for now)
+// - store the data in DB
+// - check db to see if we already have the meta data for a video
+// 	 to avoid unnecessary calls to the YouTube API
 export const createApi = (config: YouTubeConfig, log: LogFunction) => {
-	const fetching = new Map<string, Promise<Response>>();
+	type PromisedResponseMap = Map<string, Promise<Response>>;
+	type PromisedResponseSet = Set<Promise<Response>>;
+
 	const cache: MetaMap = new Map();
+	const fetching: PromisedResponseMap = new Map();
 
 	const url = `${config.videosEndPoint}/?key=${config.apiKey}&part=topicDetails&part=snippet`;
 
 	return {
-		async getTopicsAndCategories(youTubeIds: string[]): Promise<YouTubeResponseMeta> {
+		async getTopicsAndCategories(youTubeIdsMaybeNonUnique: string[]): Promise<YouTubeResponseMeta> {
+			const tStart = Date.now();
 			const metaMap: MetaMap = new Map();
+			const promisesToWaitFor: PromisedResponseSet = new Set();
 
-			const ids = youTubeIds.filter(id => !fetching.has(id) && !cache.has(id)).map(id => `id=${id}`).join('&');
+			const youTubeIds = [...new Set(youTubeIdsMaybeNonUnique)];
+			const newIdsToFetch: string[] = [];
 
 			for (const id of youTubeIds) {
 				const cached = cache.get(id);
 				if (cached) {
 					metaMap.set(id, cached);
+					continue;
 				}
+
+				const alreadyFetching = fetching.get(id);
+				if (alreadyFetching) {
+					promisesToWaitFor.add(alreadyFetching);
+					continue;
+				}
+
+				newIdsToFetch.push(id);
 			}
 
-			const hits = metaMap.size;
+			const hits = youTubeIds.length - newIdsToFetch.length;
 
-			const finalUrl = `${url}&${ids}`;
+			const idsUrlArgs = newIdsToFetch.map(id => `id=${id}`).join('&');
+			const finalUrl = `${url}&${idsUrlArgs}`;
 			const responseP = fetch(finalUrl, {
 				method: 'GET',
 				headers: {
@@ -102,67 +127,68 @@ export const createApi = (config: YouTubeConfig, log: LogFunction) => {
 
 			for (const id of youTubeIds) {
 				fetching.set(id, responseP);
+				promisesToWaitFor.add(responseP);
 			}
 
-			const response = await responseP;
+			const responses = await Promise.allSettled(promisesToWaitFor);
 
-			const youTubeResponse = new YouTubeResponse();
-			const rawResponse = await response.json() as unknown;
-			// D log('Raw YouTube API response:', rawResponse);
-			Object.assign(youTubeResponse, rawResponse);
-			const thisBatchErrors = await validate(youTubeResponse);
-
-			if (thisBatchErrors.length === 0) {
-				for (const item of youTubeResponse.items) {
-					const meta: YouTubeMeta = {
-						videoId: item.id,
-						categoryId: item.snippet.categoryId,
-						topicCategories: item.topicDetails.topicCategories,
-					};
-
-					metaMap.set(item.id, meta);
-				}
-			} else {
-				log('error(s) getting meta-data for videos:', thisBatchErrors);
-			}
-
-			const stillWaiting: Array<Promise<Response>> = [];
-
-			for (const id of youTubeIds) {
-				const p = fetching.get(id);
-
-				if (p && p !== responseP) {
-					stillWaiting.push(p);
+			const arrayResponses: Response[] = [];
+			for (const response of responses) {
+				if (response.status === 'rejected') {
+					log('error getting some meta-data for videos:', response.reason);
+				} else {
+					arrayResponses.push(response.value);
 				}
 			}
 
-			const responses = await Promise.all(stillWaiting);
-			const objects = await Promise.all(responses.map(async r => r.json()));
-			const previousResponses = objects.map(obj => {
-				const ytResponse = new YouTubeResponse();
-				Object.assign(ytResponse, obj);
-				return ytResponse;
-			});
-			const previousErrors = await Promise.all(previousResponses.map(async yt => validate(yt)));
+			const rawResponses = await Promise.all(arrayResponses.map(async r => r.json()));
 
-			previousErrors.forEach((errors, i) => {
-				if (errors.length === 0) {
-					for (const item of previousResponses[i].items) {
-						metaMap.set(item.id, item.topicDetails.topicCategories);
+			const validationPromises: Array<Promise<ValidationError[]>> = [];
+			const youTubeResponses: YouTubeResponse[] = [];
+
+			for (const raw of rawResponses) {
+				const youTubeResponse = new YouTubeResponse();
+				Object.assign(youTubeResponse, raw);
+				validationPromises.push(validate(youTubeResponse));
+				youTubeResponses.push(youTubeResponse);
+			}
+
+			const validation = await Promise.allSettled(validationPromises);
+
+			validation.forEach((validationResult, i) => {
+				if (validationResult.status === 'rejected') {
+					log('error validating some meta-data for videos:', validationResult.reason);
+				} else {
+					const errors = validationResult.value;
+					if (errors.length === 0) {
+						const youTubeResponse = youTubeResponses[i];
+						for (const item of youTubeResponse.items) {
+							const meta: YouTubeMeta = {
+								videoId: item.id,
+								categoryId: item.snippet.categoryId,
+								topicCategories: item.topicDetails.topicCategories,
+							};
+							metaMap.set(item.id, meta);
+							cache.set(item.id, meta);
+						}
+					} else {
+						log('errors validating some meta-data for videos:', errors);
 					}
 				}
 			});
 
-			for (const id of youTubeIds) {
-				if (!metaMap.has(id)) {
-					log('no category information found for video', id);
-				}
+			const fetchedIds = new Set(metaMap.keys());
+			const failedIds = youTubeIds.filter(id => !fetchedIds.has(id));
+			failedIds.forEach(id => fetching.delete(id));
 
-				fetching.delete(id);
-			}
+			const failRate = pct(failedIds.length, youTubeIds.length);
+			const hitRate = pct(hits, youTubeIds.length);
+			const requestTimeMs = Date.now() - tStart;
 
 			return {
-				hitRate: Number(Math.round(100 * hits / youTubeIds.length).toFixed(2)),
+				failRate,
+				hitRate,
+				requestTimeMs,
 				data: metaMap,
 			};
 		},

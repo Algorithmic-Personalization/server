@@ -60,10 +60,14 @@ export const storeRecommendationsShown = async ({
 		...event.personalized.map(v => v.videoId),
 		...event.shown.map(v => v.videoId),
 	])];
+
 	const now = Date.now();
-	const categories = await youTubeApi.getTopicsAndCategories(youTubeIds);
-	const elapsed = Date.now() - now;
-	log(`Fetched ${categories.data.size} topic meta-data for ${youTubeIds.length} videos in ${elapsed} ms.`, {categories});
+	youTubeApi.getTopicsAndCategories(youTubeIds).then(categories => {
+		const elapsed = Date.now() - now;
+		log(`fetched ${categories.data.size} topic meta-data for ${youTubeIds.length} videos in ${elapsed} ms.`, {categories});
+	}).catch(err => {
+		log('error fetching video meta-data', err);
+	});
 
 	const nonPersonalizedTypes = nonPersonalized.map(() => VideoType.NON_PERSONALIZED);
 	const personalizedTypes = personalized.map(() => VideoType.PERSONALIZED);
