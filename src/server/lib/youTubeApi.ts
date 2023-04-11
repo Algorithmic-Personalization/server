@@ -4,7 +4,13 @@ import {validate, IsString, IsInt, ValidateNested} from 'class-validator';
 import {type YouTubeConfig} from './routeCreation';
 import {type LogFunction} from './logger';
 
-export type YouTubeTopicCategories = Map<string, string[]>;
+export type YouTubeMeta = {
+	videoId: string;
+	categoryId: string;
+	topicCategories: string[];
+};
+
+export type MetaMap = Map<string, YouTubeMeta>;
 
 class PageInfo {
 	@IsInt()
@@ -33,6 +39,14 @@ class TopicDetails {
 		topicCategories: string[] = [];
 }
 
+class Snippet {
+	@IsString()
+		channelId = '';
+
+	@IsString()
+		categoryId = '';
+}
+
 class Item {
 	@IsString()
 		kind = '';
@@ -45,34 +59,38 @@ class Item {
 
 	@ValidateNested()
 		topicDetails = new TopicDetails();
+
+	@ValidateNested()
+		snippet = new Snippet();
 }
 
 export type YouTubeResponseMeta = {
 	hitRate: number;
-	topicCategories: YouTubeTopicCategories;
+	data: MetaMap;
 };
 
-// TODO: check db to see if we have the topic categories for these videos
+// TODO: check db to see if we already have the data categories for these videos in db to prevent
+// unnecessary calls to YouTube API
 export const createApi = (config: YouTubeConfig, log: LogFunction) => {
 	const fetching = new Map<string, Promise<Response>>();
-	const cache: YouTubeTopicCategories = new Map();
+	const cache: MetaMap = new Map();
 
-	const url = `${config.videosEndPoint}/?key=${config.apiKey}&part=topicDetails`;
+	const url = `${config.videosEndPoint}/?key=${config.apiKey}&part=topicDetails&part=snippet`;
 
 	return {
-		async getTopicCategories(youTubeIds: string[]): Promise<YouTubeResponseMeta> {
-			const topicCategories: YouTubeTopicCategories = new Map();
+		async getTopicsAndCategories(youTubeIds: string[]): Promise<YouTubeResponseMeta> {
+			const metaMap: MetaMap = new Map();
 
 			const ids = youTubeIds.filter(id => !fetching.has(id) && !cache.has(id)).map(id => `id=${id}`).join('&');
 
 			for (const id of youTubeIds) {
 				const cached = cache.get(id);
 				if (cached) {
-					topicCategories.set(id, cached);
+					metaMap.set(id, cached);
 				}
 			}
 
-			const hits = topicCategories.size;
+			const hits = metaMap.size;
 
 			const finalUrl = `${url}&${ids}`;
 			const responseP = fetch(finalUrl, {
@@ -89,15 +107,23 @@ export const createApi = (config: YouTubeConfig, log: LogFunction) => {
 			const response = await responseP;
 
 			const youTubeResponse = new YouTubeResponse();
-			Object.assign(youTubeResponse, await response.json());
+			const rawResponse = await response.json() as unknown;
+			// D log('Raw YouTube API response:', rawResponse);
+			Object.assign(youTubeResponse, rawResponse);
 			const thisBatchErrors = await validate(youTubeResponse);
 
 			if (thisBatchErrors.length === 0) {
 				for (const item of youTubeResponse.items) {
-					topicCategories.set(item.id, item.topicDetails.topicCategories);
+					const meta: YouTubeMeta = {
+						videoId: item.id,
+						categoryId: item.snippet.categoryId,
+						topicCategories: item.topicDetails.topicCategories,
+					};
+
+					metaMap.set(item.id, meta);
 				}
 			} else {
-				log('error getting category information for videos:', thisBatchErrors);
+				log('error(s) getting meta-data for videos:', thisBatchErrors);
 			}
 
 			const stillWaiting: Array<Promise<Response>> = [];
@@ -122,13 +148,13 @@ export const createApi = (config: YouTubeConfig, log: LogFunction) => {
 			previousErrors.forEach((errors, i) => {
 				if (errors.length === 0) {
 					for (const item of previousResponses[i].items) {
-						topicCategories.set(item.id, item.topicDetails.topicCategories);
+						metaMap.set(item.id, item.topicDetails.topicCategories);
 					}
 				}
 			});
 
 			for (const id of youTubeIds) {
-				if (!topicCategories.has(id)) {
+				if (!metaMap.has(id)) {
 					log('no category information found for video', id);
 				}
 
@@ -137,7 +163,7 @@ export const createApi = (config: YouTubeConfig, log: LogFunction) => {
 
 			return {
 				hitRate: Number(Math.round(100 * hits / youTubeIds.length).toFixed(2)),
-				topicCategories,
+				data: metaMap,
 			};
 		},
 	};
