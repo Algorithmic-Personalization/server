@@ -80,7 +80,7 @@ export type YouTubeResponseMeta = {
 // - store the data in DB
 // - check db to see if we already have the meta data for a video
 // 	 to avoid unnecessary calls to the YouTube API
-export const makeCreateYoyTubeApi = () => {
+export const makeCreateYouTubeApi = () => {
 	type PromisedResponseMap = Map<string, Promise<Response>>;
 	type PromisedResponseSet = Set<Promise<Response>>;
 
@@ -197,4 +197,4 @@ export const makeCreateYoyTubeApi = () => {
 	};
 };
 
-export default makeCreateYoyTubeApi;
+export default makeCreateYouTubeApi;
