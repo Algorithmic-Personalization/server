@@ -26,6 +26,8 @@ export type YouTubeConfig = {
 	// you can pass many of them in one single request.
 	videosEndPoint: string;
 
+	categoriesEndPoint: string;
+
 	// Use it in a header like this: `Authorization: Bearer ${apiKey}`
 	// or as a key query parameter like this: `?key=${apiKey}`
 	apiKey: string;

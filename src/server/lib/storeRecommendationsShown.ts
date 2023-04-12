@@ -64,9 +64,9 @@ export const storeRecommendationsShown = async ({
 	])];
 
 	const now = Date.now();
-	youTubeApi.getTopicsAndCategories(youTubeIds).then(categories => {
+	youTubeApi.getMetaFromVideoIds(youTubeIds).then(categories => {
 		const elapsed = Date.now() - now;
-		log(`fetched ${categories.data.size} topic meta-data for ${youTubeIds.length} videos in ${elapsed} ms.`, {categories});
+		log(`fetched ${categories.data.size} meta-data items for ${youTubeIds.length} videos in ${elapsed} ms.`, categories);
 	}).catch(err => {
 		log('error fetching video meta-data', err);
 	});

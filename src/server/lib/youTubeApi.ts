@@ -1,5 +1,5 @@
 import fetch, {type Response} from 'node-fetch';
-import {validate, IsString, IsInt, ValidateNested, type ValidationError} from 'class-validator';
+import {validate, IsString, IsInt, ValidateNested, type ValidationError, IsBoolean} from 'class-validator';
 
 import {type YouTubeConfig} from './routeCreation';
 import {type LogFunction} from './logger';
@@ -20,7 +20,22 @@ class PageInfo {
 		resultsPerPage = 0;
 }
 
-class YouTubeResponse {
+class YouTubeResponse<T> {
+	@IsString()
+		kind = '';
+
+	@IsString()
+		etag = '';
+
+	@ValidateNested()
+		pageInfo?: PageInfo;
+
+	@ValidateNested({each: true})
+		items: T[] = [];
+}
+
+/* D
+class YouTubeVideoListResponse {
 	@IsString()
 		kind = '';
 
@@ -31,15 +46,16 @@ class YouTubeResponse {
 		pageInfo: PageInfo = new PageInfo();
 
 	@ValidateNested({each: true})
-		items: Item[] = [];
+		items: VideoListItem[] = [];
 }
+*/
 
 class TopicDetails {
 	@IsString({each: true})
 		topicCategories: string[] = [];
 }
 
-class Snippet {
+class VideoSnippet {
 	@IsString()
 		channelId = '';
 
@@ -47,7 +63,7 @@ class Snippet {
 		categoryId = '';
 }
 
-class Item {
+export class VideoListItem {
 	@IsString()
 		kind = '';
 
@@ -61,7 +77,38 @@ class Item {
 		topicDetails = new TopicDetails();
 
 	@ValidateNested()
-		snippet = new Snippet();
+		snippet = new VideoSnippet();
+}
+
+class YouTubeVideoListResponse extends YouTubeResponse<VideoListItem> {
+}
+
+class CategorySnippet {
+	@IsString()
+		title = '';
+
+	@IsBoolean()
+		assignable = false;
+
+	@IsString()
+		channelId = '';
+}
+
+export class CategoryListItem {
+	@IsString()
+		kind = '';
+
+	@IsString()
+		etag = '';
+
+	@IsString()
+		id = '';
+
+	@ValidateNested()
+		snippet = new CategorySnippet();
+}
+
+class YouTubeCategoryListResponse extends YouTubeResponse<CategoryListItem> {
 }
 
 // Compute a percentage from 0 to 100 as a number, with two decimal places
@@ -77,6 +124,7 @@ export type YouTubeResponseMeta = {
 
 // TODO:
 // - fetch category names (we only have the ID for now)
+// - what's the thing with the regions for categories?
 // - store the data in DB
 // - check db to see if we already have the meta data for a video
 // 	 to avoid unnecessary calls to the YouTube API
@@ -91,12 +139,12 @@ export const makeCreateYouTubeApi = () => {
 		const url = `${config.videosEndPoint}/?key=${config.apiKey}&part=topicDetails&part=snippet`;
 
 		return {
-			async getTopicsAndCategories(youTubeIdsMaybeNonUnique: string[]): Promise<YouTubeResponseMeta> {
+			async getMetaFromVideoIds(youTubeVideoIdsMaybeNonUnique: string[]): Promise<YouTubeResponseMeta> {
 				const tStart = Date.now();
 				const metaMap: MetaMap = new Map();
 				const promisesToWaitFor: PromisedResponseSet = new Set();
 
-				const youTubeIds = [...new Set(youTubeIdsMaybeNonUnique)];
+				const youTubeIds = [...new Set(youTubeVideoIdsMaybeNonUnique)];
 				const newIdsToFetch: string[] = [];
 
 				for (const id of youTubeIds) {
@@ -145,10 +193,10 @@ export const makeCreateYouTubeApi = () => {
 				const rawResponses = await Promise.all(arrayResponses.map(async r => r.json()));
 
 				const validationPromises: Array<Promise<ValidationError[]>> = [];
-				const youTubeResponses: YouTubeResponse[] = [];
+				const youTubeResponses: YouTubeVideoListResponse[] = [];
 
 				for (const raw of rawResponses) {
-					const youTubeResponse = new YouTubeResponse();
+					const youTubeResponse = new YouTubeVideoListResponse();
 					Object.assign(youTubeResponse, raw);
 					validationPromises.push(validate(youTubeResponse));
 					youTubeResponses.push(youTubeResponse);
@@ -192,6 +240,23 @@ export const makeCreateYouTubeApi = () => {
 					requestTimeMs,
 					data: metaMap,
 				};
+			},
+
+			async getCategoriesFromRegionCode(regionCode: string, hl = 'en'): Promise<CategoryListItem[]> {
+				const url = `${config.categoriesEndPoint}/?key=${config.apiKey}&part=snippet&regionCode=${regionCode}&hl=${hl}`;
+
+				const response = await fetch(url);
+				const raw = await response.json() as unknown;
+
+				const youTubeResponse = new YouTubeCategoryListResponse();
+				Object.assign(youTubeResponse, raw);
+
+				const errors = await validate(youTubeResponse);
+				if (errors.length > 0) {
+					throw new Error(`error validating YouTube category list response: ${errors.join(', ')}`);
+				}
+
+				return youTubeResponse.items;
 			},
 		};
 	};
