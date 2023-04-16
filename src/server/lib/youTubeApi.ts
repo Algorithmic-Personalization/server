@@ -330,11 +330,14 @@ export const makeCreateYouTubeApi = () => {
 				const promise = categoriesRepo.find();
 				fetchingCategories = promise;
 				const categories = await promise;
+
 				for (const category of categories) {
 					categoriesCache.set(category.youtubeId, category.title);
 				}
 
-				return;
+				if (categoriesCache.size > 0) {
+					return;
+				}
 			}
 
 			const promise = api.getCategoriesFromRegionCode('US');
