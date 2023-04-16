@@ -34,22 +34,6 @@ class YouTubeResponse<T> {
 		items: T[] = [];
 }
 
-/* D
-class YouTubeVideoListResponse {
-	@IsString()
-		kind = '';
-
-	@IsString()
-		etag = '';
-
-	@ValidateNested()
-		pageInfo: PageInfo = new PageInfo();
-
-	@ValidateNested({each: true})
-		items: VideoListItem[] = [];
-}
-*/
-
 class TopicDetails {
 	@IsString({each: true})
 		topicCategories: string[] = [];
@@ -212,6 +196,7 @@ export const makeCreateYouTubeApi = () => {
 						if (errors.length === 0) {
 							const youTubeResponse = youTubeResponses[i];
 							for (const item of youTubeResponse.items) {
+								console.log('item:', item);
 								const meta: YouTubeMeta = {
 									videoId: item.id,
 									categoryId: item.snippet.categoryId,
