@@ -58,7 +58,7 @@ export class VideoListItem {
 		id = '';
 
 	@ValidateNested()
-		topicDetails = new TopicDetails();
+		topicDetails?: TopicDetails;
 
 	@ValidateNested()
 		snippet = new VideoSnippet();
@@ -123,7 +123,7 @@ export const makeCreateYouTubeApi = () => {
 		const url = `${config.videosEndPoint}/?key=${config.apiKey}&part=topicDetails&part=snippet`;
 
 		return {
-			async getMetaFromVideoIds(youTubeVideoIdsMaybeNonUnique: string[]): Promise<YouTubeResponseMeta> {
+			async getMetaFromVideoIds(youTubeVideoIdsMaybeNonUnique: string[], hl = 'en'): Promise<YouTubeResponseMeta> {
 				const tStart = Date.now();
 				const metaMap: MetaMap = new Map();
 				const promisesToWaitFor: PromisedResponseSet = new Set();
@@ -150,7 +150,7 @@ export const makeCreateYouTubeApi = () => {
 				const hits = youTubeIds.length - newIdsToFetch.length;
 
 				const idsUrlArgs = newIdsToFetch.map(id => `id=${id}`).join('&');
-				const finalUrl = `${url}&${idsUrlArgs}`;
+				const finalUrl = `${url}&${idsUrlArgs}&hl=${hl}`;
 				const responseP = fetch(finalUrl, {
 					method: 'GET',
 					headers: {
@@ -200,7 +200,7 @@ export const makeCreateYouTubeApi = () => {
 								const meta: YouTubeMeta = {
 									videoId: item.id,
 									categoryId: item.snippet.categoryId,
-									topicCategories: item.topicDetails.topicCategories,
+									topicCategories: item.topicDetails?.topicCategories ?? [],
 								};
 								metaMap.set(item.id, meta);
 								cache.set(item.id, meta);
