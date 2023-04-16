@@ -38,6 +38,9 @@ import VideoListItem from './models/videoListItem';
 import DailyActivityTime from './models/dailyActivityTime';
 import TransitionEvent from './models/transitionEvent';
 import TransitionSetting from './models/transitionSetting';
+import VideoMetadata from './models/videoMetadata';
+import VideoCategory from './models/videoCategory';
+import YouTubeRequestLatency from './models/youTubeRequestLatency';
 
 import SmtpConfig from './lib/smtpConfig';
 
@@ -124,6 +127,9 @@ const entities = [
 	DailyActivityTime,
 	TransitionEvent,
 	TransitionSetting,
+	VideoMetadata,
+	VideoCategory,
+	YouTubeRequestLatency,
 ];
 
 const env = process.env.NODE_ENV;

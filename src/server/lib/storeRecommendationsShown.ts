@@ -46,7 +46,7 @@ export const storeRecommendationsShown = async ({
 }: StoreRecommendationsShownParams) => {
 	log('Storing recommendations shown event meta-data');
 
-	const youTubeApi = createYouTubeApi(youTubeConfig, log);
+	const youTubeApi = createYouTubeApi(youTubeConfig, log, dataSource);
 
 	const videoRepo = dataSource.getRepository(Video);
 
