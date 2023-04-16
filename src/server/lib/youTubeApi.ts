@@ -262,6 +262,18 @@ export const makeCreateYouTubeApi = () => {
 					for (const meta of metaToPersist) {
 						fetchingMeta.delete(meta.videoId);
 
+						const categoryIdMeta = new VideoMetadata();
+						categoryIdMeta.youtubeId = meta.videoId;
+						categoryIdMeta.type = MetadataType.YT_CATEGORY_ID;
+						categoryIdMeta.value = meta.categoryId;
+						metaToPersistInOrder.push(categoryIdMeta);
+
+						const categoryTitleMeta = new VideoMetadata();
+						categoryTitleMeta.youtubeId = meta.videoId;
+						categoryTitleMeta.type = MetadataType.YT_CATEGORY_TITLE;
+						categoryTitleMeta.value = meta.categoryTitle;
+						metaToPersistInOrder.push(categoryTitleMeta);
+
 						for (const topic of meta.topicCategories) {
 							const metaData = new VideoMetadata();
 							metaData.youtubeId = meta.videoId;
