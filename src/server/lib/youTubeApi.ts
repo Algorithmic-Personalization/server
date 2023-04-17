@@ -198,15 +198,16 @@ const createPersistYouTubeMetas = (dataSource: DataSource, log: LogFunction) => 
 			const ignoreSet = new Set(metas.map(m => m.youtubeId));
 			log('info', ignoreSet.size, 'metas already in DB, skipping them...');
 
-			const insertSet = metaToPersistInOrder.filter(m => !ignoreSet.has(m.youtubeId));
-			log('info', insertSet.length, 'metas to insert in DB...');
+			const insertList = metaToPersistInOrder.filter(m => !ignoreSet.has(m.youtubeId));
+			const nVids = youtubeIds.length - ignoreSet.size;
+			log('info', insertList.length, 'metas to insert in DB, corresponding to', nVids, 'videos ...');
 
-			const res = await repo.insert(insertSet);
+			const res = await repo.insert(insertList);
 			const inserted = res.identifiers.length;
 
 			await qr.commitTransaction();
 
-			log('info', inserted, 'metas inserted in DB or', pct(insertSet.length, youtubeIds.length), '%');
+			log('info', inserted, 'metas inserted in DB or', pct(insertList.length, youtubeIds.length), '%');
 		} catch (e) {
 			await qr.rollbackTransaction();
 			throw e;
