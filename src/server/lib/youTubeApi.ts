@@ -1,5 +1,5 @@
 import fetch, {type Response} from 'node-fetch';
-import {type DataSource} from 'typeorm';
+import {type Repository, type DataSource} from 'typeorm';
 import {validate, IsString, IsInt, ValidateNested, type ValidationError, IsBoolean} from 'class-validator';
 
 import {type YouTubeConfig} from './routeCreation';
@@ -14,7 +14,7 @@ export type YouTubeMeta = {
 	categoryId: string;
 	categoryTitle: string;
 	topicCategories: string[];
-	tags?: string[];
+	tags: string[];
 };
 
 export type MetaMap = Map<string, YouTubeMeta>;
@@ -111,17 +111,111 @@ const pct = (numerator: number, denominator: number): number =>
 
 export type YouTubeResponseMeta = {
 	requestTimeMs: number;
+	cacheHitRate: number;
+	dbHitRate: number;
 	hitRate: number;
 	failRate: number;
 	data: MetaMap;
 };
 
-// TODO:
-// - fetch category names (we only have the ID for now)
-// - what's the thing with the regions for categories?
-// - store the data in DB
-// - check db to see if we already have the meta data for a video
-// 	 to avoid unnecessary calls to the YouTube API
+const getYouTubeMeta = (repo: Repository<VideoMetadata>) => async (youtubeId: string): Promise<YouTubeMeta | undefined> => {
+	const metaRows = await repo.find({where: {youtubeId}});
+
+	if (metaRows.length === 0) {
+		return undefined;
+	}
+
+	const meta: YouTubeMeta = {
+		videoId: youtubeId,
+		categoryId: '',
+		categoryTitle: '',
+		topicCategories: [],
+		tags: [],
+	};
+
+	for (const row of metaRows) {
+		switch (row.type) {
+			case MetadataType.TAG:
+				meta.tags.push(row.value);
+				break;
+			case MetadataType.TOPIC_CATEGORY:
+				meta.topicCategories.push(row.value);
+				break;
+			case MetadataType.YT_CATEGORY_ID:
+				meta.categoryId = row.value;
+				break;
+			case MetadataType.YT_CATEGORY_TITLE:
+				meta.categoryTitle = row.value;
+				break;
+			default:
+				// Here eslint fucks up, because the switch is exhaustive
+				throw new Error('this should never happen');
+		}
+	}
+
+	if (meta.categoryId.length > 0) {
+		return meta;
+	}
+
+	return undefined;
+};
+
+const getManyYoutubeMetas = (repo: Repository<VideoMetadata>) => async (videoIds: string[]): Promise<MetaMap> => {
+	const getOne = getYouTubeMeta(repo);
+	const res: MetaMap = new Map();
+
+	const metas = await Promise.all(videoIds.map(getOne));
+	for (const meta of metas) {
+		if (meta === undefined) {
+			continue;
+		}
+
+		res.set(meta.videoId, meta);
+	}
+
+	return res;
+};
+
+// TODO: handle update?
+const createPersistYouTubeMetas = (dataSource: DataSource, log: LogFunction) => {
+	const qr = dataSource.createQueryRunner();
+
+	return async (metaToPersistInOrder: VideoMetadata[]) => {
+		const youtubeIds = [...new Set(metaToPersistInOrder)];
+
+		try {
+			await qr.connect();
+			await qr.startTransaction();
+			const repo = qr.manager.getRepository(VideoMetadata);
+			const metas = await repo
+				.createQueryBuilder('m')
+				.useTransaction(true)
+				.setLock('pessimistic_write')
+				.where({youtubeId: youtubeIds})
+				.select('m.youtube_id')
+				.getMany();
+
+			const ignoreSet = new Set(metas.map(m => m.youtubeId));
+			log('info', ignoreSet.size, 'metas already in DB, skipping them...');
+
+			const insertSet = metaToPersistInOrder.filter(m => !ignoreSet.has(m.youtubeId));
+			log('info', insertSet.length, 'metas to insert in DB...');
+
+			const res = await repo.insert(insertSet);
+			const inserted = res.identifiers.length;
+
+			await qr.commitTransaction();
+
+			log('info', inserted, 'metas inserted in DB or', pct(insertSet.length, youtubeIds.length), '%');
+		} catch (e) {
+			await qr.rollbackTransaction();
+			throw e;
+		} finally {
+			await qr.release();
+		}
+	};
+};
+
 export const makeCreateYouTubeApi = () => {
 	type PromisedResponseMap = Map<string, Promise<Response>>;
 	type PromisedResponseSet = Set<Promise<Response>>;
@@ -136,6 +230,9 @@ export const makeCreateYouTubeApi = () => {
 		const latencyRepo = dataSource?.getRepository(YouTubeRequestLatency);
 		const metaRepo = dataSource?.getRepository(VideoMetadata);
 		const categoryRepo = dataSource?.getRepository(VideoCategory);
+		const persistMetas = dataSource
+			? createPersistYouTubeMetas(dataSource, log)
+			: undefined;
 
 		const endpoint = `${config.videosEndPoint}/?key=${config.apiKey}&part=topicDetails&part=snippet`;
 
@@ -170,13 +267,14 @@ export const makeCreateYouTubeApi = () => {
 			// TODO: split into multiple queries if the list of unique IDs is too long (> 50)
 			async getMetaFromVideoIds(youTubeVideoIdsMaybeNonUnique: string[], hl = 'en'): Promise<YouTubeResponseMeta> {
 				await fetchingCategories;
+				const youTubeIds = [...new Set(youTubeVideoIdsMaybeNonUnique)];
 
 				const tStart = Date.now();
 				const metaMap: MetaMap = new Map();
+
 				const promisesToWaitFor: PromisedResponseSet = new Set();
 
-				const youTubeIds = [...new Set(youTubeVideoIdsMaybeNonUnique)];
-				const newIdsToFetch: string[] = [];
+				const idsNotCached: string[] = [];
 
 				for (const id of youTubeIds) {
 					const cached = metaCache.get(id);
@@ -191,12 +289,31 @@ export const makeCreateYouTubeApi = () => {
 						continue;
 					}
 
-					newIdsToFetch.push(id);
+					idsNotCached.push(id);
 				}
 
-				const hits = youTubeIds.length - newIdsToFetch.length;
+				const cacheHits = youTubeIds.length - idsNotCached.length;
 
-				const idsUrlArgs = newIdsToFetch.map(id => `id=${id}`).join('&');
+				const dbMap = metaRepo
+					? await getManyYoutubeMetas(metaRepo)(idsNotCached)
+					: undefined;
+
+				const finalIdsToGetFromYouTube: string[] = [];
+
+				for (const id of idsNotCached) {
+					const cached = dbMap?.get(id);
+					if (cached) {
+						metaCache.set(id, cached);
+						metaMap.set(id, cached);
+						continue;
+					}
+
+					finalIdsToGetFromYouTube.push(id);
+				}
+
+				const dbHits = idsNotCached.length - finalIdsToGetFromYouTube.length;
+
+				const idsUrlArgs = finalIdsToGetFromYouTube.map(id => `id=${id}`).join('&');
 				const finalUrl = `${endpoint}&${idsUrlArgs}&hl=${hl}`;
 				const responseP = getUrlAndStoreLatency(finalUrl);
 
@@ -244,7 +361,7 @@ export const makeCreateYouTubeApi = () => {
 									categoryId: item.snippet.categoryId,
 									categoryTitle: categoriesCache.get(item.snippet.categoryId) ?? '<unknown>',
 									topicCategories: item.topicDetails?.topicCategories ?? [],
-									tags: item.snippet.tags,
+									tags: item.snippet.tags ?? [],
 								};
 								metaToPersist.push(meta);
 								metaMap.set(item.id, meta);
@@ -291,9 +408,11 @@ export const makeCreateYouTubeApi = () => {
 								metaToPersistInOrder.push(metaData);
 							}
 						}
+					}
 
-						metaRepo.save(metaToPersistInOrder).catch(err => {
-							log('error', 'Failed to save YouTube meta-data', err);
+					if (persistMetas) {
+						persistMetas(metaToPersistInOrder).catch(err => {
+							log('error', 'persisting video metadata:', err);
 						});
 					}
 				}
@@ -303,11 +422,15 @@ export const makeCreateYouTubeApi = () => {
 				failedIds.forEach(id => fetchingMeta.delete(id));
 
 				const failRate = pct(failedIds.length, youTubeIds.length);
-				const hitRate = pct(hits, youTubeIds.length);
+				const hitRate = pct(cacheHits + dbHits, youTubeIds.length);
+				const dbHitRate = pct(dbHits, youTubeIds.length);
+				const cacheHitRate = pct(cacheHits, youTubeIds.length);
 				const requestTimeMs = Date.now() - tStart;
 
 				return {
 					failRate,
+					dbHitRate,
+					cacheHitRate,
 					hitRate,
 					requestTimeMs,
 					data: metaMap,
