@@ -325,12 +325,14 @@ const start = async () => {
 	let requestId = 0;
 
 	app.use((req, _res, next) => {
+		const tStart = Date.now();
+		++requestId;
 		currentRequests.inc();
-		req.on('end', () => {
-			console.log('end');
+		req.on('close', () => {
+			const tElapsed = Date.now() - tStart;
+			console.log(`\x1b[94m{request #${requestId} ended in ${tElapsed}ms}\x1b[0m`);
 			currentRequests.dec();
 		});
-		++requestId;
 		req.requestId = requestId;
 		createLogger(req.requestId)(req.method, req.url, req.headers);
 		next();
