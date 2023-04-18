@@ -1,6 +1,7 @@
 import fetch, {type Response} from 'node-fetch';
 import {type Repository, type DataSource} from 'typeorm';
 import {validate, IsString, IsInt, ValidateNested, type ValidationError, IsBoolean} from 'class-validator';
+import {Cache as MemoryCache} from 'memory-cache';
 
 import {type YouTubeConfig} from './routeCreation';
 import {type LogFunction} from './logger';
@@ -221,11 +222,14 @@ export const makeCreateYouTubeApi = () => {
 	type PromisedResponseMap = Map<string, Promise<Response>>;
 	type PromisedResponseSet = Set<Promise<Response>>;
 
-	const metaCache: MetaMap = new Map();
+	const metaCache = new MemoryCache<string, YouTubeMeta>();
 	const categoriesCache = new Map<string, string>();
 
 	const fetchingMeta: PromisedResponseMap = new Map();
 	let fetchingCategories: Promise<unknown> | undefined;
+
+	// TODO: cache items for less time if memory is low
+	const cacheForMs = () => 1000 * 60 * 5; // 5 minutes
 
 	return (config: YouTubeConfig, log: LogFunction, dataSource?: DataSource) => {
 		const latencyRepo = dataSource?.getRepository(YouTubeRequestLatency);
@@ -302,10 +306,10 @@ export const makeCreateYouTubeApi = () => {
 				const finalIdsToGetFromYouTube: string[] = [];
 
 				for (const id of idsNotCached) {
-					const cached = dbMap?.get(id);
-					if (cached) {
-						metaCache.set(id, cached);
-						metaMap.set(id, cached);
+					const dbCached = dbMap?.get(id);
+					if (dbCached) {
+						metaCache.put(id, dbCached, cacheForMs());
+						metaMap.set(id, dbCached);
 						continue;
 					}
 
@@ -366,7 +370,7 @@ export const makeCreateYouTubeApi = () => {
 								};
 								metaToPersist.push(meta);
 								metaMap.set(item.id, meta);
-								metaCache.set(item.id, meta);
+								metaCache.put(item.id, meta, cacheForMs());
 							}
 						} else {
 							log('errors validating some meta-data for videos:', errors);
