@@ -205,7 +205,7 @@ const getManyYoutubeMetas = (repo: Repository<VideoMetadata>) => async (videoIds
 const createPersistYouTubeMetas = (dataSource: DataSource, log: LogFunction) =>
 	async (metaToPersistInOrder: VideoMetadata[]) => {
 		const qr = dataSource.createQueryRunner();
-		const youtubeIds = [...new Set(metaToPersistInOrder)];
+		const youtubeIds = [...new Set(metaToPersistInOrder.map(m => m.youtubeId))];
 
 		try {
 			await qr.connect();
