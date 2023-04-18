@@ -72,12 +72,17 @@ const storeRecommendationsShown = ({ log, dataSource, event, youTubeConfig, }) =
             ...event.shown.map(v => v.videoId),
         ])];
     const now = Date.now();
-    youTubeApi.getMetaFromVideoIds(youTubeIds).then(categories => {
-        const elapsed = Date.now() - now;
-        log(`fetched ${categories.data.size} meta-data items for ${youTubeIds.length} videos in ${elapsed} ms.`);
-    }).catch(err => {
+    try {
+        yield youTubeApi.getMetaFromVideoIds(youTubeIds).then(categories => {
+            const elapsed = Date.now() - now;
+            log(`fetched ${categories.data.size} meta-data items for ${youTubeIds.length} videos in ${elapsed} ms.`);
+        }).catch(err => {
+            log('error fetching video meta-data', err);
+        });
+    }
+    catch (err) {
         log('error fetching video meta-data', err);
-    });
+    }
     const nonPersonalizedTypes = nonPersonalized.map(() => videoListItem_1.VideoType.NON_PERSONALIZED);
     const personalizedTypes = personalized.map(() => videoListItem_1.VideoType.PERSONALIZED);
     const shownTypes = event.shown.map(r => {

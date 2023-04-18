@@ -20,7 +20,8 @@
     "serve:dev": "NODE_ENV=development nodemon --watch src/server src/server/server.ts",
     "watch:admin": "NODE_ENV=development webpack --config webpack.config.app.ts --watch",
     "dev": "./dev",
-    "serve": "NODE_ENV=production yarn pm2-runtime build/src/server/server.js"
+    "serve": "NODE_ENV=production yarn pm2-runtime build/src/server/server.js",
+    "scrape-api": "ts-node src/misc/youTubeApiCategoriesExploration.ts scrape"
   },
   "devDependencies": {
     "@jest/globals": "^29.5.0",

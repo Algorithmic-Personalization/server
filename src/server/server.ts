@@ -39,7 +39,7 @@ import {
 	makeRouteConnector as makeExpressHandlerCreator,
 } from './lib/routeCreation';
 
-import {createDefaultLogger} from './lib/logger';
+import {makeCreateDefaultLogger} from './lib/logger';
 import {createTokenTools} from './lib/crypto';
 import createAuthMiddleWare from './lib/authMiddleware';
 import createParticipantMiddleware from './lib/participantMiddleware';
@@ -127,7 +127,7 @@ const start = async () => {
 	const configJson = await readFile(join(root, 'config.yaml'), 'utf-8');
 	const config = parse(configJson) as unknown;
 
-	const createLogger = createDefaultLogger(logStream);
+	const createLogger = makeCreateDefaultLogger(logStream);
 	const log = createLogger('<server>');
 
 	const dockerComposeJson = await readFile(join(root, 'docker-compose.yaml'), 'utf-8');

@@ -1,5 +1,6 @@
-import {join} from 'path';
+import {basename, join} from 'path';
 import {readFile} from 'fs/promises';
+import {createWriteStream} from 'fs';
 
 import {parse} from 'yaml';
 import {DataSource} from 'typeorm';
@@ -11,9 +12,10 @@ import getYouTubeConfig from '../server/lib/config-loader/getYouTubeConfig';
 import makeCreateYouTubeApi, {type CategoryListItem, type YtApi} from '../server/lib/youTubeApi';
 
 import entities from '../server/entities';
-import DatabaseLogger from '../server/lib/databaseLogger';
-import {type LogFunction, createDefaultLogger} from '../server/lib/logger';
-import {createWriteStream} from 'fs';
+// D import DatabaseLogger from '../server/lib/databaseLogger';
+import {type LogFunction, makeCreateDefaultLogger} from '../server/lib/logger';
+
+import Video from '../server/models/video';
 
 const commands = new Map([
 	['compare', 'will compare the categories set of different regions'],
@@ -34,41 +36,65 @@ const env = (): 'production' | 'development' => {
 	return 'development';
 };
 
-const scrape = async (dataSource: DataSource, log: LogFunction, _api: YtApi): Promise<void> => {
-	const youtubeIdsWithoutMetadata = await dataSource
-		.createQueryBuilder()
-		.select('v.youtube_id', 'youtube_id')
-		.from('Video', 'v')
-		.where('not exists (select 1 from video_metadata m where m.youtube_id = v.youtube_id)')
-		.limit(10)
-		.getMany();
+const scrape = async (dataSource: DataSource, log: LogFunction, api: YtApi): Promise<void> => {
+	log('gonna scrape!');
 
-	log('youtubeIds needing fetching the meta-data for:', youtubeIdsWithoutMetadata);
+	const query = dataSource
+		.getRepository(Video)
+		.createQueryBuilder('v')
+		.select('v.youtube_id')
+		.where('not exists (select 1 from video_metadata m where m.youtube_Id = v.youtube_Id)');
+
+	log('running query: ', query.getSql());
+	const youtubeIdsWithoutMetadata: Array<{youtube_id: string}> = await query.getRawMany();
+	log('youtubeIds needing fetching the meta-data for:', youtubeIdsWithoutMetadata.length);
+
+	const pagesToFetch: string[][] = [];
+
+	const idsPerRequest = 50;
+
+	let pos = 0;
+	for (; pos + idsPerRequest < youtubeIdsWithoutMetadata.length; ++pos) {
+		pagesToFetch.push(youtubeIdsWithoutMetadata.slice(pos, pos + 50).map(x => x.youtube_id));
+	}
+
+	if (pos < youtubeIdsWithoutMetadata.length) {
+		pagesToFetch.push(youtubeIdsWithoutMetadata.slice(pos).map(x => x.youtube_id));
+	}
+
+	for (const page of pagesToFetch) {
+		// eslint-disable-next-line no-await-in-loop
+		const meta = await api.getMetaFromVideoIds(page);
+		const {data, ...stats} = meta;
+		log('got meta-data for', data.size, 'videos with stats:', stats);
+	}
+
+	log('done!');
 };
 
 // TODO: move this to a separate file, use in in server.ts because it
 // is duplicated there and it is ugly in server.ts
-//
-// TODO: dissociate the fact that we're in development from the fact that
-// we're using docker-compose
-const createDataSource = async (projectRootDir: string): Promise<DataSource> => {
+const createDataSource = async (projectRootDir: string, log: LogFunction): Promise<DataSource> => {
 	const dockerComposeJson = await readFile(join(projectRootDir, 'docker-compose.yaml'), 'utf-8');
 	const dockerComposeConfig = parse(dockerComposeJson) as unknown;
 	if (!dockerComposeConfig || typeof dockerComposeConfig !== 'object') {
 		throw new Error('Invalid docker-compose.yaml');
 	}
 
+	const outsideDocker = process.env.OUTSIDE_DOCKER !== 'false';
+	log(`we are running ${outsideDocker ? 'outside' : 'inside'} docker in ${env()} mode`);
+
 	const dbPortString = getString(['services', `${env()}-db`, 'ports', '0'])(dockerComposeConfig);
 	const [dbHostPort, dbDockerPort] = dbPortString.split(':');
 
-	const dbPort = env() === 'development' ? Number(dbHostPort) : Number(dbDockerPort);
+	const dbPort = outsideDocker ? Number(dbHostPort) : Number(dbDockerPort);
 
 	if (!dbPort || !Number.isInteger(dbPort)) {
 		throw new Error(`Invalid db port: ${dbPort}`);
 	}
 
 	const dbConfigPath = ['services', `${env()}-db`, 'environment'];
-	const dbHost = env() === 'development' ? 'localhost' : `${env()}-db`;
+	const dbHost = outsideDocker ? 'localhost' : `${env()}-db`;
 	const dbUser = getString([...dbConfigPath, 'POSTGRES_USER'])(dockerComposeConfig);
 	const dbPassword = getString([...dbConfigPath, 'POSTGRES_PASSWORD'])(dockerComposeConfig);
 	const dbDatabase = getString([...dbConfigPath, 'POSTGRES_DB'])(dockerComposeConfig);
@@ -88,9 +114,8 @@ const createDataSource = async (projectRootDir: string): Promise<DataSource> => 
 		synchronize: false,
 		entities,
 		namingStrategy: new SnakeNamingStrategy(),
-		logging: true,
-		maxQueryExecutionTime: 200,
-		logger: new DatabaseLogger(console.log),
+		// D logging: true,
+		// D logger: new DatabaseLogger(console.log),
 	});
 
 	await ds.initialize();
@@ -100,18 +125,20 @@ const createDataSource = async (projectRootDir: string): Promise<DataSource> => 
 
 const main = async () => {
 	const cmd = process.argv[2];
-	console.log(process.argv);
+
+	const root = await findPackageJsonDir(__dirname);
+	const createLog = makeCreateDefaultLogger(createWriteStream(join(root, `${basename(__filename)}.log`)));
+	const log = createLog('<main>');
 
 	if (!commands.has(cmd)) {
-		console.log('Please provide a command, one of:');
+		log('Please provide a command, one of:');
 		for (const [cmd, desc] of commands) {
-			console.log(`  ${cmd}: ${desc}`);
+			log(`  ${cmd}: ${desc}`);
 		}
 
 		process.exit(1);
 	}
 
-	const root = await findPackageJsonDir(__dirname);
 	const configJson = await readFile(join(root, 'config.yaml'), 'utf-8');
 	const config = parse(configJson) as unknown;
 	const youTubeConfig = getYouTubeConfig(config);
@@ -121,7 +148,7 @@ const main = async () => {
 	const dataSourceNeeded = commandsNeedingDataSource.has(cmd);
 
 	const dataSource = dataSourceNeeded
-		? await createDataSource(root)
+		? await createDataSource(root, log)
 		: undefined;
 
 	if (dataSourceNeeded && !dataSource) {
@@ -135,9 +162,10 @@ const main = async () => {
 		process.exit(1);
 	}
 
-	const api = createApi(youTubeConfig, console.log);
+	const api = createApi(youTubeConfig, createLog('<yt-api>'), dataSource);
 
 	const compareCategoriesOfTwoRegions = async (regionA: string, regionB: string) => {
+		const log = createLog('<compare-categories>');
 		type CategoriesMap = Map<string, CategoryListItem>;
 
 		const [categoriesA, categoriesB] = await Promise.all([
@@ -159,7 +187,7 @@ const main = async () => {
 		const mapB = toMap(categoriesB);
 
 		if (mapA.size !== mapB.size) {
-			console.log(
+			log(
 				`Categories of ${regionA} and ${regionB} differ in size,`,
 				`region ${regionA} has ${mapA.size} categories,`,
 				`while region ${regionB} has ${mapB.size} categories.`,
@@ -170,7 +198,7 @@ const main = async () => {
 			const categoryB = mapB.get(id);
 
 			if (!categoryB) {
-				console.log(
+				log(
 					`Category ${categoryA.snippet.title} (${id})`,
 					`is only available in region ${regionA},`,
 					`but not in region ${regionB}.`,
@@ -182,7 +210,7 @@ const main = async () => {
 			const categoryA = mapA.get(id);
 
 			if (!categoryA) {
-				console.log(
+				log(
 					`Category ${categoryB.snippet.title} (${id})`,
 					`is only available in region ${regionB},`,
 					`but not in region ${regionA}.`,
@@ -198,7 +226,7 @@ const main = async () => {
 			}
 
 			if (categoryA.snippet.title !== categoryB.snippet.title) {
-				console.log(
+				log(
 					`Category ${categoryA.snippet.title} (${id})`,
 					`is called ${categoryB.snippet.title} in region ${regionB}.`,
 				);
@@ -225,14 +253,17 @@ const main = async () => {
 			throw new Error('dataSource is undefined');
 		}
 
-		const log = createDefaultLogger(createWriteStream('scrape.log'));
-
-		await scrape(dataSource, log, api);
+		try {
+			const scrapeLog = createLog('<scrape>');
+			await scrape(dataSource, scrapeLog, api);
+		} catch (err) {
+			console.error('Error while scraping:', err);
+		}
 	} else {
-		console.log('Unknown command', cmd);
-		console.log('Try one of:');
+		log('Unknown command', cmd);
+		log('Try one of:');
 		for (const [cmd, desc] of commands) {
-			console.log(`  ${cmd}: ${desc}`);
+			log(`  ${cmd}: ${desc}`);
 		}
 
 		process.exit(1);

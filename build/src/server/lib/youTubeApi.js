@@ -256,40 +256,38 @@ const getManyYoutubeMetas = (repo) => (videoIds) => __awaiter(void 0, void 0, vo
     return res;
 });
 // TODO: handle update?
-const createPersistYouTubeMetas = (dataSource, log) => {
+const createPersistYouTubeMetas = (dataSource, log) => (metaToPersistInOrder) => __awaiter(void 0, void 0, void 0, function* () {
     const qr = dataSource.createQueryRunner();
-    return (metaToPersistInOrder) => __awaiter(void 0, void 0, void 0, function* () {
-        const youtubeIds = [...new Set(metaToPersistInOrder)];
-        try {
-            yield qr.connect();
-            yield qr.startTransaction();
-            const repo = qr.manager.getRepository(videoMetadata_1.default);
-            const metas = yield repo
-                .createQueryBuilder('m')
-                .useTransaction(true)
-                .setLock('pessimistic_write')
-                .where({ youtubeId: youtubeIds })
-                .select('m.youtube_id')
-                .getMany();
-            const ignoreSet = new Set(metas.map(m => m.youtubeId));
-            log('info', ignoreSet.size, 'metas already in DB, skipping them...');
-            const insertList = metaToPersistInOrder.filter(m => !ignoreSet.has(m.youtubeId));
-            const nVids = youtubeIds.length - ignoreSet.size;
-            log('info', insertList.length, 'metas to insert in DB, corresponding to', nVids, 'videos ...');
-            const res = yield repo.insert(insertList);
-            const inserted = res.identifiers.length;
-            yield qr.commitTransaction();
-            log('info', inserted, 'metas inserted in DB or', pct(insertList.length, youtubeIds.length), '%');
-        }
-        catch (e) {
-            yield qr.rollbackTransaction();
-            throw e;
-        }
-        finally {
-            yield qr.release();
-        }
-    });
-};
+    const youtubeIds = [...new Set(metaToPersistInOrder)];
+    try {
+        yield qr.connect();
+        yield qr.startTransaction();
+        const repo = qr.manager.getRepository(videoMetadata_1.default);
+        const metas = yield repo
+            .createQueryBuilder('m')
+            .useTransaction(true)
+            .setLock('pessimistic_write')
+            .where({ youtubeId: youtubeIds })
+            .select('m.youtube_id')
+            .getMany();
+        const ignoreSet = new Set(metas.map(m => m.youtubeId));
+        log('info', ignoreSet.size, 'metas already in DB, skipping them...');
+        const insertList = metaToPersistInOrder.filter(m => !ignoreSet.has(m.youtubeId));
+        const nVids = youtubeIds.length - ignoreSet.size;
+        log('info', insertList.length, 'metas to insert in DB, corresponding to', nVids, 'videos ...');
+        const res = yield repo.insert(insertList);
+        const inserted = res.identifiers.length;
+        yield qr.commitTransaction();
+        log('info', inserted, 'metas inserted in DB or', pct(insertList.length, youtubeIds.length), '%');
+    }
+    catch (e) {
+        yield qr.rollbackTransaction();
+        throw e;
+    }
+    finally {
+        yield qr.release();
+    }
+});
 const makeCreateYouTubeApi = () => {
     const metaCache = new memory_cache_1.Cache();
     const categoriesCache = new Map();

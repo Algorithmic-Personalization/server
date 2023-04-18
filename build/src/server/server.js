@@ -92,7 +92,7 @@ const start = () => __awaiter(void 0, void 0, void 0, function* () {
     const logStream = (0, fs_1.createWriteStream)(logsPath, { flags: 'a' });
     const configJson = yield (0, promises_1.readFile)((0, path_1.join)(root, 'config.yaml'), 'utf-8');
     const config = (0, yaml_1.parse)(configJson);
-    const createLogger = (0, logger_1.createDefaultLogger)(logStream);
+    const createLogger = (0, logger_1.makeCreateDefaultLogger)(logStream);
     const log = createLogger('<server>');
     const dockerComposeJson = yield (0, promises_1.readFile)((0, path_1.join)(root, 'docker-compose.yaml'), 'utf-8');
     const dockerComposeConfig = (0, yaml_1.parse)(dockerComposeJson);

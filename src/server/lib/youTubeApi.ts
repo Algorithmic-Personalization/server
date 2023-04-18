@@ -202,10 +202,9 @@ const getManyYoutubeMetas = (repo: Repository<VideoMetadata>) => async (videoIds
 };
 
 // TODO: handle update?
-const createPersistYouTubeMetas = (dataSource: DataSource, log: LogFunction) => {
-	const qr = dataSource.createQueryRunner();
-
-	return async (metaToPersistInOrder: VideoMetadata[]) => {
+const createPersistYouTubeMetas = (dataSource: DataSource, log: LogFunction) =>
+	async (metaToPersistInOrder: VideoMetadata[]) => {
+		const qr = dataSource.createQueryRunner();
 		const youtubeIds = [...new Set(metaToPersistInOrder)];
 
 		try {
@@ -240,7 +239,6 @@ const createPersistYouTubeMetas = (dataSource: DataSource, log: LogFunction) => 
 			await qr.release();
 		}
 	};
-};
 
 export type YtApi = {
 	getMetaFromVideoIds(youTubeVideoIdsMaybeNonUnique: string[], hl?: string): Promise<YouTubeResponseMeta>;

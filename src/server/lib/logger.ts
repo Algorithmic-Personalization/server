@@ -5,7 +5,7 @@ export type LogFunction = (message: string, ...args: any[]) => void;
 
 export type CreateLogger = (requestIdOrId: number | string) => LogFunction;
 
-export const createDefaultLogger = (f: WriteStream): CreateLogger => (requestIdOrId: number | string) =>
+export const makeCreateDefaultLogger = (f: WriteStream): CreateLogger => (requestIdOrId: number | string) =>
 	(...args: any[]) => {
 		const id = typeof requestIdOrId === 'number' ? `request #${requestIdOrId}` : requestIdOrId;
 
@@ -25,4 +25,4 @@ export const createDefaultLogger = (f: WriteStream): CreateLogger => (requestIdO
 		f.write(`${parts.join(' ')}\n`);
 	};
 
-export default createDefaultLogger;
+export default makeCreateDefaultLogger;

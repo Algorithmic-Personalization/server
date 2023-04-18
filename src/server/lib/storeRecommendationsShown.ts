@@ -64,12 +64,16 @@ export const storeRecommendationsShown = async ({
 	])];
 
 	const now = Date.now();
-	youTubeApi.getMetaFromVideoIds(youTubeIds).then(categories => {
-		const elapsed = Date.now() - now;
-		log(`fetched ${categories.data.size} meta-data items for ${youTubeIds.length} videos in ${elapsed} ms.`);
-	}).catch(err => {
+	try {
+		await youTubeApi.getMetaFromVideoIds(youTubeIds).then(categories => {
+			const elapsed = Date.now() - now;
+			log(`fetched ${categories.data.size} meta-data items for ${youTubeIds.length} videos in ${elapsed} ms.`);
+		}).catch(err => {
+			log('error fetching video meta-data', err);
+		});
+	} catch (err) {
 		log('error fetching video meta-data', err);
-	});
+	}
 
 	const nonPersonalizedTypes = nonPersonalized.map(() => VideoType.NON_PERSONALIZED);
 	const personalizedTypes = personalized.map(() => VideoType.PERSONALIZED);
