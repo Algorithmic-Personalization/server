@@ -11,8 +11,9 @@ class DatabaseLogger extends typeorm_1.AbstractLogger {
         this.slowQueryMeter = slowQueryMeter;
     }
     logQuerySlow(time, query, parameters, _queryRunner) {
+        var _a;
         this.logger('/!\\ Query is slow /!\\ time:', time, 'query:', PlatformTools_1.PlatformTools.highlightSql(query), 'parameters:', parameters ? (0, util_1.inspect)(parameters) : '');
-        this.slowQueryMeter.mark();
+        (_a = this.slowQueryMeter) === null || _a === void 0 ? void 0 : _a.mark();
     }
     writeLog(_level, _messageOrMessages, _queryRunner) {
         // Do nothing

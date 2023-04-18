@@ -32,18 +32,8 @@ const nodemailer_1 = __importDefault(require("nodemailer"));
 const express_status_monitor_1 = __importDefault(require("express-status-monitor"));
 const io_1 = __importDefault(require("@pm2/io"));
 const util_1 = require("../common/util");
-const admin_1 = __importDefault(require("../common/models/admin"));
 const token_1 = __importDefault(require("./models/token"));
-const participant_1 = __importDefault(require("./models/participant"));
-const experimentConfig_1 = __importDefault(require("../common/models/experimentConfig"));
-const session_1 = __importDefault(require("../common/models/session"));
-const event_1 = __importDefault(require("../common/models/event"));
-const video_1 = __importDefault(require("./models/video"));
-const watchTime_1 = __importDefault(require("./models/watchTime"));
-const videoListItem_1 = __importDefault(require("./models/videoListItem"));
-const dailyActivityTime_1 = __importDefault(require("./models/dailyActivityTime"));
-const transitionEvent_1 = __importDefault(require("./models/transitionEvent"));
-const transitionSetting_1 = __importDefault(require("./models/transitionSetting"));
+const requestLog_1 = __importDefault(require("./models/requestLog"));
 const smtpConfig_1 = __importDefault(require("./lib/smtpConfig"));
 const webpack_config_1 = __importDefault(require("../../webpack.config"));
 const routeCreation_1 = require("./lib/routeCreation");
@@ -79,22 +69,10 @@ const updateParticipant_1 = __importDefault(require("./api-2/updateParticipant")
 const getActivityReport_1 = __importDefault(require("./api-2/getActivityReport"));
 const createTransitionSetting_1 = __importDefault(require("./api-2/createTransitionSetting"));
 const getTransitionSetting_1 = __importDefault(require("./api-2/getTransitionSetting"));
-// Add classes used by typeorm as models here
-// so that typeorm can extract the metadata from them.
-const entities = [
-    admin_1.default,
-    token_1.default,
-    participant_1.default,
-    experimentConfig_1.default,
-    session_1.default,
-    event_1.default,
-    video_1.default,
-    videoListItem_1.default,
-    watchTime_1.default,
-    dailyActivityTime_1.default,
-    transitionEvent_1.default,
-    transitionSetting_1.default,
-];
+const getInstalledEventConfig_1 = __importDefault(require("./lib/config-loader/getInstalledEventConfig"));
+const getYouTubeConfig_1 = __importDefault(require("./lib/config-loader/getYouTubeConfig"));
+// DO NOT FORGET TO UPDATE THIS FILE WHEN ADDING NEW ENTITIES
+const entities_1 = __importDefault(require("./entities"));
 const env = process.env.NODE_ENV;
 if (env !== 'production' && env !== 'development') {
     throw new Error('NODE_ENV must be set to "production" or "development"');
@@ -108,29 +86,14 @@ const slowQueries = io_1.default.meter({
     name: 'Slow queries',
     id: 'app/realtime/slowQueries',
 });
-const getInstalledEventConfig = (conf) => {
-    if (!(0, util_1.has)('installed-event')(conf) || typeof conf['installed-event'] !== 'object') {
-        throw new Error('Missing or invalid installed-event config key in config.yaml');
-    }
-    const installedEvent = conf['installed-event'];
-    if (!(0, util_1.has)('url')(installedEvent) || typeof installedEvent.url !== 'string') {
-        throw new Error('Missing or invalid url key in installed-event config');
-    }
-    if (!(0, util_1.has)('token')(installedEvent) || typeof installedEvent.token !== 'string') {
-        throw new Error('Missing or invalid token key in installed-event config');
-    }
-    return {
-        url: installedEvent.url,
-        token: installedEvent.token,
-    };
-};
 const start = () => __awaiter(void 0, void 0, void 0, function* () {
     const root = yield (0, util_1.findPackageJsonDir)(__dirname);
     const logsPath = (0, path_1.join)(root, 'logs', 'server.log');
     const logStream = (0, fs_1.createWriteStream)(logsPath, { flags: 'a' });
-    console.log('Package root is:', root);
     const configJson = yield (0, promises_1.readFile)((0, path_1.join)(root, 'config.yaml'), 'utf-8');
     const config = (0, yaml_1.parse)(configJson);
+    const createLogger = (0, logger_1.createDefaultLogger)(logStream);
+    const log = createLogger('<server>');
     const dockerComposeJson = yield (0, promises_1.readFile)((0, path_1.join)(root, 'docker-compose.yaml'), 'utf-8');
     const dockerComposeConfig = (0, yaml_1.parse)(dockerComposeJson);
     if (!config || typeof config !== 'object') {
@@ -147,7 +110,7 @@ const start = () => __awaiter(void 0, void 0, void 0, function* () {
         process.exit(1);
     }
     const mailer = nodemailer_1.default.createTransport(smtpConfig);
-    console.log('Mailer created:', mailer.transporter.name);
+    log('info', 'mailer created:', mailer.transporter.name);
     if (!dockerComposeConfig || typeof dockerComposeConfig !== 'object') {
         throw new Error('Invalid docker-compose.yaml');
     }
@@ -181,15 +144,14 @@ const start = () => __awaiter(void 0, void 0, void 0, function* () {
     }
     try {
         const migrated = yield (0, postgres_migrations_1.migrate)({ client: pgClient }, (0, path_1.join)(root, 'migrations'));
-        console.log('Successfully ran migrations:', migrated);
+        log('successfully', 'ran migrations:', migrated);
     }
     catch (err) {
-        console.error('Error running migrations:', err);
+        log('error', 'running migrations:', err);
         process.exit(1);
     }
     yield pgClient.end();
-    const createLogger = (0, logger_1.createDefaultLogger)(logStream);
-    const ds = new typeorm_1.DataSource(Object.assign(Object.assign({ type: 'postgres' }, dbConfig), { username: dbUser, synchronize: false, entities, namingStrategy: new typeorm_naming_strategies_1.SnakeNamingStrategy(), logging: true, maxQueryExecutionTime: 200, logger: new databaseLogger_1.default(createLogger('database'), slowQueries) }));
+    const ds = new typeorm_1.DataSource(Object.assign(Object.assign({ type: 'postgres' }, dbConfig), { username: dbUser, synchronize: false, entities: entities_1.default, namingStrategy: new typeorm_naming_strategies_1.SnakeNamingStrategy(), logging: true, maxQueryExecutionTime: 200, logger: new databaseLogger_1.default(createLogger('<database>'), slowQueries) }));
     try {
         yield ds.initialize();
     }
@@ -197,7 +159,7 @@ const start = () => __awaiter(void 0, void 0, void 0, function* () {
         console.error('Error initializing data source:', err);
         process.exit(1);
     }
-    console.log('Successfully initialized data source');
+    log('Successfully initialized data source');
     try {
         yield (0, updateCounters_1.default)({
             dataSource: ds,
@@ -205,12 +167,12 @@ const start = () => __awaiter(void 0, void 0, void 0, function* () {
         });
     }
     catch (err) {
-        console.error('Error updating activity counters:', err);
+        log('error', 'updating activity counters:', err);
         process.exit(1);
     }
     const privateKey = yield (0, promises_1.readFile)((0, path_1.join)(root, 'private.key'), 'utf-8');
     const tokenTools = (0, crypto_1.createTokenTools)(privateKey);
-    const installedEventConfig = getInstalledEventConfig(config);
+    const installedEventConfig = (0, getInstalledEventConfig_1.default)(config);
     const routeContext = {
         dataSource: ds,
         mailer,
@@ -218,6 +180,7 @@ const start = () => __awaiter(void 0, void 0, void 0, function* () {
         createLogger,
         tokenTools,
         installedEventConfig,
+        youTubeConfig: (0, getYouTubeConfig_1.default)(config),
     };
     const makeHandler = (0, routeCreation_1.makeRouteConnector)(routeContext);
     const tokenRepo = ds.getRepository(token_1.default);
@@ -243,15 +206,51 @@ const start = () => __awaiter(void 0, void 0, void 0, function* () {
     app.use(staticRouter);
     app.use(body_parser_1.default.json());
     let requestId = 0;
-    app.use((req, _res, next) => {
-        currentRequests.inc();
-        req.on('end', () => {
-            console.log('end');
-            currentRequests.dec();
-        });
+    let nCurrentRequests = 0;
+    const logRepo = ds.getRepository(requestLog_1.default);
+    app.use((req, res, next) => {
+        const tStart = Date.now();
         ++requestId;
+        ++nCurrentRequests;
         req.requestId = requestId;
-        createLogger(req.requestId)(req.method, req.url, req.headers);
+        const log = createLogger(req.requestId);
+        currentRequests.inc();
+        req.requestId = requestId;
+        log(req.method, req.url, req.headers);
+        req.on('close', () => __awaiter(void 0, void 0, void 0, function* () {
+            const tElapsed = Date.now() - tStart;
+            log(`\x1b[94m{request #${requestId} ended in ${tElapsed}ms}\x1b[0m`);
+            currentRequests.dec();
+            --nCurrentRequests;
+            const logEntry = new requestLog_1.default();
+            logEntry.latencyMs = tElapsed;
+            logEntry.requestId = requestId;
+            logEntry.verb = req.method;
+            logEntry.path = req.path;
+            const { sessionUuid } = req.body;
+            if (typeof sessionUuid === 'string') {
+                logEntry.sessionUuid = sessionUuid;
+            }
+            logEntry.statusCode = res.statusCode;
+            const { type } = req.body;
+            if (typeof type === 'string') {
+                logEntry.comment.push(`type: ${type}`);
+            }
+            try {
+                const errors = yield (0, util_1.validateNew)(logEntry);
+                if (errors.length > 0) {
+                    log('error', 'invalid request log entry:', errors);
+                }
+                else {
+                    logRepo.save(logEntry).catch(err => {
+                        log('error', 'saving request log:', err);
+                    });
+                }
+            }
+            catch (err) {
+                log('error', 'saving request log:', err);
+            }
+        }));
         next();
     });
     const defineAdminRoute = (def) => {
@@ -292,8 +291,31 @@ const start = () => __awaiter(void 0, void 0, void 0, function* () {
         }
         next();
     });
-    app.listen(port, '0.0.0.0', () => {
-        console.log(`Server in "${env}" mode listening on port ${port}`);
+    const server = app.listen(port, '0.0.0.0', () => {
+        log('info', `server in "${env}" mode listening on port ${port}`);
+    });
+    process.on('SIGINT', () => {
+        log('info', 'received SIGINT, exiting');
+        new Promise((resolve, reject) => {
+            server.getConnections((err, connections) => {
+                if (err) {
+                    log('error', 'getting number of open connections', err);
+                    reject(err);
+                }
+                log('info', `closing ${connections} open connections`);
+                server.close(() => {
+                    log('info', 'server closed');
+                    resolve(connections);
+                });
+            });
+        }).then(connections => {
+            log('info', 'exiting after closing (according to Express):', connections, 'connections');
+            log('info', 'current requests at exit as computed by app:', nCurrentRequests);
+            process.exit(0);
+        }).catch(err => {
+            log('error', 'error while closing server', err);
+            process.exit(1);
+        });
     });
 });
 start().catch(err => {

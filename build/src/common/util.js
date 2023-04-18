@@ -9,7 +9,7 @@ var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, ge
     });
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.findPackageJsonDir = exports.makeApiVerbCreator = exports.restoreInnerInstance = exports.isMaybe = exports.validateExisting = exports.validateNew = exports.validateExcept = exports.getInteger = exports.getMessage = exports.getNumber = exports.getString = exports.get = exports.retryOnError = exports.wait = exports.memoizeTemporarily = exports.has = exports.removeDuplicates = exports.shuffleArray = exports.setPersonalizedFlags = exports.uuidv4 = void 0;
+exports.findPackageJsonDir = exports.makeApiVerbCreator = exports.restoreInnerInstance = exports.isMaybe = exports.validateExisting = exports.validateNew = exports.validateExcept = exports.getInteger = exports.getMessage = exports.getNumber = exports.getString = exports.get = exports.retryOnError = exports.wait = exports.memoizeTemporarily = exports.record = exports.has = exports.removeDuplicates = exports.shuffleArray = exports.setPersonalizedFlags = exports.uuidv4 = void 0;
 const path_1 = require("path");
 const promises_1 = require("fs/promises");
 var uuid_1 = require("uuid");
@@ -72,6 +72,8 @@ const removeDuplicates = (identifier) => (array) => {
 exports.removeDuplicates = removeDuplicates;
 const has = (key) => (x) => typeof x === 'object' && x !== null && key in x;
 exports.has = has;
+const record = (key) => (x) => (0, exports.has)(key)(x) && typeof x[key] === 'object' && x[key] !== null;
+exports.record = record;
 const memoizeTemporarily = (ttlMs) => (f) => {
     const cache = new Map();
     return (x) => {

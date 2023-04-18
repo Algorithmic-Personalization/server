@@ -35,168 +35,23 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
     return (mod && mod.__esModule) ? mod : { "default": mod };
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.createPostEventRoute = void 0;
-const node_fetch_1 = __importDefault(require("node-fetch"));
-const typeorm_1 = require("typeorm");
+exports.createPostEventRoute = exports.shouldTriggerPhaseTransition = void 0;
 const participant_1 = __importDefault(require("../models/participant"));
 const event_1 = __importStar(require("../../common/models/event"));
 const experimentConfig_1 = __importDefault(require("../../common/models/experimentConfig"));
-const video_1 = __importDefault(require("../models/video"));
-const videoListItem_1 = __importStar(require("../models/videoListItem"));
-const watchTime_1 = __importDefault(require("../models/watchTime"));
 const util_1 = require("../../common/util");
 const dailyActivityTime_1 = __importDefault(require("../models/dailyActivityTime"));
-const updateCounters_1 = require("../lib/updateCounters");
-const transitionSetting_1 = __importStar(require("../models/transitionSetting"));
-const transitionEvent_1 = __importStar(require("../models/transitionEvent"));
+const transitionSetting_1 = require("../models/transitionSetting");
+const transitionEvent_1 = __importDefault(require("../models/transitionEvent"));
+const handleExtensionInstalledEvent_1 = __importDefault(require("./postEvent/handleExtensionInstalledEvent"));
+const updateParticipantPhase_1 = __importDefault(require("./postEvent/updateParticipantPhase"));
+const createUpdateActivity_1 = __importDefault(require("./postEvent/createUpdateActivity"));
+const storeWatchTime_1 = __importDefault(require("./postEvent/storeWatchTime"));
+const storeRecommendationsShown_1 = __importDefault(require("../lib/storeRecommendationsShown"));
 const util_2 = require("../../util");
-const storeVideos = (repo, videos) => __awaiter(void 0, void 0, void 0, function* () {
-    const ids = [];
-    for (const video of videos) {
-        // eslint-disable-next-line no-await-in-loop
-        const existing = yield repo.findOneBy({
-            youtubeId: video.youtubeId,
-        });
-        if (existing) {
-            ids.push(existing.id);
-        }
-        else {
-            const newVideo = new video_1.default();
-            Object.assign(newVideo, video);
-            // eslint-disable-next-line no-await-in-loop
-            yield (0, util_1.validateNew)(newVideo);
-            // eslint-disable-next-line no-await-in-loop
-            const saved = yield repo.save(newVideo);
-            ids.push(saved.id);
-        }
-    }
-    return ids;
-});
-const makeVideos = (recommendations) => recommendations.map(r => {
-    const v = new video_1.default();
-    v.youtubeId = r.videoId;
-    v.title = r.title;
-    v.url = r.url;
-    return v;
-});
-const storeItems = (repo, eventId) => (videoIds, listType, videoTypes) => __awaiter(void 0, void 0, void 0, function* () {
-    for (let i = 0; i < videoIds.length; i++) {
-        const item = new videoListItem_1.default();
-        item.videoId = videoIds[i];
-        item.listType = listType;
-        item.videoType = videoTypes[i];
-        item.position = i;
-        item.eventId = eventId;
-        // eslint-disable-next-line no-await-in-loop
-        yield (0, util_1.validateNew)(item);
-        // eslint-disable-next-line no-await-in-loop
-        yield repo.save(item);
-    }
-});
-const storeRecommendationsShown = (log, dataSource, event) => __awaiter(void 0, void 0, void 0, function* () {
-    log('Storing recommendations shown event meta-data');
-    const videoRepo = dataSource.getRepository(video_1.default);
-    const nonPersonalized = yield storeVideos(videoRepo, makeVideos(event.nonPersonalized));
-    const personalized = yield storeVideos(videoRepo, makeVideos(event.personalized));
-    const shown = yield storeVideos(videoRepo, makeVideos(event.shown));
-    log('Non-personalized', nonPersonalized);
-    log('Personalized', personalized);
-    log('Shown', shown);
-    const nonPersonalizedTypes = nonPersonalized.map(() => videoListItem_1.VideoType.NON_PERSONALIZED);
-    const personalizedTypes = personalized.map(() => videoListItem_1.VideoType.PERSONALIZED);
-    const shownTypes = event.shown.map(r => {
-        if (r.personalization === 'non-personalized') {
-            return videoListItem_1.VideoType.NON_PERSONALIZED;
-        }
-        if (r.personalization === 'personalized') {
-            return videoListItem_1.VideoType.PERSONALIZED;
-        }
-        if (r.personalization === 'mixed') {
-            return videoListItem_1.VideoType.MIXED;
-        }
-        throw new Error(`Invalid personalization type: ${r.personalization}`);
-    });
-    const itemRepo = dataSource.getRepository(videoListItem_1.default);
-    const store = storeItems(itemRepo, event.id);
-    try {
-        yield store(nonPersonalized, videoListItem_1.ListType.NON_PERSONALIZED, nonPersonalizedTypes);
-        yield store(personalized, videoListItem_1.ListType.PERSONALIZED, personalizedTypes);
-        yield store(shown, videoListItem_1.ListType.SHOWN, shownTypes);
-    }
-    catch (err) {
-        log('Error storing recommendations shown event meta-data', err);
-    }
-});
-const storeWatchTime = (log, dataSource, event) => __awaiter(void 0, void 0, void 0, function* () {
-    const eventRepo = dataSource.getRepository(watchTime_1.default);
-    const watchTime = new watchTime_1.default();
-    watchTime.eventId = event.id;
-    watchTime.secondsWatched = event.secondsWatched;
-    try {
-        yield (0, util_1.validateNew)(watchTime);
-        yield eventRepo.save(watchTime);
-    }
-    catch (err) {
-        log('Error storing watch time event meta-data', err);
-    }
-});
 const isLocalUuidAlreadyExistsError = (e) => (0, util_1.has)('code')(e) && (0, util_1.has)('constraint')(e)
     && e.code === '23505'
     && e.constraint === 'event_local_uuid_idx';
-const getOrCreateActivity = (repo, participantId, day) => __awaiter(void 0, void 0, void 0, function* () {
-    const existing = yield repo.findOneBy({
-        participantId,
-        createdAt: day,
-    });
-    if (existing) {
-        return existing;
-    }
-    const newActivity = new dailyActivityTime_1.default();
-    newActivity.participantId = participantId;
-    newActivity.createdAt = day;
-    return repo.save(newActivity);
-});
-const createUpdateActivity = ({ activityRepo, eventRepo, log }) => (participant, event) => __awaiter(void 0, void 0, void 0, function* () {
-    log('Updating activity for participant ', participant.code);
-    const day = (0, updateCounters_1.wholeDate)(event.createdAt);
-    const activity = yield getOrCreateActivity(activityRepo, participant.id, day);
-    if (event.type === event_1.EventType.PAGE_VIEW) {
-        const latestSessionEvent = yield eventRepo
-            .findOne({
-            where: {
-                sessionUuid: event.sessionUuid,
-                createdAt: (0, typeorm_1.LessThan)(event.createdAt),
-            },
-            order: {
-                createdAt: 'DESC',
-            },
-        });
-        const dt = latestSessionEvent
-            ? Number(event.createdAt) - Number(latestSessionEvent.createdAt)
-            : 0;
-        if (dt < updateCounters_1.timeSpentEventDiffLimit && dt > 0) {
-            const dtS = dt / 1000;
-            log('Time since last event:', dtS);
-            activity.timeSpentOnYoutubeSeconds += dtS;
-        }
-    }
-    if (event.type === event_1.EventType.WATCH_TIME) {
-        activity.videoTimeViewedSeconds += event.secondsWatched;
-    }
-    if (event.type === event_1.EventType.PAGE_VIEW) {
-        activity.pagesViewed += 1;
-        if (event.url.includes('/watch')) {
-            activity.videoPagesViewed += 1;
-        }
-    }
-    if (event.type === 'PERSONALIZED_CLICKED'
-        || event.type === 'NON_PERSONALIZED_CLICKED'
-        || event.type === 'MIXED_CLICKED') {
-        activity.sidebarRecommendationsClicked += 1;
-    }
-    activity.updatedAt = new Date();
-    yield activityRepo.save(activity);
-});
 const activityMatches = (setting, activity) => {
     let criteriaOk = 0;
     const criteriaCount = 5;
@@ -240,73 +95,7 @@ const shouldTriggerPhaseTransition = (setting, activities) => {
     }
     return undefined;
 };
-const createUpdatePhase = ({ dataSource, log, }) => (participant, latestEvent) => __awaiter(void 0, void 0, void 0, function* () {
-    log('updating participant phase if needed...');
-    if (participant.phase === transitionSetting_1.Phase.POST_EXPERIMENT) {
-        log('participant in post-experiment, no need to check for phase transition, skipping');
-        return;
-    }
-    // Find the right transition settings to apply
-    const fromPhase = participant.phase;
-    const toPhase = fromPhase === transitionSetting_1.Phase.PRE_EXPERIMENT
-        ? transitionSetting_1.Phase.EXPERIMENT
-        : transitionSetting_1.Phase.POST_EXPERIMENT;
-    const transitionSettingRepo = dataSource.getRepository(transitionSetting_1.default);
-    const setting = yield transitionSettingRepo.findOneBy({
-        fromPhase,
-        toPhase,
-        isCurrent: true,
-    });
-    if (!setting) {
-        log('/!\\ no transition setting from', fromPhase, 'to', toPhase, 'found, skipping - this is probably a bug or a misconfiguration');
-        return;
-    }
-    log('transition setting from phase', fromPhase, 'to phase', toPhase, 'found:', setting);
-    // Find the entry date of participant in the phase they're currently in
-    const transitionRepo = dataSource.getRepository(transitionEvent_1.default);
-    const latestTransition = yield transitionRepo.findOne({
-        where: {
-            toPhase: participant.phase,
-            participantId: participant.id,
-        },
-        order: {
-            id: 'DESC',
-        },
-    });
-    const entryDate = latestTransition ? latestTransition.createdAt : participant.createdAt;
-    // Get all statistics for the participant after entry into current phase
-    const activityRepo = dataSource.getRepository(dailyActivityTime_1.default);
-    const activities = yield activityRepo.find({
-        where: {
-            participantId: participant.id,
-            createdAt: (0, typeorm_1.MoreThan)(entryDate),
-        },
-    });
-    log('found', activities.length, 'activities for participant', participant.id, 'after entry date', entryDate, 'into phase', participant.phase);
-    const transitionEvent = shouldTriggerPhaseTransition(setting, activities);
-    if (transitionEvent) {
-        log('triggering transition from phase', fromPhase, 'to phase', toPhase);
-        const triggerEvent = new event_1.default();
-        Object.assign(triggerEvent, latestEvent);
-        triggerEvent.id = 0;
-        triggerEvent.type = event_1.EventType.PHASE_TRANSITION;
-        transitionEvent.participantId = participant.id;
-        transitionEvent.fromPhase = fromPhase;
-        transitionEvent.toPhase = toPhase;
-        transitionEvent.reason = transitionEvent_1.TransitionReason.AUTOMATIC;
-        transitionEvent.transitionSettingId = setting.id;
-        participant.phase = toPhase;
-        yield dataSource.transaction((manager) => __awaiter(void 0, void 0, void 0, function* () {
-            const trigger = yield manager.save(triggerEvent);
-            transitionEvent.eventId = trigger.id;
-            yield manager.save(transitionEvent);
-            yield manager.save(participant);
-        }));
-    }
-    else {
-        log('no phase transition needed at this point');
-    }
-});
+exports.shouldTriggerPhaseTransition = shouldTriggerPhaseTransition;
 const summarizeForDisplay = (event) => {
     const summary = Object.assign({}, event);
     if (event.type === event_1.EventType.RECOMMENDATIONS_SHOWN) {
@@ -317,54 +106,7 @@ const summarizeForDisplay = (event) => {
     }
     return summary;
 };
-const createHandleExtensionInstalledEvent = (dataSource, installedEventConfig, log) => (participantId, event) => __awaiter(void 0, void 0, void 0, function* () {
-    log('handling extension installed event...');
-    const eventRepo = dataSource.getRepository(event_1.default);
-    const queryRunner = dataSource.createQueryRunner();
-    try {
-        yield queryRunner.startTransaction();
-        const participant = yield queryRunner.manager.getRepository(participant_1.default)
-            .createQueryBuilder('participant')
-            .useTransaction(true)
-            .setLock('pessimistic_write')
-            .where({ id: participantId })
-            .getOne();
-        if (!participant) {
-            throw new Error('Participant not found');
-        }
-        if (participant.extensionInstalled) {
-            log('participant extension already installed, skipping');
-        }
-        else {
-            log('participant extension not installed, calling API to notify installation...');
-            yield (0, node_fetch_1.default)(installedEventConfig.url, {
-                method: 'POST',
-                headers: {
-                    'Content-Type': 'application/json',
-                    'X-API-TOKEN': installedEventConfig.token,
-                },
-                body: JSON.stringify({
-                    code: participant.code,
-                }),
-            });
-            log('remote server notified, updating local participant...');
-            participant.extensionInstalled = true;
-            yield queryRunner.manager.save(participant);
-            const e = yield eventRepo.save(event);
-            log('event saved', e);
-            yield queryRunner.commitTransaction();
-            log('participant updated, transaction committed');
-        }
-    }
-    catch (err) {
-        log('error handling EXTENSION_INSTALLED event:', err);
-        yield queryRunner.rollbackTransaction();
-    }
-    finally {
-        yield queryRunner.release();
-    }
-});
-const createPostEventRoute = ({ createLogger, dataSource, installedEventConfig, }) => (req, res) => __awaiter(void 0, void 0, void 0, function* () {
+const createPostEventRoute = ({ createLogger, dataSource, installedEventConfig, youTubeConfig, }) => (req, res) => __awaiter(void 0, void 0, void 0, function* () {
     const log = createLogger(req.requestId);
     log('Received post event request');
     const { participantCode } = req;
@@ -385,16 +127,20 @@ const createPostEventRoute = ({ createLogger, dataSource, installedEventConfig, 
     const participantRepo = dataSource.getRepository(participant_1.default);
     const activityRepo = dataSource.getRepository(dailyActivityTime_1.default);
     const eventRepo = dataSource.getRepository(event_1.default);
-    const updateActivity = createUpdateActivity({
+    const updateActivity = (0, createUpdateActivity_1.default)({
         activityRepo,
         eventRepo,
         log,
     });
-    const updatePhase = createUpdatePhase({
+    const updatePhase = (0, updateParticipantPhase_1.default)({
         dataSource,
         log,
     });
-    const handleExtensionInstalledEvent = createHandleExtensionInstalledEvent(dataSource, installedEventConfig, log);
+    const handleExtensionInstalledEvent = (0, handleExtensionInstalledEvent_1.default)(dataSource, installedEventConfig, log);
+    const storeWatchTime = (0, storeWatchTime_1.default)({
+        dataSource,
+        log,
+    });
     const participant = yield participantRepo.findOneBy({
         code: participantCode,
     });
@@ -444,10 +190,15 @@ const createPostEventRoute = ({ createLogger, dataSource, installedEventConfig, 
             log('event saved', summarizeForDisplay(e));
             res.send({ kind: 'Success', value: e });
             if (event.type === event_1.EventType.RECOMMENDATIONS_SHOWN) {
-                yield storeRecommendationsShown(log, dataSource, event);
+                yield (0, storeRecommendationsShown_1.default)({
+                    dataSource,
+                    youTubeConfig,
+                    event: event,
+                    log,
+                });
             }
             else if (event.type === event_1.EventType.WATCH_TIME) {
-                yield storeWatchTime(log, dataSource, event);
+                yield storeWatchTime(event);
             }
         }
     }

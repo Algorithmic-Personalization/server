@@ -37,9 +37,9 @@ const env = (): 'production' | 'development' => {
 const scrape = async (dataSource: DataSource, log: LogFunction, _api: YtApi): Promise<void> => {
 	const youtubeIdsWithoutMetadata = await dataSource
 		.createQueryBuilder()
-		.select('video.youtube_id', 'youtube_id')
-		.from('Video', 'video')
-		.where('video.youtube_id NOT IN (SELECT youtube_id FROM video_metadata)')
+		.select('v.youtube_id', 'youtube_id')
+		.from('Video', 'v')
+		.where('not exists (select 1 from video_metadata m where m.youtube_id = v.youtube_id)')
 		.limit(10)
 		.getMany();
 
