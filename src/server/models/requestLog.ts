@@ -2,7 +2,7 @@
 import {Column, Entity} from 'typeorm';
 
 import Model from '../../common/lib/model';
-import {IsInt, IsNotEmpty, IsString, Min} from 'class-validator';
+import {IsInt, IsNotEmpty, IsOptional, IsString, Min} from 'class-validator';
 
 export enum HttpVerb {
 	GET = 'GET',
@@ -31,8 +31,8 @@ export class RequestLog extends Model {
 
 	@Column()
 	@IsString()
-	@IsNotEmpty()
-		sessionUuid: string = '';
+	@IsOptional()
+		sessionUuid?: string;
 
 	@Column()
 	@IsString()

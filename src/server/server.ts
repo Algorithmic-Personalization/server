@@ -361,6 +361,11 @@ const start = async () => {
 
 			logEntry.statusCode = res.statusCode;
 
+			const {type} = req.body as {type?: unknown};
+			if (typeof type === 'string') {
+				logEntry.comment.push(`type: ${type}`);
+			}
+
 			try {
 				const errors = await validateNew(logEntry);
 
