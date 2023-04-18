@@ -6,7 +6,7 @@ import {inspect} from 'util';
 import {type LogFunction} from './logger';
 
 export class DatabaseLogger extends AbstractLogger implements AbstractLogger {
-	constructor(private readonly logger: LogFunction, private readonly slowQueryMeter: Meter) {
+	constructor(private readonly logger: LogFunction, private readonly slowQueryMeter?: Meter) {
 		super();
 	}
 
@@ -20,7 +20,7 @@ export class DatabaseLogger extends AbstractLogger implements AbstractLogger {
 			parameters ? inspect(parameters) : '',
 		);
 
-		this.slowQueryMeter.mark();
+		this.slowQueryMeter?.mark();
 	}
 
 	protected writeLog(

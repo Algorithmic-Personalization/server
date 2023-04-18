@@ -242,6 +242,11 @@ const createPersistYouTubeMetas = (dataSource: DataSource, log: LogFunction) => 
 	};
 };
 
+export type YtApi = {
+	getMetaFromVideoIds(youTubeVideoIdsMaybeNonUnique: string[], hl?: string): Promise<YouTubeResponseMeta>;
+	getCategoriesFromRegionCode(regionCode: string, hl?: string): Promise<CategoryListItem[]>;
+};
+
 export const makeCreateYouTubeApi = () => {
 	type PromisedResponseMap = Map<string, Promise<Response>>;
 	type PromisedResponseSet = Set<Promise<Response>>;
@@ -299,7 +304,7 @@ export const makeCreateYouTubeApi = () => {
 			return res;
 		};
 
-		const api = {
+		const api: YtApi = {
 			// TODO: split into multiple queries if the list of unique IDs is too long (> 50)
 			async getMetaFromVideoIds(youTubeVideoIdsMaybeNonUnique: string[], hl = 'en'): Promise<YouTubeResponseMeta> {
 				await fetchingCategories;
