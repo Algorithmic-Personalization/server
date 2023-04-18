@@ -2,6 +2,7 @@ import fetch, {type Response} from 'node-fetch';
 import {type Repository, type DataSource} from 'typeorm';
 import {validate, IsString, IsInt, ValidateNested, type ValidationError, IsBoolean} from 'class-validator';
 import {Cache as MemoryCache} from 'memory-cache';
+import sizeof from 'object-sizeof';
 
 import {type YouTubeConfig} from './routeCreation';
 import {type LogFunction} from './logger';
@@ -106,17 +107,40 @@ export class CategoryListItem {
 class YouTubeCategoryListResponse extends YouTubeResponse<CategoryListItem> {
 }
 
+const formatPct = (pctBetween0And100: number): string =>
+	`${pctBetween0And100.toFixed(2)}%`;
+
 // Compute a percentage from 0 to 100 as a number, with two decimal places
 const pct = (numerator: number, denominator: number): number =>
 	Number(Math.round(100 * numerator / denominator).toFixed(2));
 
-export type YouTubeResponseMeta = {
-	requestTimeMs: number;
+type Stats = {
+	metadataRequestTimeMs: number;
 	cacheHitRate: number;
+	overAllCacheHitRate: string;
 	dbHitRate: number;
 	hitRate: number;
 	failRate: number;
+	cacheMemSizeBytes: number;
+	cacheMemSizeString: string;
+	cachedEntries: number;
+};
+
+export type YouTubeResponseMeta = Stats & {
 	data: MetaMap;
+};
+
+const formatSize = (sizeInBytes: number): string => {
+	const units = ['B', 'KB', 'MB', 'GB', 'TB'];
+	let unitIndex = 0;
+	let size = sizeInBytes;
+
+	while (size > 1024) {
+		size /= 1024;
+		unitIndex++;
+	}
+
+	return `${size.toFixed(2)} ${units[unitIndex]}`;
 };
 
 const getYouTubeMeta = (repo: Repository<VideoMetadata>) => async (youtubeId: string): Promise<YouTubeMeta | undefined> => {
@@ -227,6 +251,13 @@ export const makeCreateYouTubeApi = () => {
 
 	const fetchingMeta: PromisedResponseMap = new Map();
 	let fetchingCategories: Promise<unknown> | undefined;
+	let totalCacheHitRate = 0;
+	let numberOfCalls = 0;
+
+	const getCacheMemSizeBytes = (): number =>
+		metaCache
+			.keys()
+			.reduce((acc, key) => sizeof(metaCache.get(key)) + acc, 0);
 
 	// TODO: cache items for less time if memory is low
 	const cacheForMs = () => 1000 * 60 * 5; // 5 minutes
@@ -432,12 +463,27 @@ export const makeCreateYouTubeApi = () => {
 				const cacheHitRate = pct(cacheHits, youTubeIds.length);
 				const requestTimeMs = Date.now() - tStart;
 
-				return {
+				totalCacheHitRate += cacheHitRate;
+				++numberOfCalls;
+
+				const cacheMemSizeBytes = getCacheMemSizeBytes();
+
+				const stats: Stats = {
+					metadataRequestTimeMs: requestTimeMs,
 					failRate,
 					dbHitRate,
 					cacheHitRate,
+					cacheMemSizeBytes,
+					cacheMemSizeString: formatSize(cacheMemSizeBytes),
+					cachedEntries: metaCache.size(),
 					hitRate,
-					requestTimeMs,
+					overAllCacheHitRate: formatPct(totalCacheHitRate / numberOfCalls),
+				};
+
+				log('info', 'meta data gotten from yt, stats:', stats);
+
+				return {
+					...stats,
 					data: metaMap,
 				};
 			},
