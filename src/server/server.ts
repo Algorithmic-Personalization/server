@@ -154,9 +154,11 @@ const start = async () => {
 	const root = await findPackageJsonDir(__dirname);
 	const logsPath = join(root, 'logs', 'server.log');
 	const logStream = createWriteStream(logsPath, {flags: 'a'});
-	console.log('Package root is:', root);
 	const configJson = await readFile(join(root, 'config.yaml'), 'utf-8');
 	const config = parse(configJson) as unknown;
+
+	const createLogger = createDefaultLogger(logStream);
+	const log = createLogger('<server>');
 
 	const dockerComposeJson = await readFile(join(root, 'docker-compose.yaml'), 'utf-8');
 	const dockerComposeConfig = parse(dockerComposeJson) as unknown;
@@ -181,7 +183,7 @@ const start = async () => {
 
 	const mailer = nodemailer.createTransport(smtpConfig);
 
-	console.log('Mailer created:', mailer.transporter.name);
+	log('info', 'mailer created:', mailer.transporter.name);
 
 	if (!dockerComposeConfig || typeof dockerComposeConfig !== 'object') {
 		throw new Error('Invalid docker-compose.yaml');
@@ -230,15 +232,13 @@ const start = async () => {
 
 	try {
 		const migrated = await migrate({client: pgClient}, join(root, 'migrations'));
-		console.log('Successfully ran migrations:', migrated);
+		log('successfully', 'ran migrations:', migrated);
 	} catch (err) {
-		console.error('Error running migrations:', err);
+		log('error', 'running migrations:', err);
 		process.exit(1);
 	}
 
 	await pgClient.end();
-
-	const createLogger = createDefaultLogger(logStream);
 
 	const ds = new DataSource({
 		type: 'postgres',
@@ -249,7 +249,7 @@ const start = async () => {
 		namingStrategy: new SnakeNamingStrategy(),
 		logging: true,
 		maxQueryExecutionTime: 200,
-		logger: new DatabaseLogger(createLogger('database'), slowQueries),
+		logger: new DatabaseLogger(createLogger('<database>'), slowQueries),
 	});
 
 	try {
@@ -259,7 +259,7 @@ const start = async () => {
 		process.exit(1);
 	}
 
-	console.log('Successfully initialized data source');
+	log('Successfully initialized data source');
 
 	try {
 		await updateCounters({
@@ -267,7 +267,7 @@ const start = async () => {
 			log: createLogger(0),
 		});
 	} catch (err) {
-		console.error('Error updating activity counters:', err);
+		log('error', 'updating activity counters:', err);
 		process.exit(1);
 	}
 
@@ -327,14 +327,16 @@ const start = async () => {
 	app.use((req, _res, next) => {
 		const tStart = Date.now();
 		++requestId;
+		req.requestId = requestId;
+		const log = createLogger(req.requestId);
 		currentRequests.inc();
 		req.on('close', () => {
 			const tElapsed = Date.now() - tStart;
-			console.log(`\x1b[94m{request #${requestId} ended in ${tElapsed}ms}\x1b[0m`);
+			log(`\x1b[94m{request #${requestId} ended in ${tElapsed}ms}\x1b[0m`);
 			currentRequests.dec();
 		});
 		req.requestId = requestId;
-		createLogger(req.requestId)(req.method, req.url, req.headers);
+		log(req.method, req.url, req.headers);
 		next();
 	});
 
@@ -384,8 +386,32 @@ const start = async () => {
 		next();
 	});
 
-	app.listen(port, '0.0.0.0', () => {
-		console.log(`Server in "${env}" mode listening on port ${port}`);
+	const server = app.listen(port, '0.0.0.0', () => {
+		log('info', `server in "${env}" mode listening on port ${port}`);
+	});
+
+	process.on('SIGINT', () => {
+		log('info', 'received SIGINT, exiting');
+		new Promise((resolve, reject) => {
+			server.getConnections((err, connections) => {
+				if (err) {
+					log('error', 'getting number of open connections', err);
+					reject(err);
+				}
+
+				log('info', `closing ${connections} open connections`);
+				server.close(() => {
+					log('info', 'server closed');
+					resolve(connections);
+				});
+			});
+		}).then(connections => {
+			log('info', 'exiting after closing', connections, 'connections');
+			process.exit(0);
+		}).catch(err => {
+			log('error', 'error while closing server', err);
+			process.exit(1);
+		});
 	});
 };
 
