@@ -42,7 +42,7 @@ const scrape = async (dataSource: DataSource, log: LogFunction, api: YtApi): Pro
 	const query = dataSource
 		.getRepository(Video)
 		.createQueryBuilder('v')
-		.select('v.youtube_id')
+		.select('distinct v.youtube_id')
 		.where('not exists (select 1 from video_metadata m where m.youtube_Id = v.youtube_Id)');
 
 	log('running query: ', query.getSql());
@@ -54,7 +54,7 @@ const scrape = async (dataSource: DataSource, log: LogFunction, api: YtApi): Pro
 	const idsPerRequest = 50;
 
 	let pos = 0;
-	for (; pos + idsPerRequest < youtubeIdsWithoutMetadata.length; ++pos) {
+	for (; pos + idsPerRequest < youtubeIdsWithoutMetadata.length; pos += idsPerRequest) {
 		pagesToFetch.push(youtubeIdsWithoutMetadata.slice(pos, pos + 50).map(x => x.youtube_id));
 	}
 
