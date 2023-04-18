@@ -24,7 +24,7 @@ import monitor from 'express-status-monitor';
 
 import io from '@pm2/io';
 
-import {getInteger, getString, has, findPackageJsonDir} from '../common/util';
+import {getInteger, getString, has, findPackageJsonDir, validateNew} from '../common/util';
 
 import Admin from '../common/models/admin';
 import Token from './models/token';
@@ -41,6 +41,7 @@ import TransitionSetting from './models/transitionSetting';
 import VideoMetadata from './models/videoMetadata';
 import VideoCategory from './models/videoCategory';
 import YouTubeRequestLatency from './models/youTubeRequestLatency';
+import RequestLog, {type HttpVerb} from './models/requestLog';
 
 import SmtpConfig from './lib/smtpConfig';
 
@@ -130,6 +131,7 @@ const entities = [
 	VideoMetadata,
 	VideoCategory,
 	YouTubeRequestLatency,
+	RequestLog,
 ];
 
 const env = process.env.NODE_ENV;
@@ -323,20 +325,57 @@ const start = async () => {
 	app.use(bodyParser.json());
 
 	let requestId = 0;
+	let nCurrentRequests = 0;
 
-	app.use((req, _res, next) => {
+	const logRepo = ds.getRepository(RequestLog);
+
+	app.use((req, res, next) => {
 		const tStart = Date.now();
 		++requestId;
+		++nCurrentRequests;
 		req.requestId = requestId;
 		const log = createLogger(req.requestId);
 		currentRequests.inc();
-		req.on('close', () => {
-			const tElapsed = Date.now() - tStart;
-			log(`\x1b[94m{request #${requestId} ended in ${tElapsed}ms}\x1b[0m`);
-			currentRequests.dec();
-		});
+
 		req.requestId = requestId;
 		log(req.method, req.url, req.headers);
+
+		req.on('close', async () => {
+			const tElapsed = Date.now() - tStart;
+
+			log(`\x1b[94m{request #${requestId} ended in ${tElapsed}ms}\x1b[0m`);
+
+			currentRequests.dec();
+			--nCurrentRequests;
+
+			const logEntry = new RequestLog();
+			logEntry.latencyMs = tElapsed;
+			logEntry.requestId = requestId;
+			logEntry.verb = req.method as HttpVerb;
+			logEntry.path = req.path;
+
+			const {sessionUuid} = req.body as {sessionUuid?: unknown};
+			if (typeof sessionUuid === 'string') {
+				logEntry.sessionUuid = sessionUuid;
+			}
+
+			logEntry.statusCode = res.statusCode;
+
+			try {
+				const errors = await validateNew(logEntry);
+
+				if (errors.length > 0) {
+					log('error', 'invalid request log entry:', errors);
+				} else {
+					logRepo.save(logEntry).catch(err => {
+						log('error', 'saving request log:', err);
+					});
+				}
+			} catch (err) {
+				log('error', 'saving request log:', err);
+			}
+		});
+
 		next();
 	});
 
@@ -406,7 +445,8 @@ const start = async () => {
 				});
 			});
 		}).then(connections => {
-			log('info', 'exiting after closing', connections, 'connections');
+			log('info', 'exiting after closing (according to Express):', connections, 'connections');
+			log('info', 'current requests at exit as computed by app:', nCurrentRequests);
 			process.exit(0);
 		}).catch(err => {
 			log('error', 'error while closing server', err);
