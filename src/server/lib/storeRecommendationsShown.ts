@@ -66,7 +66,7 @@ export const storeRecommendationsShown = async ({
 	const now = Date.now();
 	youTubeApi.getMetaFromVideoIds(youTubeIds).then(categories => {
 		const elapsed = Date.now() - now;
-		log(`fetched ${categories.data.size} meta-data items for ${youTubeIds.length} videos in ${elapsed} ms.`, categories);
+		log(`fetched ${categories.data.size} meta-data items for ${youTubeIds.length} videos in ${elapsed} ms.`);
 	}).catch(err => {
 		log('error fetching video meta-data', err);
 	});
