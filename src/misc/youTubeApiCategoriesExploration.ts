@@ -36,6 +36,17 @@ const env = (): 'production' | 'development' => {
 	return 'development';
 };
 
+const keypress = async (): Promise<string> => {
+	process.stdin.setRawMode(true);
+
+	return new Promise(resolve => {
+		process.stdin.once('data', d => {
+			process.stdin.setRawMode(false);
+			resolve(d.toString('utf-8'));
+		});
+	});
+};
+
 const scrape = async (dataSource: DataSource, log: LogFunction, api: YtApi): Promise<void> => {
 	log('gonna scrape!');
 
@@ -47,13 +58,27 @@ const scrape = async (dataSource: DataSource, log: LogFunction, api: YtApi): Pro
 
 	log('running query: ', query.getSql());
 	const youtubeIdsWithoutMetadata: Array<{youtube_id: string}> = await query.getRawMany();
+	const videoCount = await dataSource.getRepository(Video).count();
 	log('youtubeIds needing fetching the meta-data for:', youtubeIdsWithoutMetadata.length);
+	log('total video count:', videoCount);
+	log(`percentage of videos lacking meta-data: ${(youtubeIdsWithoutMetadata.length * 100 / videoCount).toFixed(2)}%`);
+
+	log('press y to continue, anything else to abort');
+
+	const input = await keypress();
+
+	if (input !== 'y') {
+		log('aborting');
+		process.exit(0);
+		return;
+	}
 
 	const pagesToFetch: string[][] = [];
 
 	const idsPerRequest = 50;
 
 	let pos = 0;
+	let persisted = 0;
 	for (; pos + idsPerRequest < youtubeIdsWithoutMetadata.length; pos += idsPerRequest) {
 		pagesToFetch.push(youtubeIdsWithoutMetadata.slice(pos, pos + 50).map(x => x.youtube_id));
 	}
@@ -66,10 +91,13 @@ const scrape = async (dataSource: DataSource, log: LogFunction, api: YtApi): Pro
 		// eslint-disable-next-line no-await-in-loop
 		const meta = await api.getMetaFromVideoIds(page);
 		const {data, ...stats} = meta;
-		log('got meta-data for', data.size, 'videos with stats:', stats);
+		persisted += data.size;
+		const progress = (persisted * 100 / youtubeIdsWithoutMetadata.length).toFixed(2);
+		log('got meta-data for', data.size, `videos (\x1b[34m${progress}\x1b[0m%) with stats:`, stats);
 	}
 
 	log('done!');
+	process.exit(0);
 };
 
 // TODO: move this to a separate file, use in in server.ts because it
@@ -127,7 +155,13 @@ const main = async () => {
 	const cmd = process.argv[2];
 
 	const root = await findPackageJsonDir(__dirname);
-	const createLog = makeCreateDefaultLogger(createWriteStream(join(root, `${basename(__filename)}.log`)));
+
+	const createLog = makeCreateDefaultLogger(
+		createWriteStream(
+			join(root, `${basename(__filename)}.log`), {
+				flags: 'a',
+			}));
+
 	const log = createLog('<main>');
 
 	if (!commands.has(cmd)) {

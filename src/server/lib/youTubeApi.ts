@@ -231,7 +231,7 @@ const createPersistYouTubeMetas = (dataSource: DataSource, log: LogFunction) =>
 
 			await qr.commitTransaction();
 
-			log('info', inserted, 'metas inserted in DB or', pct(insertList.length, youtubeIds.length), '%');
+			log('info', inserted, 'metas inserted in DB or', pct(inserted, insertList.length), '%');
 		} catch (e) {
 			await qr.rollbackTransaction();
 			throw e;
