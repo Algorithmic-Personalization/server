@@ -12,10 +12,12 @@ import getYouTubeConfig from '../server/lib/config-loader/getYouTubeConfig';
 import makeCreateYouTubeApi, {type CategoryListItem, type YtApi} from '../server/lib/youTubeApi';
 
 import entities from '../server/entities';
-// D import DatabaseLogger from '../server/lib/databaseLogger';
+import DatabaseLogger from '../server/lib/databaseLogger';
 import {type LogFunction, makeCreateDefaultLogger} from '../server/lib/logger';
 
 import Video from '../server/models/video';
+
+import {asyncPerf} from '../util';
 
 const commands = new Map([
 	['compare', 'will compare the categories set of different regions'],
@@ -57,7 +59,17 @@ const scrape = async (dataSource: DataSource, log: LogFunction, api: YtApi): Pro
 		.where('not exists (select 1 from video_metadata m where m.youtube_Id = v.youtube_Id)');
 
 	log('running query: ', query.getSql());
-	const youtubeIdsWithoutMetadata: Array<{youtube_id: string}> = await query.getRawMany();
+	const youtubeIdsWithoutMetadata: Array<{youtube_id: string}> = await asyncPerf(
+		async () => query.getRawMany(),
+		'select youtube_id\'s without metadata',
+	);
+
+	const test = () => true;
+
+	if (test()) {
+		process.exit(42);
+	}
+
 	const videoCount = await dataSource.getRepository(Video).count();
 	log('youtubeIds needing fetching the meta-data for:', youtubeIdsWithoutMetadata.length);
 	log('total video count:', videoCount);
@@ -142,7 +154,7 @@ const createDataSource = async (projectRootDir: string, log: LogFunction): Promi
 		entities,
 		namingStrategy: new SnakeNamingStrategy(),
 		// D logging: true,
-		// D logger: new DatabaseLogger(console.log),
+		logger: new DatabaseLogger(log),
 	});
 
 	await ds.initialize();

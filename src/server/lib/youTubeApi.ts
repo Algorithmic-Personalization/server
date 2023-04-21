@@ -10,6 +10,7 @@ import {type LogFunction} from './logger';
 import VideoCategory from '../models/videoCategory';
 import VideoMetadata, {MetadataType} from '../models/videoMetadata';
 import YouTubeRequestLatency from '../models/youTubeRequestLatency';
+import {formatSize} from '../../util';
 
 export type YouTubeMeta = {
 	videoId: string;
@@ -128,19 +129,6 @@ type Stats = {
 
 export type YouTubeResponseMeta = Stats & {
 	data: MetaMap;
-};
-
-const formatSize = (sizeInBytes: number): string => {
-	const units = ['B', 'KB', 'MB', 'GB', 'TB'];
-	let unitIndex = 0;
-	let size = sizeInBytes;
-
-	while (size > 1024) {
-		size /= 1024;
-		unitIndex++;
-	}
-
-	return `${size.toFixed(2)} ${units[unitIndex]}`;
 };
 
 const getYouTubeMeta = (repo: Repository<VideoMetadata>) => async (youtubeId: string): Promise<YouTubeMeta | undefined> => {
