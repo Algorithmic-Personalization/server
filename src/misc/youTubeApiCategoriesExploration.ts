@@ -97,7 +97,6 @@ const scrape = async (dataSource: DataSource, log: LogFunction, api: YtApi): Pro
 	}
 
 	log('done!');
-	process.exit(0);
 };
 
 // TODO: move this to a separate file, use in in server.ts because it
@@ -302,6 +301,8 @@ const main = async () => {
 
 		process.exit(1);
 	}
+
+	process.exit(0);
 };
 
 main().catch(console.error);
