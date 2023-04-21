@@ -17,7 +17,7 @@ import {type LogFunction, makeCreateDefaultLogger} from '../server/lib/logger';
 
 import Video from '../server/models/video';
 
-import {asyncPerf} from '../util';
+import {asyncPerf, formatPct, pct} from '../util';
 
 const commands = new Map([
 	['compare', 'will compare the categories set of different regions'],
@@ -59,21 +59,16 @@ const scrape = async (dataSource: DataSource, log: LogFunction, api: YtApi): Pro
 		.where('not exists (select 1 from video_metadata m where m.youtube_Id = v.youtube_Id)');
 
 	log('running query: ', query.getSql());
-	const youtubeIdsWithoutMetadata: Array<{youtube_id: string}> = await asyncPerf(
-		async () => query.getRawMany(),
+	const youtubeIdsWithoutMetadataCount: number = await asyncPerf(
+		async () => query.getCount(),
 		'select youtube_id\'s without metadata',
+		log,
 	);
 
-	const test = () => true;
-
-	if (test()) {
-		process.exit(42);
-	}
-
 	const videoCount = await dataSource.getRepository(Video).count();
-	log('youtubeIds needing fetching the meta-data for:', youtubeIdsWithoutMetadata.length);
+	log('youtube_id\'s needing fetching the meta-data of:', youtubeIdsWithoutMetadataCount);
 	log('total video count:', videoCount);
-	log(`percentage of videos lacking meta-data: ${(youtubeIdsWithoutMetadata.length * 100 / videoCount).toFixed(2)}%`);
+	log(`percentage of videos lacking meta-data: ${formatPct(pct(youtubeIdsWithoutMetadataCount, videoCount))}`);
 
 	log('press y to continue, anything else to abort');
 
@@ -85,30 +80,71 @@ const scrape = async (dataSource: DataSource, log: LogFunction, api: YtApi): Pro
 		return;
 	}
 
-	const pagesToFetch: string[][] = [];
+	const pageSize = 25;
+	let nMetaAskedFor = 0;
+	let nMetaObtained = 0;
+	let refetched = 0;
 
-	const idsPerRequest = 50;
+	for (let offset = 0; ; ++offset) {
+		try {
+			// eslint-disable-next-line no-await-in-loop
+			const videos: Array<{youtube_id: string}> = await asyncPerf(
+				async () => query.limit(pageSize).offset(offset * pageSize).getRawMany(),
+				`attempting to fetch ${pageSize} videos at offset ${offset * pageSize} from the db`,
+				log,
+			);
 
-	let pos = 0;
-	let persisted = 0;
-	for (; pos + idsPerRequest < youtubeIdsWithoutMetadata.length; pos += idsPerRequest) {
-		pagesToFetch.push(youtubeIdsWithoutMetadata.slice(pos, pos + 50).map(x => x.youtube_id));
+			const pageIds = videos.map(v => v.youtube_id);
+
+			nMetaAskedFor += pageIds.length;
+
+			log('fetched', videos.length, 'videos from the db:', pageIds);
+
+			if (videos.length === 0) {
+				log('no more videos to fetch from db');
+				break;
+			}
+
+			// eslint-disable-next-line no-await-in-loop
+			const meta = await asyncPerf(
+				async () => api.getMetaFromVideoIds(pageIds),
+				`attempting to fetch meta-data for ${videos.length} videos using the YouTube API`,
+				log,
+			);
+			const {data, ...stats} = meta;
+
+			nMetaObtained += data.size;
+			refetched += stats.refetched;
+
+			log('got meta-data for', data.size, 'videos with stats:', stats);
+
+			// We don't need to persist the meta-data here because the
+			// `getMetaFromVideoIds` method already does that for us.
+
+			++offset;
+		} catch (e) {
+			log('error while fetching videos from the db', e);
+			process.exit(1);
+		}
 	}
 
-	if (pos < youtubeIdsWithoutMetadata.length) {
-		pagesToFetch.push(youtubeIdsWithoutMetadata.slice(pos).map(x => x.youtube_id));
+	const nowMissing = await query.getCount();
+	const finalPct = formatPct(pct(nowMissing, videoCount));
+	if (nowMissing !== 0) {
+		log('warning', `now still missing ${finalPct} of the videos...`);
+		log(
+			'warning',
+			'obtained only',
+			formatPct(pct(nMetaObtained, nMetaAskedFor)),
+			'of the meta-data we asked for',
+		);
 	}
 
-	for (const page of pagesToFetch) {
-		// eslint-disable-next-line no-await-in-loop
-		const meta = await api.getMetaFromVideoIds(page);
-		const {data, ...stats} = meta;
-		persisted += data.size;
-		const progress = (persisted * 100 / youtubeIdsWithoutMetadata.length).toFixed(2);
-		log('got meta-data for', data.size, `videos (\x1b[34m${progress}\x1b[0m%) with stats:`, stats);
+	if (refetched !== 0) {
+		log('warning', 'refetched', refetched, 'videos');
 	}
 
-	log('done!');
+	log('success', 'done!');
 };
 
 // TODO: move this to a separate file, use in in server.ts because it
@@ -162,6 +198,85 @@ const createDataSource = async (projectRootDir: string, log: LogFunction): Promi
 	return ds;
 };
 
+const compareCategoriesOfTwoRegions = async (regionA: string, regionB: string, log: LogFunction, api: YtApi) => {
+	type CategoriesMap = Map<string, CategoryListItem>;
+
+	const [categoriesA, categoriesB] = await Promise.all([
+		api.getCategoriesFromRegionCode(regionA),
+		api.getCategoriesFromRegionCode(regionB),
+	]);
+
+	const toMap = (categories: CategoryListItem[]): CategoriesMap => {
+		const map: CategoriesMap = new Map();
+
+		for (const category of categories) {
+			map.set(category.id, category);
+		}
+
+		return map;
+	};
+
+	const mapA = toMap(categoriesA);
+	const mapB = toMap(categoriesB);
+
+	if (mapA.size !== mapB.size) {
+		log(
+			`Categories of ${regionA} and ${regionB} differ in size,`,
+			`region ${regionA} has ${mapA.size} categories,`,
+			`while region ${regionB} has ${mapB.size} categories.`,
+		);
+	}
+
+	for (const [id, categoryA] of mapA) {
+		const categoryB = mapB.get(id);
+
+		if (!categoryB) {
+			log(
+				`Category ${categoryA.snippet.title} (${id})`,
+				`is only available in region ${regionA},`,
+				`but not in region ${regionB}.`,
+			);
+		}
+	}
+
+	for (const [id, categoryB] of mapB) {
+		const categoryA = mapA.get(id);
+
+		if (!categoryA) {
+			log(
+				`Category ${categoryB.snippet.title} (${id})`,
+				`is only available in region ${regionB},`,
+				`but not in region ${regionA}.`,
+			);
+		}
+	}
+
+	for (const [id, categoryA] of mapA) {
+		const categoryB = mapB.get(id);
+
+		if (!categoryB) {
+			continue;
+		}
+
+		if (categoryA.snippet.title !== categoryB.snippet.title) {
+			log(
+				`Category ${categoryA.snippet.title} (${id})`,
+				`is called ${categoryB.snippet.title} in region ${regionB}.`,
+			);
+		}
+	}
+};
+
+const compareSomeCategoriesWithUs = async (log: LogFunction, api: YtApi) => {
+	const regionA = 'US';
+	const regionBs = ['FR', 'DE', 'GB', 'CA', 'AU', 'IT', 'JP', 'GR'];
+
+	for (const regionB of regionBs) {
+		// eslint-disable-next-line no-await-in-loop
+		await compareCategoriesOfTwoRegions(regionA, regionB, log, api);
+	}
+};
+
 const main = async () => {
 	const cmd = process.argv[2];
 
@@ -188,7 +303,8 @@ const main = async () => {
 	const config = parse(configJson) as unknown;
 	const youTubeConfig = getYouTubeConfig(config);
 
-	const createApi = makeCreateYouTubeApi();
+	const createApiWithCache = makeCreateYouTubeApi('with-cache');
+	const createApiWithoutCache = makeCreateYouTubeApi('without-cache');
 
 	const dataSourceNeeded = commandsNeedingDataSource.has(cmd);
 
@@ -207,91 +323,15 @@ const main = async () => {
 		process.exit(1);
 	}
 
-	const api = createApi(youTubeConfig, createLog('<yt-api>'), dataSource);
-
-	const compareCategoriesOfTwoRegions = async (regionA: string, regionB: string) => {
-		const log = createLog('<compare-categories>');
-		type CategoriesMap = Map<string, CategoryListItem>;
-
-		const [categoriesA, categoriesB] = await Promise.all([
-			api.getCategoriesFromRegionCode(regionA),
-			api.getCategoriesFromRegionCode(regionB),
-		]);
-
-		const toMap = (categories: CategoryListItem[]): CategoriesMap => {
-			const map: CategoriesMap = new Map();
-
-			for (const category of categories) {
-				map.set(category.id, category);
-			}
-
-			return map;
-		};
-
-		const mapA = toMap(categoriesA);
-		const mapB = toMap(categoriesB);
-
-		if (mapA.size !== mapB.size) {
-			log(
-				`Categories of ${regionA} and ${regionB} differ in size,`,
-				`region ${regionA} has ${mapA.size} categories,`,
-				`while region ${regionB} has ${mapB.size} categories.`,
-			);
-		}
-
-		for (const [id, categoryA] of mapA) {
-			const categoryB = mapB.get(id);
-
-			if (!categoryB) {
-				log(
-					`Category ${categoryA.snippet.title} (${id})`,
-					`is only available in region ${regionA},`,
-					`but not in region ${regionB}.`,
-				);
-			}
-		}
-
-		for (const [id, categoryB] of mapB) {
-			const categoryA = mapA.get(id);
-
-			if (!categoryA) {
-				log(
-					`Category ${categoryB.snippet.title} (${id})`,
-					`is only available in region ${regionB},`,
-					`but not in region ${regionA}.`,
-				);
-			}
-		}
-
-		for (const [id, categoryA] of mapA) {
-			const categoryB = mapB.get(id);
-
-			if (!categoryB) {
-				continue;
-			}
-
-			if (categoryA.snippet.title !== categoryB.snippet.title) {
-				log(
-					`Category ${categoryA.snippet.title} (${id})`,
-					`is called ${categoryB.snippet.title} in region ${regionB}.`,
-				);
-			}
-		}
-	};
-
-	const compareSomeCategoriesWithUs = async () => {
-		const regionA = 'US';
-		const regionBs = ['FR', 'DE', 'GB', 'CA', 'AU', 'IT', 'JP', 'GR'];
-
-		for (const regionB of regionBs) {
-			// eslint-disable-next-line no-await-in-loop
-			await compareCategoriesOfTwoRegions(regionA, regionB);
-		}
-	};
+	const apiWithCache = createApiWithCache(youTubeConfig, createLog('<yt-cached-api>'), dataSource);
+	const apiWithoutCache = createApiWithoutCache(youTubeConfig, createLog('<yt-uncached-api>'), dataSource);
 
 	if (cmd === 'compare') {
-		console.log('Running compare...');
-		await compareSomeCategoriesWithUs();
+		log('Running compare...');
+		await compareSomeCategoriesWithUs(
+			createLog('<compare>'),
+			apiWithCache,
+		);
 	} else if (cmd === 'scrape') {
 		console.log('Running scrape...');
 		if (!dataSource) {
@@ -300,7 +340,8 @@ const main = async () => {
 
 		try {
 			const scrapeLog = createLog('<scrape>');
-			await scrape(dataSource, scrapeLog, api);
+			// Use API without memory cache to minimize RAM usage on low-perf server
+			await scrape(dataSource, scrapeLog, apiWithoutCache);
 		} catch (err) {
 			console.error('Error while scraping:', err);
 		}

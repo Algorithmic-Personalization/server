@@ -10,7 +10,7 @@ import {type LogFunction} from './logger';
 import VideoCategory from '../models/videoCategory';
 import VideoMetadata, {MetadataType} from '../models/videoMetadata';
 import YouTubeRequestLatency from '../models/youTubeRequestLatency';
-import {formatSize} from '../../util';
+import {formatSize, formatPct, pct} from '../../util';
 
 export type YouTubeMeta = {
 	videoId: string;
@@ -108,13 +108,6 @@ export class CategoryListItem {
 class YouTubeCategoryListResponse extends YouTubeResponse<CategoryListItem> {
 }
 
-const formatPct = (pctBetween0And100: number): string =>
-	`${pctBetween0And100.toFixed(2)}%`;
-
-// Compute a percentage from 0 to 100 as a number, with two decimal places
-const pct = (numerator: number, denominator: number): number =>
-	Number(Math.round(100 * numerator / denominator).toFixed(2));
-
 type Stats = {
 	metadataRequestTimeMs: number;
 	cacheHitRate: number;
@@ -125,6 +118,7 @@ type Stats = {
 	cacheMemSizeBytes: number;
 	cacheMemSizeString: string;
 	cachedEntries: number;
+	refetched: number;
 };
 
 export type YouTubeResponseMeta = Stats & {
@@ -189,6 +183,52 @@ const getManyYoutubeMetas = (repo: Repository<VideoMetadata>) => async (videoIds
 	return res;
 };
 
+const convertToVideoMetaData = (meta: YouTubeMeta): VideoMetadata[] => {
+	const res: VideoMetadata[] = [];
+
+	const categoryIdMeta = new VideoMetadata();
+	categoryIdMeta.youtubeId = meta.videoId;
+	categoryIdMeta.type = MetadataType.YT_CATEGORY_ID;
+	categoryIdMeta.value = meta.categoryId;
+	res.push(categoryIdMeta);
+
+	const categoryTitleMeta = new VideoMetadata();
+	categoryTitleMeta.youtubeId = meta.videoId;
+	categoryTitleMeta.type = MetadataType.YT_CATEGORY_TITLE;
+	categoryTitleMeta.value = meta.categoryTitle;
+	res.push(categoryTitleMeta);
+
+	for (const topic of meta.topicCategories) {
+		const metaData = new VideoMetadata();
+		metaData.youtubeId = meta.videoId;
+		metaData.value = topic;
+		metaData.type = MetadataType.TOPIC_CATEGORY;
+		res.push(metaData);
+	}
+
+	if (meta.tags) {
+		for (const tag of meta.tags) {
+			const metaData = new VideoMetadata();
+			metaData.youtubeId = meta.videoId;
+			metaData.value = tag;
+			metaData.type = MetadataType.TAG;
+			res.push(metaData);
+		}
+	}
+
+	return res;
+};
+
+type MapLike<K, V> = {
+	set: (key: K, value: V) => void;
+} & Iterable<[K, V]>;
+
+const mergeInto = <K, V>(target: MapLike<K, V>) => (source: MapLike<K, V>) => {
+	for (const [key, value] of source) {
+		target.set(key, value);
+	}
+};
+
 // TODO: handle update?
 const createPersistYouTubeMetas = (dataSource: DataSource, log: LogFunction) =>
 	async (metaToPersistInOrder: VideoMetadata[]) => {
@@ -208,7 +248,9 @@ const createPersistYouTubeMetas = (dataSource: DataSource, log: LogFunction) =>
 				.getMany();
 
 			const ignoreSet = new Set(metas.map(m => m.youtubeId));
-			log('info', ignoreSet.size, 'metas already in DB, skipping them...');
+			if (ignoreSet.size > 0) {
+				log('info', ignoreSet.size, 'metas already in DB, skipping them...');
+			}
 
 			const insertList = metaToPersistInOrder.filter(m => !ignoreSet.has(m.youtubeId));
 			const nVids = youtubeIds.length - ignoreSet.size;
@@ -229,13 +271,15 @@ const createPersistYouTubeMetas = (dataSource: DataSource, log: LogFunction) =>
 	};
 
 export type YtApi = {
-	getMetaFromVideoIds(youTubeVideoIdsMaybeNonUnique: string[], hl?: string): Promise<YouTubeResponseMeta>;
+	getMetaFromVideoIds(youTubeVideoIdsMaybeNonUnique: string[], hl?: string, recurse?: boolean): Promise<YouTubeResponseMeta>;
 	getCategoriesFromRegionCode(regionCode: string, hl?: string): Promise<CategoryListItem[]>;
 };
 
-export const makeCreateYouTubeApi = () => {
+export const makeCreateYouTubeApi = (cache: 'with-cache' | 'without-cache' = 'with-cache') => {
 	type PromisedResponseMap = Map<string, Promise<Response>>;
 	type PromisedResponseSet = Set<Promise<Response>>;
+
+	const useCache = cache === 'with-cache';
 
 	const metaCache = new MemoryCache<string, YouTubeMeta>();
 	const categoriesCache = new Map<string, string>();
@@ -292,7 +336,7 @@ export const makeCreateYouTubeApi = () => {
 
 		const api: YtApi = {
 			// TODO: split into multiple queries if the list of unique IDs is too long (> 50)
-			async getMetaFromVideoIds(youTubeVideoIdsMaybeNonUnique: string[], hl = 'en'): Promise<YouTubeResponseMeta> {
+			async getMetaFromVideoIds(youTubeVideoIdsMaybeNonUnique: string[], hl = 'en', recurse = true): Promise<YouTubeResponseMeta> {
 				await fetchingCategories;
 				const youTubeIds = [...new Set(youTubeVideoIdsMaybeNonUnique)];
 
@@ -303,11 +347,15 @@ export const makeCreateYouTubeApi = () => {
 
 				const idsNotCached: string[] = [];
 
+				let refetched = 0;
+
 				for (const id of youTubeIds) {
-					const cached = metaCache.get(id);
-					if (cached) {
-						metaMap.set(id, cached);
-						continue;
+					if (useCache) {
+						const cached = metaCache.get(id);
+						if (cached) {
+							metaMap.set(id, cached);
+							continue;
+						}
 					}
 
 					const alreadyFetching = fetchingMeta.get(id);
@@ -330,8 +378,11 @@ export const makeCreateYouTubeApi = () => {
 				for (const id of idsNotCached) {
 					const dbCached = dbMap?.get(id);
 					if (dbCached) {
-						metaCache.put(id, dbCached, cacheForMs());
 						metaMap.set(id, dbCached);
+						if (useCache) {
+							metaCache.put(id, dbCached, cacheForMs());
+						}
+
 						continue;
 					}
 
@@ -377,12 +428,28 @@ export const makeCreateYouTubeApi = () => {
 
 				validation.forEach((validationResult, i) => {
 					if (validationResult.status === 'rejected') {
-						log('error validating some meta-data for videos:', validationResult.reason);
+						log(
+							'error validating some meta-data for videos:',
+							validationResult.reason,
+							'response from YouTube was:',
+							youTubeResponses[i],
+						);
 					} else {
 						const errors = validationResult.value;
 						if (errors.length === 0) {
-							const youTubeResponse = youTubeResponses[i];
-							for (const item of youTubeResponse.items) {
+							const {items} = youTubeResponses[i];
+
+							log('debug', 'YouTube response page info:', youTubeResponses[i].pageInfo);
+
+							if (!items || items.length === 0) {
+								log(
+									'error',
+									'YouTube response did not contain items, API quota probably exceeded',
+									youTubeResponses[i],
+								);
+							}
+
+							for (const item of items) {
 								const meta: YouTubeMeta = {
 									videoId: item.id,
 									categoryId: item.snippet.categoryId,
@@ -392,7 +459,9 @@ export const makeCreateYouTubeApi = () => {
 								};
 								metaToPersist.push(meta);
 								metaMap.set(item.id, meta);
-								metaCache.put(item.id, meta, cacheForMs());
+								if (useCache) {
+									metaCache.put(item.id, meta, cacheForMs());
+								}
 							}
 						} else {
 							log('errors validating some meta-data for videos:', errors);
@@ -405,36 +474,7 @@ export const makeCreateYouTubeApi = () => {
 				if (metaRepo) {
 					for (const meta of metaToPersist) {
 						fetchingMeta.delete(meta.videoId);
-
-						const categoryIdMeta = new VideoMetadata();
-						categoryIdMeta.youtubeId = meta.videoId;
-						categoryIdMeta.type = MetadataType.YT_CATEGORY_ID;
-						categoryIdMeta.value = meta.categoryId;
-						metaToPersistInOrder.push(categoryIdMeta);
-
-						const categoryTitleMeta = new VideoMetadata();
-						categoryTitleMeta.youtubeId = meta.videoId;
-						categoryTitleMeta.type = MetadataType.YT_CATEGORY_TITLE;
-						categoryTitleMeta.value = meta.categoryTitle;
-						metaToPersistInOrder.push(categoryTitleMeta);
-
-						for (const topic of meta.topicCategories) {
-							const metaData = new VideoMetadata();
-							metaData.youtubeId = meta.videoId;
-							metaData.value = topic;
-							metaData.type = MetadataType.TOPIC_CATEGORY;
-							metaToPersistInOrder.push(metaData);
-						}
-
-						if (meta.tags) {
-							for (const tag of meta.tags) {
-								const metaData = new VideoMetadata();
-								metaData.youtubeId = meta.videoId;
-								metaData.value = tag;
-								metaData.type = MetadataType.TAG;
-								metaToPersistInOrder.push(metaData);
-							}
-						}
+						metaToPersistInOrder.push(...convertToVideoMetaData(meta));
 					}
 
 					if (persistMetas) {
@@ -459,6 +499,31 @@ export const makeCreateYouTubeApi = () => {
 
 				const cacheMemSizeBytes = getCacheMemSizeBytes();
 
+				if (metaMap.size !== youTubeIds.length) {
+					const message = `got meta-data back only for ${metaMap.size} of ${youTubeIds.length} videos`;
+
+					const missing: string[] = [];
+					for (const id of youTubeIds) {
+						if (!metaMap.has(id)) {
+							missing.push(id);
+						}
+					}
+
+					log(
+						'warning',
+						message,
+						'the missing ids are:',
+						missing,
+					);
+
+					log('debug', 'trying to fetch the missing meta again');
+					if (recurse) {
+						const meta = await this.getMetaFromVideoIds(missing, hl, false);
+						mergeInto(metaMap)(meta.data);
+						refetched = meta.data.size;
+					}
+				}
+
 				const stats: Stats = {
 					metadataRequestTimeMs: requestTimeMs,
 					failRate,
@@ -469,6 +534,7 @@ export const makeCreateYouTubeApi = () => {
 					cachedEntries: metaCache.size(),
 					hitRate,
 					overAllCacheHitRate: formatPct(totalCacheHitRate / numberOfCalls),
+					refetched,
 				};
 
 				log('info', 'meta data gotten from yt, stats:', stats);
