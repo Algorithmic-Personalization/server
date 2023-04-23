@@ -1,8 +1,8 @@
 import {type RouteDefinition} from '../lib/routeCreation';
 
-import {isParticipantRecord} from '../lib/participant';
 import Participant from '../models/participant';
 import {has} from '../../common/util';
+import {ExperimentArm} from '../../common/models/event';
 
 export type ParticipantData = {
 	arm: 'control' | 'treatment' | 0 | 1;
@@ -11,15 +11,8 @@ export type ParticipantData = {
 
 export const isParticipantData = (record: Record<string, string | number>): record is ParticipantData =>
 	has('code')(record)
-	&& has('arm')(record)
 	&& typeof record.code === 'string'
-	&& record.code.length > 0
-	&& (
-		record.arm === 'control'
-		|| record.arm === 'treatment'
-		|| record.arm === 0
-		|| record.arm === 1
-	);
+	&& record.code.length > 0;
 
 export const createParticipantDefinition: RouteDefinition<Participant> = {
 	verb: 'post',
@@ -42,13 +35,17 @@ export const createParticipantDefinition: RouteDefinition<Participant> = {
 
 		const participantEntity = new Participant();
 
-		if (participantData.arm === 0) {
-			participantData.arm = 'control';
-		} else if (participantData.arm === 1) {
-			participantData.arm = 'treatment';
+		if (!participantData.arm || participantData.arm === ExperimentArm.CONTROL) {
+			participantData.arm = ExperimentArm.CONTROL;
+		} else if (participantData.arm === 1 || participantData.arm === 'treatment') {
+			participantData.arm = ExperimentArm.TREATMENT;
+		} else {
+			log('warning', 'invalid participant arm', participantData);
+			throw new Error('invalid participant arm');
 		}
 
-		Object.assign(participantEntity, participantData);
+		participantEntity.arm = participantData.arm as ExperimentArm;
+		participantEntity.code = participantData.code;
 
 		return participantRepo.save(participantEntity);
 	},

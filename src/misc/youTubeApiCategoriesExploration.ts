@@ -26,6 +26,10 @@ const commands = new Map([
 
 const commandsNeedingDataSource = new Set(['scrape']);
 
+const sleep = async (ms: number): Promise<void> => new Promise(resolve => {
+	setTimeout(resolve, ms);
+});
+
 const env = (): 'production' | 'development' => {
 	const env = process.env.NODE_ENV;
 
@@ -49,7 +53,7 @@ const keypress = async (): Promise<string> => {
 	});
 };
 
-const scrape = async (dataSource: DataSource, log: LogFunction, api: YtApi): Promise<void> => {
+const scrape = async (dataSource: DataSource, log: LogFunction, api: YtApi, pauseBetweenBatches = 200): Promise<void> => {
 	log('gonna scrape!');
 
 	const query = dataSource
@@ -75,7 +79,7 @@ const scrape = async (dataSource: DataSource, log: LogFunction, api: YtApi): Pro
 	const input = await keypress();
 
 	if (input !== 'y') {
-		log('aborting');
+		log('aborting as requested by user');
 		process.exit(0);
 		return;
 	}
@@ -84,6 +88,8 @@ const scrape = async (dataSource: DataSource, log: LogFunction, api: YtApi): Pro
 	let nMetaAskedFor = 0;
 	let nMetaObtained = 0;
 	let refetched = 0;
+
+	let retrying = false;
 
 	for (let offset = 0; ; ++offset) {
 		try {
@@ -113,6 +119,23 @@ const scrape = async (dataSource: DataSource, log: LogFunction, api: YtApi): Pro
 			);
 			const {data, ...stats} = meta;
 
+			if (data.size > 0 && retrying) {
+				retrying = false;
+			}
+
+			if (data.size === 0) {
+				log('no meta-data obtained from the YouTube API, we\'re probably being rate-limited');
+				const extraPause = pauseBetweenBatches * 5;
+				// eslint-disable-next-line no-await-in-loop
+				await sleep(extraPause);
+				if (!retrying) {
+					retrying = true;
+					--offset;
+				}
+
+				continue;
+			}
+
 			nMetaObtained += data.size;
 			refetched += stats.refetched;
 
@@ -126,6 +149,9 @@ const scrape = async (dataSource: DataSource, log: LogFunction, api: YtApi): Pro
 			log('error while fetching videos from the db', e);
 			process.exit(1);
 		}
+
+		// eslint-disable-next-line no-await-in-loop
+		await sleep(pauseBetweenBatches);
 	}
 
 	const nowMissing = await query.getCount();
