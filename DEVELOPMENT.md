@@ -325,6 +325,8 @@ You can create a participant through the API by sending a `POST` request to to `
 }
 ```
 
+**Note**: the `arm` field can now also be `0` (or any other value that evaluates to `false` in JavaScript, including not being specified) for `control` and `1` for `treatment`
+
 As with all API calls, you must include a valid API token in your request, passed to the server with the `authorization` header.
 
 The API should reply with either

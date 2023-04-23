@@ -23,25 +23,41 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
     return (mod && mod.__esModule) ? mod : { "default": mod };
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.createParticipantDefinition = void 0;
-const participant_1 = require("../lib/participant");
-const participant_2 = __importDefault(require("../models/participant"));
+exports.createParticipantDefinition = exports.isParticipantData = void 0;
+const participant_1 = __importDefault(require("../models/participant"));
+const util_1 = require("../../common/util");
+const event_1 = require("../../common/models/event");
+const isParticipantData = (record) => (0, util_1.has)('code')(record)
+    && typeof record.code === 'string'
+    && record.code.length > 0;
+exports.isParticipantData = isParticipantData;
 exports.createParticipantDefinition = {
     verb: 'post',
     path: '/api/participant',
     makeHandler: ({ createLogger, dataSource }) => (req) => __awaiter(void 0, void 0, void 0, function* () {
         const log = createLogger(req.requestId);
         log('Received create participant request');
-        const _a = req.body, { id: _unused } = _a, participantPayload = __rest(_a, ["id"]);
-        if (!(0, participant_1.isParticipantRecord)(participantPayload)) {
+        const _a = req.body, { id: _unused } = _a, participantData = __rest(_a, ["id"]);
+        if (!(0, exports.isParticipantData)(participantData)) {
             throw new Error('Invalid participant record');
         }
-        const participantRepo = dataSource.getRepository(participant_2.default);
-        if (yield participantRepo.findOneBy({ code: participantPayload.code })) {
+        const participantRepo = dataSource.getRepository(participant_1.default);
+        if (yield participantRepo.findOneBy({ code: participantData.code })) {
             throw new Error('Participant with that code already exists, use the update endpoint (PUT method) if you want to update it');
         }
-        const participantEntity = new participant_2.default();
-        Object.assign(participantEntity, participantPayload);
+        const participantEntity = new participant_1.default();
+        if (!participantData.arm || participantData.arm === event_1.ExperimentArm.CONTROL) {
+            participantData.arm = event_1.ExperimentArm.CONTROL;
+        }
+        else if (participantData.arm === 1 || participantData.arm === 'treatment') {
+            participantData.arm = event_1.ExperimentArm.TREATMENT;
+        }
+        else {
+            log('warning', 'invalid participant arm', participantData);
+            throw new Error('invalid participant arm');
+        }
+        participantEntity.arm = participantData.arm;
+        participantEntity.code = participantData.code;
         return participantRepo.save(participantEntity);
     }),
 };
