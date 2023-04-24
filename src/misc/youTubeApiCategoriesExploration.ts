@@ -17,7 +17,7 @@ import {type LogFunction, makeCreateDefaultLogger} from '../server/lib/logger';
 
 import Video from '../server/models/video';
 
-import {asyncPerf, formatPct, pct} from '../util';
+import {asyncPerf, formatPct, pct, formatSize} from '../util';
 
 const commands = new Map([
 	['compare', 'will compare the categories set of different regions'],
@@ -53,14 +53,94 @@ const keypress = async (): Promise<string> => {
 	});
 };
 
-const scrape = async (dataSource: DataSource, log: LogFunction, api: YtApi, pauseBetweenBatches = 200): Promise<void> => {
+class RateLimiter {
+	#sleepTimes = [0, 100, 200, 400, 800, 1600, 3200, 6400, 12800];
+	#sleepIndex = 0;
+
+	constructor(public readonly log: LogFunction) {
+
+	}
+
+	async sleep(latestCallWasSuccessful: boolean): Promise<number> {
+		if (latestCallWasSuccessful) {
+			if (this.#sleepIndex > 0) {
+				--this.#sleepIndex;
+			}
+		} else if (this.#sleepIndex < this.#sleepTimes.length - 1) {
+			++this.#sleepIndex;
+		}
+
+		const t = this.getSleepTime();
+
+		if (t > 0) {
+			this.log('warning', `we're probably being rate-limited, sleeping for ${t} ms`);
+			await sleep(t);
+			return t;
+		}
+
+		return 0;
+	}
+
+	getSleepTime(): number {
+		return this.#sleepTimes[this.#sleepIndex];
+	}
+}
+
+type MemReport = {
+	tStart: Date;
+	maxHeapUsed: string;
+	maxHeapTime: Date;
+	minHeapUsed: string;
+	minHeapTime: Date;
+	deltaHeapUsed: string;
+};
+
+class MemWatcher {
+	#tStart = Date.now();
+	#minHeapUsed = Infinity;
+	#minHeapTime = 0;
+	#maxHeapUsed = 0;
+	#maxHeapTime = 0;
+
+	#interval: NodeJS.Timer;
+
+	constructor(public readonly intervalMs = 100) {
+		this.#interval = setInterval(() => {
+			const {heapUsed} = process.memoryUsage();
+
+			if (heapUsed < this.#minHeapUsed) {
+				this.#minHeapUsed = heapUsed;
+				this.#minHeapTime = Date.now();
+			} else if (heapUsed > this.#maxHeapUsed) {
+				this.#maxHeapUsed = heapUsed;
+				this.#maxHeapTime = Date.now();
+			}
+		}, intervalMs);
+	}
+
+	stop(): MemReport {
+		clearInterval(this.#interval);
+
+		return {
+			tStart: new Date(this.#tStart),
+			maxHeapUsed: formatSize(this.#maxHeapUsed),
+			maxHeapTime: new Date(this.#maxHeapTime),
+			minHeapUsed: formatSize(this.#minHeapUsed),
+			minHeapTime: new Date(this.#minHeapTime),
+			deltaHeapUsed: formatSize(this.#maxHeapUsed - this.#minHeapUsed),
+		};
+	}
+}
+
+const scrape = async (dataSource: DataSource, log: LogFunction, api: YtApi): Promise<void> => {
 	log('gonna scrape!');
 
 	const query = dataSource
 		.getRepository(Video)
 		.createQueryBuilder('v')
 		.select('distinct v.youtube_id')
-		.where('not exists (select 1 from video_metadata m where m.youtube_Id = v.youtube_Id)');
+		.where('not exists (select 1 from video_metadata m where m.youtube_Id = v.youtube_Id)')
+		.orderBy('v.youtube_id', 'ASC');
 
 	log('running query: ', query.getSql());
 	const youtubeIdsWithoutMetadataCount: number = await asyncPerf(
@@ -85,11 +165,13 @@ const scrape = async (dataSource: DataSource, log: LogFunction, api: YtApi, paus
 	}
 
 	const pageSize = 25;
-	let nMetaAskedFor = 0;
+	let nVideosQueried = 0;
 	let nMetaObtained = 0;
 	let refetched = 0;
+	let timeSlept = 0;
 
-	let retrying = false;
+	const rateLimiter = new RateLimiter(log);
+	const memWatcher = new MemWatcher();
 
 	for (let offset = 0; ; ++offset) {
 		try {
@@ -102,7 +184,7 @@ const scrape = async (dataSource: DataSource, log: LogFunction, api: YtApi, paus
 
 			const pageIds = videos.map(v => v.youtube_id);
 
-			nMetaAskedFor += pageIds.length;
+			nVideosQueried += pageIds.length;
 
 			log('fetched', videos.length, 'videos from the db:', pageIds);
 
@@ -119,20 +201,12 @@ const scrape = async (dataSource: DataSource, log: LogFunction, api: YtApi, paus
 			);
 			const {data, ...stats} = meta;
 
-			if (data.size > 0 && retrying) {
-				retrying = false;
-			}
+			const latestCallWasSuccessful = data.size > 0;
 
-			if (data.size === 0) {
-				log('no meta-data obtained from the YouTube API, we\'re probably being rate-limited');
-				const extraPause = pauseBetweenBatches * 5;
-				// eslint-disable-next-line no-await-in-loop
-				await sleep(extraPause);
-				if (!retrying) {
-					retrying = true;
-					--offset;
-				}
-
+			// eslint-disable-next-line no-await-in-loop
+			timeSlept += await rateLimiter.sleep(latestCallWasSuccessful);
+			if (!latestCallWasSuccessful) {
+				--offset;
 				continue;
 			}
 
@@ -140,6 +214,7 @@ const scrape = async (dataSource: DataSource, log: LogFunction, api: YtApi, paus
 			refetched += stats.refetched;
 
 			log('got meta-data for', data.size, 'videos with stats:', stats);
+			log('info', `${formatPct(pct(nMetaObtained, videoCount))} done`);
 
 			// We don't need to persist the meta-data here because the
 			// `getMetaFromVideoIds` method already does that for us.
@@ -149,10 +224,10 @@ const scrape = async (dataSource: DataSource, log: LogFunction, api: YtApi, paus
 			log('error while fetching videos from the db', e);
 			process.exit(1);
 		}
-
-		// eslint-disable-next-line no-await-in-loop
-		await sleep(pauseBetweenBatches);
 	}
+
+	const mem = memWatcher.stop();
+	log('info', 'memory usage stats:', mem);
 
 	const nowMissing = await query.getCount();
 	const finalPct = formatPct(pct(nowMissing, videoCount));
@@ -161,14 +236,26 @@ const scrape = async (dataSource: DataSource, log: LogFunction, api: YtApi, paus
 		log(
 			'warning',
 			'obtained only',
-			formatPct(pct(nMetaObtained, nMetaAskedFor)),
+			formatPct(pct(nMetaObtained, nVideosQueried)),
 			'of the meta-data we asked for',
+		);
+	}
+
+	log('counted', youtubeIdsWithoutMetadataCount, 'videos without meta-data and queried', nVideosQueried);
+	if (youtubeIdsWithoutMetadataCount !== nVideosQueried) {
+		log(
+			'warning',
+			'youtubeIdsWithoutMetadataCount !== nVideosQueried:',
+			'did not query the API for all the videos we thought we needed to.',
+			`only ${formatPct(pct(nVideosQueried, youtubeIdsWithoutMetadataCount))} of the videos were queried`,
 		);
 	}
 
 	if (refetched !== 0) {
 		log('warning', 'refetched', refetched, 'videos');
 	}
+
+	log('info', 'time slept for rate-limiting:', timeSlept, 'ms');
 
 	log('success', 'done!');
 };
