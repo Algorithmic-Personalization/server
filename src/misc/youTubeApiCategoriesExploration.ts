@@ -132,7 +132,7 @@ class MemWatcher {
 	}
 }
 
-const scrape = async (dataSource: DataSource, log: LogFunction, api: YtApi): Promise<void> => {
+const _scrape = async (dataSource: DataSource, log: LogFunction, api: YtApi, batchId: number): Promise<[number, number]> => {
 	log('gonna scrape!');
 
 	const query = dataSource
@@ -154,14 +154,14 @@ const scrape = async (dataSource: DataSource, log: LogFunction, api: YtApi): Pro
 	log('total video count:', videoCount);
 	log(`percentage of videos lacking meta-data: ${formatPct(pct(youtubeIdsWithoutMetadataCount, videoCount))}`);
 
-	log('press y to continue, anything else to abort');
+	if (batchId === 0) {
+		log('press y to continue, anything else to abort');
+		const input = await keypress();
 
-	const input = await keypress();
-
-	if (input !== 'y') {
-		log('aborting as requested by user');
-		process.exit(0);
-		return;
+		if (input !== 'y') {
+			log('aborting as requested by user');
+			return [0, 0];
+		}
 	}
 
 	const pageSize = 25;
@@ -171,7 +171,6 @@ const scrape = async (dataSource: DataSource, log: LogFunction, api: YtApi): Pro
 	let timeSlept = 0;
 
 	const rateLimiter = new RateLimiter(log);
-	const memWatcher = new MemWatcher();
 
 	for (let offset = 0; ; ++offset) {
 		try {
@@ -214,7 +213,7 @@ const scrape = async (dataSource: DataSource, log: LogFunction, api: YtApi): Pro
 			refetched += stats.refetched;
 
 			log('got meta-data for', data.size, 'videos with stats:', stats);
-			log('info', `${formatPct(pct(nMetaObtained, videoCount))} done`);
+			log('info', `${formatPct(pct(nMetaObtained, videoCount))} youtubeIdsWithoutMetadataCount`);
 
 			// We don't need to persist the meta-data here because the
 			// `getMetaFromVideoIds` method already does that for us.
@@ -222,12 +221,9 @@ const scrape = async (dataSource: DataSource, log: LogFunction, api: YtApi): Pro
 			++offset;
 		} catch (e) {
 			log('error while fetching videos from the db', e);
-			process.exit(1);
+			return [0, nMetaObtained];
 		}
 	}
-
-	const mem = memWatcher.stop();
-	log('info', 'memory usage stats:', mem);
 
 	const nowMissing = await query.getCount();
 	const finalPct = formatPct(pct(nowMissing, videoCount));
@@ -257,7 +253,39 @@ const scrape = async (dataSource: DataSource, log: LogFunction, api: YtApi): Pro
 
 	log('info', 'time slept for rate-limiting:', timeSlept, 'ms');
 
-	log('success', 'done!');
+	log('debug', 'batch', batchId, 'done');
+
+	return [nowMissing, nMetaObtained];
+};
+
+const scrape = async (dataSource: DataSource, log: LogFunction, api: YtApi) => {
+	let i = 0;
+	let missing: number;
+	let obtained: number;
+
+	const memWatcher = new MemWatcher();
+
+	do {
+		// eslint-disable-next-line no-await-in-loop
+		[missing, obtained] = await _scrape(dataSource, log, api, i);
+		++i;
+		if (missing !== 0) {
+			if (obtained > 0) {
+				log('warning', 'could not get all the meta-data in one go, trying again...');
+			} else {
+				log('error', 'no meta-data obtained, giving up');
+			}
+		}
+	} while (missing !== 0);
+
+	log('info', 'done scraping meta-data in', i, 'passes');
+
+	if (missing > 0) {
+		log('warning', 'still missing', missing, 'video meta-data');
+	}
+
+	const mem = memWatcher.stop();
+	log('info', 'memory usage stats:', mem);
 };
 
 // TODO: move this to a separate file, use in in server.ts because it
