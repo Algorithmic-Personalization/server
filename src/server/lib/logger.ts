@@ -37,6 +37,10 @@ export const makeCreateDefaultLogger = (f: WriteStream): CreateLogger => (reques
 				return str;
 			}
 
+			if (typeof arg === 'string') {
+				return arg;
+			}
+
 			return inspect(arg, {depth: null, colors: true});
 		})];
 
