@@ -58,12 +58,15 @@ class RateLimiter {
 	#sleepIndex = 0;
 	#maxAttemptsAtMaxSleep = 5;
 	#attemptsAtMaxSleepLeft: number;
+	#baseDelay = 100;
 
 	constructor(public readonly log: LogFunction) {
 		this.#attemptsAtMaxSleepLeft = this.#maxAttemptsAtMaxSleep;
 	}
 
 	async sleep(latestCallWasSuccessful: boolean): Promise<number> {
+		await sleep(this.#baseDelay);
+
 		if (latestCallWasSuccessful) {
 			this.#attemptsAtMaxSleepLeft = this.#maxAttemptsAtMaxSleep;
 
