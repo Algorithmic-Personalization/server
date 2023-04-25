@@ -176,7 +176,7 @@ const _scrape = async (dataSource: DataSource, log: LogFunction, api: YtApi, bat
 		try {
 			// eslint-disable-next-line no-await-in-loop
 			const videos: Array<{youtube_id: string}> = await asyncPerf(
-				async () => query.limit(pageSize).offset(offset * pageSize).getRawMany(),
+				async () => query.take(pageSize).offset(offset * pageSize).getRawMany(),
 				`attempting to fetch ${pageSize} videos at offset ${offset * pageSize} from the db`,
 				log,
 			);
