@@ -56,18 +56,24 @@ const keypress = async (): Promise<string> => {
 class RateLimiter {
 	#sleepTimes = [0, 100, 200, 400, 800, 1600, 3200, 6400, 12800];
 	#sleepIndex = 0;
+	#maxAttemptsAtMaxSleep = 5;
+	#attemptsAtMaxSleepLeft: number;
 
 	constructor(public readonly log: LogFunction) {
-
+		this.#attemptsAtMaxSleepLeft = this.#maxAttemptsAtMaxSleep;
 	}
 
 	async sleep(latestCallWasSuccessful: boolean): Promise<number> {
 		if (latestCallWasSuccessful) {
+			this.#attemptsAtMaxSleepLeft = this.#maxAttemptsAtMaxSleep;
+
 			if (this.#sleepIndex > 0) {
 				--this.#sleepIndex;
 			}
 		} else if (this.#sleepIndex < this.#sleepTimes.length - 1) {
 			++this.#sleepIndex;
+		} else if (this.#attemptsAtMaxSleepLeft > 0) {
+			--this.#attemptsAtMaxSleepLeft;
 		}
 
 		const t = this.getSleepTime();
@@ -83,6 +89,10 @@ class RateLimiter {
 
 	getSleepTime(): number {
 		return this.#sleepTimes[this.#sleepIndex];
+	}
+
+	isStuck(): boolean {
+		return this.#attemptsAtMaxSleepLeft === 0;
 	}
 }
 
@@ -164,7 +174,7 @@ const _scrape = async (dataSource: DataSource, log: LogFunction, api: YtApi, bat
 		}
 	}
 
-	const pageSize = 25;
+	const pageSize = 50;
 	let nVideosQueried = 0;
 	let nMetaObtained = 0;
 	let refetched = 0;
@@ -176,7 +186,7 @@ const _scrape = async (dataSource: DataSource, log: LogFunction, api: YtApi, bat
 		try {
 			// eslint-disable-next-line no-await-in-loop
 			const videos: Array<{youtube_id: string}> = await asyncPerf(
-				async () => query.take(pageSize).offset(offset * pageSize).getRawMany(),
+				async () => query.take(pageSize).limit(pageSize).offset(offset * pageSize).getRawMany(),
 				`attempting to fetch ${pageSize} videos at offset ${offset * pageSize} from the db`,
 				log,
 			);
@@ -205,6 +215,11 @@ const _scrape = async (dataSource: DataSource, log: LogFunction, api: YtApi, bat
 			// eslint-disable-next-line no-await-in-loop
 			timeSlept += await rateLimiter.sleep(latestCallWasSuccessful);
 			if (!latestCallWasSuccessful) {
+				if (rateLimiter.isStuck()) {
+					log('looks like we\'re stuck, aborting');
+					break;
+				}
+
 				--offset;
 				continue;
 			}
@@ -274,6 +289,7 @@ const scrape = async (dataSource: DataSource, log: LogFunction, api: YtApi) => {
 				log('warning', 'could not get all the meta-data in one go, trying again...');
 			} else {
 				log('error', 'no meta-data obtained, giving up');
+				break;
 			}
 		}
 	} while (missing !== 0);
