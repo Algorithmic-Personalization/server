@@ -320,7 +320,8 @@ const createDataSource = async (projectRootDir: string, log: LogFunction): Promi
 		throw new Error('Invalid docker-compose.yaml');
 	}
 
-	const outsideDocker = process.env.OUTSIDE_DOCKER !== 'false';
+	const insideDocker = process.env.INSIDE_DOCKER === 'true';
+	const outsideDocker = !insideDocker;
 	log(`we are running ${outsideDocker ? 'outside' : 'inside'} docker in ${env()} mode`);
 
 	const dbPortString = getString(['services', `${env()}-db`, 'ports', '0'])(dockerComposeConfig);
