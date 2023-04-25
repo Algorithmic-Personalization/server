@@ -145,7 +145,7 @@ class MemWatcher {
 	}
 }
 
-const _scrape = async (dataSource: DataSource, log: LogFunction, api: YtApi, batchId: number): Promise<[number, number]> => {
+const _scrape = async (dataSource: DataSource, log: LogFunction, api: YtApi, batchId: number): Promise<[number, number, boolean]> => {
 	log('gonna scrape!');
 
 	const query = dataSource
@@ -167,13 +167,15 @@ const _scrape = async (dataSource: DataSource, log: LogFunction, api: YtApi, bat
 	log('total video count:', videoCount);
 	log(`percentage of videos lacking meta-data: ${formatPct(pct(youtubeIdsWithoutMetadataCount, videoCount))}`);
 
+	let gotStuck = false;
+
 	if (batchId === 0) {
 		log('press y to continue, anything else to abort');
 		const input = await keypress();
 
 		if (input !== 'y') {
 			log('aborting as requested by user');
-			return [0, 0];
+			return [0, 0, false];
 		}
 	}
 
@@ -220,6 +222,7 @@ const _scrape = async (dataSource: DataSource, log: LogFunction, api: YtApi, bat
 			if (!latestCallWasSuccessful) {
 				if (rateLimiter.isStuck()) {
 					log('looks like we\'re stuck, aborting');
+					gotStuck = true;
 					break;
 				}
 
@@ -239,7 +242,7 @@ const _scrape = async (dataSource: DataSource, log: LogFunction, api: YtApi, bat
 			++offset;
 		} catch (e) {
 			log('error while fetching videos from the db', e);
-			return [0, nMetaObtained];
+			return [0, nMetaObtained, false];
 		}
 	}
 
@@ -273,22 +276,23 @@ const _scrape = async (dataSource: DataSource, log: LogFunction, api: YtApi, bat
 
 	log('debug', 'batch', batchId, 'done');
 
-	return [nowMissing, nMetaObtained];
+	return [nowMissing, nMetaObtained, !gotStuck];
 };
 
 const scrape = async (dataSource: DataSource, log: LogFunction, api: YtApi) => {
 	let i = 0;
 	let missing: number;
 	let obtained: number;
+	let shouldRetry: boolean;
 
 	const memWatcher = new MemWatcher();
 
 	do {
 		// eslint-disable-next-line no-await-in-loop
-		[missing, obtained] = await _scrape(dataSource, log, api, i);
+		[missing, obtained, shouldRetry] = await _scrape(dataSource, log, api, i);
 		++i;
 		if (missing !== 0) {
-			if (obtained > 0) {
+			if (obtained > 0 && shouldRetry) {
 				log('warning', 'could not get all the meta-data in one go, trying again...');
 			} else {
 				log('error', 'no meta-data obtained, giving up');
