@@ -346,6 +346,10 @@ const createDataSource = async (projectRootDir: string, log: LogFunction): Promi
 		database: dbDatabase,
 	};
 
+	const dbConfigForLog = {...dbConfig, password: '<masked>'};
+
+	log('info', 'dbConfig:', dbConfigForLog);
+
 	const ds = new DataSource({
 		type: 'postgres',
 		...dbConfig,
