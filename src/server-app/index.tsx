@@ -5,6 +5,9 @@ import {ThemeProvider} from '@mui/material';
 
 import {BrowserRouter} from 'react-router-dom';
 
+import {LocalizationProvider} from '@mui/x-date-pickers';
+import {AdapterDayjs} from '@mui/x-date-pickers/AdapterDayjs';
+
 import theme from './theme';
 import AdminApiProvider, {serverUrl} from './adminApiProvider';
 import {createAdminApi} from './adminApi';
@@ -27,11 +30,13 @@ const App: React.FC = () => {
 				<AdminApiProvider value={createAdminApi(serverUrl, () => {
 					setLoginModalOpen(true);
 				})}>
-					<LoginModalC
-						open={loginModalOpen}
-						setOpen={setLoginModalOpen}
-					/>
-					<Server />
+					<LocalizationProvider dateAdapter={AdapterDayjs}>
+						<LoginModalC
+							open={loginModalOpen}
+							setOpen={setLoginModalOpen}
+						/>
+						<Server />
+					</LocalizationProvider>
 				</AdminApiProvider>
 			</BrowserRouter>
 		</ThemeProvider>

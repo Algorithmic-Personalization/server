@@ -32,6 +32,7 @@ import EventsC from './EventsP';
 import TokenC from './ApiTokenCreationP';
 import NotFoundC from './NotFoundP';
 import UserWidgetC from './shared/UserWidgetC';
+import MonitoringC from './Monitoring';
 
 type NavItem = {
 	label: string;
@@ -64,6 +65,11 @@ const navItems: NavItem[] = [
 		label: 'API Tokens',
 		link: '/tokens',
 		component: TokenC,
+	},
+	{
+		label: 'Monitoring',
+		link: '/monitoring',
+		component: MonitoringC,
 	},
 ];
 
