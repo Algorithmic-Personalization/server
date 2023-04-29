@@ -221,80 +221,84 @@ const ListC: React.FC = () => {
 
 	const list = (
 		<Box>
-			<Box sx={{
-				mb: 2,
-				display: 'flex',
-				alignItems: 'stretch',
-				flexDirection: 'column',
-				width: 'max-content',
-				gap: 1,
-			}}>
-				<TextField
-					value={codeLike}
-					onChange={e => {
-						setCodeLike(e.target.value);
-						setPageInput('1');
-					}}
-					sx={{display: 'block'}}
-					label='Search participant by email'
-					InputProps={{
-						endAdornment: (
-							<InputAdornment position='end'>
-								<SearchIcon/>
-							</InputAdornment>
-						),
-					}}
-				/>
-				<FormControl>
-					<InputLabel id='participant-phase-search'>Filter by phase</InputLabel>
-					<Select
-						labelId='participant-phase-search'
-						label='Filter by phase'
+			<Box sx={{display: {xl: 'flex'}, gap: 2, alignItems: 'top'}}>
+				<Box sx={{
+					mb: 2,
+					display: 'flex',
+					alignItems: 'stretch',
+					flexDirection: 'column',
+					width: 'max-content',
+					gap: 1,
+				}}>
+					<TextField
+						value={codeLike}
 						onChange={e => {
-							setPhase(e.target.value as Phase);
+							setCodeLike(e.target.value);
 							setPageInput('1');
 						}}
-						value={phase}
-					>
-						<MenuItem value={-1}>Any</MenuItem>
-						<MenuItem value={Phase.PRE_EXPERIMENT}>Pre-Experiment</MenuItem>
-						<MenuItem value={Phase.EXPERIMENT}>Experiment</MenuItem>
-						<MenuItem value={Phase.POST_EXPERIMENT}>Post-Experiment</MenuItem>
-					</Select>
-				</FormControl>
-				<FormControl>
-					<InputLabel id='participant-extension-installed-search'>Extension installed</InputLabel>
-					<Select
-						labelId='participant-extension-installed-search'
-						label='Extension installed'
-						onChange={e => {
-							setExtensionInstalled(e.target.value as 'yes' | 'no' | 'any');
-							setPageInput('1');
-						}}
-						value={extensionInstalled}
-					>
-						<MenuItem value='any'>Any</MenuItem>
-						<MenuItem value='yes'>Yes</MenuItem>
-						<MenuItem value='no'>No</MenuItem>
-					</Select>
-				</FormControl>
-				<Box sx={{display: 'flex', alignItems: 'center'}}>
-					<Typography variant='body2'>Page&nbsp;</Typography>
-					<input
-						type='number'
-						value={pageInputOk ? page : pageInput}
-						min={1}
-						max={participants.pageCount}
-						step={1}
-						onChange={e => {
-							setPageInput(e.target.value);
+						sx={{display: 'block'}}
+						label='Search participant by email'
+						InputProps={{
+							endAdornment: (
+								<InputAdornment position='end'>
+									<SearchIcon/>
+								</InputAdornment>
+							),
 						}}
 					/>
-					<Typography variant='body2'>&nbsp;/&nbsp;</Typography>
-					<Typography variant='body2'>{participants.pageCount}&nbsp;({participants.count} total)</Typography>
+					<FormControl>
+						<InputLabel id='participant-phase-search'>Filter by phase</InputLabel>
+						<Select
+							labelId='participant-phase-search'
+							label='Filter by phase'
+							onChange={e => {
+								setPhase(e.target.value as Phase);
+								setPageInput('1');
+							}}
+							value={phase}
+						>
+							<MenuItem value={-1}>Any</MenuItem>
+							<MenuItem value={Phase.PRE_EXPERIMENT}>Pre-Experiment</MenuItem>
+							<MenuItem value={Phase.EXPERIMENT}>Experiment</MenuItem>
+							<MenuItem value={Phase.POST_EXPERIMENT}>Post-Experiment</MenuItem>
+						</Select>
+					</FormControl>
+					<FormControl>
+						<InputLabel id='participant-extension-installed-search'>Extension installed</InputLabel>
+						<Select
+							labelId='participant-extension-installed-search'
+							label='Extension installed'
+							onChange={e => {
+								setExtensionInstalled(e.target.value as 'yes' | 'no' | 'any');
+								setPageInput('1');
+							}}
+							value={extensionInstalled}
+						>
+							<MenuItem value='any'>Any</MenuItem>
+							<MenuItem value='yes'>Yes</MenuItem>
+							<MenuItem value='no'>No</MenuItem>
+						</Select>
+					</FormControl>
+					<Box sx={{display: 'flex', alignItems: 'center'}}>
+						<Typography variant='body2'>Page&nbsp;</Typography>
+						<input
+							type='number'
+							value={pageInputOk ? page : pageInput}
+							min={1}
+							max={participants.pageCount}
+							step={1}
+							onChange={e => {
+								setPageInput(e.target.value);
+							}}
+						/>
+						<Typography variant='body2'>&nbsp;/&nbsp;</Typography>
+						<Typography variant='body2'>{participants.pageCount}&nbsp;({participants.count} total)</Typography>
+					</Box>
+				</Box>
+				<Box sx={{flexGrow: 1}}>
+					<TableC items={participants.results}/>
 				</Box>
 			</Box>
-			<TableC items={participants.results}/>
 		</Box>
 	);
 
