@@ -1,4 +1,5 @@
 import {
+	And,
 	MoreThan,
 	LessThanOrEqual,
 	type DataSource,
@@ -49,11 +50,14 @@ const getMostViewedPages = (dataSource: DataSource, log: LogFunction) => async (
 			.from(Event, 'e')
 			.groupBy('url')
 			.orderBy('count(*)', 'DESC')
-			.where([
-				{createdAt: MoreThan(fromDate)},
-				{createdAt: LessThanOrEqual(toDate)},
-				{type: 'PAGE_VIEW'},
-			]),
+			.where({
+				createdAt: And(
+					MoreThan(fromDate),
+					LessThanOrEqual(toDate),
+				),
+			}).andWhere({
+				type: 'PAGE_VIEW',
+			}),
 	).getRawMany();
 
 	const mostViewedPages: ViewCount[] = [];
@@ -102,11 +106,12 @@ const getReport = (dataSource: DataSource, log: LogFunction) => async ({fromDate
 	const requestRepo = dataSource.getRepository(RequestLog);
 
 	const nPagesViewed = await requestRepo.count({
-		where: [{
-			createdAt: MoreThan(fromDate),
-		}, {
-			createdAt: LessThanOrEqual(toDate),
-		}],
+		where: {
+			createdAt: And(
+				MoreThan(fromDate),
+				LessThanOrEqual(toDate),
+			),
+		},
 	});
 
 	const data = await show(
@@ -114,10 +119,11 @@ const getReport = (dataSource: DataSource, log: LogFunction) => async ({fromDate
 			.select('count(distinct participant_code)', 'nUniqueParticipants')
 			.from(Event, 'e')
 			.innerJoin(Session, 's', 'e.session_uuid = s.uuid')
-			.where([
-				{createdAt: MoreThan(fromDate)},
-				{createdAt: LessThanOrEqual(toDate)},
-			]),
+			.where({
+				createdAt: And(
+					MoreThan(fromDate),
+					LessThanOrEqual(toDate),
+				)}),
 	).getRawOne() as unknown;
 
 	log('info', 'got data for number of unique participants:', data);
@@ -147,24 +153,19 @@ const getReport = (dataSource: DataSource, log: LogFunction) => async ({fromDate
 const getQuery = (query: ParsedQs): MonitoringQuery => {
 	const {fromDate: fromMs, toDate: toMs} = query;
 
-	if (typeof fromMs !== 'number') {
-		throw new Error('Missing fromDate');
+	const from = Number(fromMs);
+	const to = Number(toMs);
+
+	if (isNaN(from)) {
+		throw new Error('invalid fromDate');
 	}
 
-	if (isNaN(fromMs)) {
-		throw new Error('Invalid fromDate');
+	if (isNaN(to)) {
+		throw new Error('invalid toDate');
 	}
 
-	if (typeof toMs !== 'number') {
-		throw new Error('Missing toDate');
-	}
-
-	if (isNaN(toMs)) {
-		throw new Error('Invalid toDate');
-	}
-
-	const fromDate = new Date(fromMs);
-	const toDate = new Date(toMs);
+	const fromDate = new Date(from);
+	const toDate = new Date(to);
 
 	return {
 		fromDate,
@@ -188,7 +189,7 @@ export const monitoringDefinition: RouteDefinition<MonitoringReport> = {
 	makeHandler: ({createLogger, dataSource}) => async (req): Promise<MonitoringReport> => {
 		const log = createLogger(req.requestId);
 
-		log('info', 'received monitoring request');
+		log('info', 'received monitoring request', req.query);
 
 		let query: MonitoringQuery;
 
