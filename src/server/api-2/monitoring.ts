@@ -52,6 +52,7 @@ const getMostViewedPages = (dataSource: DataSource, log: LogFunction) => async (
 			.where([
 				{createdAt: MoreThan(fromDate)},
 				{createdAt: LessThanOrEqual(toDate)},
+				{type: 'PAGE_VIEW'},
 			]),
 	).getRawMany();
 
