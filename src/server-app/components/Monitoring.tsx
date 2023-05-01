@@ -107,6 +107,7 @@ const ReportC: React.FC<{data: MonitoringReport}> = ({data}) => (
 		<Typography variant='h3'>Report</Typography>
 		<Typography variant='body1' sx={{mb: 2}}>Unique active participants: {data.nUniqueParticipants}</Typography>
 		<Typography variant='body1' sx={{mb: 2}}>Total number of pages viewed: {data.nPagesViewed}</Typography>
+		<Typography variant='body1' sx={{mb: 2}}>Average request latency: {data.averageLatency} ms</Typography>
 
 		<Typography variant='h4'>Most viewed pages</Typography>
 		<ShareTableC items={addShare(groupByUrlType(data.mostViewedPages))}/>

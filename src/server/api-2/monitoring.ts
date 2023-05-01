@@ -27,6 +27,7 @@ export type MonitoringReport = {
 	nPagesViewed: number;
 	nUniqueParticipants: number;
 	mostViewedPages: ViewCount[];
+	averageLatency: number;
 };
 
 export type MonitoringQuery = {
@@ -114,6 +115,33 @@ const getReport = (dataSource: DataSource, log: LogFunction) => async ({fromDate
 		},
 	});
 
+	const averageLatencyRes = await show(
+		requestRepo.createQueryBuilder()
+			.select('avg(latency)', 'averageLatency')
+			.where({
+				createdAt: And(
+					MoreThan(fromDate),
+					LessThanOrEqual(toDate),
+				),
+			}),
+	).getRawOne() as unknown;
+
+	if (typeof averageLatencyRes !== 'object' || !averageLatencyRes) {
+		log('error', 'Unexpected result from query: not an object', averageLatencyRes);
+		throw new Error('Unexpected result from query: not an object');
+	}
+
+	if (!has('averageLatency')(averageLatencyRes)) {
+		log('error', 'Unexpected result from query: missing averageLatency', averageLatencyRes);
+		throw new Error('Unexpected result from query: missing averageLatency');
+	}
+
+	const averageLatency = Number(averageLatencyRes.averageLatency);
+	if (isNaN(averageLatency)) {
+		log('error', 'Unexpected result from query: averageLatency is not a number', averageLatencyRes);
+		throw new Error('Unexpected result from query: averageLatency is not a number');
+	}
+
 	const data = await show(
 		dataSource.createQueryBuilder()
 			.select('count(distinct participant_code)', 'nUniqueParticipants')
@@ -147,6 +175,7 @@ const getReport = (dataSource: DataSource, log: LogFunction) => async ({fromDate
 		nPagesViewed,
 		nUniqueParticipants,
 		mostViewedPages,
+		averageLatency,
 	};
 };
 
