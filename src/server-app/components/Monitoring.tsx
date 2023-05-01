@@ -42,7 +42,7 @@ const shareDescriptor: TableDescriptor<UrlAndShare> = {
 		...mostViewedDescriptor.headers,
 		{
 			key: 'share',
-			element: 'share of total',
+			element: 'Share of total',
 		},
 	],
 	rows: e => ({
