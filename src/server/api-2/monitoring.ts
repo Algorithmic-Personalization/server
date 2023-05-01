@@ -150,18 +150,26 @@ const getReport = (dataSource: DataSource, log: LogFunction) => async ({fromDate
 	};
 };
 
-const getQuery = (query: ParsedQs): MonitoringQuery => {
+const createGetQuery = (log: LogFunction) => (query: ParsedQs): MonitoringQuery | undefined => {
 	const {fromDate: fromMs, toDate: toMs} = query;
 
 	const from = Number(fromMs);
 	const to = Number(toMs);
 
+	let ok = true;
+
 	if (isNaN(from)) {
-		throw new Error('invalid fromDate');
+		log('getQuery: invalid fromDate');
+		ok = false;
 	}
 
 	if (isNaN(to)) {
-		throw new Error('invalid toDate');
+		log('getQuery: invalid toDate');
+		ok = false;
+	}
+
+	if (!ok) {
+		return undefined;
 	}
 
 	const fromDate = new Date(from);
@@ -190,15 +198,9 @@ export const monitoringDefinition: RouteDefinition<MonitoringReport> = {
 		const log = createLogger(req.requestId);
 
 		log('info', 'received monitoring request', req.query);
+		const getQuery = createGetQuery(log);
 
-		let query: MonitoringQuery;
-
-		try {
-			query = getQuery(req.query);
-		} catch (e) {
-			query = getDefaultQuery();
-			log('warning', 'invalid query for report:', e);
-		}
+		const query = getQuery(req.query) ?? getDefaultQuery();
 
 		const report = getReport(dataSource, log);
 
