@@ -23,6 +23,8 @@ export const createParticipantDefinition: RouteDefinition<Participant> = {
 
 		const {id: _unused, ...participantData} = req.body as Record<string, string>;
 
+		log('info', 'new participant data', participantData);
+
 		if (!isParticipantData(participantData)) {
 			throw new Error('Invalid participant record');
 		}
