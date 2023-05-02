@@ -11,6 +11,10 @@ services:
       PM2_PUBLIC_KEY: a public key for pm2 or disable
       PM2_SECRET_KEY: a secret key for pm2 or disable
     command: yarn serve
+    volumes:
+        - type: bind
+          source: ./logs
+          target: /root/ytdpnl/logs
 
   production-db:
     image: postgres
