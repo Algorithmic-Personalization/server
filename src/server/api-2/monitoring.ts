@@ -117,7 +117,7 @@ const getReport = (dataSource: DataSource, log: LogFunction) => async ({fromDate
 
 	const averageLatencyRes = await show(
 		requestRepo.createQueryBuilder()
-			.select('avg(latency)', 'averageLatency')
+			.select('avg(latency_ms)', 'averageLatency')
 			.where({
 				createdAt: And(
 					MoreThan(fromDate),
