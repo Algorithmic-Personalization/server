@@ -5,7 +5,7 @@ import {has} from '../../common/util';
 import {ExperimentArm} from '../../common/models/event';
 
 export type ParticipantData = {
-	arm: 'control' | 'treatment' | 0 | 1;
+	arm: 'control' | 'treatment' | 0 | 1 | '0' | '1';
 	code: string;
 };
 
@@ -37,9 +37,9 @@ export const createParticipantDefinition: RouteDefinition<Participant> = {
 
 		const participantEntity = new Participant();
 
-		if (!participantData.arm || participantData.arm === ExperimentArm.CONTROL) {
+		if (!participantData.arm || participantData.arm === ExperimentArm.CONTROL || participantData.arm === '0') {
 			participantData.arm = ExperimentArm.CONTROL;
-		} else if (participantData.arm === 1 || participantData.arm === 'treatment') {
+		} else if (participantData.arm === 1 || participantData.arm === ExperimentArm.TREATMENT || participantData.arm === '1') {
 			participantData.arm = ExperimentArm.TREATMENT;
 		} else {
 			log('warning', 'invalid participant arm', participantData);

@@ -47,10 +47,10 @@ exports.createParticipantDefinition = {
             throw new Error('Participant with that code already exists, use the update endpoint (PUT method) if you want to update it');
         }
         const participantEntity = new participant_1.default();
-        if (!participantData.arm || participantData.arm === event_1.ExperimentArm.CONTROL) {
+        if (!participantData.arm || participantData.arm === event_1.ExperimentArm.CONTROL || participantData.arm === '0') {
             participantData.arm = event_1.ExperimentArm.CONTROL;
         }
-        else if (participantData.arm === 1 || participantData.arm === 'treatment') {
+        else if (participantData.arm === 1 || participantData.arm === event_1.ExperimentArm.TREATMENT || participantData.arm === '1') {
             participantData.arm = event_1.ExperimentArm.TREATMENT;
         }
         else {
