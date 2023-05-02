@@ -9,6 +9,7 @@ import {type Event} from '../common/models/event';
 import {type TransitionSetting} from '../server/models/transitionSetting';
 import type ParticipantOverview from '../server/projections/ParticipantOverview';
 import type EventOverview from '../server/projections/EventOverview';
+import {type MonitoringQuery, type MonitoringReport} from '../server/api-2/monitoring';
 
 import {
 	postRegister,
@@ -42,6 +43,10 @@ import {
 import {
 	updateParticipantDefinition,
 } from '../server/api-2/updateParticipant';
+
+import {
+	monitoringDefinition,
+} from '../server/api-2/monitoring';
 
 import {
 	type Maybe,
@@ -79,6 +84,7 @@ export type AdminApi = {
 	createTransitionSetting: (setting: TransitionSetting) => Promise<Maybe<TransitionSetting>>;
 	getTransitionSetting: (from: number, to: number) => Promise<Maybe<TransitionSetting>>;
 	updateParticipantPhase: (participantCode: string, phase: number) => Promise<Maybe<Participant>>;
+	getMonitoringReport: (q: MonitoringQuery) => Promise<Maybe<MonitoringReport>>;
 };
 
 const loadItem = <T>(key: string): T | undefined => {
@@ -265,6 +271,16 @@ export const createAdminApi = (serverUrl: string, showLoginModal?: () => void): 
 				{phase},
 				headers(),
 			);
+		},
+
+		async getMonitoringReport(q: MonitoringQuery) {
+			const {path} = monitoringDefinition;
+			const query = {
+				...q,
+				fromDate: q.fromDate.getTime(),
+				toDate: q.toDate.getTime(),
+			};
+			return get<MonitoringReport>(path, query, headers());
 		},
 	};
 };
