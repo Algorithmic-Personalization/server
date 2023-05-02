@@ -25,4 +25,5 @@ const loadConfigYamlRaw = () => __awaiter(void 0, void 0, void 0, function* () {
     return config;
 });
 exports.loadConfigYamlRaw = loadConfigYamlRaw;
+exports.default = exports.loadConfigYamlRaw;
 //# sourceMappingURL=loadConfigYamlRaw.js.map

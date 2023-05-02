@@ -112,8 +112,8 @@ export const startJobs = async ({
 		});
 	};
 
-	runAt(1, 0, log)(doBackup, 'backup');
-	runAt(1, 15, log)(doUploadBackup, 'upload backup');
+	runAt(11, 40, log)(doBackup, 'backup');
+	runAt(11, 45, log)(doUploadBackup, 'upload backup');
 };
 
 export default startJobs;

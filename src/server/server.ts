@@ -103,16 +103,19 @@ import getYouTubeConfig from './lib/config-loader/getYouTubeConfig';
 import entities from './entities';
 import {loadConfigYamlRaw} from './lib/config-loader/loadConfigYamlRaw';
 
-import startJobs, {type JobsContext} from './jobs';
-import {stringFromMaybeError} from '../util';
-
 export type Env = 'production' | 'development';
 
-const env = process.env.NODE_ENV as Env;
+export const getEnv = (): Env => {
+	const env = process.env.NODE_ENV;
 
-if (env !== 'production' && env !== 'development') {
-	throw new Error('NODE_ENV must be set to "production" or "development"');
-}
+	if (env !== 'production' && env !== 'development') {
+		throw new Error('NODE_ENV must be set explicitly to either "production" or "development"');
+	}
+
+	return env;
+};
+
+const env = getEnv();
 
 const upload = multer();
 
@@ -126,9 +129,11 @@ const slowQueries = io.meter({
 	id: 'app/realtime/slowQueries',
 });
 
+export const logsDirName = 'logs';
+
 const main = async () => {
 	const root = await findPackageJsonDir(__dirname);
-	const logsPath = join(root, 'logs', 'server.log');
+	const logsPath = join(root, logsDirName, 'server.log');
 	const logStream = createWriteStream(logsPath, {flags: 'a'});
 	const config = await loadConfigYamlRaw();
 
@@ -268,25 +273,6 @@ const main = async () => {
 		text: `YTDPNL server started in ${env} mode`,
 	}).catch(err => {
 		log('error', 'an error occurred while sending a startup email', err);
-	});
-
-	const jobsContext: JobsContext = {
-		mailerFrom: routeContext.mailerFrom,
-		env,
-		mailer,
-		log: createLogger('<jobs>'),
-	};
-
-	startJobs(jobsContext).catch(err => {
-		log('error', 'an error cancelled the CRONs', err);
-		mailer.sendMail({
-			from: smtpConfig.auth.user,
-			to: 'fm.de.jouvencel@gmail.com',
-			subject: 'An error cancelled the CRONs in YTDPNL',
-			text: stringFromMaybeError(err),
-		}).catch(err => {
-			log('error', 'an error occurred while sending an error email', err);
-		});
 	});
 
 	const makeHandler = makeExpressHandlerCreator(routeContext);

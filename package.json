@@ -22,7 +22,8 @@
     "dev": "./dev",
     "serve": "NODE_ENV=production yarn pm2-runtime build/src/server/server.js",
     "scrape-api": "ts-node src/misc/youTubeApiCategoriesExploration.ts scrape",
-    "prod-scrape-api": "NODE_ENV=production INSIDE_DOCKER=true ts-node src/misc/youTubeApiCategoriesExploration.ts scrape"
+    "prod-scrape-api": "NODE_ENV=production INSIDE_DOCKER=true ts-node src/misc/youTubeApiCategoriesExploration.ts scrape",
+    "start-cron": "NODE_ENV=production node build/src/misc/cron.js"
   },
   "devDependencies": {
     "@jest/globals": "^29.5.0",

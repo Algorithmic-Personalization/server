@@ -20,3 +20,5 @@ export const loadConfigYamlRaw = async (): Promise<RawConfig> => {
 
 	return config as RawConfig;
 };
+
+export default loadConfigYamlRaw;

@@ -87,8 +87,8 @@ const startJobs = ({ log, env, mailer, mailerFrom, }) => __awaiter(void 0, void 
             });
         });
     };
-    runAt(1, 0, log)(doBackup, 'backup');
-    runAt(1, 15, log)(doUploadBackup, 'upload backup');
+    runAt(11, 40, log)(doBackup, 'backup');
+    runAt(11, 45, log)(doUploadBackup, 'upload backup');
 });
 exports.startJobs = startJobs;
 exports.default = exports.startJobs;
