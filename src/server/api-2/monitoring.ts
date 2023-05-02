@@ -136,7 +136,7 @@ const getReport = (dataSource: DataSource, log: LogFunction) => async ({fromDate
 		throw new Error('Unexpected result from query: missing averageLatency');
 	}
 
-	const averageLatency = Number(averageLatencyRes.averageLatency);
+	const averageLatency = Math.round(Number(averageLatencyRes.averageLatency));
 	if (isNaN(averageLatency)) {
 		log('error', 'Unexpected result from query: averageLatency is not a number', averageLatencyRes);
 		throw new Error('Unexpected result from query: averageLatency is not a number');
