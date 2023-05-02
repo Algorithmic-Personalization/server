@@ -343,7 +343,7 @@ or, in case of error:
 
 ```json
 {
-  "kind": "Error",
+  "kind": "Failure",
   "message": "Some error message"
 }
 ```
