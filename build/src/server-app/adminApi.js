@@ -15,6 +15,7 @@ const getActivityReport_1 = require("../server/api-2/getActivityReport");
 const createTransitionSetting_1 = require("../server/api-2/createTransitionSetting");
 const getTransitionSetting_1 = require("../server/api-2/getTransitionSetting");
 const updateParticipant_1 = require("../server/api-2/updateParticipant");
+const monitoring_1 = require("../server/api-2/monitoring");
 const util_1 = require("../common/util");
 const loadItem = (key) => {
     const item = sessionStorage.getItem(key);
@@ -192,6 +193,13 @@ const createAdminApi = (serverUrl, showLoginModal) => {
             return __awaiter(this, void 0, void 0, function* () {
                 const { path } = updateParticipant_1.updateParticipantDefinition;
                 return put(path.replace(':code', participantCode), { phase }, headers());
+            });
+        },
+        getMonitoringReport(q) {
+            return __awaiter(this, void 0, void 0, function* () {
+                const { path } = monitoring_1.monitoringDefinition;
+                const query = Object.assign(Object.assign({}, q), { fromDate: q.fromDate.getTime(), toDate: q.toDate.getTime() });
+                return get(path, query, headers());
             });
         },
     };

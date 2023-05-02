@@ -70,6 +70,7 @@ const updateParticipant_1 = __importDefault(require("./api-2/updateParticipant")
 const getActivityReport_1 = __importDefault(require("./api-2/getActivityReport"));
 const createTransitionSetting_1 = __importDefault(require("./api-2/createTransitionSetting"));
 const getTransitionSetting_1 = __importDefault(require("./api-2/getTransitionSetting"));
+const monitoring_1 = __importDefault(require("./api-2/monitoring"));
 const getInstalledEventConfig_1 = __importDefault(require("./lib/config-loader/getInstalledEventConfig"));
 const getYouTubeConfig_1 = __importDefault(require("./lib/config-loader/getYouTubeConfig"));
 // DO NOT FORGET TO UPDATE THIS FILE WHEN ADDING NEW ENTITIES
@@ -279,6 +280,7 @@ const main = () => __awaiter(void 0, void 0, void 0, function* () {
     defineAdminRoute(createTransitionSetting_1.default);
     defineAdminRoute(getTransitionSetting_1.default);
     defineAdminRoute(updateParticipant_1.default);
+    defineAdminRoute(monitoring_1.default);
     app.post(serverRoutes_1.postRegister, (0, register_1.default)(routeContext));
     app.get(serverRoutes_1.getVerifyEmailToken, (0, verifyEmail_1.default)(routeContext));
     app.post(serverRoutes_1.postLogin, (0, login_1.default)(routeContext));
