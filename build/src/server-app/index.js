@@ -30,6 +30,8 @@ const react_1 = __importStar(require("react"));
 const client_1 = require("react-dom/client");
 const material_1 = require("@mui/material");
 const react_router_dom_1 = require("react-router-dom");
+const x_date_pickers_1 = require("@mui/x-date-pickers");
+const AdapterDayjs_1 = require("@mui/x-date-pickers/AdapterDayjs");
 const theme_1 = __importDefault(require("./theme"));
 const adminApiProvider_1 = __importStar(require("./adminApiProvider"));
 const adminApi_1 = require("./adminApi");
@@ -47,8 +49,9 @@ const App = () => {
                 react_1.default.createElement(adminApiProvider_1.default, { value: (0, adminApi_1.createAdminApi)(adminApiProvider_1.serverUrl, () => {
                         setLoginModalOpen(true);
                     }) },
-                    react_1.default.createElement(LoginModalP_1.default, { open: loginModalOpen, setOpen: setLoginModalOpen }),
-                    react_1.default.createElement(Server_1.default, null))))));
+                    react_1.default.createElement(x_date_pickers_1.LocalizationProvider, { dateAdapter: AdapterDayjs_1.AdapterDayjs },
+                        react_1.default.createElement(LoginModalP_1.default, { open: loginModalOpen, setOpen: setLoginModalOpen }),
+                        react_1.default.createElement(Server_1.default, null)))))));
 };
 (0, client_1.createRoot)(elt).render(react_1.default.createElement(App, null));
 //# sourceMappingURL=index.js.map

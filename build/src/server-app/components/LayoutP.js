@@ -39,6 +39,7 @@ const EventsP_1 = __importDefault(require("./EventsP"));
 const ApiTokenCreationP_1 = __importDefault(require("./ApiTokenCreationP"));
 const NotFoundP_1 = __importDefault(require("./NotFoundP"));
 const UserWidgetC_1 = __importDefault(require("./shared/UserWidgetC"));
+const Monitoring_1 = __importDefault(require("./Monitoring"));
 const navItems = [
     {
         label: 'Home',
@@ -64,6 +65,11 @@ const navItems = [
         label: 'API Tokens',
         link: '/tokens',
         component: ApiTokenCreationP_1.default,
+    },
+    {
+        label: 'Monitoring',
+        link: '/monitoring',
+        component: Monitoring_1.default,
     },
 ];
 const LayoutC = () => {

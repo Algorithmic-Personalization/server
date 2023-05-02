@@ -38,6 +38,7 @@ exports.createParticipantDefinition = {
         const log = createLogger(req.requestId);
         log('Received create participant request');
         const _a = req.body, { id: _unused } = _a, participantData = __rest(_a, ["id"]);
+        log('info', 'new participant data', participantData);
         if (!(0, exports.isParticipantData)(participantData)) {
             throw new Error('Invalid participant record');
         }

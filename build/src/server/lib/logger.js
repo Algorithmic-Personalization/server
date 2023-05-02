@@ -25,6 +25,9 @@ const makeCreateDefaultLogger = (f) => (requestIdOrId) => (...args) => {
                 }
                 return str;
             }
+            if (typeof arg === 'string') {
+                return arg;
+            }
             return (0, util_1.inspect)(arg, { depth: null, colors: true });
         })];
     console.log(...parts);

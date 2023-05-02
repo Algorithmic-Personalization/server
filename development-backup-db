@@ -1,0 +1,14 @@
+#!/bin/env bash
+echo "Backing up database..."
+export COMPOSE_INTERACTIVE_NO_CLI=1
+docker-compose exec development-db pg_dump -U admin -f ytdpnl.tar -F t ytdpnl || exit 1
+container_id=$(docker-compose ps -q development-db | tr -d '\r\n')
+echo "Container id ($container_id) found."
+d=$(date +%Y-%m-%d)
+target="$(pwd)/development-ytdpnl-$d.tar"
+echo "Copying backup from container $container_id to host: $target..."
+docker cp "$container_id":/ytdpnl.tar "$target" || exit 2
+echo "Removing backup from container..."
+docker-compose exec development-db rm ytdpnl.tar || exit 3
+echo "Backup done:"
+echo "$target"

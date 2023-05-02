@@ -8,6 +8,17 @@ var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, ge
         step((generator = generator.apply(thisArg, _arguments || [])).next());
     });
 };
+var __classPrivateFieldGet = (this && this.__classPrivateFieldGet) || function (receiver, state, kind, f) {
+    if (kind === "a" && !f) throw new TypeError("Private accessor was defined without a getter");
+    if (typeof state === "function" ? receiver !== state || !f : !state.has(receiver)) throw new TypeError("Cannot read private member from an object whose class did not declare it");
+    return kind === "m" ? f : kind === "a" ? f.call(receiver) : f ? f.value : state.get(receiver);
+};
+var __classPrivateFieldSet = (this && this.__classPrivateFieldSet) || function (receiver, state, value, kind, f) {
+    if (kind === "m") throw new TypeError("Private method is not writable");
+    if (kind === "a" && !f) throw new TypeError("Private accessor was defined without a setter");
+    if (typeof state === "function" ? receiver !== state || !f : !state.has(receiver)) throw new TypeError("Cannot write private member to an object whose class did not declare it");
+    return (kind === "a" ? f.call(receiver, value) : f ? f.value = value : state.set(receiver, value)), value;
+};
 var __rest = (this && this.__rest) || function (s, e) {
     var t = {};
     for (var p in s) if (Object.prototype.hasOwnProperty.call(s, p) && e.indexOf(p) < 0)
@@ -22,6 +33,7 @@ var __rest = (this && this.__rest) || function (s, e) {
 var __importDefault = (this && this.__importDefault) || function (mod) {
     return (mod && mod.__esModule) ? mod : { "default": mod };
 };
+var _RateLimiter_sleepTimes, _RateLimiter_sleepIndex, _RateLimiter_maxAttemptsAtMaxSleep, _RateLimiter_attemptsAtMaxSleepLeft, _RateLimiter_baseDelay, _MemWatcher_tStart, _MemWatcher_minHeapUsed, _MemWatcher_minHeapTime, _MemWatcher_maxHeapUsed, _MemWatcher_maxHeapTime, _MemWatcher_interval;
 Object.defineProperty(exports, "__esModule", { value: true });
 const path_1 = require("path");
 const promises_1 = require("fs/promises");
@@ -64,37 +76,118 @@ const keypress = () => __awaiter(void 0, void 0, void 0, function* () {
         });
     });
 });
-const scrape = (dataSource, log, api, pauseBetweenBatches = 200) => __awaiter(void 0, void 0, void 0, function* () {
+class RateLimiter {
+    constructor(log) {
+        this.log = log;
+        _RateLimiter_sleepTimes.set(this, [0, 100, 200, 400, 800, 1600, 3200, 6400, 12800]);
+        _RateLimiter_sleepIndex.set(this, 0);
+        _RateLimiter_maxAttemptsAtMaxSleep.set(this, 5);
+        _RateLimiter_attemptsAtMaxSleepLeft.set(this, void 0);
+        _RateLimiter_baseDelay.set(this, 100);
+        __classPrivateFieldSet(this, _RateLimiter_attemptsAtMaxSleepLeft, __classPrivateFieldGet(this, _RateLimiter_maxAttemptsAtMaxSleep, "f"), "f");
+    }
+    sleep(latestCallWasSuccessful) {
+        var _a, _b, _c;
+        return __awaiter(this, void 0, void 0, function* () {
+            yield sleep(__classPrivateFieldGet(this, _RateLimiter_baseDelay, "f"));
+            if (latestCallWasSuccessful) {
+                __classPrivateFieldSet(this, _RateLimiter_attemptsAtMaxSleepLeft, __classPrivateFieldGet(this, _RateLimiter_maxAttemptsAtMaxSleep, "f"), "f");
+                if (__classPrivateFieldGet(this, _RateLimiter_sleepIndex, "f") > 0) {
+                    __classPrivateFieldSet(this, _RateLimiter_sleepIndex, (_a = __classPrivateFieldGet(this, _RateLimiter_sleepIndex, "f"), --_a), "f");
+                }
+            }
+            else if (__classPrivateFieldGet(this, _RateLimiter_sleepIndex, "f") < __classPrivateFieldGet(this, _RateLimiter_sleepTimes, "f").length - 1) {
+                __classPrivateFieldSet(this, _RateLimiter_sleepIndex, (_b = __classPrivateFieldGet(this, _RateLimiter_sleepIndex, "f"), ++_b), "f");
+            }
+            else if (__classPrivateFieldGet(this, _RateLimiter_attemptsAtMaxSleepLeft, "f") > 0) {
+                __classPrivateFieldSet(this, _RateLimiter_attemptsAtMaxSleepLeft, (_c = __classPrivateFieldGet(this, _RateLimiter_attemptsAtMaxSleepLeft, "f"), --_c), "f");
+            }
+            const t = this.getSleepTime();
+            if (t > 0) {
+                this.log('warning', `we're probably being rate-limited, sleeping for ${t} ms`);
+                yield sleep(t);
+                return t;
+            }
+            return 0;
+        });
+    }
+    getSleepTime() {
+        return __classPrivateFieldGet(this, _RateLimiter_sleepTimes, "f")[__classPrivateFieldGet(this, _RateLimiter_sleepIndex, "f")];
+    }
+    isStuck() {
+        return __classPrivateFieldGet(this, _RateLimiter_attemptsAtMaxSleepLeft, "f") === 0;
+    }
+}
+_RateLimiter_sleepTimes = new WeakMap(), _RateLimiter_sleepIndex = new WeakMap(), _RateLimiter_maxAttemptsAtMaxSleep = new WeakMap(), _RateLimiter_attemptsAtMaxSleepLeft = new WeakMap(), _RateLimiter_baseDelay = new WeakMap();
+class MemWatcher {
+    constructor(intervalMs = 100) {
+        this.intervalMs = intervalMs;
+        _MemWatcher_tStart.set(this, Date.now());
+        _MemWatcher_minHeapUsed.set(this, Infinity);
+        _MemWatcher_minHeapTime.set(this, 0);
+        _MemWatcher_maxHeapUsed.set(this, 0);
+        _MemWatcher_maxHeapTime.set(this, 0);
+        _MemWatcher_interval.set(this, void 0);
+        __classPrivateFieldSet(this, _MemWatcher_interval, setInterval(() => {
+            const { heapUsed } = process.memoryUsage();
+            if (heapUsed < __classPrivateFieldGet(this, _MemWatcher_minHeapUsed, "f")) {
+                __classPrivateFieldSet(this, _MemWatcher_minHeapUsed, heapUsed, "f");
+                __classPrivateFieldSet(this, _MemWatcher_minHeapTime, Date.now(), "f");
+            }
+            else if (heapUsed > __classPrivateFieldGet(this, _MemWatcher_maxHeapUsed, "f")) {
+                __classPrivateFieldSet(this, _MemWatcher_maxHeapUsed, heapUsed, "f");
+                __classPrivateFieldSet(this, _MemWatcher_maxHeapTime, Date.now(), "f");
+            }
+        }, intervalMs), "f");
+    }
+    stop() {
+        clearInterval(__classPrivateFieldGet(this, _MemWatcher_interval, "f"));
+        return {
+            tStart: new Date(__classPrivateFieldGet(this, _MemWatcher_tStart, "f")),
+            maxHeapUsed: (0, util_2.formatSize)(__classPrivateFieldGet(this, _MemWatcher_maxHeapUsed, "f")),
+            maxHeapTime: new Date(__classPrivateFieldGet(this, _MemWatcher_maxHeapTime, "f")),
+            minHeapUsed: (0, util_2.formatSize)(__classPrivateFieldGet(this, _MemWatcher_minHeapUsed, "f")),
+            minHeapTime: new Date(__classPrivateFieldGet(this, _MemWatcher_minHeapTime, "f")),
+            deltaHeapUsed: (0, util_2.formatSize)(__classPrivateFieldGet(this, _MemWatcher_maxHeapUsed, "f") - __classPrivateFieldGet(this, _MemWatcher_minHeapUsed, "f")),
+        };
+    }
+}
+_MemWatcher_tStart = new WeakMap(), _MemWatcher_minHeapUsed = new WeakMap(), _MemWatcher_minHeapTime = new WeakMap(), _MemWatcher_maxHeapUsed = new WeakMap(), _MemWatcher_maxHeapTime = new WeakMap(), _MemWatcher_interval = new WeakMap();
+const _scrape = (dataSource, log, api, batchId) => __awaiter(void 0, void 0, void 0, function* () {
     log('gonna scrape!');
     const query = dataSource
         .getRepository(video_1.default)
         .createQueryBuilder('v')
         .select('distinct v.youtube_id')
-        .where('not exists (select 1 from video_metadata m where m.youtube_Id = v.youtube_Id)');
+        .where('not exists (select 1 from video_metadata m where m.youtube_Id = v.youtube_Id)')
+        .orderBy('v.youtube_id', 'ASC');
     log('running query: ', query.getSql());
     const youtubeIdsWithoutMetadataCount = yield (0, util_2.asyncPerf)(() => __awaiter(void 0, void 0, void 0, function* () { return query.getCount(); }), 'select youtube_id\'s without metadata', log);
     const videoCount = yield dataSource.getRepository(video_1.default).count();
     log('youtube_id\'s needing fetching the meta-data of:', youtubeIdsWithoutMetadataCount);
     log('total video count:', videoCount);
     log(`percentage of videos lacking meta-data: ${(0, util_2.formatPct)((0, util_2.pct)(youtubeIdsWithoutMetadataCount, videoCount))}`);
-    log('press y to continue, anything else to abort');
-    const input = yield keypress();
-    if (input !== 'y') {
-        log('aborting as requested by user');
-        process.exit(0);
-        return;
+    let gotStuck = false;
+    if (batchId === 0) {
+        log('press y to continue, anything else to abort');
+        const input = yield keypress();
+        if (input !== 'y') {
+            log('aborting as requested by user');
+            return [0, 0, false];
+        }
     }
-    const pageSize = 25;
-    let nMetaAskedFor = 0;
+    const pageSize = 50;
+    let nVideosQueried = 0;
     let nMetaObtained = 0;
     let refetched = 0;
-    let retrying = false;
+    let timeSlept = 0;
+    const rateLimiter = new RateLimiter(log);
     for (let offset = 0;; ++offset) {
         try {
             // eslint-disable-next-line no-await-in-loop
-            const videos = yield (0, util_2.asyncPerf)(() => __awaiter(void 0, void 0, void 0, function* () { return query.limit(pageSize).offset(offset * pageSize).getRawMany(); }), `attempting to fetch ${pageSize} videos at offset ${offset * pageSize} from the db`, log);
+            const videos = yield (0, util_2.asyncPerf)(() => __awaiter(void 0, void 0, void 0, function* () { return query.take(pageSize).limit(pageSize).offset(offset * pageSize).getRawMany(); }), `attempting to fetch ${pageSize} videos at offset ${offset * pageSize} from the db`, log);
             const pageIds = videos.map(v => v.youtube_id);
-            nMetaAskedFor += pageIds.length;
+            nVideosQueried += pageIds.length;
             log('fetched', videos.length, 'videos from the db:', pageIds);
             if (videos.length === 0) {
                 log('no more videos to fetch from db');
@@ -103,44 +196,74 @@ const scrape = (dataSource, log, api, pauseBetweenBatches = 200) => __awaiter(vo
             // eslint-disable-next-line no-await-in-loop
             const meta = yield (0, util_2.asyncPerf)(() => __awaiter(void 0, void 0, void 0, function* () { return api.getMetaFromVideoIds(pageIds); }), `attempting to fetch meta-data for ${videos.length} videos using the YouTube API`, log);
             const { data } = meta, stats = __rest(meta, ["data"]);
-            if (data.size > 0 && retrying) {
-                retrying = false;
-            }
-            if (data.size === 0) {
-                log('no meta-data obtained from the YouTube API, we\'re probably being rate-limited');
-                const extraPause = pauseBetweenBatches * 5;
-                // eslint-disable-next-line no-await-in-loop
-                yield sleep(extraPause);
-                if (!retrying) {
-                    retrying = true;
-                    --offset;
+            const latestCallWasSuccessful = data.size > 0;
+            // eslint-disable-next-line no-await-in-loop
+            timeSlept += yield rateLimiter.sleep(latestCallWasSuccessful);
+            if (!latestCallWasSuccessful) {
+                if (rateLimiter.isStuck()) {
+                    log('looks like we\'re stuck, aborting');
+                    gotStuck = true;
+                    break;
                 }
+                --offset;
                 continue;
             }
             nMetaObtained += data.size;
             refetched += stats.refetched;
             log('got meta-data for', data.size, 'videos with stats:', stats);
+            log('info', `${(0, util_2.formatPct)((0, util_2.pct)(nMetaObtained, videoCount))} youtubeIdsWithoutMetadataCount`);
             // We don't need to persist the meta-data here because the
             // `getMetaFromVideoIds` method already does that for us.
             ++offset;
         }
         catch (e) {
             log('error while fetching videos from the db', e);
-            process.exit(1);
+            return [0, nMetaObtained, false];
         }
-        // eslint-disable-next-line no-await-in-loop
-        yield sleep(pauseBetweenBatches);
     }
     const nowMissing = yield query.getCount();
     const finalPct = (0, util_2.formatPct)((0, util_2.pct)(nowMissing, videoCount));
     if (nowMissing !== 0) {
         log('warning', `now still missing ${finalPct} of the videos...`);
-        log('warning', 'obtained only', (0, util_2.formatPct)((0, util_2.pct)(nMetaObtained, nMetaAskedFor)), 'of the meta-data we asked for');
+        log('warning', 'obtained only', (0, util_2.formatPct)((0, util_2.pct)(nMetaObtained, nVideosQueried)), 'of the meta-data we asked for');
+    }
+    log('counted', youtubeIdsWithoutMetadataCount, 'videos without meta-data and queried', nVideosQueried);
+    if (youtubeIdsWithoutMetadataCount !== nVideosQueried) {
+        log('warning', 'youtubeIdsWithoutMetadataCount !== nVideosQueried:', 'did not query the API for all the videos we thought we needed to.', `only ${(0, util_2.formatPct)((0, util_2.pct)(nVideosQueried, youtubeIdsWithoutMetadataCount))} of the videos were queried`);
     }
     if (refetched !== 0) {
         log('warning', 'refetched', refetched, 'videos');
     }
-    log('success', 'done!');
+    log('info', 'time slept for rate-limiting:', timeSlept, 'ms');
+    log('debug', 'batch', batchId, 'done');
+    return [nowMissing, nMetaObtained, !gotStuck];
+});
+const scrape = (dataSource, log, api) => __awaiter(void 0, void 0, void 0, function* () {
+    let i = 0;
+    let missing;
+    let obtained;
+    let shouldRetry;
+    const memWatcher = new MemWatcher();
+    do {
+        // eslint-disable-next-line no-await-in-loop
+        [missing, obtained, shouldRetry] = yield _scrape(dataSource, log, api, i);
+        ++i;
+        if (missing !== 0) {
+            if (obtained > 0 && shouldRetry) {
+                log('warning', 'could not get all the meta-data in one go, trying again...');
+            }
+            else {
+                log('error', 'no meta-data obtained, giving up');
+                break;
+            }
+        }
+    } while (missing !== 0);
+    log('info', 'done scraping meta-data in', i, 'passes');
+    if (missing > 0) {
+        log('warning', 'still missing', missing, 'video meta-data');
+    }
+    const mem = memWatcher.stop();
+    log('info', 'memory usage stats:', mem);
 });
 // TODO: move this to a separate file, use in in server.ts because it
 // is duplicated there and it is ugly in server.ts
@@ -150,7 +273,8 @@ const createDataSource = (projectRootDir, log) => __awaiter(void 0, void 0, void
     if (!dockerComposeConfig || typeof dockerComposeConfig !== 'object') {
         throw new Error('Invalid docker-compose.yaml');
     }
-    const outsideDocker = process.env.OUTSIDE_DOCKER !== 'false';
+    const insideDocker = process.env.INSIDE_DOCKER === 'true';
+    const outsideDocker = !insideDocker;
     log(`we are running ${outsideDocker ? 'outside' : 'inside'} docker in ${env()} mode`);
     const dbPortString = (0, util_1.getString)(['services', `${env()}-db`, 'ports', '0'])(dockerComposeConfig);
     const [dbHostPort, dbDockerPort] = dbPortString.split(':');
@@ -170,6 +294,8 @@ const createDataSource = (projectRootDir, log) => __awaiter(void 0, void 0, void
         password: dbPassword,
         database: dbDatabase,
     };
+    const dbConfigForLog = Object.assign(Object.assign({}, dbConfig), { password: '<masked>' });
+    log('info', 'dbConfig:', dbConfigForLog);
     const ds = new typeorm_1.DataSource(Object.assign(Object.assign({ type: 'postgres' }, dbConfig), { username: dbUser, synchronize: false, entities: entities_1.default, namingStrategy: new typeorm_naming_strategies_1.SnakeNamingStrategy(), 
         // D logging: true,
         logger: new databaseLogger_1.default(log) }));

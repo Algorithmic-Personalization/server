@@ -9,7 +9,7 @@ var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, ge
     });
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.asyncPerf = exports.pct = exports.formatPct = exports.formatSize = exports.daysElapsed = exports.withLock = void 0;
+exports.stringFromMaybeError = exports.asyncPerf = exports.pct = exports.formatPct = exports.formatSize = exports.daysElapsed = exports.withLock = void 0;
 const locks = new Map();
 const unstackLock = (id, log) => __awaiter(void 0, void 0, void 0, function* () {
     const stack = locks.get(id);
@@ -107,4 +107,18 @@ const asyncPerf = (f, identifier, customLog) => __awaiter(void 0, void 0, void 0
     return result;
 });
 exports.asyncPerf = asyncPerf;
+const stringFromMaybeError = (maybeError, defaultMessage = 'unknown error') => {
+    if (!maybeError) {
+        return defaultMessage;
+    }
+    if (maybeError instanceof Error) {
+        return [
+            maybeError.name,
+            maybeError.message,
+            maybeError.stack,
+        ].join('\n');
+    }
+    return JSON.stringify(maybeError);
+};
+exports.stringFromMaybeError = stringFromMaybeError;
 //# sourceMappingURL=util.js.map

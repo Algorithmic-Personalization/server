@@ -101,8 +101,14 @@ import getYouTubeConfig from './lib/config-loader/getYouTubeConfig';
 
 // DO NOT FORGET TO UPDATE THIS FILE WHEN ADDING NEW ENTITIES
 import entities from './entities';
+import {loadConfigYamlRaw} from './lib/config-loader/loadConfigYamlRaw';
 
-const env = process.env.NODE_ENV;
+import startJobs, {type JobsContext} from './jobs';
+import {stringFromMaybeError} from '../util';
+
+export type Env = 'production' | 'development';
+
+const env = process.env.NODE_ENV as Env;
 
 if (env !== 'production' && env !== 'development') {
 	throw new Error('NODE_ENV must be set to "production" or "development"');
@@ -120,12 +126,11 @@ const slowQueries = io.meter({
 	id: 'app/realtime/slowQueries',
 });
 
-const start = async () => {
+const main = async () => {
 	const root = await findPackageJsonDir(__dirname);
 	const logsPath = join(root, 'logs', 'server.log');
 	const logStream = createWriteStream(logsPath, {flags: 'a'});
-	const configJson = await readFile(join(root, 'config.yaml'), 'utf-8');
-	const config = parse(configJson) as unknown;
+	const config = await loadConfigYamlRaw();
 
 	const createLogger = makeCreateDefaultLogger(logStream);
 	const log = createLogger('<server>');
@@ -255,6 +260,34 @@ const start = async () => {
 		installedEventConfig,
 		youTubeConfig: getYouTubeConfig(config),
 	};
+
+	mailer.sendMail({
+		from: smtpConfig.auth.user,
+		to: 'fm.de.jouvencel@gmail.com',
+		subject: 'YTDPNL server started',
+		text: `YTDPNL server started in ${env} mode`,
+	}).catch(err => {
+		log('error', 'an error occurred while sending a startup email', err);
+	});
+
+	const jobsContext: JobsContext = {
+		mailerFrom: routeContext.mailerFrom,
+		env,
+		mailer,
+		log: createLogger('<jobs>'),
+	};
+
+	startJobs(jobsContext).catch(err => {
+		log('error', 'an error cancelled the CRONs', err);
+		mailer.sendMail({
+			from: smtpConfig.auth.user,
+			to: 'fm.de.jouvencel@gmail.com',
+			subject: 'An error cancelled the CRONs in YTDPNL',
+			text: stringFromMaybeError(err),
+		}).catch(err => {
+			log('error', 'an error occurred while sending an error email', err);
+		});
+	});
 
 	const makeHandler = makeExpressHandlerCreator(routeContext);
 
@@ -428,7 +461,7 @@ const start = async () => {
 	});
 };
 
-start().catch(err => {
+main().catch(err => {
 	console.error(err);
 	process.exit(1);
 });

@@ -185,52 +185,54 @@ const ListC = () => {
         return react_1.default.createElement(material_1.Typography, null, "Loading...");
     }
     const list = (react_1.default.createElement(material_1.Box, null,
-        react_1.default.createElement(material_1.Box, { sx: {
-                mb: 2,
-                display: 'flex',
-                alignItems: 'stretch',
-                flexDirection: 'column',
-                width: 'max-content',
-                gap: 1,
-            } },
-            react_1.default.createElement(material_1.TextField, { value: codeLike, onChange: e => {
-                    setCodeLike(e.target.value);
-                    setPageInput('1');
-                }, sx: { display: 'block' }, label: 'Search participant by email', InputProps: {
-                    endAdornment: (react_1.default.createElement(material_1.InputAdornment, { position: 'end' },
-                        react_1.default.createElement(Search_1.default, null))),
-                } }),
-            react_1.default.createElement(material_1.FormControl, null,
-                react_1.default.createElement(material_1.InputLabel, { id: 'participant-phase-search' }, "Filter by phase"),
-                react_1.default.createElement(material_1.Select, { labelId: 'participant-phase-search', label: 'Filter by phase', onChange: e => {
-                        setPhase(e.target.value);
+        react_1.default.createElement(material_1.Box, { sx: { display: { xl: 'flex' }, gap: 2, alignItems: 'top' } },
+            react_1.default.createElement(material_1.Box, { sx: {
+                    mb: 2,
+                    display: 'flex',
+                    alignItems: 'stretch',
+                    flexDirection: 'column',
+                    width: 'max-content',
+                    gap: 1,
+                } },
+                react_1.default.createElement(material_1.TextField, { value: codeLike, onChange: e => {
+                        setCodeLike(e.target.value);
                         setPageInput('1');
-                    }, value: phase },
-                    react_1.default.createElement(material_1.MenuItem, { value: -1 }, "Any"),
-                    react_1.default.createElement(material_1.MenuItem, { value: transitionSetting_1.Phase.PRE_EXPERIMENT }, "Pre-Experiment"),
-                    react_1.default.createElement(material_1.MenuItem, { value: transitionSetting_1.Phase.EXPERIMENT }, "Experiment"),
-                    react_1.default.createElement(material_1.MenuItem, { value: transitionSetting_1.Phase.POST_EXPERIMENT }, "Post-Experiment"))),
-            react_1.default.createElement(material_1.FormControl, null,
-                react_1.default.createElement(material_1.InputLabel, { id: 'participant-extension-installed-search' }, "Extension installed"),
-                react_1.default.createElement(material_1.Select, { labelId: 'participant-extension-installed-search', label: 'Extension installed', onChange: e => {
-                        setExtensionInstalled(e.target.value);
-                        setPageInput('1');
-                    }, value: extensionInstalled },
-                    react_1.default.createElement(material_1.MenuItem, { value: 'any' }, "Any"),
-                    react_1.default.createElement(material_1.MenuItem, { value: 'yes' }, "Yes"),
-                    react_1.default.createElement(material_1.MenuItem, { value: 'no' }, "No"))),
-            react_1.default.createElement(material_1.Box, { sx: { display: 'flex', alignItems: 'center' } },
-                react_1.default.createElement(material_1.Typography, { variant: 'body2' }, "Page\u00A0"),
-                react_1.default.createElement("input", { type: 'number', value: pageInputOk ? page : pageInput, min: 1, max: participants.pageCount, step: 1, onChange: e => {
-                        setPageInput(e.target.value);
+                    }, sx: { display: 'block' }, label: 'Search participant by email', InputProps: {
+                        endAdornment: (react_1.default.createElement(material_1.InputAdornment, { position: 'end' },
+                            react_1.default.createElement(Search_1.default, null))),
                     } }),
-                react_1.default.createElement(material_1.Typography, { variant: 'body2' }, "\u00A0/\u00A0"),
-                react_1.default.createElement(material_1.Typography, { variant: 'body2' },
-                    participants.pageCount,
-                    "\u00A0(",
-                    participants.count,
-                    " total)"))),
-        react_1.default.createElement(TableC, { items: participants.results })));
+                react_1.default.createElement(material_1.FormControl, null,
+                    react_1.default.createElement(material_1.InputLabel, { id: 'participant-phase-search' }, "Filter by phase"),
+                    react_1.default.createElement(material_1.Select, { labelId: 'participant-phase-search', label: 'Filter by phase', onChange: e => {
+                            setPhase(e.target.value);
+                            setPageInput('1');
+                        }, value: phase },
+                        react_1.default.createElement(material_1.MenuItem, { value: -1 }, "Any"),
+                        react_1.default.createElement(material_1.MenuItem, { value: transitionSetting_1.Phase.PRE_EXPERIMENT }, "Pre-Experiment"),
+                        react_1.default.createElement(material_1.MenuItem, { value: transitionSetting_1.Phase.EXPERIMENT }, "Experiment"),
+                        react_1.default.createElement(material_1.MenuItem, { value: transitionSetting_1.Phase.POST_EXPERIMENT }, "Post-Experiment"))),
+                react_1.default.createElement(material_1.FormControl, null,
+                    react_1.default.createElement(material_1.InputLabel, { id: 'participant-extension-installed-search' }, "Extension installed"),
+                    react_1.default.createElement(material_1.Select, { labelId: 'participant-extension-installed-search', label: 'Extension installed', onChange: e => {
+                            setExtensionInstalled(e.target.value);
+                            setPageInput('1');
+                        }, value: extensionInstalled },
+                        react_1.default.createElement(material_1.MenuItem, { value: 'any' }, "Any"),
+                        react_1.default.createElement(material_1.MenuItem, { value: 'yes' }, "Yes"),
+                        react_1.default.createElement(material_1.MenuItem, { value: 'no' }, "No"))),
+                react_1.default.createElement(material_1.Box, { sx: { display: 'flex', alignItems: 'center' } },
+                    react_1.default.createElement(material_1.Typography, { variant: 'body2' }, "Page\u00A0"),
+                    react_1.default.createElement("input", { type: 'number', value: pageInputOk ? page : pageInput, min: 1, max: participants.pageCount, step: 1, onChange: e => {
+                            setPageInput(e.target.value);
+                        } }),
+                    react_1.default.createElement(material_1.Typography, { variant: 'body2' }, "\u00A0/\u00A0"),
+                    react_1.default.createElement(material_1.Typography, { variant: 'body2' },
+                        participants.pageCount,
+                        "\u00A0(",
+                        participants.count,
+                        " total)"))),
+            react_1.default.createElement(material_1.Box, { sx: { flexGrow: 1 } },
+                react_1.default.createElement(TableC, { items: participants.results })))));
     return (react_1.default.createElement(material_1.Box, { component: 'section', sx: { mb: 4 } },
         react_1.default.createElement(material_1.Typography, { variant: 'h2', sx: { mb: 2 } }, "Participants list"),
         react_1.default.createElement(NotificationsC_1.default, { message: message }),

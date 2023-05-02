@@ -120,3 +120,22 @@ export const asyncPerf = async <T>(f: () => Promise<T>, identifier?: string, cus
 
 	return result;
 };
+
+export const stringFromMaybeError = (
+	maybeError: unknown,
+	defaultMessage = 'unknown error',
+): string => {
+	if (!maybeError) {
+		return defaultMessage;
+	}
+
+	if (maybeError instanceof Error) {
+		return [
+			maybeError.name,
+			maybeError.message,
+			maybeError.stack,
+		].join('\n');
+	}
+
+	return JSON.stringify(maybeError);
+};

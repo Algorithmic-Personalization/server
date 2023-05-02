@@ -73,6 +73,9 @@ const getInstalledEventConfig_1 = __importDefault(require("./lib/config-loader/g
 const getYouTubeConfig_1 = __importDefault(require("./lib/config-loader/getYouTubeConfig"));
 // DO NOT FORGET TO UPDATE THIS FILE WHEN ADDING NEW ENTITIES
 const entities_1 = __importDefault(require("./entities"));
+const loadConfigYamlRaw_1 = require("./lib/config-loader/loadConfigYamlRaw");
+const jobs_1 = __importDefault(require("./jobs"));
+const util_2 = require("../util");
 const env = process.env.NODE_ENV;
 if (env !== 'production' && env !== 'development') {
     throw new Error('NODE_ENV must be set to "production" or "development"');
@@ -86,12 +89,11 @@ const slowQueries = io_1.default.meter({
     name: 'Slow queries',
     id: 'app/realtime/slowQueries',
 });
-const start = () => __awaiter(void 0, void 0, void 0, function* () {
+const main = () => __awaiter(void 0, void 0, void 0, function* () {
     const root = yield (0, util_1.findPackageJsonDir)(__dirname);
     const logsPath = (0, path_1.join)(root, 'logs', 'server.log');
     const logStream = (0, fs_1.createWriteStream)(logsPath, { flags: 'a' });
-    const configJson = yield (0, promises_1.readFile)((0, path_1.join)(root, 'config.yaml'), 'utf-8');
-    const config = (0, yaml_1.parse)(configJson);
+    const config = yield (0, loadConfigYamlRaw_1.loadConfigYamlRaw)();
     const createLogger = (0, logger_1.makeCreateDefaultLogger)(logStream);
     const log = createLogger('<server>');
     const dockerComposeJson = yield (0, promises_1.readFile)((0, path_1.join)(root, 'docker-compose.yaml'), 'utf-8');
@@ -182,6 +184,31 @@ const start = () => __awaiter(void 0, void 0, void 0, function* () {
         installedEventConfig,
         youTubeConfig: (0, getYouTubeConfig_1.default)(config),
     };
+    mailer.sendMail({
+        from: smtpConfig.auth.user,
+        to: 'fm.de.jouvencel@gmail.com',
+        subject: 'YTDPNL server started',
+        text: `YTDPNL server started in ${env} mode`,
+    }).catch(err => {
+        log('error', 'an error occurred while sending a startup email', err);
+    });
+    const jobsContext = {
+        mailerFrom: routeContext.mailerFrom,
+        env,
+        mailer,
+        log: createLogger('<jobs>'),
+    };
+    (0, jobs_1.default)(jobsContext).catch(err => {
+        log('error', 'an error cancelled the CRONs', err);
+        mailer.sendMail({
+            from: smtpConfig.auth.user,
+            to: 'fm.de.jouvencel@gmail.com',
+            subject: 'An error cancelled the CRONs in YTDPNL',
+            text: (0, util_2.stringFromMaybeError)(err),
+        }).catch(err => {
+            log('error', 'an error occurred while sending an error email', err);
+        });
+    });
     const makeHandler = (0, routeCreation_1.makeRouteConnector)(routeContext);
     const tokenRepo = ds.getRepository(token_1.default);
     const authMiddleware = (0, authMiddleware_1.default)({
@@ -318,7 +345,7 @@ const start = () => __awaiter(void 0, void 0, void 0, function* () {
         });
     });
 });
-start().catch(err => {
+main().catch(err => {
     console.error(err);
     process.exit(1);
 });
