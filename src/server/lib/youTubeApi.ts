@@ -1,6 +1,18 @@
 import fetch, {type Response} from 'node-fetch';
 import {type Repository, type DataSource} from 'typeorm';
-import {validate, IsString, IsInt, ValidateNested, type ValidationError, IsBoolean} from 'class-validator';
+
+import {
+	validate,
+	IsBoolean,
+	Min,
+	IsDate,
+	IsInt,
+	IsNotEmpty,
+	IsString,
+	ValidateNested,
+	type ValidationError,
+} from 'class-validator';
+
 import {Cache as MemoryCache} from 'memory-cache';
 import sizeof from 'object-sizeof';
 
@@ -14,10 +26,19 @@ import {formatSize, formatPct, pct} from '../../util';
 
 export type YouTubeMeta = {
 	videoId: string;
+	channelId: string;
 	categoryId: string;
+	publishedAt: Date;
 	categoryTitle: string;
+	title: string;
+	description: string;
 	topicCategories: string[];
 	tags: string[];
+	statistics: {
+		viewCount: number;
+		likeCount: number;
+		commentCount: number;
+	};
 };
 
 export type MetaMap = Map<string, YouTubeMeta>;
@@ -51,23 +72,52 @@ class TopicDetails {
 
 class VideoSnippet {
 	@IsString()
+	@IsNotEmpty()
 		channelId = '';
 
 	@IsString()
+	@IsNotEmpty()
 		categoryId = '';
+
+	@IsDate()
+	@IsNotEmpty()
+		publishedAt = '';
+
+	@IsString()
+	@IsNotEmpty()
+		title = '';
+
+	@IsString()
+		description = '';
 
 	@IsString({each: true})
 		tags?: string[] = [];
 }
 
+class VideoStatistics {
+	@IsInt()
+	@Min(0)
+		viewCount = -1;
+
+	@IsInt()
+	@Min(0)
+		likeCount = -1;
+
+	@IsInt()
+	@Min(0)
+		commentCount = -1;
+}
+
 export class VideoListItem {
 	@IsString()
+	@IsNotEmpty()
 		kind = '';
 
 	@IsString()
 		etag = '';
 
 	@IsString()
+	@IsNotEmpty()
 		id = '';
 
 	@ValidateNested()
@@ -75,6 +125,9 @@ export class VideoListItem {
 
 	@ValidateNested()
 		snippet = new VideoSnippet();
+
+	@ValidateNested()
+		statistics = new VideoStatistics();
 }
 
 class YouTubeVideoListResponse extends YouTubeResponse<VideoListItem> {
@@ -82,6 +135,7 @@ class YouTubeVideoListResponse extends YouTubeResponse<VideoListItem> {
 
 class CategorySnippet {
 	@IsString()
+	@IsNotEmpty()
 		title = '';
 
 	@IsBoolean()
@@ -93,12 +147,14 @@ class CategorySnippet {
 
 export class CategoryListItem {
 	@IsString()
+	@IsNotEmpty()
 		kind = '';
 
 	@IsString()
 		etag = '';
 
 	@IsString()
+	@IsNotEmpty()
 		id = '';
 
 	@ValidateNested()
@@ -138,25 +194,54 @@ const getYouTubeMeta = (repo: Repository<VideoMetadata>) => async (youtubeId: st
 		categoryTitle: '',
 		topicCategories: [],
 		tags: [],
+		channelId: '',
+		publishedAt: new Date(0),
+		title: '',
+		description: '',
+		statistics: {
+			viewCount: 0,
+			likeCount: 0,
+			commentCount: 0,
+		},
 	};
 
 	for (const row of metaRows) {
 		switch (row.type) {
 			case MetadataType.TAG:
-				meta.tags.push(row.value);
+				meta.tags.push(row.value as string);
 				break;
 			case MetadataType.TOPIC_CATEGORY:
-				meta.topicCategories.push(row.value);
+				meta.topicCategories.push(row.value as string);
 				break;
 			case MetadataType.YT_CATEGORY_ID:
-				meta.categoryId = row.value;
+				meta.categoryId = row.value as string;
 				break;
 			case MetadataType.YT_CATEGORY_TITLE:
-				meta.categoryTitle = row.value;
+				meta.categoryTitle = row.value as string;
+				break;
+			case MetadataType.TITLE:
+				meta.title = row.value as string;
+				break;
+			case MetadataType.YT_CHANNEL_ID:
+				meta.channelId = row.value as string;
+				break;
+			case MetadataType.PUBLISHED_AT:
+				meta.publishedAt = row.value as Date;
+				break;
+			case MetadataType.VIEW_COUNT:
+				meta.statistics.viewCount = row.value as number;
+				break;
+			case MetadataType.LIKE_COUNT:
+				meta.statistics.likeCount = row.value as number;
+				break;
+			case MetadataType.COMMENT_COUNT:
+				meta.statistics.commentCount = row.value as number;
+				break;
+			case MetadataType.DESCRIPTION:
+				meta.description = row.value as string;
 				break;
 			default:
-				// Here eslint fucks up, because the switch is exhaustive
-				throw new Error('this should never happen');
+				throw new Error('unknown metadata type, should never happen');
 		}
 	}
 
@@ -197,6 +282,48 @@ const convertToVideoMetaData = (meta: YouTubeMeta): VideoMetadata[] => {
 	categoryTitleMeta.type = MetadataType.YT_CATEGORY_TITLE;
 	categoryTitleMeta.value = meta.categoryTitle;
 	res.push(categoryTitleMeta);
+
+	const titleMeta = new VideoMetadata();
+	titleMeta.youtubeId = meta.videoId;
+	titleMeta.type = MetadataType.TITLE;
+	titleMeta.value = meta.title;
+	res.push(titleMeta);
+
+	const descriptionMeta = new VideoMetadata();
+	descriptionMeta.youtubeId = meta.videoId;
+	descriptionMeta.type = MetadataType.DESCRIPTION;
+	descriptionMeta.value = meta.description;
+	res.push(descriptionMeta);
+
+	const channelIdMeta = new VideoMetadata();
+	channelIdMeta.youtubeId = meta.videoId;
+	channelIdMeta.type = MetadataType.YT_CHANNEL_ID;
+	channelIdMeta.value = meta.channelId;
+	res.push(channelIdMeta);
+
+	const publishedAtMeta = new VideoMetadata();
+	publishedAtMeta.youtubeId = meta.videoId;
+	publishedAtMeta.type = MetadataType.PUBLISHED_AT;
+	publishedAtMeta.value = meta.publishedAt;
+	res.push(publishedAtMeta);
+
+	const viewCountMeta = new VideoMetadata();
+	viewCountMeta.youtubeId = meta.videoId;
+	viewCountMeta.type = MetadataType.VIEW_COUNT;
+	viewCountMeta.value = meta.statistics.viewCount;
+	res.push(viewCountMeta);
+
+	const likeCountMeta = new VideoMetadata();
+	likeCountMeta.youtubeId = meta.videoId;
+	likeCountMeta.type = MetadataType.LIKE_COUNT;
+	likeCountMeta.value = meta.statistics.likeCount;
+	res.push(likeCountMeta);
+
+	const commentCountMeta = new VideoMetadata();
+	commentCountMeta.youtubeId = meta.videoId;
+	commentCountMeta.type = MetadataType.COMMENT_COUNT;
+	commentCountMeta.value = meta.statistics.commentCount;
+	res.push(commentCountMeta);
 
 	for (const topic of meta.topicCategories) {
 		const metaData = new VideoMetadata();
@@ -305,7 +432,7 @@ export const makeCreateYouTubeApi = (cache: 'with-cache' | 'without-cache' = 'wi
 			? createPersistYouTubeMetas(dataSource, log)
 			: undefined;
 
-		const endpoint = `${config.videosEndPoint}/?key=${config.apiKey}&part=topicDetails&part=snippet`;
+		const endpoint = `${config.videosEndPoint}/?key=${config.apiKey}&part=topicDetails&part=snippet&part=statistics`;
 
 		const getUrlAndStoreLatency = async (url: string): Promise<Response> => {
 			const tStart = Date.now();
@@ -336,6 +463,7 @@ export const makeCreateYouTubeApi = (cache: 'with-cache' | 'without-cache' = 'wi
 
 		const api: YtApi = {
 			// TODO: split into multiple queries if the list of unique IDs is too long (> 50)
+			// eslint-disable-next-line complexity
 			async getMetaFromVideoIds(youTubeVideoIdsMaybeNonUnique: string[], hl = 'en', recurse = true): Promise<YouTubeResponseMeta> {
 				await fetchingCategories;
 				const youTubeIds = [...new Set(youTubeVideoIdsMaybeNonUnique)];
@@ -372,6 +500,14 @@ export const makeCreateYouTubeApi = (cache: 'with-cache' | 'without-cache' = 'wi
 				const dbMap = metaRepo
 					? await getManyYoutubeMetas(metaRepo)(idsNotCached)
 					: undefined;
+
+				if (idsNotCached.length > 0 && dbMap) {
+					log(
+						'info',
+						'just showing one video as retrieved from the db for debugging purposes:',
+						dbMap.get(idsNotCached[0]),
+					);
+				}
 
 				const finalIdsToGetFromYouTube: string[] = [];
 
@@ -419,7 +555,10 @@ export const makeCreateYouTubeApi = (cache: 'with-cache' | 'without-cache' = 'wi
 				for (const raw of rawResponses) {
 					const youTubeResponse = new YouTubeVideoListResponse();
 					Object.assign(youTubeResponse, raw);
-					validationPromises.push(validate(youTubeResponse));
+					validationPromises.push(validate(youTubeResponse, {
+						skipMissingProperties: false,
+						forbidUnknownValues: false,
+					}));
 					youTubeResponses.push(youTubeResponse);
 				}
 
@@ -456,6 +595,11 @@ export const makeCreateYouTubeApi = (cache: 'with-cache' | 'without-cache' = 'wi
 									categoryTitle: categoriesCache.get(item.snippet.categoryId) ?? '<unknown>',
 									topicCategories: item.topicDetails?.topicCategories ?? [],
 									tags: item.snippet.tags ?? [],
+									title: item.snippet.title,
+									description: item.snippet.description,
+									publishedAt: new Date(item.snippet.publishedAt),
+									channelId: item.snippet.channelId,
+									statistics: item.statistics,
 								};
 								metaToPersist.push(meta);
 								metaMap.set(item.id, meta);

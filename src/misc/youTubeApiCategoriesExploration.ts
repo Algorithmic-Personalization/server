@@ -8,16 +8,14 @@ import {DataSource} from 'typeorm';
 import {SnakeNamingStrategy} from 'typeorm-naming-strategies';
 
 import {findPackageJsonDir, getString} from '../common/util';
+import {sleep} from '../util';
 import getYouTubeConfig from '../server/lib/config-loader/getYouTubeConfig';
 import makeCreateYouTubeApi, {type CategoryListItem, type YtApi} from '../server/lib/youTubeApi';
 
 import entities from '../server/entities';
 import DatabaseLogger from '../server/lib/databaseLogger';
 import {type LogFunction, makeCreateDefaultLogger} from '../server/lib/logger';
-
-import Video from '../server/models/video';
-
-import {asyncPerf, formatPct, pct, formatSize} from '../util';
+import scrape from '../server/lib/scrapeYouTube';
 
 const commands = new Map([
 	['compare', 'will compare the categories set of different regions'],
@@ -25,10 +23,6 @@ const commands = new Map([
 ]);
 
 const commandsNeedingDataSource = new Set(['scrape']);
-
-const sleep = async (ms: number): Promise<void> => new Promise(resolve => {
-	setTimeout(resolve, ms);
-});
 
 const env = (): 'production' | 'development' => {
 	const env = process.env.NODE_ENV;
@@ -42,7 +36,7 @@ const env = (): 'production' | 'development' => {
 	return 'development';
 };
 
-const keypress = async (): Promise<string> => {
+export const keypress = async (): Promise<string> => {
 	process.stdin.setRawMode(true);
 
 	return new Promise(resolve => {
@@ -53,7 +47,7 @@ const keypress = async (): Promise<string> => {
 	});
 };
 
-class RateLimiter {
+export class RateLimiter {
 	#sleepTimes = [0, 100, 200, 400, 800, 1600, 3200, 6400, 12800];
 	#sleepIndex = 0;
 	#maxAttemptsAtMaxSleep = 5;
@@ -98,218 +92,6 @@ class RateLimiter {
 		return this.#attemptsAtMaxSleepLeft === 0;
 	}
 }
-
-type MemReport = {
-	tStart: Date;
-	maxHeapUsed: string;
-	maxHeapTime: Date;
-	minHeapUsed: string;
-	minHeapTime: Date;
-	deltaHeapUsed: string;
-};
-
-class MemWatcher {
-	#tStart = Date.now();
-	#minHeapUsed = Infinity;
-	#minHeapTime = 0;
-	#maxHeapUsed = 0;
-	#maxHeapTime = 0;
-
-	#interval: NodeJS.Timer;
-
-	constructor(public readonly intervalMs = 100) {
-		this.#interval = setInterval(() => {
-			const {heapUsed} = process.memoryUsage();
-
-			if (heapUsed < this.#minHeapUsed) {
-				this.#minHeapUsed = heapUsed;
-				this.#minHeapTime = Date.now();
-			} else if (heapUsed > this.#maxHeapUsed) {
-				this.#maxHeapUsed = heapUsed;
-				this.#maxHeapTime = Date.now();
-			}
-		}, intervalMs);
-	}
-
-	stop(): MemReport {
-		clearInterval(this.#interval);
-
-		return {
-			tStart: new Date(this.#tStart),
-			maxHeapUsed: formatSize(this.#maxHeapUsed),
-			maxHeapTime: new Date(this.#maxHeapTime),
-			minHeapUsed: formatSize(this.#minHeapUsed),
-			minHeapTime: new Date(this.#minHeapTime),
-			deltaHeapUsed: formatSize(this.#maxHeapUsed - this.#minHeapUsed),
-		};
-	}
-}
-
-const _scrape = async (dataSource: DataSource, log: LogFunction, api: YtApi, batchId: number): Promise<[number, number, boolean]> => {
-	log('gonna scrape!');
-
-	const query = dataSource
-		.getRepository(Video)
-		.createQueryBuilder('v')
-		.select('distinct v.youtube_id')
-		.where('not exists (select 1 from video_metadata m where m.youtube_Id = v.youtube_Id)')
-		.orderBy('v.youtube_id', 'ASC');
-
-	log('running query: ', query.getSql());
-	const youtubeIdsWithoutMetadataCount: number = await asyncPerf(
-		async () => query.getCount(),
-		'select youtube_id\'s without metadata',
-		log,
-	);
-
-	const videoCount = await dataSource.getRepository(Video).count();
-	log('youtube_id\'s needing fetching the meta-data of:', youtubeIdsWithoutMetadataCount);
-	log('total video count:', videoCount);
-	log(`percentage of videos lacking meta-data: ${formatPct(pct(youtubeIdsWithoutMetadataCount, videoCount))}`);
-
-	let gotStuck = false;
-
-	if (batchId === 0) {
-		log('press y to continue, anything else to abort');
-		const input = await keypress();
-
-		if (input !== 'y') {
-			log('aborting as requested by user');
-			return [0, 0, false];
-		}
-	}
-
-	const pageSize = 50;
-	let nVideosQueried = 0;
-	let nMetaObtained = 0;
-	let refetched = 0;
-	let timeSlept = 0;
-
-	const rateLimiter = new RateLimiter(log);
-
-	for (let offset = 0; ; ++offset) {
-		try {
-			// eslint-disable-next-line no-await-in-loop
-			const videos: Array<{youtube_id: string}> = await asyncPerf(
-				async () => query.take(pageSize).limit(pageSize).offset(offset * pageSize).getRawMany(),
-				`attempting to fetch ${pageSize} videos at offset ${offset * pageSize} from the db`,
-				log,
-			);
-
-			const pageIds = videos.map(v => v.youtube_id);
-
-			nVideosQueried += pageIds.length;
-
-			log('fetched', videos.length, 'videos from the db:', pageIds);
-
-			if (videos.length === 0) {
-				log('no more videos to fetch from db');
-				break;
-			}
-
-			// eslint-disable-next-line no-await-in-loop
-			const meta = await asyncPerf(
-				async () => api.getMetaFromVideoIds(pageIds),
-				`attempting to fetch meta-data for ${videos.length} videos using the YouTube API`,
-				log,
-			);
-			const {data, ...stats} = meta;
-
-			const latestCallWasSuccessful = data.size > 0;
-
-			// eslint-disable-next-line no-await-in-loop
-			timeSlept += await rateLimiter.sleep(latestCallWasSuccessful);
-			if (!latestCallWasSuccessful) {
-				if (rateLimiter.isStuck()) {
-					log('looks like we\'re stuck, aborting');
-					gotStuck = true;
-					break;
-				}
-
-				--offset;
-				continue;
-			}
-
-			nMetaObtained += data.size;
-			refetched += stats.refetched;
-
-			log('got meta-data for', data.size, 'videos with stats:', stats);
-			log('info', `${formatPct(pct(nMetaObtained, videoCount))} youtubeIdsWithoutMetadataCount`);
-
-			// We don't need to persist the meta-data here because the
-			// `getMetaFromVideoIds` method already does that for us.
-
-			++offset;
-		} catch (e) {
-			log('error while fetching videos from the db', e);
-			return [0, nMetaObtained, false];
-		}
-	}
-
-	const nowMissing = await query.getCount();
-	const finalPct = formatPct(pct(nowMissing, videoCount));
-	if (nowMissing !== 0) {
-		log('warning', `now still missing ${finalPct} of the videos...`);
-		log(
-			'warning',
-			'obtained only',
-			formatPct(pct(nMetaObtained, nVideosQueried)),
-			'of the meta-data we asked for',
-		);
-	}
-
-	log('counted', youtubeIdsWithoutMetadataCount, 'videos without meta-data and queried', nVideosQueried);
-	if (youtubeIdsWithoutMetadataCount !== nVideosQueried) {
-		log(
-			'warning',
-			'youtubeIdsWithoutMetadataCount !== nVideosQueried:',
-			'did not query the API for all the videos we thought we needed to.',
-			`only ${formatPct(pct(nVideosQueried, youtubeIdsWithoutMetadataCount))} of the videos were queried`,
-		);
-	}
-
-	if (refetched !== 0) {
-		log('warning', 'refetched', refetched, 'videos');
-	}
-
-	log('info', 'time slept for rate-limiting:', timeSlept, 'ms');
-
-	log('debug', 'batch', batchId, 'done');
-
-	return [nowMissing, nMetaObtained, !gotStuck];
-};
-
-const scrape = async (dataSource: DataSource, log: LogFunction, api: YtApi) => {
-	let i = 0;
-	let missing: number;
-	let obtained: number;
-	let shouldRetry: boolean;
-
-	const memWatcher = new MemWatcher();
-
-	do {
-		// eslint-disable-next-line no-await-in-loop
-		[missing, obtained, shouldRetry] = await _scrape(dataSource, log, api, i);
-		++i;
-		if (missing !== 0) {
-			if (obtained > 0 && shouldRetry) {
-				log('warning', 'could not get all the meta-data in one go, trying again...');
-			} else {
-				log('error', 'no meta-data obtained, giving up');
-				break;
-			}
-		}
-	} while (missing !== 0);
-
-	log('info', 'done scraping meta-data in', i, 'passes');
-
-	if (missing > 0) {
-		log('warning', 'still missing', missing, 'video meta-data');
-	}
-
-	const mem = memWatcher.stop();
-	log('info', 'memory usage stats:', mem);
-};
 
 // TODO: move this to a separate file, use in in server.ts because it
 // is duplicated there and it is ugly in server.ts

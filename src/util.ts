@@ -1,3 +1,8 @@
+import {
+	type SelectQueryBuilder,
+	type ObjectLiteral,
+} from 'typeorm';
+
 import {type LogFunction} from './server/lib/logger';
 
 type AsyncFn = () => Promise<void>;
@@ -139,3 +144,13 @@ export const stringFromMaybeError = (
 
 	return JSON.stringify(maybeError);
 };
+
+export const showSql = (log: LogFunction) => <T extends ObjectLiteral>(qb: SelectQueryBuilder<T>): SelectQueryBuilder<T> => {
+	const sql = qb.getSql();
+	log('info', 'running query:', sql);
+	return qb;
+};
+
+export const sleep = async (ms: number): Promise<void> => new Promise(resolve => {
+	setTimeout(resolve, ms);
+});

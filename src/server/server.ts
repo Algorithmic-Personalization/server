@@ -100,6 +100,8 @@ import monitoringDefinition from './api-2/monitoring';
 
 import getInstalledEventConfig from './lib/config-loader/getInstalledEventConfig';
 import getYouTubeConfig from './lib/config-loader/getYouTubeConfig';
+import makeCreateYouTubeApi from './lib/youTubeApi';
+import scrapeMissingYouTubeMetadata from './lib/scrapeYouTube';
 
 // DO NOT FORGET TO UPDATE THIS FILE WHEN ADDING NEW ENTITIES
 import entities from './entities';
@@ -253,6 +255,17 @@ const main = async () => {
 		process.exit(1);
 	}
 
+	const youTubeConfig = getYouTubeConfig(config);
+
+	const ytApi = makeCreateYouTubeApi()(youTubeConfig, createLogger('<yt-api>'));
+	scrapeMissingYouTubeMetadata(ds, createLogger('<yt-scraper>'), ytApi)
+		.then(() => {
+			log('success', 'done scraping youtube metadata [not for real]');
+		})
+		.catch(err => {
+			log('error', 'scraping youtube metadata:', err);
+		});
+
 	const privateKey = await readFile(join(root, 'private.key'), 'utf-8');
 	const tokenTools = createTokenTools(privateKey);
 
@@ -265,7 +278,7 @@ const main = async () => {
 		createLogger,
 		tokenTools,
 		installedEventConfig,
-		youTubeConfig: getYouTubeConfig(config),
+		youTubeConfig,
 	};
 
 	mailer.sendMail({

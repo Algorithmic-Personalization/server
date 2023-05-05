@@ -3,8 +3,6 @@ import {
 	MoreThan,
 	LessThanOrEqual,
 	type DataSource,
-	type SelectQueryBuilder,
-	type ObjectLiteral,
 } from 'typeorm';
 
 import {type ParsedQs} from 'qs';
@@ -17,6 +15,7 @@ import Session from '../../common/models/session';
 
 import {type LogFunction} from './../lib/logger';
 import {has} from '../../common/util';
+import {showSql} from '../../util';
 
 type ViewCount = {
 	url: string;
@@ -33,12 +32,6 @@ export type MonitoringReport = {
 export type MonitoringQuery = {
 	fromDate: Date;
 	toDate: Date;
-};
-
-export const showSql = (log: LogFunction) => <T extends ObjectLiteral>(qb: SelectQueryBuilder<T>): SelectQueryBuilder<T> => {
-	const sql = qb.getSql();
-	log('info', 'running query:', sql);
-	return qb;
 };
 
 const getMostViewedPages = (dataSource: DataSource, log: LogFunction) => async ({fromDate, toDate}: MonitoringQuery): Promise<ViewCount[]> => {
