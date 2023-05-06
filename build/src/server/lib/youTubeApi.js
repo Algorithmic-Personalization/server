@@ -241,7 +241,7 @@ const createPersistYouTubeMetas = (dataSource, log) => (metaDataItems) => __awai
         .insert()
         .into(videoMetadata_1.default)
         .values(metaDataItems)
-        .orUpdate(['youtube_id'])).execute();
+        .orUpdate(['view_count', 'like_count', 'comment_count', 'updated_at'], ['youtube_id'])).execute();
 });
 const intIfDefined = (str) => {
     if (!str) {
