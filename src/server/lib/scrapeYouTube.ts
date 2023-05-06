@@ -14,6 +14,39 @@ import {
 
 const retryDelay25Hours = 25 * 60 * 60 * 1000;
 
+class Limiter {
+	#waitDelays = [500, 500, 500, 1000, 1000, 2000, 5000, 10000, 10000];
+	#waitIndex = 0;
+
+	constructor(private readonly log: LogFunction) {}
+
+	shouldGiveUp(callWasSuccessful: boolean): boolean {
+		if (callWasSuccessful) {
+			if (this.#waitIndex > 0) {
+				--this.#waitIndex;
+				this.log('info', 'querying a bit faster because latest call was successful, now waiting', this.getDelay(), 'ms');
+			}
+
+			return false;
+		}
+
+		++this.#waitIndex;
+		this.log('warning', 'latest call was not successful, waiting for', this.getDelay(), 'ms for a bit');
+
+		const giveUp = this.#waitIndex === this.#waitDelays.length;
+
+		if (giveUp) {
+			this.log('error', 'giving scraping, too many consecutive failures');
+		}
+
+		return giveUp;
+	}
+
+	getDelay(): number {
+		return this.#waitDelays[Math.min(this.#waitDelays.length - 1, this.#waitIndex)];
+	}
+}
+
 export const scrape = async (dataSource: DataSource, log: LogFunction, api: YtApi): Promise<void> => {
 	const show = showSql(log);
 
@@ -46,6 +79,7 @@ export const scrape = async (dataSource: DataSource, log: LogFunction, api: YtAp
 	log('info', 'memory used to get the list:', formatSize(heapUsedAfter - heapUsed));
 
 	const batchSize = 50;
+	const limiter = new Limiter(log);
 
 	while (videos.length) {
 		const batch = videos.splice(0, batchSize);
@@ -54,7 +88,9 @@ export const scrape = async (dataSource: DataSource, log: LogFunction, api: YtAp
 		const {data, ...stats} = await api.getMetaFromVideoIds(batch);
 		log('info', 'yt batch scrape result:', stats);
 
-		if (data.size === 0) {
+		const callWasSuccessful = data.size > 0;
+
+		if (limiter.shouldGiveUp(callWasSuccessful)) {
 			log(
 				'error',
 				'yt batch scrape returned no data, API quota probably exceeded, stopping scrape and starting again in 25h',
@@ -67,10 +103,12 @@ export const scrape = async (dataSource: DataSource, log: LogFunction, api: YtAp
 					log('error', 'error while restarting scrape:', error);
 				}
 			}, retryDelay25Hours);
+
+			return;
 		}
 
 		// eslint-disable-next-line no-await-in-loop
-		await sleep(500);
+		await sleep(limiter.getDelay());
 	}
 };
 
