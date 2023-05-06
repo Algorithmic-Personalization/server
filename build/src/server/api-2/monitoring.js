@@ -12,20 +12,15 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
     return (mod && mod.__esModule) ? mod : { "default": mod };
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.monitoringDefinition = exports.showSql = void 0;
+exports.monitoringDefinition = void 0;
 const typeorm_1 = require("typeorm");
 const requestLog_1 = __importDefault(require("../models/requestLog"));
 const event_1 = __importDefault(require("../../common/models/event"));
 const session_1 = __importDefault(require("../../common/models/session"));
 const util_1 = require("../../common/util");
-const showSql = (log) => (qb) => {
-    const sql = qb.getSql();
-    log('info', 'running query:', sql);
-    return qb;
-};
-exports.showSql = showSql;
+const util_2 = require("../../util");
 const getMostViewedPages = (dataSource, log) => ({ fromDate, toDate }) => __awaiter(void 0, void 0, void 0, function* () {
-    const show = (0, exports.showSql)(log);
+    const show = (0, util_2.showSql)(log);
     const mostViewedPagesRaw = yield show(dataSource.createQueryBuilder()
         .select('count(*)', 'count')
         .addSelect('url')
@@ -69,7 +64,7 @@ const getMostViewedPages = (dataSource, log) => ({ fromDate, toDate }) => __awai
 });
 const getReport = (dataSource, log) => ({ fromDate, toDate }) => __awaiter(void 0, void 0, void 0, function* () {
     log('generating report from', fromDate, 'exclusive to', toDate, 'inclusive');
-    const show = (0, exports.showSql)(log);
+    const show = (0, util_2.showSql)(log);
     const requestRepo = dataSource.getRepository(requestLog_1.default);
     const nPagesViewed = yield requestRepo.count({
         where: {

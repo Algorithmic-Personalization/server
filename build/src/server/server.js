@@ -73,6 +73,8 @@ const getTransitionSetting_1 = __importDefault(require("./api-2/getTransitionSet
 const monitoring_1 = __importDefault(require("./api-2/monitoring"));
 const getInstalledEventConfig_1 = __importDefault(require("./lib/config-loader/getInstalledEventConfig"));
 const getYouTubeConfig_1 = __importDefault(require("./lib/config-loader/getYouTubeConfig"));
+const youTubeApi_1 = __importDefault(require("./lib/youTubeApi"));
+const scrapeYouTube_1 = __importDefault(require("./lib/scrapeYouTube"));
 // DO NOT FORGET TO UPDATE THIS FILE WHEN ADDING NEW ENTITIES
 const entities_1 = __importDefault(require("./entities"));
 const loadConfigYamlRaw_1 = require("./lib/config-loader/loadConfigYamlRaw");
@@ -178,6 +180,16 @@ const main = () => __awaiter(void 0, void 0, void 0, function* () {
         log('error', 'updating activity counters:', err);
         process.exit(1);
     }
+    const youTubeConfig = (0, getYouTubeConfig_1.default)(config);
+    // Not using cache in the scraping process because we're not gonna ask twice for the same video data
+    const ytApi = (0, youTubeApi_1.default)('without-cache')(youTubeConfig, createLogger('<yt-api>'));
+    (0, scrapeYouTube_1.default)(ds, createLogger('<yt-scraper>'), ytApi)
+        .then(() => {
+        log('success', 'done scraping youtube metadata [not for real]');
+    })
+        .catch(err => {
+        log('error', 'scraping youtube metadata:', err);
+    });
     const privateKey = yield (0, promises_1.readFile)((0, path_1.join)(root, 'private.key'), 'utf-8');
     const tokenTools = (0, crypto_1.createTokenTools)(privateKey);
     const installedEventConfig = (0, getInstalledEventConfig_1.default)(config);
@@ -188,7 +200,7 @@ const main = () => __awaiter(void 0, void 0, void 0, function* () {
         createLogger,
         tokenTools,
         installedEventConfig,
-        youTubeConfig: (0, getYouTubeConfig_1.default)(config),
+        youTubeConfig,
     };
     mailer.sendMail({
         from: smtpConfig.auth.user,

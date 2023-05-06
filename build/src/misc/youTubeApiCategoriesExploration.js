@@ -19,22 +19,12 @@ var __classPrivateFieldSet = (this && this.__classPrivateFieldSet) || function (
     if (typeof state === "function" ? receiver !== state || !f : !state.has(receiver)) throw new TypeError("Cannot write private member to an object whose class did not declare it");
     return (kind === "a" ? f.call(receiver, value) : f ? f.value = value : state.set(receiver, value)), value;
 };
-var __rest = (this && this.__rest) || function (s, e) {
-    var t = {};
-    for (var p in s) if (Object.prototype.hasOwnProperty.call(s, p) && e.indexOf(p) < 0)
-        t[p] = s[p];
-    if (s != null && typeof Object.getOwnPropertySymbols === "function")
-        for (var i = 0, p = Object.getOwnPropertySymbols(s); i < p.length; i++) {
-            if (e.indexOf(p[i]) < 0 && Object.prototype.propertyIsEnumerable.call(s, p[i]))
-                t[p[i]] = s[p[i]];
-        }
-    return t;
-};
 var __importDefault = (this && this.__importDefault) || function (mod) {
     return (mod && mod.__esModule) ? mod : { "default": mod };
 };
-var _RateLimiter_sleepTimes, _RateLimiter_sleepIndex, _RateLimiter_maxAttemptsAtMaxSleep, _RateLimiter_attemptsAtMaxSleepLeft, _RateLimiter_baseDelay, _MemWatcher_tStart, _MemWatcher_minHeapUsed, _MemWatcher_minHeapTime, _MemWatcher_maxHeapUsed, _MemWatcher_maxHeapTime, _MemWatcher_interval;
+var _RateLimiter_sleepTimes, _RateLimiter_sleepIndex, _RateLimiter_maxAttemptsAtMaxSleep, _RateLimiter_attemptsAtMaxSleepLeft, _RateLimiter_baseDelay;
 Object.defineProperty(exports, "__esModule", { value: true });
+exports.RateLimiter = exports.keypress = void 0;
 const path_1 = require("path");
 const promises_1 = require("fs/promises");
 const fs_1 = require("fs");
@@ -42,23 +32,18 @@ const yaml_1 = require("yaml");
 const typeorm_1 = require("typeorm");
 const typeorm_naming_strategies_1 = require("typeorm-naming-strategies");
 const util_1 = require("../common/util");
+const util_2 = require("../util");
 const getYouTubeConfig_1 = __importDefault(require("../server/lib/config-loader/getYouTubeConfig"));
 const youTubeApi_1 = __importDefault(require("../server/lib/youTubeApi"));
 const entities_1 = __importDefault(require("../server/entities"));
 const databaseLogger_1 = __importDefault(require("../server/lib/databaseLogger"));
 const logger_1 = require("../server/lib/logger");
-const video_1 = __importDefault(require("../server/models/video"));
-const util_2 = require("../util");
+const scrapeYouTube_1 = __importDefault(require("../server/lib/scrapeYouTube"));
 const commands = new Map([
     ['compare', 'will compare the categories set of different regions'],
     ['scrape', 'will scrape meta-data for all the videos we don\'t have yet'],
 ]);
 const commandsNeedingDataSource = new Set(['scrape']);
-const sleep = (ms) => __awaiter(void 0, void 0, void 0, function* () {
-    return new Promise(resolve => {
-        setTimeout(resolve, ms);
-    });
-});
 const env = () => {
     const env = process.env.NODE_ENV;
     if (env === 'production') {
@@ -76,6 +61,7 @@ const keypress = () => __awaiter(void 0, void 0, void 0, function* () {
         });
     });
 });
+exports.keypress = keypress;
 class RateLimiter {
     constructor(log) {
         this.log = log;
@@ -89,7 +75,7 @@ class RateLimiter {
     sleep(latestCallWasSuccessful) {
         var _a, _b, _c;
         return __awaiter(this, void 0, void 0, function* () {
-            yield sleep(__classPrivateFieldGet(this, _RateLimiter_baseDelay, "f"));
+            yield (0, util_2.sleep)(__classPrivateFieldGet(this, _RateLimiter_baseDelay, "f"));
             if (latestCallWasSuccessful) {
                 __classPrivateFieldSet(this, _RateLimiter_attemptsAtMaxSleepLeft, __classPrivateFieldGet(this, _RateLimiter_maxAttemptsAtMaxSleep, "f"), "f");
                 if (__classPrivateFieldGet(this, _RateLimiter_sleepIndex, "f") > 0) {
@@ -105,7 +91,7 @@ class RateLimiter {
             const t = this.getSleepTime();
             if (t > 0) {
                 this.log('warning', `we're probably being rate-limited, sleeping for ${t} ms`);
-                yield sleep(t);
+                yield (0, util_2.sleep)(t);
                 return t;
             }
             return 0;
@@ -118,153 +104,8 @@ class RateLimiter {
         return __classPrivateFieldGet(this, _RateLimiter_attemptsAtMaxSleepLeft, "f") === 0;
     }
 }
+exports.RateLimiter = RateLimiter;
 _RateLimiter_sleepTimes = new WeakMap(), _RateLimiter_sleepIndex = new WeakMap(), _RateLimiter_maxAttemptsAtMaxSleep = new WeakMap(), _RateLimiter_attemptsAtMaxSleepLeft = new WeakMap(), _RateLimiter_baseDelay = new WeakMap();
-class MemWatcher {
-    constructor(intervalMs = 100) {
-        this.intervalMs = intervalMs;
-        _MemWatcher_tStart.set(this, Date.now());
-        _MemWatcher_minHeapUsed.set(this, Infinity);
-        _MemWatcher_minHeapTime.set(this, 0);
-        _MemWatcher_maxHeapUsed.set(this, 0);
-        _MemWatcher_maxHeapTime.set(this, 0);
-        _MemWatcher_interval.set(this, void 0);
-        __classPrivateFieldSet(this, _MemWatcher_interval, setInterval(() => {
-            const { heapUsed } = process.memoryUsage();
-            if (heapUsed < __classPrivateFieldGet(this, _MemWatcher_minHeapUsed, "f")) {
-                __classPrivateFieldSet(this, _MemWatcher_minHeapUsed, heapUsed, "f");
-                __classPrivateFieldSet(this, _MemWatcher_minHeapTime, Date.now(), "f");
-            }
-            else if (heapUsed > __classPrivateFieldGet(this, _MemWatcher_maxHeapUsed, "f")) {
-                __classPrivateFieldSet(this, _MemWatcher_maxHeapUsed, heapUsed, "f");
-                __classPrivateFieldSet(this, _MemWatcher_maxHeapTime, Date.now(), "f");
-            }
-        }, intervalMs), "f");
-    }
-    stop() {
-        clearInterval(__classPrivateFieldGet(this, _MemWatcher_interval, "f"));
-        return {
-            tStart: new Date(__classPrivateFieldGet(this, _MemWatcher_tStart, "f")),
-            maxHeapUsed: (0, util_2.formatSize)(__classPrivateFieldGet(this, _MemWatcher_maxHeapUsed, "f")),
-            maxHeapTime: new Date(__classPrivateFieldGet(this, _MemWatcher_maxHeapTime, "f")),
-            minHeapUsed: (0, util_2.formatSize)(__classPrivateFieldGet(this, _MemWatcher_minHeapUsed, "f")),
-            minHeapTime: new Date(__classPrivateFieldGet(this, _MemWatcher_minHeapTime, "f")),
-            deltaHeapUsed: (0, util_2.formatSize)(__classPrivateFieldGet(this, _MemWatcher_maxHeapUsed, "f") - __classPrivateFieldGet(this, _MemWatcher_minHeapUsed, "f")),
-        };
-    }
-}
-_MemWatcher_tStart = new WeakMap(), _MemWatcher_minHeapUsed = new WeakMap(), _MemWatcher_minHeapTime = new WeakMap(), _MemWatcher_maxHeapUsed = new WeakMap(), _MemWatcher_maxHeapTime = new WeakMap(), _MemWatcher_interval = new WeakMap();
-const _scrape = (dataSource, log, api, batchId) => __awaiter(void 0, void 0, void 0, function* () {
-    log('gonna scrape!');
-    const query = dataSource
-        .getRepository(video_1.default)
-        .createQueryBuilder('v')
-        .select('distinct v.youtube_id')
-        .where('not exists (select 1 from video_metadata m where m.youtube_Id = v.youtube_Id)')
-        .orderBy('v.youtube_id', 'ASC');
-    log('running query: ', query.getSql());
-    const youtubeIdsWithoutMetadataCount = yield (0, util_2.asyncPerf)(() => __awaiter(void 0, void 0, void 0, function* () { return query.getCount(); }), 'select youtube_id\'s without metadata', log);
-    const videoCount = yield dataSource.getRepository(video_1.default).count();
-    log('youtube_id\'s needing fetching the meta-data of:', youtubeIdsWithoutMetadataCount);
-    log('total video count:', videoCount);
-    log(`percentage of videos lacking meta-data: ${(0, util_2.formatPct)((0, util_2.pct)(youtubeIdsWithoutMetadataCount, videoCount))}`);
-    let gotStuck = false;
-    if (batchId === 0) {
-        log('press y to continue, anything else to abort');
-        const input = yield keypress();
-        if (input !== 'y') {
-            log('aborting as requested by user');
-            return [0, 0, false];
-        }
-    }
-    const pageSize = 50;
-    let nVideosQueried = 0;
-    let nMetaObtained = 0;
-    let refetched = 0;
-    let timeSlept = 0;
-    const rateLimiter = new RateLimiter(log);
-    for (let offset = 0;; ++offset) {
-        try {
-            // eslint-disable-next-line no-await-in-loop
-            const videos = yield (0, util_2.asyncPerf)(() => __awaiter(void 0, void 0, void 0, function* () { return query.take(pageSize).limit(pageSize).offset(offset * pageSize).getRawMany(); }), `attempting to fetch ${pageSize} videos at offset ${offset * pageSize} from the db`, log);
-            const pageIds = videos.map(v => v.youtube_id);
-            nVideosQueried += pageIds.length;
-            log('fetched', videos.length, 'videos from the db:', pageIds);
-            if (videos.length === 0) {
-                log('no more videos to fetch from db');
-                break;
-            }
-            // eslint-disable-next-line no-await-in-loop
-            const meta = yield (0, util_2.asyncPerf)(() => __awaiter(void 0, void 0, void 0, function* () { return api.getMetaFromVideoIds(pageIds); }), `attempting to fetch meta-data for ${videos.length} videos using the YouTube API`, log);
-            const { data } = meta, stats = __rest(meta, ["data"]);
-            const latestCallWasSuccessful = data.size > 0;
-            // eslint-disable-next-line no-await-in-loop
-            timeSlept += yield rateLimiter.sleep(latestCallWasSuccessful);
-            if (!latestCallWasSuccessful) {
-                if (rateLimiter.isStuck()) {
-                    log('looks like we\'re stuck, aborting');
-                    gotStuck = true;
-                    break;
-                }
-                --offset;
-                continue;
-            }
-            nMetaObtained += data.size;
-            refetched += stats.refetched;
-            log('got meta-data for', data.size, 'videos with stats:', stats);
-            log('info', `${(0, util_2.formatPct)((0, util_2.pct)(nMetaObtained, videoCount))} youtubeIdsWithoutMetadataCount`);
-            // We don't need to persist the meta-data here because the
-            // `getMetaFromVideoIds` method already does that for us.
-            ++offset;
-        }
-        catch (e) {
-            log('error while fetching videos from the db', e);
-            return [0, nMetaObtained, false];
-        }
-    }
-    const nowMissing = yield query.getCount();
-    const finalPct = (0, util_2.formatPct)((0, util_2.pct)(nowMissing, videoCount));
-    if (nowMissing !== 0) {
-        log('warning', `now still missing ${finalPct} of the videos...`);
-        log('warning', 'obtained only', (0, util_2.formatPct)((0, util_2.pct)(nMetaObtained, nVideosQueried)), 'of the meta-data we asked for');
-    }
-    log('counted', youtubeIdsWithoutMetadataCount, 'videos without meta-data and queried', nVideosQueried);
-    if (youtubeIdsWithoutMetadataCount !== nVideosQueried) {
-        log('warning', 'youtubeIdsWithoutMetadataCount !== nVideosQueried:', 'did not query the API for all the videos we thought we needed to.', `only ${(0, util_2.formatPct)((0, util_2.pct)(nVideosQueried, youtubeIdsWithoutMetadataCount))} of the videos were queried`);
-    }
-    if (refetched !== 0) {
-        log('warning', 'refetched', refetched, 'videos');
-    }
-    log('info', 'time slept for rate-limiting:', timeSlept, 'ms');
-    log('debug', 'batch', batchId, 'done');
-    return [nowMissing, nMetaObtained, !gotStuck];
-});
-const scrape = (dataSource, log, api) => __awaiter(void 0, void 0, void 0, function* () {
-    let i = 0;
-    let missing;
-    let obtained;
-    let shouldRetry;
-    const memWatcher = new MemWatcher();
-    do {
-        // eslint-disable-next-line no-await-in-loop
-        [missing, obtained, shouldRetry] = yield _scrape(dataSource, log, api, i);
-        ++i;
-        if (missing !== 0) {
-            if (obtained > 0 && shouldRetry) {
-                log('warning', 'could not get all the meta-data in one go, trying again...');
-            }
-            else {
-                log('error', 'no meta-data obtained, giving up');
-                break;
-            }
-        }
-    } while (missing !== 0);
-    log('info', 'done scraping meta-data in', i, 'passes');
-    if (missing > 0) {
-        log('warning', 'still missing', missing, 'video meta-data');
-    }
-    const mem = memWatcher.stop();
-    log('info', 'memory usage stats:', mem);
-});
 // TODO: move this to a separate file, use in in server.ts because it
 // is duplicated there and it is ugly in server.ts
 const createDataSource = (projectRootDir, log) => __awaiter(void 0, void 0, void 0, function* () {
@@ -390,7 +231,7 @@ const main = () => __awaiter(void 0, void 0, void 0, function* () {
         try {
             const scrapeLog = createLog('<scrape>');
             // Use API without memory cache to minimize RAM usage on low-perf server
-            yield scrape(dataSource, scrapeLog, apiWithoutCache);
+            yield (0, scrapeYouTube_1.default)(dataSource, scrapeLog, apiWithoutCache);
         }
         catch (err) {
             console.error('Error while scraping:', err);

@@ -12,24 +12,25 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
     return (mod && mod.__esModule) ? mod : { "default": mod };
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.MetadataType = void 0;
 /* eslint-disable @typescript-eslint/no-inferrable-types */
 const typeorm_1 = require("typeorm");
 const model_1 = __importDefault(require("../../common/lib/model"));
 const class_validator_1 = require("class-validator");
-var MetadataType;
-(function (MetadataType) {
-    MetadataType["TAG"] = "TAG";
-    MetadataType["TOPIC_CATEGORY"] = "TOPIC_CATEGORY";
-    MetadataType["YT_CATEGORY_ID"] = "YT_CATEGORY_ID";
-    MetadataType["YT_CATEGORY_TITLE"] = "YT_CATEGORY_TITLE";
-})(MetadataType = exports.MetadataType || (exports.MetadataType = {}));
 let VideoMetadata = class VideoMetadata extends model_1.default {
     constructor() {
         super(...arguments);
         this.youtubeId = '';
-        this.type = MetadataType.TAG;
-        this.value = '';
+        this.youtubeCategoryId = '';
+        this.categoryTitle = '';
+        this.youtubeChannelId = '';
+        this.videoTitle = '';
+        this.videoDescription = '';
+        this.publishedAt = new Date(0);
+        this.viewCount = -1;
+        this.likeCount = -1;
+        this.commentCount = -1;
+        this.tags = [];
+        this.topicCategories = [];
     }
 };
 __decorate([
@@ -40,16 +41,68 @@ __decorate([
 ], VideoMetadata.prototype, "youtubeId", void 0);
 __decorate([
     (0, typeorm_1.Column)(),
-    (0, class_validator_1.IsEnum)(MetadataType),
+    (0, class_validator_1.IsString)(),
     (0, class_validator_1.IsNotEmpty)(),
     __metadata("design:type", String)
-], VideoMetadata.prototype, "type", void 0);
+], VideoMetadata.prototype, "youtubeCategoryId", void 0);
 __decorate([
     (0, typeorm_1.Column)(),
     (0, class_validator_1.IsString)(),
     (0, class_validator_1.IsNotEmpty)(),
     __metadata("design:type", String)
-], VideoMetadata.prototype, "value", void 0);
+], VideoMetadata.prototype, "categoryTitle", void 0);
+__decorate([
+    (0, typeorm_1.Column)(),
+    (0, class_validator_1.IsString)(),
+    (0, class_validator_1.IsNotEmpty)(),
+    __metadata("design:type", String)
+], VideoMetadata.prototype, "youtubeChannelId", void 0);
+__decorate([
+    (0, typeorm_1.Column)(),
+    (0, class_validator_1.IsString)(),
+    (0, class_validator_1.IsNotEmpty)(),
+    __metadata("design:type", String)
+], VideoMetadata.prototype, "videoTitle", void 0);
+__decorate([
+    (0, typeorm_1.Column)(),
+    (0, class_validator_1.IsString)(),
+    __metadata("design:type", String)
+], VideoMetadata.prototype, "videoDescription", void 0);
+__decorate([
+    (0, typeorm_1.Column)(),
+    (0, class_validator_1.IsDate)(),
+    (0, class_validator_1.IsNotEmpty)(),
+    (0, class_validator_1.MinDate)(new Date(1)),
+    __metadata("design:type", Date)
+], VideoMetadata.prototype, "publishedAt", void 0);
+__decorate([
+    (0, typeorm_1.Column)(),
+    (0, class_validator_1.IsInt)(),
+    (0, class_validator_1.Min)(0),
+    __metadata("design:type", Number)
+], VideoMetadata.prototype, "viewCount", void 0);
+__decorate([
+    (0, typeorm_1.Column)(),
+    (0, class_validator_1.IsInt)(),
+    (0, class_validator_1.Min)(0),
+    __metadata("design:type", Number)
+], VideoMetadata.prototype, "likeCount", void 0);
+__decorate([
+    (0, typeorm_1.Column)(),
+    (0, class_validator_1.IsInt)(),
+    (0, class_validator_1.Min)(0),
+    __metadata("design:type", Number)
+], VideoMetadata.prototype, "commentCount", void 0);
+__decorate([
+    (0, typeorm_1.Column)('text', { array: true }),
+    (0, class_validator_1.IsString)({ each: true }),
+    __metadata("design:type", Array)
+], VideoMetadata.prototype, "tags", void 0);
+__decorate([
+    (0, typeorm_1.Column)('text', { array: true }),
+    (0, class_validator_1.IsString)({ each: true }),
+    __metadata("design:type", Array)
+], VideoMetadata.prototype, "topicCategories", void 0);
 VideoMetadata = __decorate([
     (0, typeorm_1.Entity)()
 ], VideoMetadata);

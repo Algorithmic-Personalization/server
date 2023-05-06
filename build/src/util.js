@@ -9,7 +9,7 @@ var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, ge
     });
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.stringFromMaybeError = exports.asyncPerf = exports.pct = exports.formatPct = exports.formatSize = exports.daysElapsed = exports.withLock = void 0;
+exports.sleep = exports.showInsertSql = exports.showSql = exports.stringFromMaybeError = exports.asyncPerf = exports.pct = exports.formatPct = exports.formatSize = exports.daysElapsed = exports.withLock = void 0;
 const locks = new Map();
 const unstackLock = (id, log) => __awaiter(void 0, void 0, void 0, function* () {
     const stack = locks.get(id);
@@ -121,4 +121,22 @@ const stringFromMaybeError = (maybeError, defaultMessage = 'unknown error') => {
     return JSON.stringify(maybeError);
 };
 exports.stringFromMaybeError = stringFromMaybeError;
+const showSql = (log) => (qb) => {
+    const sql = qb.getSql();
+    log('info', 'running query:', sql);
+    return qb;
+};
+exports.showSql = showSql;
+const showInsertSql = (log) => (qb) => {
+    const sql = qb.getSql();
+    log('info', 'running query:', sql);
+    return qb;
+};
+exports.showInsertSql = showInsertSql;
+const sleep = (ms) => __awaiter(void 0, void 0, void 0, function* () {
+    return new Promise(resolve => {
+        setTimeout(resolve, ms);
+    });
+});
+exports.sleep = sleep;
 //# sourceMappingURL=util.js.map
