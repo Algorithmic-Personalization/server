@@ -257,7 +257,12 @@ const main = async () => {
 
 	const youTubeConfig = getYouTubeConfig(config);
 
-	const ytApi = makeCreateYouTubeApi()(youTubeConfig, createLogger('<yt-api>'));
+	// Not using cache in the scraping process because we're not gonna ask twice for the same video data
+	const ytApi = makeCreateYouTubeApi('without-cache')(
+		youTubeConfig,
+		createLogger('<yt-api>'),
+	);
+
 	scrapeMissingYouTubeMetadata(ds, createLogger('<yt-scraper>'), ytApi)
 		.then(() => {
 			log('success', 'done scraping youtube metadata [not for real]');

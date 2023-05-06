@@ -1,5 +1,11 @@
 import fetch, {type Response} from 'node-fetch';
-import {type Repository, type DataSource} from 'typeorm';
+
+import {
+	type Repository,
+	type DataSource,
+	type InsertResult,
+	In,
+} from 'typeorm';
 
 import {
 	validate,
@@ -20,28 +26,18 @@ import {type YouTubeConfig} from './routeCreation';
 import {type LogFunction} from './logger';
 
 import VideoCategory from '../models/videoCategory';
-import VideoMetadata, {MetadataType} from '../models/videoMetadata';
+import VideoMetadata from '../models/videoMetadata';
 import YouTubeRequestLatency from '../models/youTubeRequestLatency';
-import {formatSize, formatPct, pct} from '../../util';
+import {formatSize, formatPct, pct, showInsertSql} from '../../util';
+import {validateNew} from './../../common/util';
 
-export type YouTubeMeta = {
-	videoId: string;
-	channelId: string;
-	categoryId: string;
-	publishedAt: Date;
-	categoryTitle: string;
-	title: string;
-	description: string;
-	topicCategories: string[];
-	tags: string[];
-	statistics: {
-		viewCount: number;
-		likeCount: number;
-		commentCount: number;
-	};
+export type MetaMap = Map<string, VideoMetadata>;
+
+const mergeInto = (target: MetaMap) => (source: MetaMap) => {
+	for (const [key, value] of source) {
+		target.set(key, value);
+	}
 };
-
-export type MetaMap = Map<string, YouTubeMeta>;
 
 class PageInfo {
 	@IsInt()
@@ -97,15 +93,15 @@ class VideoSnippet {
 class VideoStatistics {
 	@IsInt()
 	@Min(0)
-		viewCount = -1;
+		viewCount = '0';
 
 	@IsInt()
 	@Min(0)
-		likeCount = -1;
+		likeCount = '0';
 
 	@IsInt()
 	@Min(0)
-		commentCount = -1;
+		commentCount = '0';
 }
 
 export class VideoListItem {
@@ -181,221 +177,37 @@ export type YouTubeResponseMeta = Stats & {
 	data: MetaMap;
 };
 
-const getYouTubeMeta = (repo: Repository<VideoMetadata>) => async (youtubeId: string): Promise<YouTubeMeta | undefined> => {
-	const metaRows = await repo.find({where: {youtubeId}});
+const getManyYoutubeMetas = (repo: Repository<VideoMetadata>) => async (youtubeIds: string[]): Promise<MetaMap> => {
+	const items = await repo.find({
+		where: {youtubeId: In(youtubeIds)},
+	});
 
-	if (metaRows.length === 0) {
-		return undefined;
-	}
-
-	const meta: YouTubeMeta = {
-		videoId: youtubeId,
-		categoryId: '',
-		categoryTitle: '',
-		topicCategories: [],
-		tags: [],
-		channelId: '',
-		publishedAt: new Date(0),
-		title: '',
-		description: '',
-		statistics: {
-			viewCount: 0,
-			likeCount: 0,
-			commentCount: 0,
-		},
-	};
-
-	for (const row of metaRows) {
-		switch (row.type) {
-			case MetadataType.TAG:
-				meta.tags.push(row.value as string);
-				break;
-			case MetadataType.TOPIC_CATEGORY:
-				meta.topicCategories.push(row.value as string);
-				break;
-			case MetadataType.YT_CATEGORY_ID:
-				meta.categoryId = row.value as string;
-				break;
-			case MetadataType.YT_CATEGORY_TITLE:
-				meta.categoryTitle = row.value as string;
-				break;
-			case MetadataType.TITLE:
-				meta.title = row.value as string;
-				break;
-			case MetadataType.YT_CHANNEL_ID:
-				meta.channelId = row.value as string;
-				break;
-			case MetadataType.PUBLISHED_AT:
-				meta.publishedAt = row.value as Date;
-				break;
-			case MetadataType.VIEW_COUNT:
-				meta.statistics.viewCount = row.value as number;
-				break;
-			case MetadataType.LIKE_COUNT:
-				meta.statistics.likeCount = row.value as number;
-				break;
-			case MetadataType.COMMENT_COUNT:
-				meta.statistics.commentCount = row.value as number;
-				break;
-			case MetadataType.DESCRIPTION:
-				meta.description = row.value as string;
-				break;
-			default:
-				throw new Error('unknown metadata type, should never happen');
-		}
-	}
-
-	if (meta.categoryId.length > 0) {
-		return meta;
-	}
-
-	return undefined;
+	return new Map(items.map(m => [m.youtubeId, m]));
 };
 
-const getManyYoutubeMetas = (repo: Repository<VideoMetadata>) => async (videoIds: string[]): Promise<MetaMap> => {
-	const getOne = getYouTubeMeta(repo);
-	const res: MetaMap = new Map();
-
-	const metas = await Promise.all(videoIds.map(getOne));
-	for (const meta of metas) {
-		if (meta === undefined) {
-			continue;
-		}
-
-		res.set(meta.videoId, meta);
-	}
-
-	return res;
-};
-
-const convertToVideoMetaData = (meta: YouTubeMeta): VideoMetadata[] => {
-	const res: VideoMetadata[] = [];
-
-	const categoryIdMeta = new VideoMetadata();
-	categoryIdMeta.youtubeId = meta.videoId;
-	categoryIdMeta.type = MetadataType.YT_CATEGORY_ID;
-	categoryIdMeta.value = meta.categoryId;
-	res.push(categoryIdMeta);
-
-	const categoryTitleMeta = new VideoMetadata();
-	categoryTitleMeta.youtubeId = meta.videoId;
-	categoryTitleMeta.type = MetadataType.YT_CATEGORY_TITLE;
-	categoryTitleMeta.value = meta.categoryTitle;
-	res.push(categoryTitleMeta);
-
-	const titleMeta = new VideoMetadata();
-	titleMeta.youtubeId = meta.videoId;
-	titleMeta.type = MetadataType.TITLE;
-	titleMeta.value = meta.title;
-	res.push(titleMeta);
-
-	const descriptionMeta = new VideoMetadata();
-	descriptionMeta.youtubeId = meta.videoId;
-	descriptionMeta.type = MetadataType.DESCRIPTION;
-	descriptionMeta.value = meta.description;
-	res.push(descriptionMeta);
-
-	const channelIdMeta = new VideoMetadata();
-	channelIdMeta.youtubeId = meta.videoId;
-	channelIdMeta.type = MetadataType.YT_CHANNEL_ID;
-	channelIdMeta.value = meta.channelId;
-	res.push(channelIdMeta);
-
-	const publishedAtMeta = new VideoMetadata();
-	publishedAtMeta.youtubeId = meta.videoId;
-	publishedAtMeta.type = MetadataType.PUBLISHED_AT;
-	publishedAtMeta.value = meta.publishedAt;
-	res.push(publishedAtMeta);
-
-	const viewCountMeta = new VideoMetadata();
-	viewCountMeta.youtubeId = meta.videoId;
-	viewCountMeta.type = MetadataType.VIEW_COUNT;
-	viewCountMeta.value = meta.statistics.viewCount;
-	res.push(viewCountMeta);
-
-	const likeCountMeta = new VideoMetadata();
-	likeCountMeta.youtubeId = meta.videoId;
-	likeCountMeta.type = MetadataType.LIKE_COUNT;
-	likeCountMeta.value = meta.statistics.likeCount;
-	res.push(likeCountMeta);
-
-	const commentCountMeta = new VideoMetadata();
-	commentCountMeta.youtubeId = meta.videoId;
-	commentCountMeta.type = MetadataType.COMMENT_COUNT;
-	commentCountMeta.value = meta.statistics.commentCount;
-	res.push(commentCountMeta);
-
-	for (const topic of meta.topicCategories) {
-		const metaData = new VideoMetadata();
-		metaData.youtubeId = meta.videoId;
-		metaData.value = topic;
-		metaData.type = MetadataType.TOPIC_CATEGORY;
-		res.push(metaData);
-	}
-
-	if (meta.tags) {
-		for (const tag of meta.tags) {
-			const metaData = new VideoMetadata();
-			metaData.youtubeId = meta.videoId;
-			metaData.value = tag;
-			metaData.type = MetadataType.TAG;
-			res.push(metaData);
-		}
-	}
-
-	return res;
-};
-
-type MapLike<K, V> = {
-	set: (key: K, value: V) => void;
-} & Iterable<[K, V]>;
-
-const mergeInto = <K, V>(target: MapLike<K, V>) => (source: MapLike<K, V>) => {
-	for (const [key, value] of source) {
-		target.set(key, value);
-	}
-};
-
-// TODO: handle update?
 const createPersistYouTubeMetas = (dataSource: DataSource, log: LogFunction) =>
-	async (metaToPersistInOrder: VideoMetadata[]) => {
-		const qr = dataSource.createQueryRunner();
-		const youtubeIds = [...new Set(metaToPersistInOrder.map(m => m.youtubeId))];
+	async (metaDataItems: VideoMetadata[]): Promise<InsertResult> =>
+		showInsertSql(log)(
+			dataSource.createQueryBuilder()
+				.insert()
+				.into(VideoMetadata)
+				.values(metaDataItems)
+				.orUpdate(['youtube_id']),
+		).execute();
 
-		try {
-			await qr.connect();
-			await qr.startTransaction();
-			const repo = qr.manager.getRepository(VideoMetadata);
-			const metas = await repo
-				.createQueryBuilder('m')
-				.useTransaction(true)
-				.setLock('pessimistic_write')
-				.where({youtubeId: youtubeIds})
-				.select('m.youtube_id')
-				.getMany();
+const intIfDefined = (str: string | undefined): number => {
+	if (!str) {
+		return 0;
+	}
 
-			const ignoreSet = new Set(metas.map(m => m.youtubeId));
-			if (ignoreSet.size > 0) {
-				log('info', ignoreSet.size, 'metas already in DB, skipping them...');
-			}
+	const res = parseInt(str, 10);
 
-			const insertList = metaToPersistInOrder.filter(m => !ignoreSet.has(m.youtubeId));
-			const nVids = youtubeIds.length - ignoreSet.size;
-			log('info', insertList.length, 'metas to insert in DB, corresponding to', nVids, 'videos ...');
+	if (isNaN(res)) {
+		throw new Error('invalid number: ' + str);
+	}
 
-			const res = await repo.insert(insertList);
-			const inserted = res.identifiers.length;
-
-			await qr.commitTransaction();
-
-			log('info', inserted, 'metas inserted in DB or', pct(inserted, insertList.length), '%');
-		} catch (e) {
-			await qr.rollbackTransaction();
-			throw e;
-		} finally {
-			await qr.release();
-		}
-	};
+	return res;
+};
 
 export type YtApi = {
 	getMetaFromVideoIds(youTubeVideoIdsMaybeNonUnique: string[], hl?: string, recurse?: boolean): Promise<YouTubeResponseMeta>;
@@ -408,7 +220,7 @@ export const makeCreateYouTubeApi = (cache: 'with-cache' | 'without-cache' = 'wi
 
 	const useCache = cache === 'with-cache';
 
-	const metaCache = new MemoryCache<string, YouTubeMeta>();
+	const metaCache = new MemoryCache<string, VideoMetadata>();
 	const categoriesCache = new Map<string, string>();
 
 	const fetchingMeta: PromisedResponseMap = new Map();
@@ -463,7 +275,6 @@ export const makeCreateYouTubeApi = (cache: 'with-cache' | 'without-cache' = 'wi
 
 		const api: YtApi = {
 			// TODO: split into multiple queries if the list of unique IDs is too long (> 50)
-			// eslint-disable-next-line complexity
 			async getMetaFromVideoIds(youTubeVideoIdsMaybeNonUnique: string[], hl = 'en', recurse = true): Promise<YouTubeResponseMeta> {
 				await fetchingCategories;
 				const youTubeIds = [...new Set(youTubeVideoIdsMaybeNonUnique)];
@@ -563,12 +374,14 @@ export const makeCreateYouTubeApi = (cache: 'with-cache' | 'without-cache' = 'wi
 				}
 
 				const validation = await Promise.allSettled(validationPromises);
-				const metaToPersist: YouTubeMeta[] = [];
+				const metaToValidate: VideoMetadata[] = [];
+				const itemsFromYouTube: VideoListItem[] = [];
+				const metaValidationPromises: Array<Promise<string[]>> = [];
 
 				validation.forEach((validationResult, i) => {
 					if (validationResult.status === 'rejected') {
 						log(
-							'error validating some meta-data for videos:',
+							'error validating the response from the YouTube API:',
 							validationResult.reason,
 							'response from YouTube was:',
 							youTubeResponses[i],
@@ -589,23 +402,24 @@ export const makeCreateYouTubeApi = (cache: 'with-cache' | 'without-cache' = 'wi
 							}
 
 							for (const item of items) {
-								const meta: YouTubeMeta = {
-									videoId: item.id,
-									categoryId: item.snippet.categoryId,
-									categoryTitle: categoriesCache.get(item.snippet.categoryId) ?? '<unknown>',
-									topicCategories: item.topicDetails?.topicCategories ?? [],
-									tags: item.snippet.tags ?? [],
-									title: item.snippet.title,
-									description: item.snippet.description,
-									publishedAt: new Date(item.snippet.publishedAt),
-									channelId: item.snippet.channelId,
-									statistics: item.statistics,
-								};
-								metaToPersist.push(meta);
-								metaMap.set(item.id, meta);
-								if (useCache) {
-									metaCache.put(item.id, meta, cacheForMs());
-								}
+								itemsFromYouTube.push(item);
+
+								const meta = new VideoMetadata();
+								meta.youtubeId = item.id;
+								meta.youtubeCategoryId = item.snippet.categoryId;
+								meta.categoryTitle = categoriesCache.get(item.snippet.categoryId) ?? '<unknown>';
+								meta.topicCategories = item.topicDetails?.topicCategories ?? [];
+								meta.tags = item.snippet.tags ?? [];
+								meta.videoTitle = item.snippet.title;
+								meta.videoDescription = item.snippet.description;
+								meta.publishedAt = new Date(item.snippet.publishedAt);
+								meta.youtubeChannelId = item.snippet.channelId;
+								meta.viewCount = intIfDefined(item.statistics.viewCount);
+								meta.likeCount = intIfDefined(item.statistics.likeCount);
+								meta.commentCount = intIfDefined(item.statistics.commentCount);
+
+								metaToValidate.push(meta);
+								metaValidationPromises.push(validateNew(meta));
 							}
 						} else {
 							log('errors validating some meta-data for videos:', errors);
@@ -613,19 +427,39 @@ export const makeCreateYouTubeApi = (cache: 'with-cache' | 'without-cache' = 'wi
 					}
 				});
 
-				const metaToPersistInOrder: VideoMetadata[] = [];
+				const metaToPersist: VideoMetadata[] = [];
 
-				if (metaRepo) {
-					for (const meta of metaToPersist) {
-						fetchingMeta.delete(meta.videoId);
-						metaToPersistInOrder.push(...convertToVideoMetaData(meta));
-					}
+				const metaValidations = await Promise.allSettled(metaValidationPromises);
 
-					if (persistMetas) {
-						persistMetas(metaToPersistInOrder).catch(err => {
-							log('error', 'persisting video metadata:', err);
-						});
+				metaValidations.forEach((validationResult, i) => {
+					if (validationResult.status === 'rejected') {
+						log('error running the validation on video metadata:', validationResult.reason);
+					} else {
+						const errors = validationResult.value;
+						const meta = metaToValidate[i];
+						if (errors.length === 0) {
+							metaToPersist.push(meta);
+
+							metaMap.set(meta.youtubeId, meta);
+							if (useCache) {
+								metaCache.put(meta.youtubeId, meta, cacheForMs());
+							}
+						} else {
+							log('errors validating video metadata before insert:', errors, {
+								meta,
+								item: itemsFromYouTube[i],
+							});
+						}
 					}
+				});
+
+				if (persistMetas) {
+					log('info', `persisting ${metaToPersist.length} video metas`);
+					persistMetas(metaToPersist).then(res => {
+						log('info', `persisted video metadata for ${res.identifiers.length} videos`);
+					}, err => {
+						log('error', 'error persisting video metadata:', err);
+					});
 				}
 
 				const fetchedIds = new Set(metaMap.keys());

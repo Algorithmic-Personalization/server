@@ -1,6 +1,7 @@
 import {
 	type SelectQueryBuilder,
 	type ObjectLiteral,
+	type InsertQueryBuilder,
 } from 'typeorm';
 
 import {type LogFunction} from './server/lib/logger';
@@ -146,6 +147,12 @@ export const stringFromMaybeError = (
 };
 
 export const showSql = (log: LogFunction) => <T extends ObjectLiteral>(qb: SelectQueryBuilder<T>): SelectQueryBuilder<T> => {
+	const sql = qb.getSql();
+	log('info', 'running query:', sql);
+	return qb;
+};
+
+export const showInsertSql = (log: LogFunction) => <T extends ObjectLiteral>(qb: InsertQueryBuilder<T>): InsertQueryBuilder<T> => {
 	const sql = qb.getSql();
 	log('info', 'running query:', sql);
 	return qb;

@@ -27,6 +27,7 @@ module.exports = {
 	],
 	rules: {
 		'new-cap': 0,
+		'@typescript-eslint/switch-exhaustiveness-check': 'error',
 	},
 	settings: {
 		react: {

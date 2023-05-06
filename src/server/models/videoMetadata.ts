@@ -2,21 +2,7 @@
 import {Column, Entity} from 'typeorm';
 
 import Model from '../../common/lib/model';
-import {IsString, IsNotEmpty, IsEnum} from 'class-validator';
-
-export enum MetadataType {
-	TAG = 'TAG',
-	TOPIC_CATEGORY = 'TOPIC_CATEGORY',
-	YT_CATEGORY_ID = 'YT_CATEGORY_ID',
-	YT_CATEGORY_TITLE = 'YT_CATEGORY_TITLE',
-	VIEW_COUNT = 'VIEW_COUNT',
-	LIKE_COUNT = 'LIKE_COUNT',
-	COMMENT_COUNT = 'COMMENT_COUNT',
-	TITLE = 'TITLE',
-	DESCRIPTION = 'DESCRIPTION',
-	PUBLISHED_AT = 'PUBLISHED_AT',
-	YT_CHANNEL_ID = 'YT_CHANNEL_ID',
-}
+import {IsString, IsNotEmpty, IsDate, Min, IsInt, MinDate} from 'class-validator';
 
 @Entity()
 class VideoMetadata extends Model {
@@ -26,13 +12,57 @@ class VideoMetadata extends Model {
 		youtubeId: string = '';
 
 	@Column()
-	@IsEnum(MetadataType)
+	@IsString()
 	@IsNotEmpty()
-		type: MetadataType = MetadataType.TAG;
+		youtubeCategoryId: string = '';
 
-	@Column('simple-json')
+	@Column()
+	@IsString()
 	@IsNotEmpty()
-		value: string | number | Date = '';
+		categoryTitle: string = '';
+
+	@Column()
+	@IsString()
+	@IsNotEmpty()
+		youtubeChannelId: string = '';
+
+	@Column()
+	@IsString()
+	@IsNotEmpty()
+		videoTitle: string = '';
+
+	@Column()
+	@IsString()
+		videoDescription: string = '';
+
+	@Column()
+	@IsDate()
+	@IsNotEmpty()
+	@MinDate(new Date(1))
+		publishedAt: Date = new Date(0);
+
+	@Column()
+	@IsInt()
+	@Min(0)
+		viewCount: number = -1;
+
+	@Column()
+	@IsInt()
+	@Min(0)
+		likeCount: number = -1;
+
+	@Column()
+	@IsInt()
+	@Min(0)
+		commentCount: number = -1;
+
+	@Column('text', {array: true})
+	@IsString({each: true})
+		tags: string[] = [];
+
+	@Column('text', {array: true})
+	@IsString({each: true})
+		topicCategories: string[] = [];
 }
 
 export default VideoMetadata;
