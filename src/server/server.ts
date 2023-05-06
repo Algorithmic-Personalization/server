@@ -261,6 +261,7 @@ const main = async () => {
 	const ytApi = makeCreateYouTubeApi('without-cache')(
 		youTubeConfig,
 		createLogger('<yt-api>'),
+		ds,
 	);
 
 	scrapeMissingYouTubeMetadata(ds, createLogger('<yt-scraper>'), ytApi)

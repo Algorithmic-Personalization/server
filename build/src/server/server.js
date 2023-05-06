@@ -182,7 +182,7 @@ const main = () => __awaiter(void 0, void 0, void 0, function* () {
     }
     const youTubeConfig = (0, getYouTubeConfig_1.default)(config);
     // Not using cache in the scraping process because we're not gonna ask twice for the same video data
-    const ytApi = (0, youTubeApi_1.default)('without-cache')(youTubeConfig, createLogger('<yt-api>'));
+    const ytApi = (0, youTubeApi_1.default)('without-cache')(youTubeConfig, createLogger('<yt-api>'), ds);
     (0, scrapeYouTube_1.default)(ds, createLogger('<yt-scraper>'), ytApi)
         .then(() => {
         log('success', 'done scraping youtube metadata [not for real]');
