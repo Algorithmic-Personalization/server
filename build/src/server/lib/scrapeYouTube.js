@@ -38,7 +38,7 @@ Object.defineProperty(exports, "__esModule", { value: true });
 exports.scrape = void 0;
 const video_1 = __importDefault(require("../models/video"));
 const util_1 = require("../../util");
-const retryDelay25Hours = 25 * 60 * 60 * 1000;
+const oneDayRetryDelay = 1000 * 60 * 60 * 24;
 class Limiter {
     constructor(log) {
         this.log = log;
@@ -67,7 +67,7 @@ class Limiter {
     }
 }
 _Limiter_waitDelays = new WeakMap(), _Limiter_waitIndex = new WeakMap();
-const scrape = (dataSource, log, api) => __awaiter(void 0, void 0, void 0, function* () {
+const _scrape = (dataSource, log, api) => __awaiter(void 0, void 0, void 0, function* () {
     const show = (0, util_1.showSql)(log);
     const videoCount = yield dataSource.getRepository(video_1.default).count();
     log('info', 'there are currently', videoCount, 'videos in the database');
@@ -88,26 +88,39 @@ const scrape = (dataSource, log, api) => __awaiter(void 0, void 0, void 0, funct
     log('info', 'memory used to get the list:', (0, util_1.formatSize)(heapUsedAfter - heapUsed));
     const batchSize = 50;
     const limiter = new Limiter(log);
+    let scrapeCount = 0;
     while (videos.length) {
         const batch = videos.splice(0, batchSize);
         // eslint-disable-next-line no-await-in-loop
         const _a = yield api.getMetaFromVideoIds(batch), { data } = _a, stats = __rest(_a, ["data"]);
         log('info', 'yt batch scrape result:', stats);
+        scrapeCount += data.size;
         const callWasSuccessful = data.size > 0;
+        if (!callWasSuccessful) {
+            log('warning', 'yt batch scrape result was not entirely successful, only got', data.size, 'videos out of', batch.length);
+        }
         if (limiter.shouldGiveUp(callWasSuccessful)) {
-            log('error', 'yt batch scrape returned no data, API quota probably exceeded, stopping scrape and starting again in 25h');
-            setTimeout(() => __awaiter(void 0, void 0, void 0, function* () {
-                try {
-                    yield (0, exports.scrape)(dataSource, log, api);
-                }
-                catch (error) {
-                    log('error', 'error while restarting scrape:', error);
-                }
-            }), retryDelay25Hours);
-            return;
+            log('error', 'giving up scraping YT API for now, too many consecutive failures');
+            break;
         }
         // eslint-disable-next-line no-await-in-loop
         yield (0, util_1.sleep)(limiter.getDelay());
+    }
+    log('successfully', 'scraped', scrapeCount, 'videos from yt API');
+    return scrapeCount;
+});
+const scrape = (dataSource, log, api) => __awaiter(void 0, void 0, void 0, function* () {
+    if (!api.hasDataSource()) {
+        log('error', 'no data source provided to YT API, skipping scrape');
+        return;
+    }
+    for (;;) {
+        log('info', 'starting yt API scrape');
+        // eslint-disable-next-line no-await-in-loop
+        yield _scrape(dataSource, log, api);
+        log('info', 'yt API scrape finished, waiting', oneDayRetryDelay, 'ms before next scrape');
+        // eslint-disable-next-line no-await-in-loop
+        yield (0, util_1.sleep)(oneDayRetryDelay);
     }
 });
 exports.scrape = scrape;

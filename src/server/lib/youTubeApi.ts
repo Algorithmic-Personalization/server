@@ -1,4 +1,5 @@
 import fetch, {type Response} from 'node-fetch';
+import {parse} from 'node-html-parser';
 
 import {
 	type Repository,
@@ -175,6 +176,18 @@ type Stats = {
 
 export type YouTubeResponseMeta = Stats & {
 	data: MetaMap;
+};
+
+// TODO: non working
+export const isVideoAvailable = async (youtubeId: string): Promise<boolean> => {
+	const url = `https://www.youtube.com/watch?v=${youtubeId}`;
+
+	const responseHtml = await (await fetch(url)).text();
+	const root = parse(responseHtml);
+
+	const videoElem = root.querySelector('video');
+
+	return Boolean(videoElem);
 };
 
 const getManyYoutubeMetas = (repo: Repository<VideoMetadata>) => async (youtubeIds: string[]): Promise<MetaMap> => {

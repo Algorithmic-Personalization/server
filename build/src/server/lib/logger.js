@@ -6,7 +6,7 @@ const red = (str) => `\x1b[31m${str}\x1b[0m`;
 const green = (str) => `\x1b[32m${str}\x1b[0m`;
 const orange = (str) => `\x1b[33m${str}\x1b[0m`;
 const blue = (str) => `\x1b[34m${str}\x1b[0m`;
-const makeCreateDefaultLogger = (f) => (requestIdOrId) => (...args) => {
+const makeCreateDefaultLogger = (prettyStream) => (requestIdOrId) => (...args) => {
     const id = typeof requestIdOrId === 'number' ? `request #${requestIdOrId}` : requestIdOrId;
     const parts = [`\x1b[94m[${id} at ${new Date().toISOString()}]\x1b[0m`, ...args.map((arg, i) => {
             if (typeof arg === 'string' && i === 0) {
@@ -31,7 +31,7 @@ const makeCreateDefaultLogger = (f) => (requestIdOrId) => (...args) => {
             return (0, util_1.inspect)(arg, { depth: null, colors: true });
         })];
     console.log(...parts);
-    f.write(`${parts.join(' ')}\n`);
+    prettyStream.write(`${parts.join(' ')}\n`);
 };
 exports.makeCreateDefaultLogger = makeCreateDefaultLogger;
 exports.default = exports.makeCreateDefaultLogger;

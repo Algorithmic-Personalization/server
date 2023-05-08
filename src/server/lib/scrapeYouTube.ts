@@ -12,7 +12,7 @@ import {
 	sleep,
 } from '../../util';
 
-const oneHourRetryDelay = 1000 * 60 * 60;
+const oneDayRetryDelay = 1000 * 60 * 60 * 24;
 
 class Limiter {
 	#waitDelays = [500, 500, 500, 1000, 1000, 2000, 5000, 10000, 10000];
@@ -120,9 +120,9 @@ export const scrape = async (dataSource: DataSource, log: LogFunction, api: YtAp
 		log('info', 'starting yt API scrape');
 		// eslint-disable-next-line no-await-in-loop
 		await _scrape(dataSource, log, api);
-		log('info', 'yt API scrape finished, waiting', oneHourRetryDelay, 'ms before next scrape');
+		log('info', 'yt API scrape finished, waiting', oneDayRetryDelay, 'ms before next scrape');
 		// eslint-disable-next-line no-await-in-loop
-		await sleep(oneHourRetryDelay);
+		await sleep(oneDayRetryDelay);
 	}
 };
 

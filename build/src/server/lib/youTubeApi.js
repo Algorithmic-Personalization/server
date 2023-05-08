@@ -21,8 +21,9 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
     return (mod && mod.__esModule) ? mod : { "default": mod };
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.makeCreateYouTubeApi = exports.CategoryListItem = exports.VideoListItem = void 0;
+exports.makeCreateYouTubeApi = exports.isVideoAvailable = exports.CategoryListItem = exports.VideoListItem = void 0;
 const node_fetch_1 = __importDefault(require("node-fetch"));
+const node_html_parser_1 = require("node-html-parser");
 const typeorm_1 = require("typeorm");
 const class_validator_1 = require("class-validator");
 const memory_cache_1 = require("memory-cache");
@@ -230,6 +231,15 @@ __decorate([
 exports.CategoryListItem = CategoryListItem;
 class YouTubeCategoryListResponse extends YouTubeResponse {
 }
+// TODO: non working
+const isVideoAvailable = (youtubeId) => __awaiter(void 0, void 0, void 0, function* () {
+    const url = `https://www.youtube.com/watch?v=${youtubeId}`;
+    const responseHtml = yield (yield (0, node_fetch_1.default)(url)).text();
+    const root = (0, node_html_parser_1.parse)(responseHtml);
+    const videoElem = root.querySelector('video');
+    return Boolean(videoElem);
+});
+exports.isVideoAvailable = isVideoAvailable;
 const getManyYoutubeMetas = (repo) => (youtubeIds) => __awaiter(void 0, void 0, void 0, function* () {
     const items = yield repo.find({
         where: { youtubeId: (0, typeorm_1.In)(youtubeIds) },
@@ -298,6 +308,9 @@ const makeCreateYouTubeApi = (cache = 'with-cache') => {
             return res;
         });
         const api = {
+            hasDataSource() {
+                return Boolean(dataSource);
+            },
             // TODO: split into multiple queries if the list of unique IDs is too long (> 50)
             getMetaFromVideoIds(youTubeVideoIdsMaybeNonUnique, hl = 'en', recurse = true) {
                 return __awaiter(this, void 0, void 0, function* () {
