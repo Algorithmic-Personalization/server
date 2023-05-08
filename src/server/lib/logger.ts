@@ -10,7 +10,7 @@ const green = (str: string) => `\x1b[32m${str}\x1b[0m`;
 const orange = (str: string) => `\x1b[33m${str}\x1b[0m`;
 const blue = (str: string) => `\x1b[34m${str}\x1b[0m`;
 
-export const makeCreateDefaultLogger = (f: WriteStream): CreateLogger => (requestIdOrId: number | string) =>
+export const makeCreateDefaultLogger = (prettyStream: WriteStream): CreateLogger => (requestIdOrId: number | string) =>
 	(...args: any[]) => {
 		const id = typeof requestIdOrId === 'number' ? `request #${requestIdOrId}` : requestIdOrId;
 
@@ -45,7 +45,7 @@ export const makeCreateDefaultLogger = (f: WriteStream): CreateLogger => (reques
 		})];
 
 		console.log(...parts);
-		f.write(`${parts.join(' ')}\n`);
+		prettyStream.write(`${parts.join(' ')}\n`);
 	};
 
 export default makeCreateDefaultLogger;

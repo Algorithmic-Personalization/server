@@ -210,6 +210,7 @@ const intIfDefined = (str: string | undefined): number => {
 };
 
 export type YtApi = {
+	hasDataSource(): boolean;
 	getMetaFromVideoIds(youTubeVideoIdsMaybeNonUnique: string[], hl?: string, recurse?: boolean): Promise<YouTubeResponseMeta>;
 	getCategoriesFromRegionCode(regionCode: string, hl?: string): Promise<CategoryListItem[]>;
 };
@@ -274,6 +275,9 @@ export const makeCreateYouTubeApi = (cache: 'with-cache' | 'without-cache' = 'wi
 		};
 
 		const api: YtApi = {
+			hasDataSource(): boolean {
+				return Boolean(dataSource);
+			},
 			// TODO: split into multiple queries if the list of unique IDs is too long (> 50)
 			async getMetaFromVideoIds(youTubeVideoIdsMaybeNonUnique: string[], hl = 'en', recurse = true): Promise<YouTubeResponseMeta> {
 				await fetchingCategories;
@@ -340,6 +344,7 @@ export const makeCreateYouTubeApi = (cache: 'with-cache' | 'without-cache' = 'wi
 
 				const idsUrlArgs = finalIdsToGetFromYouTube.map(id => `id=${id}`).join('&');
 				const finalUrl = `${endpoint}&${idsUrlArgs}&hl=${hl}`;
+
 				const responseP = getUrlAndStoreLatency(finalUrl);
 
 				for (const id of youTubeIds) {

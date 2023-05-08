@@ -12,7 +12,7 @@ import {
 	sleep,
 } from '../../util';
 
-const retryDelay25Hours = 25 * 60 * 60 * 1000;
+const oneHourRetryDelay = 1000 * 60 * 60;
 
 class Limiter {
 	#waitDelays = [500, 500, 500, 1000, 1000, 2000, 5000, 10000, 10000];
@@ -47,7 +47,7 @@ class Limiter {
 	}
 }
 
-export const scrape = async (dataSource: DataSource, log: LogFunction, api: YtApi): Promise<void> => {
+const _scrape = async (dataSource: DataSource, log: LogFunction, api: YtApi): Promise<number> => {
 	const show = showSql(log);
 
 	const videoCount = await dataSource.getRepository(Video).count();
@@ -80,6 +80,7 @@ export const scrape = async (dataSource: DataSource, log: LogFunction, api: YtAp
 
 	const batchSize = 50;
 	const limiter = new Limiter(log);
+	let scrapeCount = 0;
 
 	while (videos.length) {
 		const batch = videos.splice(0, batchSize);
@@ -88,27 +89,40 @@ export const scrape = async (dataSource: DataSource, log: LogFunction, api: YtAp
 		const {data, ...stats} = await api.getMetaFromVideoIds(batch);
 		log('info', 'yt batch scrape result:', stats);
 
+		scrapeCount += data.size;
 		const callWasSuccessful = data.size > 0;
 
+		if (!callWasSuccessful) {
+			log('warning', 'yt batch scrape result was not entirely successful, only got', data.size, 'videos out of', batch.length);
+		}
+
 		if (limiter.shouldGiveUp(callWasSuccessful)) {
-			log(
-				'error',
-				'yt batch scrape returned no data, API quota probably exceeded, stopping scrape and starting again in 25h',
-			);
-
-			setTimeout(async () => {
-				try {
-					await scrape(dataSource, log, api);
-				} catch (error) {
-					log('error', 'error while restarting scrape:', error);
-				}
-			}, retryDelay25Hours);
-
-			return;
+			log('error', 'giving up scraping YT API for now, too many consecutive failures');
+			break;
 		}
 
 		// eslint-disable-next-line no-await-in-loop
 		await sleep(limiter.getDelay());
+	}
+
+	log('successfully', 'scraped', scrapeCount, 'videos from yt API');
+
+	return scrapeCount;
+};
+
+export const scrape = async (dataSource: DataSource, log: LogFunction, api: YtApi): Promise<void> => {
+	if (!api.hasDataSource()) {
+		log('error', 'no data source provided to YT API, skipping scrape');
+		return;
+	}
+
+	for (;;) {
+		log('info', 'starting yt API scrape');
+		// eslint-disable-next-line no-await-in-loop
+		await _scrape(dataSource, log, api);
+		log('info', 'yt API scrape finished, waiting', oneHourRetryDelay, 'ms before next scrape');
+		// eslint-disable-next-line no-await-in-loop
+		await sleep(oneHourRetryDelay);
 	}
 };
 
