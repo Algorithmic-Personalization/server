@@ -29,3 +29,5 @@ scripts.conf
 upload-backup
 
 *.draft
+
+adminsWhitelist.ts
