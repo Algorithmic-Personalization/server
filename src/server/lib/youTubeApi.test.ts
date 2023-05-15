@@ -10,6 +10,6 @@ describe('isVideoAvailable', () => {
 	});
 
 	it('should reply `false` for a deleted video', async () => {
-		expect(await isVideoAvailable('q6EoRBvdVPQ')).toBe(false);
+		expect(await isVideoAvailable('0zLBgvymn74')).toBe(false);
 	});
 });

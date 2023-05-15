@@ -1,5 +1,4 @@
 import fetch, {type Response} from 'node-fetch';
-import {parse} from 'node-html-parser';
 
 import {
 	type Repository,
@@ -178,16 +177,68 @@ export type YouTubeResponseMeta = Stats & {
 	data: MetaMap;
 };
 
+const findYtInitialData = (html: string): string | undefined => {
+	const startString = 'var ytInitialData = ';
+	const startPos = html.indexOf(startString);
+
+	if (startPos === -1) {
+		return undefined;
+	}
+
+	const endPos = html.indexOf(';</script>', startPos);
+
+	if (endPos === -1) {
+		return undefined;
+	}
+
+	return html.slice(startPos + startString.length, endPos);
+};
+
 // TODO: non working
 export const isVideoAvailable = async (youtubeId: string): Promise<boolean> => {
 	const url = `https://www.youtube.com/watch?v=${youtubeId}`;
 
 	const responseHtml = await (await fetch(url)).text();
-	const root = parse(responseHtml);
 
-	const videoElem = root.querySelector('video');
+	const jsonText = findYtInitialData(responseHtml);
 
-	return Boolean(videoElem);
+	if (!jsonText) {
+		return false;
+	}
+
+	const json = JSON.parse(jsonText) as unknown;
+
+	if (typeof json !== 'object') {
+		throw new Error('json is not an object');
+	}
+
+	const {contents} = json as {contents: unknown};
+
+	if (typeof contents !== 'object') {
+		throw new Error('content is not an object');
+	}
+
+	const {twoColumnWatchNextResults} = contents as {twoColumnWatchNextResults: unknown};
+
+	if (typeof twoColumnWatchNextResults !== 'object') {
+		throw new Error('twoColumnWatchNextResults is not an object');
+	}
+
+	const {secondaryResults} = twoColumnWatchNextResults as {secondaryResults: unknown};
+
+	if (typeof secondaryResults !== 'object') {
+		return false;
+	}
+
+	const {secondaryResults: inception} = secondaryResults as {secondaryResults: unknown};
+
+	if (typeof inception !== 'object') {
+		throw new Error('inception is not an object');
+	}
+
+	const {results} = inception as {results: unknown};
+
+	return Array.isArray(results) && results.length > 0;
 };
 
 const getManyYoutubeMetas = (repo: Repository<VideoMetadata>) => async (youtubeIds: string[]): Promise<MetaMap> => {
