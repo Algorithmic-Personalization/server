@@ -34,6 +34,19 @@ export type MonitoringQuery = {
 	toDate: Date;
 };
 
+type TimeSeriesItem = {
+	timestamp: number;
+	value: number;
+};
+
+type TimeSeries = TimeSeriesItem[];
+
+export type NumberSeries = {
+	min: TimeSeries;
+	max: TimeSeries;
+	average: TimeSeries;
+};
+
 const getMostViewedPages = (dataSource: DataSource, log: LogFunction) => async ({fromDate, toDate}: MonitoringQuery): Promise<ViewCount[]> => {
 	const show = showSql(log);
 
@@ -91,6 +104,91 @@ const getMostViewedPages = (dataSource: DataSource, log: LogFunction) => async (
 	}
 
 	return mostViewedPages;
+};
+
+export const getLatencySeries = (dataSource: DataSource, log: LogFunction) => async ({fromDate, toDate}: MonitoringQuery): Promise<NumberSeries> => {
+	const data = (await showSql(log)(
+		dataSource
+			.createQueryBuilder()
+			.select('min(latency_ms)', 'min')
+			.addSelect('max(latency_ms)', 'max')
+			.addSelect('avg(latency_ms)', 'average')
+			.where({
+				createdAt: MoreThan(fromDate),
+			}).andWhere({
+				createdAt: LessThanOrEqual(toDate),
+			}),
+	).getRawOne() as unknown) as {
+		min: string;
+		max: string;
+		average: string;
+	};
+
+	const repo = dataSource.getRepository(RequestLog);
+
+	const min = Number(data.min);
+	const max = Number(data.max);
+	const average = Number(data.average);
+
+	const minPoint = await repo.findOne({
+		select: ['createdAt', 'latencyMs'],
+		where: {
+			createdAt: And(
+				MoreThan(fromDate),
+				LessThanOrEqual(toDate),
+			),
+			latencyMs: min,
+		},
+		order: {
+			id: 'ASC',
+		},
+	});
+
+	const maxPoint = await repo.findOne({
+		select: ['createdAt', 'latencyMs'],
+		where: {
+			createdAt: And(MoreThan(fromDate), LessThanOrEqual(toDate)),
+			latencyMs: max,
+		},
+		order: {
+			id: 'DESC',
+		},
+	});
+
+	const res: NumberSeries = {
+		min: [],
+		max: [],
+		average: [],
+	};
+
+	if (minPoint) {
+		const minItem: TimeSeriesItem = {
+			timestamp: minPoint.createdAt.getTime(),
+			value: minPoint.latencyMs,
+		};
+
+		res.min.push(minItem);
+	}
+
+	if (maxPoint) {
+		const maxItem: TimeSeriesItem = {
+			timestamp: maxPoint.createdAt.getTime(),
+			value: maxPoint.latencyMs,
+		};
+
+		res.max.push(maxItem);
+	}
+
+	if (minPoint && maxPoint) {
+		const avgItem: TimeSeriesItem = {
+			timestamp: (minPoint.createdAt.getTime() + maxPoint.createdAt.getTime()) / 2,
+			value: average,
+		};
+
+		res.average.push(avgItem);
+	}
+
+	return res;
 };
 
 const getReport = (dataSource: DataSource, log: LogFunction) => async ({fromDate, toDate}: MonitoringQuery): Promise<MonitoringReport> => {
