@@ -18,7 +18,7 @@ describe('isVideoAvailable', () => {
         expect(yield (0, youTubeApi_1.isVideoAvailable)('mIbYcTuJOPo')).toBe(false);
     }));
     it('should reply `false` for a deleted video', () => __awaiter(void 0, void 0, void 0, function* () {
-        expect(yield (0, youTubeApi_1.isVideoAvailable)('q6EoRBvdVPQ')).toBe(false);
+        expect(yield (0, youTubeApi_1.isVideoAvailable)('0zLBgvymn74')).toBe(false);
     }));
 });
 //# sourceMappingURL=youTubeApi.test.js.map

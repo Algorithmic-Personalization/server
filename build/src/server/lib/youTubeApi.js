@@ -23,13 +23,13 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.makeCreateYouTubeApi = exports.isVideoAvailable = exports.CategoryListItem = exports.VideoListItem = void 0;
 const node_fetch_1 = __importDefault(require("node-fetch"));
-const node_html_parser_1 = require("node-html-parser");
 const typeorm_1 = require("typeorm");
 const class_validator_1 = require("class-validator");
 const memory_cache_1 = require("memory-cache");
 const object_sizeof_1 = __importDefault(require("object-sizeof"));
 const videoCategory_1 = __importDefault(require("../models/videoCategory"));
 const videoMetadata_1 = __importDefault(require("../models/videoMetadata"));
+const video_1 = __importDefault(require("../models/video"));
 const youTubeRequestLatency_1 = __importDefault(require("../models/youTubeRequestLatency"));
 const util_1 = require("../../util");
 const util_2 = require("./../../common/util");
@@ -231,13 +231,48 @@ __decorate([
 exports.CategoryListItem = CategoryListItem;
 class YouTubeCategoryListResponse extends YouTubeResponse {
 }
+const findYtInitialData = (html) => {
+    const startString = 'var ytInitialData = ';
+    const startPos = html.indexOf(startString);
+    if (startPos === -1) {
+        return undefined;
+    }
+    const endPos = html.indexOf(';</script>', startPos);
+    if (endPos === -1) {
+        return undefined;
+    }
+    return html.slice(startPos + startString.length, endPos);
+};
 // TODO: non working
 const isVideoAvailable = (youtubeId) => __awaiter(void 0, void 0, void 0, function* () {
     const url = `https://www.youtube.com/watch?v=${youtubeId}`;
     const responseHtml = yield (yield (0, node_fetch_1.default)(url)).text();
-    const root = (0, node_html_parser_1.parse)(responseHtml);
-    const videoElem = root.querySelector('video');
-    return Boolean(videoElem);
+    const jsonText = findYtInitialData(responseHtml);
+    if (!jsonText) {
+        return false;
+    }
+    const json = JSON.parse(jsonText);
+    if (typeof json !== 'object') {
+        throw new Error('json is not an object');
+    }
+    const { contents } = json;
+    if (typeof contents !== 'object') {
+        throw new Error('content is not an object');
+    }
+    const { twoColumnWatchNextResults } = contents;
+    if (typeof twoColumnWatchNextResults !== 'object') {
+        throw new Error('twoColumnWatchNextResults is not an object');
+    }
+    const { secondaryResults } = twoColumnWatchNextResults;
+    if (typeof secondaryResults !== 'object') {
+        return false;
+    }
+    const { secondaryResults: inception } = secondaryResults;
+    if (typeof inception !== 'object') {
+        throw new Error('inception is not an object');
+    }
+    const { results } = inception;
+    return Array.isArray(results) && results.length > 0;
 });
 exports.isVideoAvailable = isVideoAvailable;
 const getManyYoutubeMetas = (repo) => (youtubeIds) => __awaiter(void 0, void 0, void 0, function* () {
@@ -247,11 +282,27 @@ const getManyYoutubeMetas = (repo) => (youtubeIds) => __awaiter(void 0, void 0, 
     return new Map(items.map(m => [m.youtubeId, m]));
 });
 const createPersistYouTubeMetas = (dataSource, log) => (metaDataItems) => __awaiter(void 0, void 0, void 0, function* () {
-    return (0, util_1.showInsertSql)(log)(dataSource.createQueryBuilder()
+    const res = (0, util_1.showInsertSql)(log)(dataSource.createQueryBuilder()
         .insert()
         .into(videoMetadata_1.default)
         .values(metaDataItems)
         .orUpdate(['view_count', 'like_count', 'comment_count', 'updated_at'], ['youtube_id'])).execute();
+    const videoRepo = dataSource.getRepository(video_1.default);
+    videoRepo.createQueryBuilder()
+        .update()
+        .set({
+        updatedAt: new Date(),
+        metadataAvailable: true,
+    })
+        .where({
+        youtubeId: (0, typeorm_1.In)(metaDataItems.map(m => m.youtubeId)),
+    })
+        .execute().then(() => {
+        log('successfully', 'marked', metaDataItems.length, 'videos as having metadata');
+    }, () => {
+        log('failed', 'to mark', metaDataItems.length, 'videos as having metadata');
+    });
+    return res;
 });
 const intIfDefined = (str) => {
     if (!str) {
@@ -284,6 +335,17 @@ const makeCreateYouTubeApi = (cache = 'with-cache') => {
             ? createPersistYouTubeMetas(dataSource, log)
             : undefined;
         const endpoint = `${config.videosEndPoint}/?key=${config.apiKey}&part=topicDetails&part=snippet&part=statistics`;
+        const persistNonAvailable = (youtubeIds) => __awaiter(void 0, void 0, void 0, function* () {
+            if (!dataSource || youtubeIds.length === 0) {
+                return;
+            }
+            const videoRepo = dataSource.getRepository(video_1.default);
+            return videoRepo.update({
+                youtubeId: (0, typeorm_1.In)(youtubeIds),
+            }, {
+                metadataAvailable: false,
+            });
+        });
         const getUrlAndStoreLatency = (url) => __awaiter(void 0, void 0, void 0, function* () {
             const tStart = Date.now();
             const res = (0, node_fetch_1.default)(url, {
@@ -312,6 +374,7 @@ const makeCreateYouTubeApi = (cache = 'with-cache') => {
                 return Boolean(dataSource);
             },
             // TODO: split into multiple queries if the list of unique IDs is too long (> 50)
+            // eslint-disable-next-line complexity
             getMetaFromVideoIds(youTubeVideoIdsMaybeNonUnique, hl = 'en', recurse = true) {
                 return __awaiter(this, void 0, void 0, function* () {
                     yield fetchingCategories;
@@ -484,6 +547,12 @@ const makeCreateYouTubeApi = (cache = 'with-cache') => {
                             mergeInto(metaMap)(meta.data);
                             refetched = meta.data.size;
                         }
+                    }
+                    if (metaMap.size !== youTubeIds.length && (!recurse)) {
+                        const stillMissing = youTubeIds.filter(id => !metaMap.has(id));
+                        const available = yield Promise.all(stillMissing.map(exports.isVideoAvailable));
+                        const res = yield persistNonAvailable(stillMissing.filter((_, i) => !available[i]));
+                        log('info', 'persisted non-available videos', res);
                     }
                     const stats = {
                         metadataRequestTimeMs: requestTimeMs,

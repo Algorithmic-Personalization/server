@@ -12,7 +12,7 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
     return (mod && mod.__esModule) ? mod : { "default": mod };
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.monitoringDefinition = void 0;
+exports.monitoringDefinition = exports.getLatencySeries = void 0;
 const typeorm_1 = require("typeorm");
 const requestLog_1 = __importDefault(require("../models/requestLog"));
 const event_1 = __importDefault(require("../../common/models/event"));
@@ -62,6 +62,70 @@ const getMostViewedPages = (dataSource, log) => ({ fromDate, toDate }) => __awai
     }
     return mostViewedPages;
 });
+const getLatencySeries = (dataSource, log) => ({ fromDate, toDate }) => __awaiter(void 0, void 0, void 0, function* () {
+    const data = yield (0, util_2.showSql)(log)(dataSource
+        .createQueryBuilder()
+        .select('min(latency_ms)', 'min')
+        .addSelect('max(latency_ms)', 'max')
+        .addSelect('avg(latency_ms)', 'average')
+        .where({
+        createdAt: (0, typeorm_1.MoreThan)(fromDate),
+    }).andWhere({
+        createdAt: (0, typeorm_1.LessThanOrEqual)(toDate),
+    })).getRawOne();
+    const repo = dataSource.getRepository(requestLog_1.default);
+    const min = Number(data.min);
+    const max = Number(data.max);
+    const average = Number(data.average);
+    const minPoint = yield repo.findOne({
+        select: ['createdAt', 'latencyMs'],
+        where: {
+            createdAt: (0, typeorm_1.And)((0, typeorm_1.MoreThan)(fromDate), (0, typeorm_1.LessThanOrEqual)(toDate)),
+            latencyMs: min,
+        },
+        order: {
+            id: 'ASC',
+        },
+    });
+    const maxPoint = yield repo.findOne({
+        select: ['createdAt', 'latencyMs'],
+        where: {
+            createdAt: (0, typeorm_1.And)((0, typeorm_1.MoreThan)(fromDate), (0, typeorm_1.LessThanOrEqual)(toDate)),
+            latencyMs: max,
+        },
+        order: {
+            id: 'DESC',
+        },
+    });
+    const res = {
+        min: [],
+        max: [],
+        average: [],
+    };
+    if (minPoint) {
+        const minItem = {
+            timestamp: minPoint.createdAt.getTime(),
+            value: minPoint.latencyMs,
+        };
+        res.min.push(minItem);
+    }
+    if (maxPoint) {
+        const maxItem = {
+            timestamp: maxPoint.createdAt.getTime(),
+            value: maxPoint.latencyMs,
+        };
+        res.max.push(maxItem);
+    }
+    if (minPoint && maxPoint) {
+        const avgItem = {
+            timestamp: (minPoint.createdAt.getTime() + maxPoint.createdAt.getTime()) / 2,
+            value: average,
+        };
+        res.average.push(avgItem);
+    }
+    return res;
+});
+exports.getLatencySeries = getLatencySeries;
 const getReport = (dataSource, log) => ({ fromDate, toDate }) => __awaiter(void 0, void 0, void 0, function* () {
     log('generating report from', fromDate, 'exclusive to', toDate, 'inclusive');
     const show = (0, util_2.showSql)(log);

@@ -43,6 +43,12 @@ __decorate([
     (0, class_validator_1.IsNotEmpty)(),
     __metadata("design:type", String)
 ], Video.prototype, "youtubeId", void 0);
+__decorate([
+    (0, typeorm_1.Column)(),
+    (0, class_validator_1.IsString)(),
+    (0, class_validator_1.IsOptional)(),
+    __metadata("design:type", Boolean)
+], Video.prototype, "metadataAvailable", void 0);
 Video = __decorate([
     (0, typeorm_1.Entity)()
 ], Video);

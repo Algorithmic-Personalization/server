@@ -75,13 +75,9 @@ const _scrape = (dataSource, log, api) => __awaiter(void 0, void 0, void 0, func
     const videos = (yield show(dataSource.createQueryBuilder()
         .select('distinct(v.youtube_id)', 'youtube_id')
         .from(video_1.default, 'v')
-        .where(qb => {
-        const subQuery = qb.subQuery()
-            .select('1')
-            .from('video_metadata', 'vmd')
-            .where('vmd.youtube_id = v.youtube_id');
-        return `NOT EXISTS ${subQuery.getQuery()}`;
-    })).getRawMany()).map(({ youtube_id }) => youtube_id);
+        .leftJoin('video_metadata', 'vm', 'v.youtube_id = vm.youtube_id')
+        .where('vm.youtube_id is null')
+        .andWhere('v.metadata_available is null')).getRawMany()).map(({ youtube_id }) => youtube_id);
     const { heapUsed: heapUsedAfter } = process.memoryUsage();
     log('info', 'among which', videos.length, 'are without metadata');
     log('info', 'that is,', (0, util_1.formatPct)((0, util_1.pct)(videos.length, videoCount)), 'of all videos');

@@ -1,6 +1,6 @@
 /* eslint-disable @typescript-eslint/no-inferrable-types */
 import {Entity, Column} from 'typeorm';
-import {IsString, IsNotEmpty} from 'class-validator';
+import {IsString, IsNotEmpty, IsOptional} from 'class-validator';
 
 import Model from '../../common/lib/model';
 
@@ -20,6 +20,11 @@ export class Video extends Model {
 	@IsString()
 	@IsNotEmpty()
 		youtubeId: string = '';
+
+	@Column()
+	@IsString()
+	@IsOptional()
+		metadataAvailable?: boolean;
 }
 
 export default Video;

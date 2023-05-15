@@ -60,14 +60,9 @@ const _scrape = async (dataSource: DataSource, log: LogFunction, api: YtApi): Pr
 		dataSource.createQueryBuilder()
 			.select('distinct(v.youtube_id)', 'youtube_id')
 			.from(Video, 'v')
-			.where(qb => {
-				const subQuery = qb.subQuery()
-					.select('1')
-					.from('video_metadata', 'vmd')
-					.where('vmd.youtube_id = v.youtube_id');
-
-				return `NOT EXISTS ${subQuery.getQuery()}`;
-			}),
+			.leftJoin('video_metadata', 'vm', 'v.youtube_id = vm.youtube_id')
+			.where('vm.youtube_id is null')
+			.andWhere('v.metadata_available is null'),
 	).getRawMany<{youtube_id: string}>()).map(
 		({youtube_id}) => youtube_id,
 	);

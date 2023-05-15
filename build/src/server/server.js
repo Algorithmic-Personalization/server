@@ -185,7 +185,7 @@ const main = () => __awaiter(void 0, void 0, void 0, function* () {
     const ytApi = (0, youTubeApi_1.default)('without-cache')(youTubeConfig, createLogger('<yt-api>'), ds);
     (0, scrapeYouTube_1.default)(ds, createLogger('<yt-scraper>'), ytApi)
         .then(() => {
-        log('success', 'done scraping youtube metadata [not for real]');
+        log('success', 'done scraping youtube metadata');
     })
         .catch(err => {
         log('error', 'scraping youtube metadata:', err);

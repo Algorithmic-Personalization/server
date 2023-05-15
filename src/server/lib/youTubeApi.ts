@@ -4,6 +4,7 @@ import {
 	type Repository,
 	type DataSource,
 	type InsertResult,
+	type UpdateResult,
 	In,
 } from 'typeorm';
 
@@ -27,6 +28,7 @@ import {type LogFunction} from './logger';
 
 import VideoCategory from '../models/videoCategory';
 import VideoMetadata from '../models/videoMetadata';
+import Video from '../models/video';
 import YouTubeRequestLatency from '../models/youTubeRequestLatency';
 import {formatSize, formatPct, pct, showInsertSql} from '../../util';
 import {validateNew} from './../../common/util';
@@ -250,14 +252,34 @@ const getManyYoutubeMetas = (repo: Repository<VideoMetadata>) => async (youtubeI
 };
 
 const createPersistYouTubeMetas = (dataSource: DataSource, log: LogFunction) =>
-	async (metaDataItems: VideoMetadata[]): Promise<InsertResult> =>
-		showInsertSql(log)(
+	async (metaDataItems: VideoMetadata[]): Promise<InsertResult> => {
+		const res = showInsertSql(log)(
 			dataSource.createQueryBuilder()
 				.insert()
 				.into(VideoMetadata)
 				.values(metaDataItems)
 				.orUpdate(['view_count', 'like_count', 'comment_count', 'updated_at'], ['youtube_id']),
 		).execute();
+
+		const videoRepo = dataSource.getRepository(Video);
+
+		videoRepo.createQueryBuilder()
+			.update()
+			.set({
+				updatedAt: new Date(),
+				metadataAvailable: true,
+			})
+			.where({
+				youtubeId: In(metaDataItems.map(m => m.youtubeId)),
+			})
+			.execute().then(() => {
+				log('successfully', 'marked', metaDataItems.length, 'videos as having metadata');
+			}, () => {
+				log('failed', 'to mark', metaDataItems.length, 'videos as having metadata');
+			});
+
+		return res;
+	};
 
 const intIfDefined = (str: string | undefined): number => {
 	if (!str) {
@@ -311,6 +333,20 @@ export const makeCreateYouTubeApi = (cache: 'with-cache' | 'without-cache' = 'wi
 
 		const endpoint = `${config.videosEndPoint}/?key=${config.apiKey}&part=topicDetails&part=snippet&part=statistics`;
 
+		const persistNonAvailable = async (youtubeIds: string[]): Promise<UpdateResult | undefined> => {
+			if (!dataSource || youtubeIds.length === 0) {
+				return;
+			}
+
+			const videoRepo = dataSource.getRepository(Video);
+
+			return videoRepo.update({
+				youtubeId: In(youtubeIds),
+			}, {
+				metadataAvailable: false,
+			});
+		};
+
 		const getUrlAndStoreLatency = async (url: string): Promise<Response> => {
 			const tStart = Date.now();
 
@@ -343,6 +379,7 @@ export const makeCreateYouTubeApi = (cache: 'with-cache' | 'without-cache' = 'wi
 				return Boolean(dataSource);
 			},
 			// TODO: split into multiple queries if the list of unique IDs is too long (> 50)
+			// eslint-disable-next-line complexity
 			async getMetaFromVideoIds(youTubeVideoIdsMaybeNonUnique: string[], hl = 'en', recurse = true): Promise<YouTubeResponseMeta> {
 				await fetchingCategories;
 				const youTubeIds = [...new Set(youTubeVideoIdsMaybeNonUnique)];
@@ -569,6 +606,14 @@ export const makeCreateYouTubeApi = (cache: 'with-cache' | 'without-cache' = 'wi
 						mergeInto(metaMap)(meta.data);
 						refetched = meta.data.size;
 					}
+				}
+
+				if (metaMap.size !== youTubeIds.length && (!recurse)) {
+					const stillMissing = youTubeIds.filter(id => !metaMap.has(id));
+					const available = await Promise.all(stillMissing.map(isVideoAvailable));
+
+					const res = await persistNonAvailable(stillMissing.filter((_, i) => !available[i]));
+					log('info', 'persisted non-available videos', res);
 				}
 
 				const stats: Stats = {

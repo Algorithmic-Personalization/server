@@ -266,7 +266,7 @@ const main = async () => {
 
 	scrapeMissingYouTubeMetadata(ds, createLogger('<yt-scraper>'), ytApi)
 		.then(() => {
-			log('success', 'done scraping youtube metadata [not for real]');
+			log('success', 'done scraping youtube metadata');
 		})
 		.catch(err => {
 			log('error', 'scraping youtube metadata:', err);
