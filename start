@@ -2,7 +2,7 @@
 echo "Stopping running containers..."
 docker-compose down
 echo "Pulling latest changes from git..."
-git pull
+git pull --recurse-submodules
 echo "Cleaning up the docker cache..."
 docker system prune
 echo "Building the new container..."
