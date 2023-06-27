@@ -55,6 +55,10 @@ __decorate([
     (0, class_validator_1.IsBoolean)(),
     __metadata("design:type", Boolean)
 ], Participant.prototype, "extensionInstalled", void 0);
+__decorate([
+    (0, typeorm_1.Column)(),
+    __metadata("design:type", Date)
+], Participant.prototype, "extensionActivatedAt", void 0);
 Participant = __decorate([
     (0, typeorm_1.Entity)()
 ], Participant);

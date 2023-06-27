@@ -30,6 +30,9 @@ export class Participant extends Model {
 	@Column()
 	@IsBoolean()
 		extensionInstalled: boolean = false;
+
+	@Column()
+		extensionActivatedAt?: Date;
 }
 
 export const isValidPhase = (phase: unknown): phase is number =>

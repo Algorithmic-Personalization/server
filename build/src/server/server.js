@@ -71,7 +71,7 @@ const getActivityReport_1 = __importDefault(require("./api-2/getActivityReport")
 const createTransitionSetting_1 = __importDefault(require("./api-2/createTransitionSetting"));
 const getTransitionSetting_1 = __importDefault(require("./api-2/getTransitionSetting"));
 const monitoring_1 = __importDefault(require("./api-2/monitoring"));
-const getInstalledEventConfig_1 = __importDefault(require("./lib/config-loader/getInstalledEventConfig"));
+const externalEventsEndpoint_1 = __importDefault(require("./lib/externalEventsEndpoint"));
 const getYouTubeConfig_1 = __importDefault(require("./lib/config-loader/getYouTubeConfig"));
 const youTubeApi_1 = __importDefault(require("./lib/youTubeApi"));
 const scrapeYouTube_1 = __importDefault(require("./lib/scrapeYouTube"));
@@ -192,14 +192,14 @@ const main = () => __awaiter(void 0, void 0, void 0, function* () {
     });
     const privateKey = yield (0, promises_1.readFile)((0, path_1.join)(root, 'private.key'), 'utf-8');
     const tokenTools = (0, crypto_1.createTokenTools)(privateKey);
-    const installedEventConfig = (0, getInstalledEventConfig_1.default)(config);
+    const externalEventsEndpoint = (0, externalEventsEndpoint_1.default)(config);
     const routeContext = {
         dataSource: ds,
         mailer,
         mailerFrom: smtpConfig.auth.user,
         createLogger,
         tokenTools,
-        installedEventConfig,
+        externalEventsEndpoint,
         youTubeConfig,
     };
     mailer.sendMail({

@@ -11,7 +11,7 @@ import NotFoundError from './notFoundError';
 const hasMessage = has('message');
 const message = (x: unknown) => (hasMessage(x) ? x.message : 'An unknown error occurred');
 
-export type InstalledEventConfig = {
+export type ExternalEventsEndpoint = {
 	url: string;
 	token: string;
 };
@@ -39,7 +39,7 @@ export type RouteContext = {
 	mailerFrom: string;
 	createLogger: CreateLogger;
 	tokenTools: TokenTools;
-	installedEventConfig: InstalledEventConfig;
+	externalEventsEndpoint: ExternalEventsEndpoint;
 	youTubeConfig: YouTubeConfig;
 };
 

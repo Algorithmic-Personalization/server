@@ -98,7 +98,7 @@ import createTransitionSettingDefinition from './api-2/createTransitionSetting';
 import getTransitionSettingDefinition from './api-2/getTransitionSetting';
 import monitoringDefinition from './api-2/monitoring';
 
-import getInstalledEventConfig from './lib/config-loader/getInstalledEventConfig';
+import getExternalEventsEndpointConfig from './lib/externalEventsEndpoint';
 import getYouTubeConfig from './lib/config-loader/getYouTubeConfig';
 import makeCreateYouTubeApi from './lib/youTubeApi';
 import scrapeMissingYouTubeMetadata from './lib/scrapeYouTube';
@@ -275,7 +275,7 @@ const main = async () => {
 	const privateKey = await readFile(join(root, 'private.key'), 'utf-8');
 	const tokenTools = createTokenTools(privateKey);
 
-	const installedEventConfig = getInstalledEventConfig(config);
+	const externalEventsEndpoint = getExternalEventsEndpointConfig(config);
 
 	const routeContext: RouteContext = {
 		dataSource: ds,
@@ -283,7 +283,7 @@ const main = async () => {
 		mailerFrom: smtpConfig.auth.user,
 		createLogger,
 		tokenTools,
-		installedEventConfig,
+		externalEventsEndpoint,
 		youTubeConfig,
 	};
 

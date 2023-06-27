@@ -29,6 +29,7 @@ var EventType;
     EventType["SESSION_END"] = "SESSION_END";
     EventType["PHASE_TRANSITION"] = "PHASE_TRANSITION";
     EventType["EXTENSION_INSTALLED"] = "EXTENSION_INSTALLED";
+    EventType["EXTENSION_ACTIVATED"] = "EXTENSION_ACTIVATED";
 })(EventType = exports.EventType || (exports.EventType = {}));
 var ExperimentArm;
 (function (ExperimentArm) {

@@ -6,11 +6,14 @@ import DailyActivityTime from '../../models/dailyActivityTime';
 import TransitionSetting, {Phase} from '../../models/transitionSetting';
 import TransitionEvent, {TransitionReason} from '../../models/transitionEvent';
 import {shouldTriggerPhaseTransition} from '../postEvent';
+import {type ExternalEventsEndpoint} from '../../lib/routeCreation';
+import {createExternalNotifier} from '../../lib/externalEventsEndpoint';
 
 export const createUpdatePhase = ({
-	dataSource, log,
+	dataSource, externalEventsEndpoint, log,
 }: {
 	dataSource: DataSource;
+	externalEventsEndpoint: ExternalEventsEndpoint;
 	log: LogFunction;
 }) => async (participant: Participant, latestEvent: Event) => {
 	log('updating participant phase if needed...');
@@ -74,9 +77,10 @@ export const createUpdatePhase = ({
 		log('triggering transition from phase', fromPhase, 'to phase', toPhase);
 
 		const triggerEvent = new Event();
-		Object.assign(triggerEvent, latestEvent);
-		triggerEvent.id = 0;
-		triggerEvent.type = EventType.PHASE_TRANSITION;
+		Object.assign(triggerEvent, latestEvent, {
+			id: 0,
+			type: EventType.PHASE_TRANSITION,
+		});
 
 		transitionEvent.participantId = participant.id;
 		transitionEvent.fromPhase = fromPhase;
@@ -89,9 +93,21 @@ export const createUpdatePhase = ({
 		await dataSource.transaction(async manager => {
 			const trigger = await manager.save(triggerEvent);
 			transitionEvent.eventId = trigger.id;
-			await manager.save(transitionEvent);
-			await manager.save(participant);
+			await Promise.all([
+				manager.save(transitionEvent),
+				manager.save(participant),
+			]);
 		});
+
+		if (toPhase === Phase.EXPERIMENT) {
+			const notifier = createExternalNotifier(
+				externalEventsEndpoint,
+				participant.code,
+				log,
+			);
+
+			void notifier.notifyInterventionPeriod(latestEvent.createdAt);
+		}
 	} else {
 		log('no phase transition needed at this point');
 	}

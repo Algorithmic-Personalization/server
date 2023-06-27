@@ -33,11 +33,13 @@ var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, ge
 };
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.updateParticipantDefinition = void 0;
+const externalEventsEndpoint_1 = require("../lib/externalEventsEndpoint");
 const participant_1 = __importStar(require("../models/participant"));
 const event_1 = require("../../common/models/event");
 const transitionEvent_1 = __importStar(require("../models/transitionEvent"));
+const transitionSetting_1 = require("../models/transitionSetting");
 const util_1 = require("../../util");
-const updateParticipantPhase = (dataSource, log) => (participant, fromPhase, toPhase) => __awaiter(void 0, void 0, void 0, function* () {
+const updateParticipantPhase = (dataSource, externalEventsEndpoint, log) => (participant, fromPhase, toPhase) => __awaiter(void 0, void 0, void 0, function* () {
     var _a;
     if (fromPhase === toPhase) {
         return participant;
@@ -65,18 +67,30 @@ const updateParticipantPhase = (dataSource, log) => (participant, fromPhase, toP
     transition.participantId = participant.id;
     transition.reason = transitionEvent_1.TransitionReason.FORCED;
     transition.numDays = (0, util_1.daysElapsed)(startOfLatestPhase, new Date());
-    return dataSource.transaction((manager) => __awaiter(void 0, void 0, void 0, function* () {
-        log('saving transition', transition);
-        yield manager.save(transition);
-        participant.phase = toPhase;
-        yield manager.save(participant);
-        return participant;
-    }));
+    try {
+        const transition = yield dataSource.transaction((manager) => __awaiter(void 0, void 0, void 0, function* () {
+            log('saving transition', transition);
+            yield manager.save(transition);
+            participant.phase = toPhase;
+            yield manager.save(participant);
+            return participant;
+        }));
+        log('success', 'saving transition', transition.id);
+        if (toPhase === transitionSetting_1.Phase.EXPERIMENT) {
+            const notifier = (0, externalEventsEndpoint_1.createExternalNotifier)(externalEventsEndpoint, participant.code, log);
+            void notifier.notifyInterventionPeriod(transition.createdAt);
+        }
+        return transition;
+    }
+    catch (e) {
+        log('error saving transition', e);
+        throw e;
+    }
 });
 exports.updateParticipantDefinition = {
     verb: 'put',
     path: '/api/participant/:code',
-    makeHandler: ({ createLogger, dataSource }) => (req) => __awaiter(void 0, void 0, void 0, function* () {
+    makeHandler: ({ createLogger, dataSource, externalEventsEndpoint }) => (req) => __awaiter(void 0, void 0, void 0, function* () {
         const log = createLogger(req.requestId);
         log('Received update participant request');
         const { id: _unused, phase, arm } = req.body;
@@ -97,7 +111,7 @@ exports.updateParticipantDefinition = {
             throw new Error('Invalid phase, must be one of: 0, 1, 2');
         }
         if ((0, participant_1.isValidPhase)(phase)) {
-            return updateParticipantPhase(dataSource, log)(participantEntity, previousPhase, phase);
+            return updateParticipantPhase(dataSource, externalEventsEndpoint, log)(participantEntity, previousPhase, phase);
         }
         return participantRepo.save(participantEntity);
     }),

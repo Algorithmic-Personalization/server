@@ -43,7 +43,6 @@ const util_1 = require("../../common/util");
 const dailyActivityTime_1 = __importDefault(require("../models/dailyActivityTime"));
 const transitionSetting_1 = require("../models/transitionSetting");
 const transitionEvent_1 = __importDefault(require("../models/transitionEvent"));
-const handleExtensionInstalledEvent_1 = __importDefault(require("./postEvent/handleExtensionInstalledEvent"));
 const updateParticipantPhase_1 = __importDefault(require("./postEvent/updateParticipantPhase"));
 const createUpdateActivity_1 = __importDefault(require("./postEvent/createUpdateActivity"));
 const storeWatchTime_1 = __importDefault(require("./postEvent/storeWatchTime"));
@@ -106,7 +105,7 @@ const summarizeForDisplay = (event) => {
     }
     return summary;
 };
-const createPostEventRoute = ({ createLogger, dataSource, installedEventConfig, youTubeConfig, }) => (req, res) => __awaiter(void 0, void 0, void 0, function* () {
+const createPostEventRoute = ({ createLogger, dataSource, externalEventsEndpoint, youTubeConfig, }) => (req, res) => __awaiter(void 0, void 0, void 0, function* () {
     const log = createLogger(req.requestId);
     log('Received post event request');
     const { participantCode } = req;
@@ -128,15 +127,17 @@ const createPostEventRoute = ({ createLogger, dataSource, installedEventConfig, 
     const activityRepo = dataSource.getRepository(dailyActivityTime_1.default);
     const eventRepo = dataSource.getRepository(event_1.default);
     const updateActivity = (0, createUpdateActivity_1.default)({
+        dataSource,
         activityRepo,
         eventRepo,
+        externalEventsEndpoint,
         log,
     });
     const updatePhase = (0, updateParticipantPhase_1.default)({
         dataSource,
+        externalEventsEndpoint,
         log,
     });
-    const handleExtensionInstalledEvent = (0, handleExtensionInstalledEvent_1.default)(dataSource, installedEventConfig, log);
     const storeWatchTime = (0, storeWatchTime_1.default)({
         dataSource,
         log,
@@ -182,7 +183,6 @@ const createPostEventRoute = ({ createLogger, dataSource, installedEventConfig, 
     }
     try {
         if (event.type === event_1.EventType.EXTENSION_INSTALLED) {
-            yield handleExtensionInstalledEvent(participant.id, event);
             res.send({ kind: 'Success', value: 'Extension installed event handled' });
         }
         else {

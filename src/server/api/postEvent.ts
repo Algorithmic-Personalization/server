@@ -14,7 +14,6 @@ import type TransitionSetting from '../models/transitionSetting';
 import {OperatorType} from '../models/transitionSetting';
 import TransitionEvent from '../models/transitionEvent';
 
-import createHandleExtensionInstalledEvent from './postEvent/handleExtensionInstalledEvent';
 import createUpdatePhase from './postEvent/updateParticipantPhase';
 import createUpdateActivity from './postEvent/createUpdateActivity';
 import createStoreWatchTime from './postEvent/storeWatchTime';
@@ -109,7 +108,7 @@ const summarizeForDisplay = (event: Event): Record<string, unknown> => {
 export const createPostEventRoute: RouteCreator = ({
 	createLogger,
 	dataSource,
-	installedEventConfig,
+	externalEventsEndpoint,
 	youTubeConfig,
 }) => async (req, res) => {
 	const log = createLogger(req.requestId);
@@ -140,21 +139,18 @@ export const createPostEventRoute: RouteCreator = ({
 	const eventRepo = dataSource.getRepository(Event);
 
 	const updateActivity = createUpdateActivity({
+		dataSource,
 		activityRepo,
 		eventRepo,
+		externalEventsEndpoint,
 		log,
 	});
 
 	const updatePhase = createUpdatePhase({
 		dataSource,
+		externalEventsEndpoint,
 		log,
 	});
-
-	const handleExtensionInstalledEvent = createHandleExtensionInstalledEvent(
-		dataSource,
-		installedEventConfig,
-		log,
-	);
 
 	const storeWatchTime = createStoreWatchTime({
 		dataSource,
@@ -211,7 +207,6 @@ export const createPostEventRoute: RouteCreator = ({
 
 	try {
 		if (event.type === EventType.EXTENSION_INSTALLED) {
-			await handleExtensionInstalledEvent(participant.id, event);
 			res.send({kind: 'Success', value: 'Extension installed event handled'});
 		} else {
 			const e = await eventRepo.save(event);

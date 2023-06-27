@@ -42,7 +42,8 @@ const dailyActivityTime_1 = __importDefault(require("../../models/dailyActivityT
 const transitionSetting_1 = __importStar(require("../../models/transitionSetting"));
 const transitionEvent_1 = __importStar(require("../../models/transitionEvent"));
 const postEvent_1 = require("../postEvent");
-const createUpdatePhase = ({ dataSource, log, }) => (participant, latestEvent) => __awaiter(void 0, void 0, void 0, function* () {
+const externalEventsEndpoint_1 = require("../../lib/externalEventsEndpoint");
+const createUpdatePhase = ({ dataSource, externalEventsEndpoint, log, }) => (participant, latestEvent) => __awaiter(void 0, void 0, void 0, function* () {
     log('updating participant phase if needed...');
     if (participant.phase === transitionSetting_1.Phase.POST_EXPERIMENT) {
         log('participant in post-experiment, no need to check for phase transition, skipping');
@@ -89,9 +90,10 @@ const createUpdatePhase = ({ dataSource, log, }) => (participant, latestEvent) =
     if (transitionEvent) {
         log('triggering transition from phase', fromPhase, 'to phase', toPhase);
         const triggerEvent = new event_1.default();
-        Object.assign(triggerEvent, latestEvent);
-        triggerEvent.id = 0;
-        triggerEvent.type = event_1.EventType.PHASE_TRANSITION;
+        Object.assign(triggerEvent, latestEvent, {
+            id: 0,
+            type: event_1.EventType.PHASE_TRANSITION,
+        });
         transitionEvent.participantId = participant.id;
         transitionEvent.fromPhase = fromPhase;
         transitionEvent.toPhase = toPhase;
@@ -101,9 +103,15 @@ const createUpdatePhase = ({ dataSource, log, }) => (participant, latestEvent) =
         yield dataSource.transaction((manager) => __awaiter(void 0, void 0, void 0, function* () {
             const trigger = yield manager.save(triggerEvent);
             transitionEvent.eventId = trigger.id;
-            yield manager.save(transitionEvent);
-            yield manager.save(participant);
+            yield Promise.all([
+                manager.save(transitionEvent),
+                manager.save(participant),
+            ]);
         }));
+        if (toPhase === transitionSetting_1.Phase.EXPERIMENT) {
+            const notifier = (0, externalEventsEndpoint_1.createExternalNotifier)(externalEventsEndpoint, participant.code, log);
+            void notifier.notifyInterventionPeriod(latestEvent.createdAt);
+        }
     }
     else {
         log('no phase transition needed at this point');

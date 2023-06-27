@@ -5,12 +5,12 @@ import {type DataSource} from 'typeorm';
 import Participant from '../../models/participant';
 import Event from '../../../common/models/event';
 
-import {type InstalledEventConfig} from '../../lib/routeCreation';
+import {type ExternalEventsEndpoint} from '../../lib/routeCreation';
 import {type LogFunction} from '../../lib/logger';
 
 export const createHandleExtensionInstalledEvent = (
 	dataSource: DataSource,
-	installedEventConfig: InstalledEventConfig,
+	installedEventConfig: ExternalEventsEndpoint,
 	log: LogFunction,
 ) => async (participantId: number, event: Event) => {
 	log('handling extension installed event...');
