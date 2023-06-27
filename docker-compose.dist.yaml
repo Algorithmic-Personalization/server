@@ -17,7 +17,7 @@ services:
           target: /root/ytdpnl/logs
 
   production-db:
-    image: postgres
+    image: postgres:15
     restart: always
     environment:
       POSTGRES_USER: admin
@@ -29,7 +29,7 @@ services:
       - production-ytdpnl:/var/lib/postgresql/data
 
   development-db:
-    image: postgres
+    image: postgres:15
     restart: always
     environment:
       POSTGRES_USER: admin
