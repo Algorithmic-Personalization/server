@@ -1,4 +1,4 @@
-FROM node:18
+FROM node:19
 
 ENV PM2_PUBLIC_KEY ""
 ENV PM2_SECRET_KEY ""
