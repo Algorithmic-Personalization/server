@@ -77,7 +77,7 @@ const scrapeYouTube_1 = __importDefault(require("./lib/scrapeYouTube"));
 // DO NOT FORGET TO UPDATE THIS FILE WHEN ADDING NEW ENTITIES
 const entities_1 = __importDefault(require("./entities"));
 const loadConfigYamlRaw_1 = require("./lib/config-loader/loadConfigYamlRaw");
-const loadExternalNotifier_1 = __importDefault(require("./lib/loadExternalNotifier"));
+const externalNotifier_1 = __importDefault(require("./lib/externalNotifier"));
 const email_1 = require("./lib/email");
 const getEnv = () => {
     const env = process.env.NODE_ENV;
@@ -203,7 +203,7 @@ const main = () => __awaiter(void 0, void 0, void 0, function* () {
         mailer,
         log: createLogger('<notifier>'),
     };
-    const notifier = (0, loadExternalNotifier_1.default)(config)(notifierServices);
+    const notifier = (0, externalNotifier_1.default)(config)(notifierServices);
     const routeContext = {
         dataSource: ds,
         mailer,
