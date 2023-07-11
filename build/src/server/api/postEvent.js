@@ -46,8 +46,8 @@ const transitionEvent_1 = __importDefault(require("../models/transitionEvent"));
 const updateParticipantPhase_1 = __importDefault(require("./postEvent/updateParticipantPhase"));
 const createUpdateActivity_1 = __importDefault(require("./postEvent/createUpdateActivity"));
 const storeWatchTime_1 = __importDefault(require("./postEvent/storeWatchTime"));
+const handleExtensionInstalledEvent_1 = __importDefault(require("./postEvent/handleExtensionInstalledEvent"));
 const storeRecommendationsShown_1 = __importDefault(require("../lib/storeRecommendationsShown"));
-const util_2 = require("../../util");
 const isLocalUuidAlreadyExistsError = (e) => (0, util_1.has)('code')(e) && (0, util_1.has)('constraint')(e)
     && e.code === '23505'
     && e.constraint === 'event_local_uuid_idx';
@@ -150,7 +150,8 @@ const createPostEventRoute = ({ createLogger, dataSource, youTubeConfig, notifie
         res.status(500).json({ kind: 'Failure', message: 'No participant found' });
         return;
     }
-    const withParticipantLock = (0, util_2.withLock)(`participant-${participant.id}`);
+    const handleInstall = (0, handleExtensionInstalledEvent_1.default)(dataSource, notifier, log);
+    void handleInstall(participant, event);
     event.arm = participant.arm;
     event.phase = participant.phase;
     if (!event.experimentConfigId) {
@@ -172,34 +173,26 @@ const createPostEventRoute = ({ createLogger, dataSource, youTubeConfig, notifie
         return;
     }
     try {
-        yield withParticipantLock(() => __awaiter(void 0, void 0, void 0, function* () {
-            log('updating activity and phase for participant', participant.id);
-            yield updateActivity(participant, event);
-            yield updatePhase(participant, event);
-        }), log);
+        yield updateActivity(participant, event);
+        yield updatePhase(participant, event);
     }
     catch (e) {
         log('activity update failed', e);
     }
     try {
-        if (event.type === event_1.EventType.EXTENSION_INSTALLED) {
-            res.send({ kind: 'Success', value: 'Extension installed event handled' });
+        const e = yield eventRepo.save(event);
+        log('event saved', summarizeForDisplay(e));
+        res.send({ kind: 'Success', value: e });
+        if (event.type === event_1.EventType.RECOMMENDATIONS_SHOWN) {
+            yield (0, storeRecommendationsShown_1.default)({
+                dataSource,
+                youTubeConfig,
+                event: event,
+                log,
+            });
         }
-        else {
-            const e = yield eventRepo.save(event);
-            log('event saved', summarizeForDisplay(e));
-            res.send({ kind: 'Success', value: e });
-            if (event.type === event_1.EventType.RECOMMENDATIONS_SHOWN) {
-                yield (0, storeRecommendationsShown_1.default)({
-                    dataSource,
-                    youTubeConfig,
-                    event: event,
-                    log,
-                });
-            }
-            else if (event.type === event_1.EventType.WATCH_TIME) {
-                yield storeWatchTime(event);
-            }
+        else if (event.type === event_1.EventType.WATCH_TIME) {
+            yield storeWatchTime(event);
         }
     }
     catch (e) {

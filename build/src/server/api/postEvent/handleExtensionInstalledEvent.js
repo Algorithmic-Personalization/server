@@ -15,38 +15,45 @@ Object.defineProperty(exports, "__esModule", { value: true });
 exports.createHandleExtensionInstalledEvent = void 0;
 const participant_1 = __importDefault(require("../../models/participant"));
 const event_1 = __importDefault(require("../../../common/models/event"));
-const createHandleExtensionInstalledEvent = (dataSource, log) => (participantId, event) => __awaiter(void 0, void 0, void 0, function* () {
+const createHandleExtensionInstalledEvent = (dataSource, notifier, log) => (p, event) => __awaiter(void 0, void 0, void 0, function* () {
     log('handling extension installed event...');
-    const eventRepo = dataSource.getRepository(event_1.default);
+    if (p.extensionInstalled) {
+        log('info', 'participant extension already installed, skipping with no lookup');
+        return;
+    }
+    log('info', 'initiating the transaction business...');
     const queryRunner = dataSource.createQueryRunner();
     try {
         yield queryRunner.startTransaction();
-        const participant = yield queryRunner.manager.getRepository(participant_1.default)
+        const participantRepo = queryRunner.manager.getRepository(participant_1.default);
+        const participant = yield participantRepo
             .createQueryBuilder('participant')
             .useTransaction(true)
             .setLock('pessimistic_write')
-            .where({ id: participantId })
+            .where({ id: p.id })
             .getOne();
         if (!participant) {
             throw new Error('Participant not found');
         }
         if (participant.extensionInstalled) {
-            log('participant extension already installed, skipping');
+            log('info', 'participant extension already installed, skipping');
         }
         else {
-            log('participant extension not installed, calling API to notify installation...');
-            // TODO
+            log('info', 'participant extension not installed, calling API to notify installation...');
             log('remote server notified, updating local participant...');
             participant.extensionInstalled = true;
             yield queryRunner.manager.save(participant);
+            const eventRepo = queryRunner.manager.getRepository(event_1.default);
             const e = yield eventRepo.save(event);
             log('event saved', e);
             yield queryRunner.commitTransaction();
             log('participant updated, transaction committed');
+            const n = notifier.makeParticipantNotifier({ participantCode: participant.code });
+            void n.notifyInstalled(event.createdAt);
         }
     }
     catch (err) {
-        log('error handling EXTENSION_INSTALLED event:', err);
+        log('error', 'handling EXTENSION_INSTALLED event', err);
         yield queryRunner.rollbackTransaction();
     }
     finally {

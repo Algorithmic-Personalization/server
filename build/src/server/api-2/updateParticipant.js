@@ -36,9 +36,8 @@ exports.updateParticipantDefinition = void 0;
 const participant_1 = __importStar(require("../models/participant"));
 const event_1 = require("../../common/models/event");
 const transitionEvent_1 = __importStar(require("../models/transitionEvent"));
-const transitionSetting_1 = require("../models/transitionSetting");
 const util_1 = require("../../util");
-const updateParticipantPhase = (dataSource, notifier, log) => (participant, fromPhase, toPhase) => __awaiter(void 0, void 0, void 0, function* () {
+const updateParticipantPhase = (dataSource, notifier, log) => (fromPhase, toPhase) => (participant) => __awaiter(void 0, void 0, void 0, function* () {
     var _a;
     if (fromPhase === toPhase) {
         return participant;
@@ -67,18 +66,18 @@ const updateParticipantPhase = (dataSource, notifier, log) => (participant, from
     transition.reason = transitionEvent_1.TransitionReason.FORCED;
     transition.numDays = (0, util_1.daysElapsed)(startOfLatestPhase, new Date());
     try {
-        const transition = yield dataSource.transaction((manager) => __awaiter(void 0, void 0, void 0, function* () {
-            log('saving transition', transition);
+        const resultParticipant = yield dataSource.transaction((manager) => __awaiter(void 0, void 0, void 0, function* () {
+            log('info', 'saving transition', transition);
             yield manager.save(transition);
+            participant = yield manager.findOneOrFail(participant_1.default, { where: { id: participant.id } });
             participant.phase = toPhase;
             yield manager.save(participant);
             return participant;
         }));
         log('success', 'saving transition', transition.id);
-        if (toPhase === transitionSetting_1.Phase.EXPERIMENT) {
-            void notifier.notifyPhaseChange(transition.createdAt, participant.code, fromPhase, toPhase);
-        }
-        return transition;
+        const n = notifier.makeParticipantNotifier({ participantCode: participant.code });
+        void n.notifyPhaseChange(transition.createdAt, fromPhase, toPhase);
+        return resultParticipant;
     }
     catch (e) {
         log('error saving transition', e);
@@ -109,7 +108,7 @@ exports.updateParticipantDefinition = {
             throw new Error('Invalid phase, must be one of: 0, 1, 2');
         }
         if ((0, participant_1.isValidPhase)(phase)) {
-            return updateParticipantPhase(dataSource, notifier, log)(participantEntity, previousPhase, phase);
+            return updateParticipantPhase(dataSource, notifier, log)(previousPhase, phase)(participantEntity);
         }
         return participantRepo.save(participantEntity);
     }),

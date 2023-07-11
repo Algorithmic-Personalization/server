@@ -10,8 +10,7 @@ smtp:
     pass: application password if you have 2-FA or e-mail password otherwise (discouraged)
 
 external-notifier:
-  recipient: yo@email.com
-  token: some_authorization_token
+  email: fm.de.jouvencel@gmail.com
 
 YouTube:
   # Obtain a key on https://console.cloud.google.com/apis/credentials

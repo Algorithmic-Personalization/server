@@ -149,7 +149,8 @@ const createUpdateActivity = ({ dataSource, activityRepo, eventRepo, notifier, l
             ]);
             yield qr.commitTransaction();
             log('success', `Participant ${participant.id} activated extension, the following event was saved:`, savedEvent);
-            void notifier.notifyActive(activationEvent.createdAt);
+            const n = notifier.makeParticipantNotifier({ participantCode: participant.code });
+            void n.notifyActive(activationEvent.createdAt);
         }
         catch (err) {
             log('error', 'while handling extension activity status determination or saving:', err);

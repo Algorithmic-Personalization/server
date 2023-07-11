@@ -10,6 +10,7 @@ var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, ge
 };
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.createDefaultNotifier = exports.makeDefaultExternalNotifier = exports.getExternalNotifierConfig = void 0;
+const event_1 = require("./../../common/models/event");
 const util_1 = require("../../common/util");
 const getExternalNotifierConfig = (generalConfigData) => {
     if (!(0, util_1.has)('external-notifier')(generalConfigData) || !generalConfigData['external-notifier'] || typeof generalConfigData['external-notifier'] !== 'object') {
@@ -24,11 +25,33 @@ const getExternalNotifierConfig = (generalConfigData) => {
     };
 };
 exports.getExternalNotifierConfig = getExternalNotifierConfig;
-// TODO implement, THEY ARE NO-OPS FOR NOW
-const makeDefaultExternalNotifier = (_config) => (_deps) => ({
-    notifyActive: (_d) => __awaiter(void 0, void 0, void 0, function* () { return true; }),
-    notifyInstalled: () => __awaiter(void 0, void 0, void 0, function* () { return true; }),
-    notifyPhaseChange: () => __awaiter(void 0, void 0, void 0, function* () { return true; }),
+const makeDefaultExternalNotifier = (config) => ({ mailer }) => ({
+    makeParticipantNotifier: (data) => ({
+        notifyActive(d) {
+            return __awaiter(this, void 0, void 0, function* () {
+                const { email: to } = config;
+                const subject = `<${event_1.EventType.PHASE_TRANSITION}}> Update for User <${data.participantCode}>`;
+                const text = `Participant <${data.participantCode}> <${event_1.EventType.EXTENSION_ACTIVATED}> as of <${d.getTime()}>`;
+                return mailer({ to, subject, text });
+            });
+        },
+        notifyInstalled(d) {
+            return __awaiter(this, void 0, void 0, function* () {
+                const { email: to } = config;
+                const subject = `<${event_1.EventType.EXTENSION_INSTALLED}}> Update for User <${data.participantCode}>`;
+                const text = `Participant <${data.participantCode}> <${event_1.EventType.EXTENSION_INSTALLED}> as of <${d.getTime()}>`;
+                return mailer({ to, subject, text });
+            });
+        },
+        notifyPhaseChange(d, from_phase, to_phase) {
+            return __awaiter(this, void 0, void 0, function* () {
+                const { email: to } = config;
+                const subject = `<${event_1.EventType.PHASE_TRANSITION}}> Update for User <${data.participantCode}>`;
+                const text = `Participant <${data.participantCode}> transitioned from phase <${from_phase} to phase <${to_phase}> on <${d.getTime()}>`;
+                return mailer({ to, subject, text });
+            });
+        },
+    }),
 });
 exports.makeDefaultExternalNotifier = makeDefaultExternalNotifier;
 const createDefaultNotifier = (config) => (services) => {
