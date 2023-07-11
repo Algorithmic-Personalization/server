@@ -42,7 +42,6 @@ export type ParticipantData = {
 	participantCode: string;
 };
 
-// TODO implement, THEY ARE NO-OPS FOR NOW
 export const makeDefaultExternalNotifier = (config: ExternalNotifierConfig) =>
 	({mailer}: ExternalNotifierDependencies): ExternalNotifier => ({
 		makeParticipantNotifier: (data: ParticipantData): ParticipantNotifier => ({

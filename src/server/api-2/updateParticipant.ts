@@ -6,7 +6,6 @@ import {type LogFunction} from '../lib/logger';
 import Participant, {isValidPhase} from '../models/participant';
 import {isValidExperimentArm} from '../../common/models/event';
 import TransitionEvent, {TransitionReason} from '../models/transitionEvent';
-import {Phase} from '../models/transitionSetting';
 
 import {daysElapsed} from '../../util';
 
@@ -17,63 +16,62 @@ const updateParticipantPhase = (
 	notifier: ExternalNotifier,
 	log: LogFunction,
 ) =>
-	async (participant: Participant, fromPhase: number, toPhase: number): Promise<Participant> => {
-		if (fromPhase === toPhase) {
-			return participant;
-		}
-
-		const latestTransition = await dataSource
-			.getRepository(TransitionEvent)
-			.findOne({
-				where: {
-					participantId: participant.id,
-				},
-				order: {
-					createdAt: 'DESC',
-				},
-			});
-
-		const startOfLatestPhase = latestTransition?.createdAt ?? participant.createdAt;
-
-		if (latestTransition) {
-			log('latest transition for participant', latestTransition);
-		} else {
-			log(
-				'no previous transition for participant, using is creation date as entry into previous phase',
-				startOfLatestPhase,
-			);
-		}
-
-		const transition = new TransitionEvent();
-		transition.fromPhase = fromPhase;
-		transition.toPhase = toPhase;
-		transition.participantId = participant.id;
-		transition.reason = TransitionReason.FORCED;
-		transition.numDays = daysElapsed(startOfLatestPhase, new Date());
-
-		try {
-			const resultParticipant = await dataSource.transaction(async manager => {
-				log('info', 'saving transition', transition);
-				await manager.save(transition);
-				participant = await manager.findOneOrFail(Participant, {where: {id: participant.id}});
-				participant.phase = toPhase;
-				await manager.save(participant);
+	(fromPhase: number, toPhase: number) =>
+		async (participant: Participant): Promise<Participant> => {
+			if (fromPhase === toPhase) {
 				return participant;
-			});
-
-			log('success', 'saving transition', transition.id);
-
-			if (toPhase === Phase.EXPERIMENT) {
-				const n = notifier.makeParticipantNotifier({participantCode: participant.code});
-				void n.notifyPhaseChange(transition.createdAt, fromPhase, toPhase);
 			}
 
-			return resultParticipant;
-		} catch (e) {
-			log('error saving transition', e);
-			throw e;
-		}
-	};
+			const latestTransition = await dataSource
+				.getRepository(TransitionEvent)
+				.findOne({
+					where: {
+						participantId: participant.id,
+					},
+					order: {
+						createdAt: 'DESC',
+					},
+				});
+
+			const startOfLatestPhase = latestTransition?.createdAt ?? participant.createdAt;
+
+			if (latestTransition) {
+				log('latest transition for participant', latestTransition);
+			} else {
+				log(
+					'no previous transition for participant, using is creation date as entry into previous phase',
+					startOfLatestPhase,
+				);
+			}
+
+			const transition = new TransitionEvent();
+			transition.fromPhase = fromPhase;
+			transition.toPhase = toPhase;
+			transition.participantId = participant.id;
+			transition.reason = TransitionReason.FORCED;
+			transition.numDays = daysElapsed(startOfLatestPhase, new Date());
+
+			try {
+				const resultParticipant = await dataSource.transaction(async manager => {
+					log('info', 'saving transition', transition);
+					await manager.save(transition);
+					participant = await manager.findOneOrFail(Participant, {where: {id: participant.id}});
+					participant.phase = toPhase;
+					await manager.save(participant);
+					return participant;
+				});
+
+				log('success', 'saving transition', transition.id);
+
+				const n = notifier.makeParticipantNotifier({participantCode: participant.code});
+				void n.notifyPhaseChange(transition.createdAt, fromPhase, toPhase);
+
+				return resultParticipant;
+			} catch (e) {
+				log('error saving transition', e);
+				throw e;
+			}
+		};
 
 export const updateParticipantDefinition: RouteDefinition<Participant> = {
 	verb: 'put',
@@ -109,7 +107,9 @@ export const updateParticipantDefinition: RouteDefinition<Participant> = {
 
 		if (isValidPhase(phase)) {
 			return updateParticipantPhase(dataSource, notifier, log)(
-				participantEntity, previousPhase, phase,
+				previousPhase, phase,
+			)(
+				participantEntity,
 			);
 		}
 

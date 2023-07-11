@@ -12,6 +12,12 @@ export const createHandleExtensionInstalledEvent = (
 	log: LogFunction,
 ) => async (p: Participant, event: Event) => {
 	log('handling extension installed event...');
+	if (p.extensionInstalled) {
+		log('info', 'participant extension already installed, skipping with no lookup');
+		return;
+	}
+
+	log('info', 'initiating the transaction business...');
 	const queryRunner = dataSource.createQueryRunner();
 
 	try {
@@ -32,8 +38,6 @@ export const createHandleExtensionInstalledEvent = (
 			log('info', 'participant extension already installed, skipping');
 		} else {
 			log('info', 'participant extension not installed, calling API to notify installation...');
-			const n = notifier.makeParticipantNotifier({participantCode: participant.code});
-			void n.notifyInstalled(event.createdAt);
 			log('remote server notified, updating local participant...');
 			participant.extensionInstalled = true;
 			await queryRunner.manager.save(participant);
@@ -42,6 +46,8 @@ export const createHandleExtensionInstalledEvent = (
 			log('event saved', e);
 			await queryRunner.commitTransaction();
 			log('participant updated, transaction committed');
+			const n = notifier.makeParticipantNotifier({participantCode: participant.code});
+			void n.notifyInstalled(event.createdAt);
 		}
 	} catch (err) {
 		log('error', 'handling EXTENSION_INSTALLED event', err);
