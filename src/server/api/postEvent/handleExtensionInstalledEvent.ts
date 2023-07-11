@@ -4,9 +4,11 @@ import Participant from '../../models/participant';
 import Event from '../../../common/models/event';
 
 import {type LogFunction} from '../../lib/logger';
+import {type ExternalNotifier} from '../../lib/loadExternalNotifier';
 
 export const createHandleExtensionInstalledEvent = (
 	dataSource: DataSource,
+	notifier: ExternalNotifier,
 	log: LogFunction,
 ) => async (participantId: number, event: Event) => {
 	log('handling extension installed event...');
@@ -30,8 +32,8 @@ export const createHandleExtensionInstalledEvent = (
 			log('participant extension already installed, skipping');
 		} else {
 			log('participant extension not installed, calling API to notify installation...');
-			// TODO
-
+			const n = notifier.makeParticipantNotifier({participantCode: participant.code});
+			void n.notifyInstalled(event.createdAt);
 			log('remote server notified, updating local participant...');
 			participant.extensionInstalled = true;
 			await queryRunner.manager.save(participant);

@@ -99,7 +99,8 @@ export const createUpdatePhase = ({
 		});
 
 		if (toPhase === Phase.EXPERIMENT) {
-			void notifier.notifyPhaseChange(transitionEvent.createdAt, participant.code, fromPhase, fromPhase);
+			const n = notifier.makeParticipantNotifier({participantCode: participant.code});
+			void n.notifyPhaseChange(transitionEvent.createdAt, fromPhase, fromPhase);
 		}
 	} else {
 		log('no phase transition needed at this point');

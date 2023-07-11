@@ -52,9 +52,10 @@ const updateParticipantPhase = (
 		transition.numDays = daysElapsed(startOfLatestPhase, new Date());
 
 		try {
-			const transition = await dataSource.transaction(async manager => {
-				log('saving transition', transition);
+			const resultParticipant = await dataSource.transaction(async manager => {
+				log('info', 'saving transition', transition);
 				await manager.save(transition);
+				participant = await manager.findOneOrFail(Participant, {where: {id: participant.id}});
 				participant.phase = toPhase;
 				await manager.save(participant);
 				return participant;
@@ -63,10 +64,11 @@ const updateParticipantPhase = (
 			log('success', 'saving transition', transition.id);
 
 			if (toPhase === Phase.EXPERIMENT) {
-				void notifier.notifyPhaseChange(transition.createdAt, participant.code, fromPhase, toPhase);
+				const n = notifier.makeParticipantNotifier({participantCode: participant.code});
+				void n.notifyPhaseChange(transition.createdAt, fromPhase, toPhase);
 			}
 
-			return transition;
+			return resultParticipant;
 		} catch (e) {
 			log('error saving transition', e);
 			throw e;

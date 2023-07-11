@@ -204,7 +204,8 @@ export const createUpdateActivity = ({dataSource, activityRepo, eventRepo, notif
 				savedEvent,
 			);
 
-			void notifier.notifyActive(activationEvent.createdAt);
+			const n = notifier.makeParticipantNotifier({participantCode: participant.code});
+			void n.notifyActive(activationEvent.createdAt);
 		} catch (err) {
 			log('error', 'while handling extension activity status determination or saving:', err);
 			await qr.rollbackTransaction();

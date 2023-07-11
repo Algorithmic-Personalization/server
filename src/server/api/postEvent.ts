@@ -17,6 +17,7 @@ import TransitionEvent from '../models/transitionEvent';
 import createUpdatePhase from './postEvent/updateParticipantPhase';
 import createUpdateActivity from './postEvent/createUpdateActivity';
 import createStoreWatchTime from './postEvent/storeWatchTime';
+import createHandleExtensionInstalledEvent from './postEvent/handleExtensionInstalledEvent';
 
 import storeRecommendationsShown from '../lib/storeRecommendationsShown';
 
@@ -207,6 +208,14 @@ export const createPostEventRoute: RouteCreator = ({
 
 	try {
 		if (event.type === EventType.EXTENSION_INSTALLED) {
+			const handleInstall = createHandleExtensionInstalledEvent(
+				dataSource,
+				notifier,
+				log,
+			);
+
+			void handleInstall(participant.id, event);
+
 			res.send({kind: 'Success', value: 'Extension installed event handled'});
 		} else {
 			const e = await eventRepo.save(event);
