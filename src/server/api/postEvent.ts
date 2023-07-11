@@ -21,8 +21,6 @@ import createHandleExtensionInstalledEvent from './postEvent/handleExtensionInst
 
 import storeRecommendationsShown from '../lib/storeRecommendationsShown';
 
-import {withLock} from '../../util';
-
 const isLocalUuidAlreadyExistsError = (e: unknown): boolean =>
 	has('code')(e) && has('constraint')(e)
 	&& e.code === '23505'
@@ -197,11 +195,8 @@ export const createPostEventRoute: RouteCreator = ({
 	}
 
 	try {
-		await withParticipantLock(async () => {
-			log('updating activity and phase for participant', participant.id);
-			await updateActivity(participant, event);
-			await updatePhase(participant, event);
-		}, log);
+		await updateActivity(participant, event);
+		await updatePhase(participant, event);
 	} catch (e) {
 		log('activity update failed', e);
 	}
