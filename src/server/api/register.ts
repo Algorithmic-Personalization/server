@@ -21,7 +21,7 @@ console.log('API URL:', config[`${env}-server-url`]);
 
 const serverUrl = config[`${env}-server-url`];
 
-export const createRegisterRoute: RouteCreator = ({dataSource, mailer, mailerFrom, createLogger}) => async (req, res) => {
+export const createRegisterRoute: RouteCreator = ({dataSource, mailer, createLogger}) => async (req, res) => {
 	const log = createLogger(req.requestId);
 
 	const admin = new Admin();
@@ -81,8 +81,8 @@ export const createRegisterRoute: RouteCreator = ({dataSource, mailer, mailerFro
 	const link = `${serverUrl}${getVerifyEmailToken}?token=${token}`;
 
 	try {
-		const mailInfo = await mailer.sendMail({
-			from: mailerFrom,
+		const mailInfo = await mailer.transport.sendMail({
+			from: mailer.from,
 			to: admin.email,
 			subject: 'Please verify your email address for YTDNPL admin',
 			text: `Please past the following link in your browser to verify your email address: ${link}`,

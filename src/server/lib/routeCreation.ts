@@ -7,6 +7,7 @@ import {type TokenTools} from './crypto';
 
 import {has} from '../../common/util';
 import NotFoundError from './notFoundError';
+import {type ExternalNotifier} from './loadExternalNotifier';
 
 const hasMessage = has('message');
 const message = (x: unknown) => (hasMessage(x) ? x.message : 'An unknown error occurred');
@@ -28,13 +29,18 @@ export type YouTubeConfig = {
 	apiKey: string;
 };
 
+export type MailService = {
+	transport: Transporter;
+	from: string;
+};
+
 export type RouteContext = {
 	dataSource: DataSource;
-	mailer: Transporter;
-	mailerFrom: string;
+	mailer: MailService;
 	createLogger: CreateLogger;
 	tokenTools: TokenTools;
 	youTubeConfig: YouTubeConfig;
+	notifier: ExternalNotifier;
 };
 
 export type RouteCreator = (context: RouteContext) => (req: Request, res: Response) => Promise<void>;

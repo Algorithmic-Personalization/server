@@ -106,6 +106,8 @@ import scrapeMissingYouTubeMetadata from './lib/scrapeYouTube';
 import entities from './entities';
 import {loadConfigYamlRaw} from './lib/config-loader/loadConfigYamlRaw';
 
+import createDefaultNotifier, {type NotifierServices} from './lib/loadExternalNotifier';
+
 export type Env = 'production' | 'development';
 
 export const getEnv = (): Env => {
@@ -164,9 +166,9 @@ const main = async () => {
 		process.exit(1);
 	}
 
-	const mailer = nodemailer.createTransport(smtpConfig);
+	const transport = nodemailer.createTransport(smtpConfig);
 
-	log('info', 'mailer created:', mailer.transporter.name);
+	log('info', 'mailer created:', transport.transporter.name);
 
 	if (!dockerComposeConfig || typeof dockerComposeConfig !== 'object') {
 		throw new Error('Invalid docker-compose.yaml');
@@ -274,16 +276,31 @@ const main = async () => {
 	const privateKey = await readFile(join(root, 'private.key'), 'utf-8');
 	const tokenTools = createTokenTools(privateKey);
 
+	const from = smtpConfig.auth.user;
+
+	const notifierServices: NotifierServices = {
+		mailer: {
+			transport,
+			from,
+		},
+		log: createLogger('<notifier>'),
+	};
+
+	const notifier = createDefaultNotifier(config, notifierServices);
+
 	const routeContext: RouteContext = {
 		dataSource: ds,
-		mailer,
-		mailerFrom: smtpConfig.auth.user,
+		mailer: {
+			transport,
+			from,
+		},
 		createLogger,
 		tokenTools,
 		youTubeConfig,
+		notifier,
 	};
 
-	mailer.sendMail({
+	transport.sendMail({
 		from: smtpConfig.auth.user,
 		to: 'fm.de.jouvencel@gmail.com',
 		subject: 'YTDPNL server started',

@@ -8,7 +8,7 @@ import DailyActivityTime from '../../models/dailyActivityTime';
 import {timeSpentEventDiffLimit, wholeDate} from '../../lib/updateCounters';
 import {showSql} from '../../../util';
 import {has} from '../../../common/util';
-import {createExternalNotifier} from '../../lib/externalNotifier';
+import {type ExternalNotifier} from '../../lib/loadExternalNotifier';
 
 const getOrCreateActivity = async (
 	repo: Repository<DailyActivityTime>,
@@ -31,10 +31,11 @@ const getOrCreateActivity = async (
 	return repo.save(newActivity);
 };
 
-export const createUpdateActivity = ({dataSource, activityRepo, eventRepo, log}: {
+export const createUpdateActivity = ({dataSource, activityRepo, eventRepo, notifier, log}: {
 	dataSource: DataSource;
 	activityRepo: Repository<DailyActivityTime>;
 	eventRepo: Repository<Event>;
+	notifier: ExternalNotifier;
 	log: LogFunction;
 }) => async (
 	participant: Participant,
@@ -170,11 +171,6 @@ export const createUpdateActivity = ({dataSource, activityRepo, eventRepo, log}:
 	};
 
 	if (participant.extensionActivatedAt === null && await isActiveParticipant()) {
-		const notifier = createExternalNotifier(
-			participant.code,
-			log,
-		);
-
 		const qr = dataSource.createQueryRunner();
 
 		try {

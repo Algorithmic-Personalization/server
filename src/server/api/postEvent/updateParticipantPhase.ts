@@ -6,12 +6,13 @@ import DailyActivityTime from '../../models/dailyActivityTime';
 import TransitionSetting, {Phase} from '../../models/transitionSetting';
 import TransitionEvent, {TransitionReason} from '../../models/transitionEvent';
 import {shouldTriggerPhaseTransition} from '../postEvent';
-import {createExternalNotifier} from '../../lib/externalNotifier';
+import {type ExternalNotifier} from '../../lib/loadExternalNotifier';
 
 export const createUpdatePhase = ({
-	dataSource, log,
+	dataSource, notifier, log,
 }: {
 	dataSource: DataSource;
+	notifier: ExternalNotifier;
 	log: LogFunction;
 }) => async (participant: Participant, latestEvent: Event) => {
 	log('updating participant phase if needed...');
@@ -98,12 +99,7 @@ export const createUpdatePhase = ({
 		});
 
 		if (toPhase === Phase.EXPERIMENT) {
-			const notifier = createExternalNotifier(
-				participant.code,
-				log,
-			);
-
-			void notifier.notifyInterventionPeriod(latestEvent.createdAt);
+			void notifier.notifyPhaseChange(transitionEvent.createdAt, participant.code, fromPhase, fromPhase);
 		}
 	} else {
 		log('no phase transition needed at this point');

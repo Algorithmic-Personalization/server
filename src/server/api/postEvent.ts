@@ -109,6 +109,7 @@ export const createPostEventRoute: RouteCreator = ({
 	createLogger,
 	dataSource,
 	youTubeConfig,
+	notifier,
 }) => async (req, res) => {
 	const log = createLogger(req.requestId);
 
@@ -141,11 +142,13 @@ export const createPostEventRoute: RouteCreator = ({
 		dataSource,
 		activityRepo,
 		eventRepo,
+		notifier,
 		log,
 	});
 
 	const updatePhase = createUpdatePhase({
 		dataSource,
+		notifier,
 		log,
 	});
 
