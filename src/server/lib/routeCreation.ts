@@ -11,11 +11,6 @@ import NotFoundError from './notFoundError';
 const hasMessage = has('message');
 const message = (x: unknown) => (hasMessage(x) ? x.message : 'An unknown error occurred');
 
-export type ExternalEventsEndpoint = {
-	url: string;
-	token: string;
-};
-
 // From the documentation at: https://developers.google.com/youtube/v3/docs/videos/list
 export type YouTubeConfig = {
 	// The base URL for the YouTube API's `videos` endpoint,
@@ -39,7 +34,6 @@ export type RouteContext = {
 	mailerFrom: string;
 	createLogger: CreateLogger;
 	tokenTools: TokenTools;
-	externalEventsEndpoint: ExternalEventsEndpoint;
 	youTubeConfig: YouTubeConfig;
 };
 

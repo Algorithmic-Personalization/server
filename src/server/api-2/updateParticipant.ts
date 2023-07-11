@@ -1,7 +1,6 @@
 import {type DataSource} from 'typeorm';
 
-import {type ExternalEventsEndpoint} from './../lib/routeCreation';
-import {createExternalNotifier} from '../lib/externalEventsEndpoint';
+import {createExternalNotifier} from '../lib/externalNotifier';
 
 import {type RouteDefinition} from '../lib/routeCreation';
 import {type LogFunction} from '../lib/logger';
@@ -15,7 +14,6 @@ import {daysElapsed} from '../../util';
 
 const updateParticipantPhase = (
 	dataSource: DataSource,
-	externalEventsEndpoint: ExternalEventsEndpoint,
 	log: LogFunction,
 ) =>
 	async (participant: Participant, fromPhase: number, toPhase: number): Promise<Participant> => {
@@ -64,7 +62,7 @@ const updateParticipantPhase = (
 			log('success', 'saving transition', transition.id);
 
 			if (toPhase === Phase.EXPERIMENT) {
-				const notifier = createExternalNotifier(externalEventsEndpoint, participant.code, log);
+				const notifier = createExternalNotifier(participant.code, log);
 				void notifier.notifyInterventionPeriod(transition.createdAt);
 			}
 
@@ -78,7 +76,7 @@ const updateParticipantPhase = (
 export const updateParticipantDefinition: RouteDefinition<Participant> = {
 	verb: 'put',
 	path: '/api/participant/:code',
-	makeHandler: ({createLogger, dataSource, externalEventsEndpoint}) => async (req): Promise<Participant> => {
+	makeHandler: ({createLogger, dataSource}) => async (req): Promise<Participant> => {
 		const log = createLogger(req.requestId);
 		log('Received update participant request');
 
@@ -108,7 +106,7 @@ export const updateParticipantDefinition: RouteDefinition<Participant> = {
 		}
 
 		if (isValidPhase(phase)) {
-			return updateParticipantPhase(dataSource, externalEventsEndpoint, log)(
+			return updateParticipantPhase(dataSource, log)(
 				participantEntity, previousPhase, phase,
 			);
 		}

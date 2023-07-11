@@ -1,16 +1,12 @@
-import fetch from 'node-fetch';
-
 import {type DataSource} from 'typeorm';
 
 import Participant from '../../models/participant';
 import Event from '../../../common/models/event';
 
-import {type ExternalEventsEndpoint} from '../../lib/routeCreation';
 import {type LogFunction} from '../../lib/logger';
 
 export const createHandleExtensionInstalledEvent = (
 	dataSource: DataSource,
-	installedEventConfig: ExternalEventsEndpoint,
 	log: LogFunction,
 ) => async (participantId: number, event: Event) => {
 	log('handling extension installed event...');
@@ -34,16 +30,7 @@ export const createHandleExtensionInstalledEvent = (
 			log('participant extension already installed, skipping');
 		} else {
 			log('participant extension not installed, calling API to notify installation...');
-			await fetch(installedEventConfig.url, {
-				method: 'POST',
-				headers: {
-					'Content-Type': 'application/json',
-					'X-API-TOKEN': installedEventConfig.token,
-				},
-				body: JSON.stringify({
-					code: participant.code,
-				}),
-			});
+			// TODO
 
 			log('remote server notified, updating local participant...');
 			participant.extensionInstalled = true;

@@ -108,7 +108,6 @@ const summarizeForDisplay = (event: Event): Record<string, unknown> => {
 export const createPostEventRoute: RouteCreator = ({
 	createLogger,
 	dataSource,
-	externalEventsEndpoint,
 	youTubeConfig,
 }) => async (req, res) => {
 	const log = createLogger(req.requestId);
@@ -142,13 +141,11 @@ export const createPostEventRoute: RouteCreator = ({
 		dataSource,
 		activityRepo,
 		eventRepo,
-		externalEventsEndpoint,
 		log,
 	});
 
 	const updatePhase = createUpdatePhase({
 		dataSource,
-		externalEventsEndpoint,
 		log,
 	});
 

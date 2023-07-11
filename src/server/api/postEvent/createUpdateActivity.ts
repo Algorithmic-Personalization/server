@@ -6,10 +6,9 @@ import {EventType} from '../../../common/models/event';
 import {type WatchTimeEvent} from '../../../common/models/watchTimeEvent';
 import DailyActivityTime from '../../models/dailyActivityTime';
 import {timeSpentEventDiffLimit, wholeDate} from '../../lib/updateCounters';
-import {type ExternalEventsEndpoint} from '../../lib/routeCreation';
 import {showSql} from '../../../util';
 import {has} from '../../../common/util';
-import {createExternalNotifier} from '../../lib/externalEventsEndpoint';
+import {createExternalNotifier} from '../../lib/externalNotifier';
 
 const getOrCreateActivity = async (
 	repo: Repository<DailyActivityTime>,
@@ -32,11 +31,10 @@ const getOrCreateActivity = async (
 	return repo.save(newActivity);
 };
 
-export const createUpdateActivity = ({dataSource, activityRepo, eventRepo, log, externalEventsEndpoint}: {
+export const createUpdateActivity = ({dataSource, activityRepo, eventRepo, log}: {
 	dataSource: DataSource;
 	activityRepo: Repository<DailyActivityTime>;
 	eventRepo: Repository<Event>;
-	externalEventsEndpoint: ExternalEventsEndpoint;
 	log: LogFunction;
 }) => async (
 	participant: Participant,
@@ -173,7 +171,6 @@ export const createUpdateActivity = ({dataSource, activityRepo, eventRepo, log, 
 
 	if (participant.extensionActivatedAt === null && await isActiveParticipant()) {
 		const notifier = createExternalNotifier(
-			externalEventsEndpoint,
 			participant.code,
 			log,
 		);
