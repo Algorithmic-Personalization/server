@@ -9,8 +9,8 @@ smtp:
     user: fm.de.jouvencel@gmail.com
     pass: application password if you have 2-FA or e-mail password otherwise (discouraged)
 
-external-events-endpoint:
-  url: https://some_url.com
+external-notifier:
+  recipient: yo@email.com
   token: some_authorization_token
 
 YouTube:

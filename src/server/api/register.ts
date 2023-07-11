@@ -81,15 +81,16 @@ export const createRegisterRoute: RouteCreator = ({dataSource, mailer, createLog
 	const link = `${serverUrl}${getVerifyEmailToken}?token=${token}`;
 
 	try {
-		const mailInfo = await mailer.transport.sendMail({
-			from: mailer.from,
+		const ok = await mailer({
 			to: admin.email,
 			subject: 'Please verify your email address for YTDNPL admin',
-			text: `Please past the following link in your browser to verify your email address: ${link}`,
+			text: `Please paste the following link in your browser to verify your email address: ${link}`,
 			html: `Please click <a href="${link}">here</a> to verify your email address.`,
-		}) as unknown;
+		});
 
-		log('E-mail sent:', mailInfo);
+		if (ok) {
+			log('success', 'e-mail sent', 'subject, subject');
+		}
 
 		res.status(200).json({
 			kind: 'Success',

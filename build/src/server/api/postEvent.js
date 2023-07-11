@@ -105,7 +105,7 @@ const summarizeForDisplay = (event) => {
     }
     return summary;
 };
-const createPostEventRoute = ({ createLogger, dataSource, externalEventsEndpoint, youTubeConfig, }) => (req, res) => __awaiter(void 0, void 0, void 0, function* () {
+const createPostEventRoute = ({ createLogger, dataSource, youTubeConfig, notifier, }) => (req, res) => __awaiter(void 0, void 0, void 0, function* () {
     const log = createLogger(req.requestId);
     log('Received post event request');
     const { participantCode } = req;
@@ -130,12 +130,12 @@ const createPostEventRoute = ({ createLogger, dataSource, externalEventsEndpoint
         dataSource,
         activityRepo,
         eventRepo,
-        externalEventsEndpoint,
+        notifier,
         log,
     });
     const updatePhase = (0, updateParticipantPhase_1.default)({
         dataSource,
-        externalEventsEndpoint,
+        notifier,
         log,
     });
     const storeWatchTime = (0, storeWatchTime_1.default)({

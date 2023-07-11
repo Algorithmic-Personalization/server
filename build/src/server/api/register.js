@@ -26,7 +26,7 @@ if (!(0, util_1.has)(`${env}-server-url`)(config_extension_1.default)) {
 console.log('NODE_ENV:', process.env.NODE_ENV);
 console.log('API URL:', config_extension_1.default[`${env}-server-url`]);
 const serverUrl = config_extension_1.default[`${env}-server-url`];
-const createRegisterRoute = ({ dataSource, mailer, mailerFrom, createLogger }) => (req, res) => __awaiter(void 0, void 0, void 0, function* () {
+const createRegisterRoute = ({ dataSource, mailer, createLogger }) => (req, res) => __awaiter(void 0, void 0, void 0, function* () {
     const log = createLogger(req.requestId);
     const admin = new admin_1.default();
     Object.assign(admin, req.body);
@@ -74,14 +74,15 @@ const createRegisterRoute = ({ dataSource, mailer, mailerFrom, createLogger }) =
     }
     const link = `${serverUrl}${serverRoutes_1.getVerifyEmailToken}?token=${token}`;
     try {
-        const mailInfo = yield mailer.sendMail({
-            from: mailerFrom,
+        const ok = yield mailer({
             to: admin.email,
             subject: 'Please verify your email address for YTDNPL admin',
-            text: `Please past the following link in your browser to verify your email address: ${link}`,
+            text: `Please paste the following link in your browser to verify your email address: ${link}`,
             html: `Please click <a href="${link}">here</a> to verify your email address.`,
         });
-        log('E-mail sent:', mailInfo);
+        if (ok) {
+            log('success', 'e-mail sent', 'subject, subject');
+        }
         res.status(200).json({
             kind: 'Success',
             value: 'Admin registered, please validate your account by clicking the link in the email you should receive shortly. Please check your spam folder if you don\'t see it in your inbox.',

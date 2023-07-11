@@ -1,12 +1,12 @@
 import {has} from '../../common/util';
 import {type LogFunction} from './logger';
-import {type MailService} from './routeCreation';
+import {type MailService} from './email';
 
 export type ExternalNotifierConfig = {
 	email: string;
 };
 
-export type NotifierServices = {
+export type ExternalNotifierDependencies = {
 	log: LogFunction;
 	mailer: MailService;
 };
@@ -34,15 +34,15 @@ export type ExternalNotifier = {
 };
 
 // TODO implement, THEY ARE NO-OPS FOR NOW
-export const makeDefaultExternalNotifier = (_config: ExternalNotifierConfig): ExternalNotifier => ({
-	notifyActive: async () => true,
+export const makeDefaultExternalNotifier = (_config: ExternalNotifierConfig) => (_deps: ExternalNotifierDependencies): ExternalNotifier => ({
+	notifyActive: async (_d: Date) => true,
 	notifyInstalled: async () => true,
 	notifyPhaseChange: async () => true,
 });
 
-export const createDefaultNotifier = (config: unknown, services: NotifierServices): ExternalNotifier => {
+export const createDefaultNotifier = (config: unknown) => (services: ExternalNotifierDependencies): ExternalNotifier => {
 	const notifierConf = getExternalNotifierConfig(config);
-	return makeDefaultExternalNotifier(notifierConf);
+	return makeDefaultExternalNotifier(notifierConf)(services);
 };
 
 export default createDefaultNotifier;

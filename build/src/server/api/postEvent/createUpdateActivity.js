@@ -21,7 +21,6 @@ const dailyActivityTime_1 = __importDefault(require("../../models/dailyActivityT
 const updateCounters_1 = require("../../lib/updateCounters");
 const util_1 = require("../../../util");
 const util_2 = require("../../../common/util");
-const externalEventsEndpoint_1 = require("../../lib/externalEventsEndpoint");
 const getOrCreateActivity = (repo, participantId, day) => __awaiter(void 0, void 0, void 0, function* () {
     const existing = yield repo.findOneBy({
         participantId,
@@ -35,7 +34,7 @@ const getOrCreateActivity = (repo, participantId, day) => __awaiter(void 0, void
     newActivity.createdAt = day;
     return repo.save(newActivity);
 });
-const createUpdateActivity = ({ dataSource, activityRepo, eventRepo, log, externalEventsEndpoint }) => (participant, event) => __awaiter(void 0, void 0, void 0, function* () {
+const createUpdateActivity = ({ dataSource, activityRepo, eventRepo, notifier, log }) => (participant, event) => __awaiter(void 0, void 0, void 0, function* () {
     log('Updating activity for participant ', participant.code);
     const day = (0, updateCounters_1.wholeDate)(event.createdAt);
     const activity = yield getOrCreateActivity(activityRepo, participant.id, day);
@@ -128,7 +127,6 @@ const createUpdateActivity = ({ dataSource, activityRepo, eventRepo, log, extern
         return true;
     });
     if (participant.extensionActivatedAt === null && (yield isActiveParticipant())) {
-        const notifier = (0, externalEventsEndpoint_1.createExternalNotifier)(externalEventsEndpoint, participant.code, log);
         const qr = dataSource.createQueryRunner();
         try {
             yield qr.startTransaction();

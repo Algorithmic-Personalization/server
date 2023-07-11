@@ -71,13 +71,14 @@ const getActivityReport_1 = __importDefault(require("./api-2/getActivityReport")
 const createTransitionSetting_1 = __importDefault(require("./api-2/createTransitionSetting"));
 const getTransitionSetting_1 = __importDefault(require("./api-2/getTransitionSetting"));
 const monitoring_1 = __importDefault(require("./api-2/monitoring"));
-const externalEventsEndpoint_1 = __importDefault(require("./lib/externalEventsEndpoint"));
 const getYouTubeConfig_1 = __importDefault(require("./lib/config-loader/getYouTubeConfig"));
 const youTubeApi_1 = __importDefault(require("./lib/youTubeApi"));
 const scrapeYouTube_1 = __importDefault(require("./lib/scrapeYouTube"));
 // DO NOT FORGET TO UPDATE THIS FILE WHEN ADDING NEW ENTITIES
 const entities_1 = __importDefault(require("./entities"));
 const loadConfigYamlRaw_1 = require("./lib/config-loader/loadConfigYamlRaw");
+const loadExternalNotifier_1 = __importDefault(require("./lib/loadExternalNotifier"));
+const email_1 = require("./lib/email");
 const getEnv = () => {
     const env = process.env.NODE_ENV;
     if (env !== 'production' && env !== 'development') {
@@ -119,8 +120,14 @@ const main = () => __awaiter(void 0, void 0, void 0, function* () {
         console.error('Invalid smtp config in config.yml', smtpConfigErrors);
         process.exit(1);
     }
-    const mailer = nodemailer_1.default.createTransport(smtpConfig);
-    log('info', 'mailer created:', mailer.transporter.name);
+    const transport = nodemailer_1.default.createTransport(smtpConfig);
+    const mailServiceDependencies = {
+        transport,
+        from: smtpConfig.auth.user,
+        log: createLogger('<mailer>'),
+    };
+    const mailer = (0, email_1.createMailService)(mailServiceDependencies);
+    log('success', 'mailer created');
     if (!dockerComposeConfig || typeof dockerComposeConfig !== 'object') {
         throw new Error('Invalid docker-compose.yaml');
     }
@@ -192,17 +199,20 @@ const main = () => __awaiter(void 0, void 0, void 0, function* () {
     });
     const privateKey = yield (0, promises_1.readFile)((0, path_1.join)(root, 'private.key'), 'utf-8');
     const tokenTools = (0, crypto_1.createTokenTools)(privateKey);
-    const externalEventsEndpoint = (0, externalEventsEndpoint_1.default)(config);
+    const notifierServices = {
+        mailer,
+        log: createLogger('<notifier>'),
+    };
+    const notifier = (0, loadExternalNotifier_1.default)(config)(notifierServices);
     const routeContext = {
         dataSource: ds,
         mailer,
-        mailerFrom: smtpConfig.auth.user,
         createLogger,
         tokenTools,
-        externalEventsEndpoint,
         youTubeConfig,
+        notifier,
     };
-    mailer.sendMail({
+    transport.sendMail({
         from: smtpConfig.auth.user,
         to: 'fm.de.jouvencel@gmail.com',
         subject: 'YTDPNL server started',

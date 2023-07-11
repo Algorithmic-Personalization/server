@@ -42,8 +42,7 @@ const dailyActivityTime_1 = __importDefault(require("../../models/dailyActivityT
 const transitionSetting_1 = __importStar(require("../../models/transitionSetting"));
 const transitionEvent_1 = __importStar(require("../../models/transitionEvent"));
 const postEvent_1 = require("../postEvent");
-const externalEventsEndpoint_1 = require("../../lib/externalEventsEndpoint");
-const createUpdatePhase = ({ dataSource, externalEventsEndpoint, log, }) => (participant, latestEvent) => __awaiter(void 0, void 0, void 0, function* () {
+const createUpdatePhase = ({ dataSource, notifier, log, }) => (participant, latestEvent) => __awaiter(void 0, void 0, void 0, function* () {
     log('updating participant phase if needed...');
     if (participant.phase === transitionSetting_1.Phase.POST_EXPERIMENT) {
         log('participant in post-experiment, no need to check for phase transition, skipping');
@@ -109,8 +108,7 @@ const createUpdatePhase = ({ dataSource, externalEventsEndpoint, log, }) => (par
             ]);
         }));
         if (toPhase === transitionSetting_1.Phase.EXPERIMENT) {
-            const notifier = (0, externalEventsEndpoint_1.createExternalNotifier)(externalEventsEndpoint, participant.code, log);
-            void notifier.notifyInterventionPeriod(latestEvent.createdAt);
+            void notifier.notifyPhaseChange(transitionEvent.createdAt, participant.code, fromPhase, fromPhase);
         }
     }
     else {

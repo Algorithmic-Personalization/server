@@ -33,13 +33,12 @@ var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, ge
 };
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.updateParticipantDefinition = void 0;
-const externalEventsEndpoint_1 = require("../lib/externalEventsEndpoint");
 const participant_1 = __importStar(require("../models/participant"));
 const event_1 = require("../../common/models/event");
 const transitionEvent_1 = __importStar(require("../models/transitionEvent"));
 const transitionSetting_1 = require("../models/transitionSetting");
 const util_1 = require("../../util");
-const updateParticipantPhase = (dataSource, externalEventsEndpoint, log) => (participant, fromPhase, toPhase) => __awaiter(void 0, void 0, void 0, function* () {
+const updateParticipantPhase = (dataSource, notifier, log) => (participant, fromPhase, toPhase) => __awaiter(void 0, void 0, void 0, function* () {
     var _a;
     if (fromPhase === toPhase) {
         return participant;
@@ -77,8 +76,7 @@ const updateParticipantPhase = (dataSource, externalEventsEndpoint, log) => (par
         }));
         log('success', 'saving transition', transition.id);
         if (toPhase === transitionSetting_1.Phase.EXPERIMENT) {
-            const notifier = (0, externalEventsEndpoint_1.createExternalNotifier)(externalEventsEndpoint, participant.code, log);
-            void notifier.notifyInterventionPeriod(transition.createdAt);
+            void notifier.notifyPhaseChange(transition.createdAt, participant.code, fromPhase, toPhase);
         }
         return transition;
     }
@@ -90,7 +88,7 @@ const updateParticipantPhase = (dataSource, externalEventsEndpoint, log) => (par
 exports.updateParticipantDefinition = {
     verb: 'put',
     path: '/api/participant/:code',
-    makeHandler: ({ createLogger, dataSource, externalEventsEndpoint }) => (req) => __awaiter(void 0, void 0, void 0, function* () {
+    makeHandler: ({ createLogger, dataSource, notifier }) => (req) => __awaiter(void 0, void 0, void 0, function* () {
         const log = createLogger(req.requestId);
         log('Received update participant request');
         const { id: _unused, phase, arm } = req.body;
@@ -111,7 +109,7 @@ exports.updateParticipantDefinition = {
             throw new Error('Invalid phase, must be one of: 0, 1, 2');
         }
         if ((0, participant_1.isValidPhase)(phase)) {
-            return updateParticipantPhase(dataSource, externalEventsEndpoint, log)(participantEntity, previousPhase, phase);
+            return updateParticipantPhase(dataSource, notifier, log)(participantEntity, previousPhase, phase);
         }
         return participantRepo.save(participantEntity);
     }),

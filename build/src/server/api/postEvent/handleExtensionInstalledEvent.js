@@ -13,10 +13,9 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
 };
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.createHandleExtensionInstalledEvent = void 0;
-const node_fetch_1 = __importDefault(require("node-fetch"));
 const participant_1 = __importDefault(require("../../models/participant"));
 const event_1 = __importDefault(require("../../../common/models/event"));
-const createHandleExtensionInstalledEvent = (dataSource, installedEventConfig, log) => (participantId, event) => __awaiter(void 0, void 0, void 0, function* () {
+const createHandleExtensionInstalledEvent = (dataSource, log) => (participantId, event) => __awaiter(void 0, void 0, void 0, function* () {
     log('handling extension installed event...');
     const eventRepo = dataSource.getRepository(event_1.default);
     const queryRunner = dataSource.createQueryRunner();
@@ -36,16 +35,7 @@ const createHandleExtensionInstalledEvent = (dataSource, installedEventConfig, l
         }
         else {
             log('participant extension not installed, calling API to notify installation...');
-            yield (0, node_fetch_1.default)(installedEventConfig.url, {
-                method: 'POST',
-                headers: {
-                    'Content-Type': 'application/json',
-                    'X-API-TOKEN': installedEventConfig.token,
-                },
-                body: JSON.stringify({
-                    code: participant.code,
-                }),
-            });
+            // TODO
             log('remote server notified, updating local participant...');
             participant.extensionInstalled = true;
             yield queryRunner.manager.save(participant);
