@@ -6,7 +6,7 @@ import DailyActivityTime from '../../models/dailyActivityTime';
 import TransitionSetting, {Phase} from '../../models/transitionSetting';
 import TransitionEvent, {TransitionReason} from '../../models/transitionEvent';
 import {shouldTriggerPhaseTransition} from '../postEvent';
-import {type ExternalNotifier} from '../../lib/loadExternalNotifier';
+import {type ExternalNotifier} from '../../lib/externalNotifier';
 
 export const createUpdatePhase = ({
 	dataSource, notifier, log,

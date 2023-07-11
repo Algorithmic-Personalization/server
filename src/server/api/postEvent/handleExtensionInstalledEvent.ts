@@ -4,7 +4,7 @@ import Participant from '../../models/participant';
 import Event from '../../../common/models/event';
 
 import {type LogFunction} from '../../lib/logger';
-import {type ExternalNotifier} from '../../lib/loadExternalNotifier';
+import {type ExternalNotifier} from '../../lib/externalNotifier';
 
 export const createHandleExtensionInstalledEvent = (
 	dataSource: DataSource,

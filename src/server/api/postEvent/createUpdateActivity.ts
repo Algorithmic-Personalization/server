@@ -8,7 +8,7 @@ import DailyActivityTime from '../../models/dailyActivityTime';
 import {timeSpentEventDiffLimit, wholeDate} from '../../lib/updateCounters';
 import {showSql} from '../../../util';
 import {has} from '../../../common/util';
-import {type ExternalNotifier} from '../../lib/loadExternalNotifier';
+import {type ExternalNotifier} from '../../lib/externalNotifier';
 
 const getOrCreateActivity = async (
 	repo: Repository<DailyActivityTime>,

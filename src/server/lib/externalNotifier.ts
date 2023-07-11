@@ -1,4 +1,4 @@
-import {EventType} from './../../common/models/event';
+import {EventType} from '../../common/models/event';
 import {has} from '../../common/util';
 import {type LogFunction} from './logger';
 import {type MailService} from './email';
@@ -47,20 +47,21 @@ export const makeDefaultExternalNotifier = (config: ExternalNotifierConfig) =>
 		makeParticipantNotifier: (data: ParticipantData): ParticipantNotifier => ({
 			async notifyActive(d: Date) {
 				const {email: to} = config;
-				const subject = `<${EventType.PHASE_TRANSITION}}> Update for User <${data.participantCode}>`;
-				const text = `Participant <${data.participantCode}> <${EventType.EXTENSION_ACTIVATED}> as of <${d.getTime()}>`;
+				const subject = `"${EventType.PHASE_TRANSITION}}" Update for User "${data.participantCode}"`;
+				const text = `Participant "${data.participantCode}" "${EventType.EXTENSION_ACTIVATED}" as of "${d.getTime()}"`;
 				return mailer({to, subject, text});
 			},
 			async notifyInstalled(d: Date) {
 				const {email: to} = config;
-				const subject = `<${EventType.EXTENSION_INSTALLED}}> Update for User <${data.participantCode}>`;
-				const text = `Participant <${data.participantCode}> <${EventType.EXTENSION_INSTALLED}> as of <${d.getTime()}>`;
+				const {participantCode} = data;
+				const subject = `"${EventType.EXTENSION_INSTALLED}" Update for User "${participantCode}"`;
+				const text = `Participant "${participantCode}" "${EventType.EXTENSION_INSTALLED}" as of "${d.getTime()}"`;
 				return mailer({to, subject, text});
 			},
 			async notifyPhaseChange(d: Date, from_phase: number, to_phase: number) {
 				const {email: to} = config;
-				const subject = `<${EventType.PHASE_TRANSITION}}> Update for User <${data.participantCode}>`;
-				const text = `Participant <${data.participantCode}> transitioned from phase <${from_phase} to phase <${to_phase}> on <${d.getTime()}>`;
+				const subject = `"${EventType.PHASE_TRANSITION}}" Update for User "${data.participantCode}"`;
+				const text = `Participant "${data.participantCode}" transitioned from phase "${from_phase}" to phase "${to_phase}" on "${d.getTime()}"`;
 				return mailer({to, subject, text});
 			},
 		}),

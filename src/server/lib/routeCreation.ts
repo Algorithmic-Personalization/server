@@ -7,7 +7,7 @@ import {type TokenTools} from './crypto';
 
 import {has} from '../../common/util';
 import NotFoundError from './notFoundError';
-import {type ExternalNotifier as NotifierService} from './loadExternalNotifier';
+import {type ExternalNotifier as NotifierService} from './externalNotifier';
 
 const hasMessage = has('message');
 const message = (x: unknown) => (hasMessage(x) ? x.message : 'An unknown error occurred');

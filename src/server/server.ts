@@ -106,7 +106,7 @@ import scrapeMissingYouTubeMetadata from './lib/scrapeYouTube';
 import entities from './entities';
 import {loadConfigYamlRaw} from './lib/config-loader/loadConfigYamlRaw';
 
-import createDefaultNotifier, {type ExternalNotifierDependencies as NotifierDependencies} from './lib/loadExternalNotifier';
+import createDefaultNotifier, {type ExternalNotifierDependencies as NotifierDependencies} from './lib/externalNotifier';
 import {createMailService, type MailServiceDependencies, type MailService} from './lib/email';
 
 export type Env = 'production' | 'development';

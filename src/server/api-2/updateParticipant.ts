@@ -9,7 +9,7 @@ import TransitionEvent, {TransitionReason} from '../models/transitionEvent';
 
 import {daysElapsed} from '../../util';
 
-import {type ExternalNotifier} from '../lib/loadExternalNotifier';
+import {type ExternalNotifier} from '../lib/externalNotifier';
 
 const updateParticipantPhase = (
 	dataSource: DataSource,
