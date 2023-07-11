@@ -166,7 +166,13 @@ export const createPostEventRoute: RouteCreator = ({
 		return;
 	}
 
-	const withParticipantLock = withLock(`participant-${participant.id}`);
+	const handleInstall = createHandleExtensionInstalledEvent(
+		dataSource,
+		notifier,
+		log,
+	);
+
+	void handleInstall(participant, event);
 
 	event.arm = participant.arm;
 	event.phase = participant.phase;
@@ -202,31 +208,19 @@ export const createPostEventRoute: RouteCreator = ({
 	}
 
 	try {
-		if (event.type === EventType.EXTENSION_INSTALLED) {
-			const handleInstall = createHandleExtensionInstalledEvent(
+		const e = await eventRepo.save(event);
+		log('event saved', summarizeForDisplay(e));
+		res.send({kind: 'Success', value: e});
+
+		if (event.type === EventType.RECOMMENDATIONS_SHOWN) {
+			await storeRecommendationsShown({
 				dataSource,
-				notifier,
+				youTubeConfig,
+				event: event as RecommendationsEvent,
 				log,
-			);
-
-			void handleInstall(participant.id, event);
-
-			res.send({kind: 'Success', value: 'Extension installed event handled'});
-		} else {
-			const e = await eventRepo.save(event);
-			log('event saved', summarizeForDisplay(e));
-			res.send({kind: 'Success', value: e});
-
-			if (event.type === EventType.RECOMMENDATIONS_SHOWN) {
-				await storeRecommendationsShown({
-					dataSource,
-					youTubeConfig,
-					event: event as RecommendationsEvent,
-					log,
-				});
-			} else if (event.type === EventType.WATCH_TIME) {
-				await storeWatchTime(event as WatchTimeEvent);
-			}
+			});
+		} else if (event.type === EventType.WATCH_TIME) {
+			await storeWatchTime(event as WatchTimeEvent);
 		}
 	} catch (e) {
 		if (isLocalUuidAlreadyExistsError(e)) {

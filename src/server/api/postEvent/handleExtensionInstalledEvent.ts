@@ -10,18 +10,18 @@ export const createHandleExtensionInstalledEvent = (
 	dataSource: DataSource,
 	notifier: ExternalNotifier,
 	log: LogFunction,
-) => async (participantId: number, event: Event) => {
+) => async (p: Participant, event: Event) => {
 	log('handling extension installed event...');
-	const eventRepo = dataSource.getRepository(Event);
 	const queryRunner = dataSource.createQueryRunner();
 
 	try {
 		await queryRunner.startTransaction();
-		const participant = await queryRunner.manager.getRepository(Participant)
+		const participantRepo = queryRunner.manager.getRepository(Participant);
+		const participant = await participantRepo
 			.createQueryBuilder('participant')
 			.useTransaction(true)
 			.setLock('pessimistic_write')
-			.where({id: participantId})
+			.where({id: p.id})
 			.getOne();
 
 		if (!participant) {
@@ -29,21 +29,22 @@ export const createHandleExtensionInstalledEvent = (
 		}
 
 		if (participant.extensionInstalled) {
-			log('participant extension already installed, skipping');
+			log('info', 'participant extension already installed, skipping');
 		} else {
-			log('participant extension not installed, calling API to notify installation...');
+			log('info', 'participant extension not installed, calling API to notify installation...');
 			const n = notifier.makeParticipantNotifier({participantCode: participant.code});
 			void n.notifyInstalled(event.createdAt);
 			log('remote server notified, updating local participant...');
 			participant.extensionInstalled = true;
 			await queryRunner.manager.save(participant);
+			const eventRepo = queryRunner.manager.getRepository(Event);
 			const e = await eventRepo.save(event);
 			log('event saved', e);
 			await queryRunner.commitTransaction();
 			log('participant updated, transaction committed');
 		}
 	} catch (err) {
-		log('error handling EXTENSION_INSTALLED event:', err);
+		log('error', 'handling EXTENSION_INSTALLED event', err);
 		await queryRunner.rollbackTransaction();
 	} finally {
 		await queryRunner.release();
