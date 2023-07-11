@@ -17,6 +17,7 @@
     "watch:ext": "NODE_ENV=development webpack --watch",
     "test": "jest",
     "tdd": "jest --watch",
+    "server": "NODE_ENV=development ts-node src/server/server.ts",
     "serve:dev": "NODE_ENV=development nodemon --watch src/server src/server/server.ts",
     "watch:admin": "NODE_ENV=development webpack --config webpack.config.app.ts --watch",
     "dev": "./dev",
