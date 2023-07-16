@@ -10,6 +10,7 @@ import TransitionEvent, {TransitionReason} from '../models/transitionEvent';
 import {daysElapsed} from '../../util';
 
 import {type ExternalNotifier} from '../lib/externalNotifier';
+import {createSaveParticipantTransition} from '../lib/participant';
 
 const updateParticipantPhase = (
 	dataSource: DataSource,
@@ -51,26 +52,14 @@ const updateParticipantPhase = (
 			transition.reason = TransitionReason.FORCED;
 			transition.numDays = daysElapsed(startOfLatestPhase, new Date());
 
-			try {
-				const resultParticipant = await dataSource.transaction(async manager => {
-					log('info', 'saving transition', transition);
-					await manager.save(transition);
-					participant = await manager.findOneOrFail(Participant, {where: {id: participant.id}});
-					participant.phase = toPhase;
-					await manager.save(participant);
-					return participant;
-				});
+			const saveParticipantTransition = createSaveParticipantTransition({
+				dataSource,
+				notifier: notifier.makeParticipantNotifier({
+					participantCode: participant.code,
+				}),
+			});
 
-				log('success', 'saving transition', transition.id);
-
-				const n = notifier.makeParticipantNotifier({participantCode: participant.code});
-				void n.notifyPhaseChange(transition.createdAt, fromPhase, toPhase);
-
-				return resultParticipant;
-			} catch (e) {
-				log('error saving transition', e);
-				throw e;
-			}
+			return saveParticipantTransition(participant, transition);
 		};
 
 export const updateParticipantDefinition: RouteDefinition<Participant> = {

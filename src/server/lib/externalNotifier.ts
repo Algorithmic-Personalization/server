@@ -25,10 +25,10 @@ export const getExternalNotifierConfig = (generalConfigData: unknown): ExternalN
 };
 
 export type ExternalNotifier = {
-	makeParticipantNotifier: (data: ParticipantData) => ParticipantNotifier;
+	makeParticipantNotifier: (data: ParticipantData) => ParticipantActivityNotifier;
 };
 
-export type ParticipantNotifier = {
+export type ParticipantActivityNotifier = {
 	notifyActive: (d: Date) => Promise<boolean>;
 	notifyInstalled(d: Date): Promise<boolean>;
 	notifyPhaseChange(d: Date, from: number, to: number): Promise<boolean>;
@@ -44,7 +44,7 @@ export type ParticipantData = {
 
 export const makeDefaultExternalNotifier = (config: ExternalNotifierConfig) =>
 	({mailer}: ExternalNotifierDependencies): ExternalNotifier => ({
-		makeParticipantNotifier: (data: ParticipantData): ParticipantNotifier => ({
+		makeParticipantNotifier: (data: ParticipantData): ParticipantActivityNotifier => ({
 			async notifyActive(d: Date) {
 				const {email: to} = config;
 				const subject = `"${EventType.PHASE_TRANSITION}}" Update for User "${data.participantCode}"`;

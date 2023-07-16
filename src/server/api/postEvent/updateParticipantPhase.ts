@@ -7,6 +7,7 @@ import TransitionSetting, {Phase} from '../../models/transitionSetting';
 import TransitionEvent, {TransitionReason} from '../../models/transitionEvent';
 import {shouldTriggerPhaseTransition} from '../postEvent';
 import {type ExternalNotifier} from '../../lib/externalNotifier';
+import {createSaveParticipantTransition} from '../../lib/participant';
 
 export const createUpdatePhase = ({
 	dataSource, notifier, log,
@@ -87,21 +88,14 @@ export const createUpdatePhase = ({
 		transitionEvent.reason = TransitionReason.AUTOMATIC;
 		transitionEvent.transitionSettingId = setting.id;
 
-		participant.phase = toPhase;
-
-		await dataSource.transaction(async manager => {
-			const trigger = await manager.save(triggerEvent);
-			transitionEvent.eventId = trigger.id;
-			await Promise.all([
-				manager.save(transitionEvent),
-				manager.save(participant),
-			]);
+		const saveParticipantTransition = createSaveParticipantTransition({
+			dataSource,
+			notifier: notifier.makeParticipantNotifier({participantCode: participant.code}),
 		});
 
-		const n = notifier.makeParticipantNotifier({participantCode: participant.code});
-		void n.notifyPhaseChange(transitionEvent.createdAt, fromPhase, fromPhase);
-	} else {
-		log('no phase transition needed at this point');
+		participant.phase = toPhase;
+
+		await saveParticipantTransition(participant, transitionEvent);
 	}
 };
 
