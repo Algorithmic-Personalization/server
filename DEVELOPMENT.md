@@ -398,5 +398,9 @@ type ParticipantsReportRow = {
 type ParticipantsReport = ParticipantsReportRow[];
 ```
 
+The numbers in all `_at` fields are Unix timestamps in milliseconds, as given by `Date.getTime` in JavaScript.
+
 Since there can in theory be multiple transitions for the same participant to the same phase (because they can be sent back to an earlier phase),
 the SQL query to construct this table is not straightforward and this call will be a bit costly, so avoid polling it too often. Once a day or even more often is fine, just don't call this 10 times per second.
+
+When multiple transitions to the same phase are found, the timestamp of the latest transition is kept.

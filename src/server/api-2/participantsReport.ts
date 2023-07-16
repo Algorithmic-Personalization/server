@@ -54,6 +54,8 @@ export const reportRoute: RouteDefinition<ParticipantsReport> = {
 			} else if (transition.toPhase === 0) {
 				participantTransitions.was_reset_to_pre_intervention_at = transition.updatedAt.getTime();
 			}
+
+			latestTransitionsMap.set(transition.participantId, participantTransitions);
 		}
 
 		const report: ParticipantsReport = participants.map(participant => ({
@@ -65,7 +67,9 @@ export const reportRoute: RouteDefinition<ParticipantsReport> = {
 			was_reset_to_pre_intervention_at: latestTransitionsMap.get(participant.id)?.was_reset_to_pre_intervention_at ?? null,
 		}));
 
-		return report;
+		return report.filter(row => row.identifier === 'blahfm');
+
+		// D return report;
 	},
 };
 

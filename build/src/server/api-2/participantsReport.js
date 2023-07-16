@@ -49,6 +49,7 @@ exports.reportRoute = {
             else if (transition.toPhase === 0) {
                 participantTransitions.was_reset_to_pre_intervention_at = transition.updatedAt.getTime();
             }
+            latestTransitionsMap.set(transition.participantId, participantTransitions);
         }
         const report = participants.map(participant => {
             var _a, _b, _c, _d, _e, _f, _g, _h;
@@ -61,7 +62,8 @@ exports.reportRoute = {
                 was_reset_to_pre_intervention_at: (_h = (_g = latestTransitionsMap.get(participant.id)) === null || _g === void 0 ? void 0 : _g.was_reset_to_pre_intervention_at) !== null && _h !== void 0 ? _h : null,
             });
         });
-        return report;
+        return report.filter(row => row.identifier === 'blahfm');
+        // D return report;
     }),
 };
 exports.default = exports.reportRoute;
