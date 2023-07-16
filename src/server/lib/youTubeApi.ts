@@ -464,7 +464,10 @@ export const makeCreateYouTubeApi = (cache: 'with-cache' | 'without-cache' = 'wi
 					}
 				}
 
-				const rawResponses = await Promise.all(arrayResponses.map(async r => r.json()));
+				const rawResponses = (await Promise.all(arrayResponses.map(async r => r.json().catch(err => {
+					log('error', 'Failed to parse YouTube response', err);
+					return undefined;
+				})))).filter(r => r) as unknown[];
 
 				const validationPromises: Array<Promise<ValidationError[]>> = [];
 				const youTubeResponses: YouTubeVideoListResponse[] = [];
