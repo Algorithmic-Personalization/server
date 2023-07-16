@@ -375,3 +375,28 @@ To update a participant, send a `PUT` request to `https://ytdpnl.fmdj.fr/api/par
 ```
 Where `:code` is the unique code identifying the participant you want to update,
 and with the usual API token in the `authorization` header.
+
+### Get the Participants Report
+
+Always using an API token in the `authorization` header, you can get the participants report by sending a `GET` request to `https://ytdpnl.fmdj.fr/api/participants-report`.
+
+It will return all the participants at once as a `ParticipantsReport` object, which is defined as:
+
+```typescript
+type TransitionDates = {
+  entered_intervention_at: number | null;
+  entered_post_intervention_at: number | null;
+  was_reset_to_pre_intervention_at: number | null;
+};
+
+type ParticipantsReportRow = {
+  identifier: string;
+  phase: number;
+  activated_browser_extension_at: number | null;
+} & TransitionDates;
+
+type ParticipantsReport = ParticipantsReportRow[];
+```
+
+Since there can in theory be multiple transitions for the same participant to the same phase (because they can be sent back to an earlier phase),
+the SQL query to construct this table is not straightforward and this call will be a bit costly, so avoid polling it too often. Once a day or even more often is fine, just don't call this 10 times per second.

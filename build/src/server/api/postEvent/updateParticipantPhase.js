@@ -42,6 +42,7 @@ const dailyActivityTime_1 = __importDefault(require("../../models/dailyActivityT
 const transitionSetting_1 = __importStar(require("../../models/transitionSetting"));
 const transitionEvent_1 = __importStar(require("../../models/transitionEvent"));
 const postEvent_1 = require("../postEvent");
+const participant_1 = require("../../lib/participant");
 const createUpdatePhase = ({ dataSource, notifier, log, }) => (participant, latestEvent) => __awaiter(void 0, void 0, void 0, function* () {
     log('updating participant phase if needed...');
     if (participant.phase === transitionSetting_1.Phase.POST_EXPERIMENT) {
@@ -98,20 +99,12 @@ const createUpdatePhase = ({ dataSource, notifier, log, }) => (participant, late
         transitionEvent.toPhase = toPhase;
         transitionEvent.reason = transitionEvent_1.TransitionReason.AUTOMATIC;
         transitionEvent.transitionSettingId = setting.id;
+        const saveParticipantTransition = (0, participant_1.createSaveParticipantTransition)({
+            dataSource,
+            notifier: notifier.makeParticipantNotifier({ participantCode: participant.code }),
+        });
         participant.phase = toPhase;
-        yield dataSource.transaction((manager) => __awaiter(void 0, void 0, void 0, function* () {
-            const trigger = yield manager.save(triggerEvent);
-            transitionEvent.eventId = trigger.id;
-            yield Promise.all([
-                manager.save(transitionEvent),
-                manager.save(participant),
-            ]);
-        }));
-        const n = notifier.makeParticipantNotifier({ participantCode: participant.code });
-        void n.notifyPhaseChange(transitionEvent.createdAt, fromPhase, fromPhase);
-    }
-    else {
-        log('no phase transition needed at this point');
+        yield saveParticipantTransition(participant, transitionEvent);
     }
 });
 exports.createUpdatePhase = createUpdatePhase;

@@ -436,7 +436,12 @@ const makeCreateYouTubeApi = (cache = 'with-cache') => {
                             arrayResponses.push(response.value);
                         }
                     }
-                    const rawResponses = yield Promise.all(arrayResponses.map((r) => __awaiter(this, void 0, void 0, function* () { return r.json(); })));
+                    const rawResponses = (yield Promise.all(arrayResponses.map((r) => __awaiter(this, void 0, void 0, function* () {
+                        return r.json().catch(err => {
+                            log('error', 'Failed to parse YouTube response', err);
+                            return undefined;
+                        });
+                    })))).filter(r => r);
                     const validationPromises = [];
                     const youTubeResponses = [];
                     for (const raw of rawResponses) {

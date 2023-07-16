@@ -97,6 +97,7 @@ import createGetActivityReportDefinition from './api-2/getActivityReport';
 import createTransitionSettingDefinition from './api-2/createTransitionSetting';
 import getTransitionSettingDefinition from './api-2/getTransitionSetting';
 import monitoringDefinition from './api-2/monitoring';
+import participantsReportDefinition from './api-2/participantsReport';
 
 import getYouTubeConfig from './lib/config-loader/getYouTubeConfig';
 import makeCreateYouTubeApi from './lib/youTubeApi';
@@ -419,6 +420,7 @@ const main = async () => {
 	defineAdminRoute(getTransitionSettingDefinition);
 	defineAdminRoute(updateParticipantDefinition);
 	defineAdminRoute(monitoringDefinition);
+	defineAdminRoute(participantsReportDefinition);
 
 	app.post(postRegister, createRegisterRoute(routeContext));
 	app.get(getVerifyEmailToken, createVerifyEmailRoute(routeContext));

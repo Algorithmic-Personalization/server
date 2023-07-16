@@ -37,6 +37,7 @@ const participant_1 = __importStar(require("../models/participant"));
 const event_1 = require("../../common/models/event");
 const transitionEvent_1 = __importStar(require("../models/transitionEvent"));
 const util_1 = require("../../util");
+const participant_2 = require("../lib/participant");
 const updateParticipantPhase = (dataSource, notifier, log) => (fromPhase, toPhase) => (participant) => __awaiter(void 0, void 0, void 0, function* () {
     var _a;
     if (fromPhase === toPhase) {
@@ -65,24 +66,13 @@ const updateParticipantPhase = (dataSource, notifier, log) => (fromPhase, toPhas
     transition.participantId = participant.id;
     transition.reason = transitionEvent_1.TransitionReason.FORCED;
     transition.numDays = (0, util_1.daysElapsed)(startOfLatestPhase, new Date());
-    try {
-        const resultParticipant = yield dataSource.transaction((manager) => __awaiter(void 0, void 0, void 0, function* () {
-            log('info', 'saving transition', transition);
-            yield manager.save(transition);
-            participant = yield manager.findOneOrFail(participant_1.default, { where: { id: participant.id } });
-            participant.phase = toPhase;
-            yield manager.save(participant);
-            return participant;
-        }));
-        log('success', 'saving transition', transition.id);
-        const n = notifier.makeParticipantNotifier({ participantCode: participant.code });
-        void n.notifyPhaseChange(transition.createdAt, fromPhase, toPhase);
-        return resultParticipant;
-    }
-    catch (e) {
-        log('error saving transition', e);
-        throw e;
-    }
+    const saveParticipantTransition = (0, participant_2.createSaveParticipantTransition)({
+        dataSource,
+        notifier: notifier.makeParticipantNotifier({
+            participantCode: participant.code,
+        }),
+    });
+    return saveParticipantTransition(participant, transition);
 });
 exports.updateParticipantDefinition = {
     verb: 'put',
