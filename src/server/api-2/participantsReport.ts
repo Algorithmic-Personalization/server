@@ -67,9 +67,7 @@ export const reportRoute: RouteDefinition<ParticipantsReport> = {
 			was_reset_to_pre_intervention_at: latestTransitionsMap.get(participant.id)?.was_reset_to_pre_intervention_at ?? null,
 		}));
 
-		return report.filter(row => row.identifier === 'blahfm');
-
-		// D return report;
+		return report;
 	},
 };
 

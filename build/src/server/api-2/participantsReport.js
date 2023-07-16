@@ -62,8 +62,7 @@ exports.reportRoute = {
                 was_reset_to_pre_intervention_at: (_h = (_g = latestTransitionsMap.get(participant.id)) === null || _g === void 0 ? void 0 : _g.was_reset_to_pre_intervention_at) !== null && _h !== void 0 ? _h : null,
             });
         });
-        return report.filter(row => row.identifier === 'blahfm');
-        // D return report;
+        return report;
     }),
 };
 exports.default = exports.reportRoute;
