@@ -8,7 +8,7 @@ import DailyActivityTime from '../../models/dailyActivityTime';
 import {timeSpentEventDiffLimit, wholeDate} from '../../lib/updateCounters';
 import {showSql} from '../../../util';
 import {has} from '../../../common/util';
-import {type ExternalNotifier} from '../../lib/externalNotifier';
+import {type ExternalNotifier, type ParticipantActivityNotifier} from '../../lib/externalNotifier';
 
 const getOrCreateActivity = async (
 	repo: Repository<DailyActivityTime>,
@@ -29,6 +29,57 @@ const getOrCreateActivity = async (
 	newActivity.createdAt = day;
 
 	return repo.save(newActivity);
+};
+
+export const createActivateExtension = ({
+	dataSource,
+	activityNotifier,
+	log,
+}: {
+	dataSource: DataSource;
+	activityNotifier: ParticipantActivityNotifier;
+	log: LogFunction;
+}) => async (event: Event, participant: Participant) => {
+	const qr = dataSource.createQueryRunner();
+
+	try {
+		await qr.startTransaction();
+		const repo = qr.manager.getRepository(Participant);
+		const p = await repo
+			.createQueryBuilder('participant')
+			.useTransaction(true)
+			.setLock('pessimistic_write')
+			.where({id: participant.id})
+			.getOne();
+
+		if (p === null) {
+			throw new Error('Participant not found');
+		}
+
+		const activationEvent = new Event();
+		Object.assign(activationEvent, event, {type: EventType.EXTENSION_ACTIVATED, id: 0});
+
+		p.extensionActivatedAt = new Date();
+		const [savedEvent] = await Promise.all([
+			qr.manager.save(activationEvent),
+			qr.manager.save(p),
+		]);
+
+		await qr.commitTransaction();
+
+		log(
+			'success',
+			`Participant ${participant.id} activated extension, the following event was saved:`,
+			savedEvent,
+		);
+
+		void activityNotifier.notifyActive(activationEvent.createdAt);
+	} catch (err) {
+		log('error', 'while handling extension activity status determination or saving:', err);
+		await qr.rollbackTransaction();
+	} finally {
+		await qr.release();
+	}
 };
 
 export const createUpdateActivity = ({dataSource, activityRepo, eventRepo, notifier, log}: {
@@ -171,47 +222,13 @@ export const createUpdateActivity = ({dataSource, activityRepo, eventRepo, notif
 	};
 
 	if (participant.extensionActivatedAt === null && await isActiveParticipant()) {
-		const qr = dataSource.createQueryRunner();
+		const activateExtension = createActivateExtension({
+			dataSource,
+			activityNotifier: notifier.makeParticipantNotifier({participantCode: participant.code}),
+			log,
+		});
 
-		try {
-			await qr.startTransaction();
-			const repo = qr.manager.getRepository(Participant);
-			const p = await repo
-				.createQueryBuilder('participant')
-				.useTransaction(true)
-				.setLock('pessimistic_write')
-				.where({id: participant.id})
-				.getOne();
-
-			if (p === null) {
-				throw new Error('Participant not found');
-			}
-
-			const activationEvent = new Event();
-			Object.assign(activationEvent, event, {type: EventType.EXTENSION_ACTIVATED, id: 0});
-
-			p.extensionActivatedAt = new Date();
-			const [savedEvent] = await Promise.all([
-				qr.manager.save(activationEvent),
-				qr.manager.save(p),
-			]);
-
-			await qr.commitTransaction();
-
-			log(
-				'success',
-				`Participant ${participant.id} activated extension, the following event was saved:`,
-				savedEvent,
-			);
-
-			const n = notifier.makeParticipantNotifier({participantCode: participant.code});
-			void n.notifyActive(activationEvent.createdAt);
-		} catch (err) {
-			log('error', 'while handling extension activity status determination or saving:', err);
-			await qr.rollbackTransaction();
-		} finally {
-			await qr.release();
-		}
+		void activateExtension(event, participant);
 	}
 };
 
