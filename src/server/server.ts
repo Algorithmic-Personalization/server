@@ -106,6 +106,7 @@ import scrapeMissingYouTubeMetadata from './lib/scrapeYouTube';
 // DO NOT FORGET TO UPDATE THIS FILE WHEN ADDING NEW ENTITIES
 import entities from './entities';
 import {loadConfigYamlRaw} from './lib/config-loader/loadConfigYamlRaw';
+import {loadDatabaseConfig} from './lib/config-loader/loadDbConfig';
 
 import createDefaultNotifier, {type ExternalNotifierDependencies as NotifierDependencies} from './lib/externalNotifier';
 import {createMailService, type MailServiceDependencies, type MailService} from './lib/email';
@@ -147,8 +148,8 @@ const main = async () => {
 	const createLogger = makeCreateDefaultLogger(logStream);
 	const log = createLogger('<server>');
 
-	const dockerComposeJson = await readFile(join(root, 'docker-compose.yaml'), 'utf-8');
-	const dockerComposeConfig = parse(dockerComposeJson) as unknown;
+	const dockerComposeYaml = await readFile(join(root, 'docker-compose.yaml'), 'utf-8');
+	const dockerComposeConfig = parse(dockerComposeYaml) as unknown;
 
 	if (!config || typeof config !== 'object') {
 		throw new Error('Invalid config.yml');
@@ -195,19 +196,10 @@ const main = async () => {
 		throw new Error(`Invalid db port: ${dbPort}`);
 	}
 
-	const dbConfigPath = ['services', `${env}-db`, 'environment'];
-	const dbHost = env === 'development' ? 'localhost' : `${env}-db`;
-	const dbUser = getString([...dbConfigPath, 'POSTGRES_USER'])(dockerComposeConfig);
-	const dbPassword = getString([...dbConfigPath, 'POSTGRES_PASSWORD'])(dockerComposeConfig);
-	const dbDatabase = getString([...dbConfigPath, 'POSTGRES_DB'])(dockerComposeConfig);
-
-	const dbConfig = {
-		host: dbHost,
-		port: dbPort,
-		user: dbUser,
-		password: dbPassword,
-		database: dbDatabase,
-	};
+	const dbConfig = await loadDatabaseConfig({
+		environnement: env,
+		useDockerAddress: env === 'production',
+	}, root);
 
 	const pgClient = new Client(dbConfig);
 
@@ -237,7 +229,7 @@ const main = async () => {
 	const ds = new DataSource({
 		type: 'postgres',
 		...dbConfig,
-		username: dbUser,
+		username: dbConfig.user,
 		synchronize: false,
 		entities,
 		namingStrategy: new SnakeNamingStrategy(),
