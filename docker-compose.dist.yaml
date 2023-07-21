@@ -40,6 +40,17 @@ services:
     volumes:
       - development-ytdpnl:/var/lib/postgresql/data
 
+  test-db:
+    image: postgres:15
+    environment:
+      POSTGRES_USER: admin
+      POSTGRES_PASSWORD: another password for the test database admin user
+      POSTGRES_DB: ytdpnl
+    ports:
+      - 54323:5432
+    volumes:
+      - test-ytdpnl:/var/lib/postgresql/data
+
   adminer:
     image: adminer
     restart: always
@@ -52,4 +63,7 @@ volumes:
     driver: local
 
   development-ytdpnl:
+    driver: local
+
+  test-ytdpnl:
     driver: local
