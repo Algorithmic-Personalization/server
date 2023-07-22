@@ -84,6 +84,7 @@ export const withLock = (id: string) => async (fn: AsyncFn, log?: LogFunction): 
 			return;
 		}
 
+		// TODO: this error should be emailed
 		if (now.getTime() - oldest.queuedAt.getTime() > 1000 * 60 * 5) {
 			log?.(
 				'error',
