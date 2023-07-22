@@ -45,7 +45,7 @@ const resetDb = async (): Promise<TestDb> => {
 		synchronize: false,
 		entities,
 		namingStrategy: new SnakeNamingStrategy(),
-		logging: true,
+		logging: false,
 		maxQueryExecutionTime: 200,
 	});
 

@@ -57,7 +57,15 @@ export const createActivateExtension = ({
 		}
 
 		const activationEvent = new Event();
-		Object.assign(activationEvent, event, {type: EventType.EXTENSION_ACTIVATED, id: 0});
+		Object.assign(
+			activationEvent,
+			event,
+			{
+				type: EventType.EXTENSION_ACTIVATED,
+				id: 0,
+				localUuid: activationEvent.localUuid,
+			},
+		);
 
 		p.extensionActivatedAt = new Date();
 		const [savedEvent] = await Promise.all([
