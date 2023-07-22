@@ -78,6 +78,7 @@ const scrapeYouTube_1 = __importDefault(require("./lib/scrapeYouTube"));
 // DO NOT FORGET TO UPDATE THIS FILE WHEN ADDING NEW ENTITIES
 const entities_1 = __importDefault(require("./entities"));
 const loadConfigYamlRaw_1 = require("./lib/config-loader/loadConfigYamlRaw");
+const loadDbConfig_1 = require("./lib/config-loader/loadDbConfig");
 const externalNotifier_1 = __importDefault(require("./lib/externalNotifier"));
 const email_1 = require("./lib/email");
 const getEnv = () => {
@@ -106,8 +107,8 @@ const main = () => __awaiter(void 0, void 0, void 0, function* () {
     const config = yield (0, loadConfigYamlRaw_1.loadConfigYamlRaw)();
     const createLogger = (0, logger_1.makeCreateDefaultLogger)(logStream);
     const log = createLogger('<server>');
-    const dockerComposeJson = yield (0, promises_1.readFile)((0, path_1.join)(root, 'docker-compose.yaml'), 'utf-8');
-    const dockerComposeConfig = (0, yaml_1.parse)(dockerComposeJson);
+    const dockerComposeYaml = yield (0, promises_1.readFile)((0, path_1.join)(root, 'docker-compose.yaml'), 'utf-8');
+    const dockerComposeConfig = (0, yaml_1.parse)(dockerComposeYaml);
     if (!config || typeof config !== 'object') {
         throw new Error('Invalid config.yml');
     }
@@ -140,18 +141,10 @@ const main = () => __awaiter(void 0, void 0, void 0, function* () {
     if (!dbPort || !Number.isInteger(dbPort)) {
         throw new Error(`Invalid db port: ${dbPort}`);
     }
-    const dbConfigPath = ['services', `${env}-db`, 'environment'];
-    const dbHost = env === 'development' ? 'localhost' : `${env}-db`;
-    const dbUser = (0, util_1.getString)([...dbConfigPath, 'POSTGRES_USER'])(dockerComposeConfig);
-    const dbPassword = (0, util_1.getString)([...dbConfigPath, 'POSTGRES_PASSWORD'])(dockerComposeConfig);
-    const dbDatabase = (0, util_1.getString)([...dbConfigPath, 'POSTGRES_DB'])(dockerComposeConfig);
-    const dbConfig = {
-        host: dbHost,
-        port: dbPort,
-        user: dbUser,
-        password: dbPassword,
-        database: dbDatabase,
-    };
+    const dbConfig = yield (0, loadDbConfig_1.loadDatabaseConfig)({
+        environnement: env,
+        useDockerAddress: env === 'production',
+    }, root);
     const pgClient = new pg_1.Client(dbConfig);
     try {
         yield pgClient.connect();
@@ -169,7 +162,7 @@ const main = () => __awaiter(void 0, void 0, void 0, function* () {
         process.exit(1);
     }
     yield pgClient.end();
-    const ds = new typeorm_1.DataSource(Object.assign(Object.assign({ type: 'postgres' }, dbConfig), { username: dbUser, synchronize: false, entities: entities_1.default, namingStrategy: new typeorm_naming_strategies_1.SnakeNamingStrategy(), logging: true, maxQueryExecutionTime: 200, logger: new databaseLogger_1.default(createLogger('<database>'), slowQueries) }));
+    const ds = new typeorm_1.DataSource(Object.assign(Object.assign({ type: 'postgres' }, dbConfig), { username: dbConfig.user, synchronize: false, entities: entities_1.default, namingStrategy: new typeorm_naming_strategies_1.SnakeNamingStrategy(), logging: true, maxQueryExecutionTime: 200, logger: new databaseLogger_1.default(createLogger('<database>'), slowQueries) }));
     try {
         yield ds.initialize();
     }

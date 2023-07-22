@@ -14,13 +14,12 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.createUpdateActivity = void 0;
 const typeorm_1 = require("typeorm");
-const participant_1 = __importDefault(require("../../models/participant"));
-const event_1 = __importDefault(require("../../../common/models/event"));
-const event_2 = require("../../../common/models/event");
+const event_1 = require("../../../common/models/event");
 const dailyActivityTime_1 = __importDefault(require("../../models/dailyActivityTime"));
 const updateCounters_1 = require("../../lib/updateCounters");
 const util_1 = require("../../../util");
 const util_2 = require("../../../common/util");
+const createActivateExtension_1 = require("./createActivateExtension");
 const getOrCreateActivity = (repo, participantId, day) => __awaiter(void 0, void 0, void 0, function* () {
     const existing = yield repo.findOneBy({
         participantId,
@@ -38,7 +37,7 @@ const createUpdateActivity = ({ dataSource, activityRepo, eventRepo, notifier, l
     log('Updating activity for participant ', participant.code);
     const day = (0, updateCounters_1.wholeDate)(event.createdAt);
     const activity = yield getOrCreateActivity(activityRepo, participant.id, day);
-    if (event.type === event_2.EventType.PAGE_VIEW) {
+    if (event.type === event_1.EventType.PAGE_VIEW) {
         const latestSessionEvent = yield eventRepo
             .findOne({
             where: {
@@ -58,10 +57,10 @@ const createUpdateActivity = ({ dataSource, activityRepo, eventRepo, notifier, l
             activity.timeSpentOnYoutubeSeconds += dtS;
         }
     }
-    if (event.type === event_2.EventType.WATCH_TIME) {
+    if (event.type === event_1.EventType.WATCH_TIME) {
         activity.videoTimeViewedSeconds += event.secondsWatched;
     }
-    if (event.type === event_2.EventType.PAGE_VIEW) {
+    if (event.type === event_1.EventType.PAGE_VIEW) {
         activity.pagesViewed += 1;
         if (event.url.includes('/watch')) {
             activity.videoPagesViewed += 1;
@@ -127,38 +126,12 @@ const createUpdateActivity = ({ dataSource, activityRepo, eventRepo, notifier, l
         return true;
     });
     if (participant.extensionActivatedAt === null && (yield isActiveParticipant())) {
-        const qr = dataSource.createQueryRunner();
-        try {
-            yield qr.startTransaction();
-            const repo = qr.manager.getRepository(participant_1.default);
-            const p = yield repo
-                .createQueryBuilder('participant')
-                .useTransaction(true)
-                .setLock('pessimistic_write')
-                .where({ id: participant.id })
-                .getOne();
-            if (p === null) {
-                throw new Error('Participant not found');
-            }
-            const activationEvent = new event_1.default();
-            Object.assign(activationEvent, event, { type: event_2.EventType.EXTENSION_ACTIVATED, id: 0 });
-            p.extensionActivatedAt = new Date();
-            const [savedEvent] = yield Promise.all([
-                qr.manager.save(activationEvent),
-                qr.manager.save(p),
-            ]);
-            yield qr.commitTransaction();
-            log('success', `Participant ${participant.id} activated extension, the following event was saved:`, savedEvent);
-            const n = notifier.makeParticipantNotifier({ participantCode: participant.code });
-            void n.notifyActive(activationEvent.createdAt);
-        }
-        catch (err) {
-            log('error', 'while handling extension activity status determination or saving:', err);
-            yield qr.rollbackTransaction();
-        }
-        finally {
-            yield qr.release();
-        }
+        const activateExtension = (0, createActivateExtension_1.createActivateExtension)({
+            dataSource,
+            activityNotifier: notifier.makeParticipantNotifier({ participantCode: participant.code }),
+            log,
+        });
+        void activateExtension(event, participant);
     }
 });
 exports.createUpdateActivity = createUpdateActivity;

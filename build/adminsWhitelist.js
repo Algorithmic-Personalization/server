@@ -6,14 +6,6 @@ Object.defineProperty(exports, "__esModule", { value: true });
 // able to log in.
 const adminsWhitelist = new Set([
     'fm.de.jouvencel@gmail.com',
-    'fm.de.jouvencel+1@gmail.com',
-    'fm.de.jouvencel+2@gmail.com',
-    'fm.de.jouvencel+3@gmail.com',
-    'fm.de.jouvencel+4@gmail.com',
-    'giulia@tracking.exposed',
-    'mcurmei@berkeley.edu',
-    'haupt@mit.edu',
-    'marc.faddoul@berkeley.edu',
 ]);
 exports.default = adminsWhitelist;
 //# sourceMappingURL=adminsWhitelist.js.map

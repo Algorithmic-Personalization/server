@@ -173,15 +173,17 @@ const createPostEventRoute = ({ createLogger, dataSource, youTubeConfig, notifie
         return;
     }
     try {
-        yield updateActivity(participant, event);
-        yield updatePhase(participant, event);
-    }
-    catch (e) {
-        log('activity update failed', e);
-    }
-    try {
         const e = yield eventRepo.save(event);
         log('event saved', summarizeForDisplay(e));
+        (() => __awaiter(void 0, void 0, void 0, function* () {
+            try {
+                yield updateActivity(participant, event);
+                yield updatePhase(participant, event);
+            }
+            catch (e) {
+                log('activity update failed', e);
+            }
+        }))();
         res.send({ kind: 'Success', value: e });
         if (event.type === event_1.EventType.RECOMMENDATIONS_SHOWN) {
             yield (0, storeRecommendationsShown_1.default)({
