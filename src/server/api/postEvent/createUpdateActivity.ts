@@ -1,14 +1,15 @@
 import {type Repository, LessThan, type DataSource} from 'typeorm';
 import {type LogFunction} from '../../lib/logger';
-import Participant from '../../models/participant';
-import Event from '../../../common/models/event';
+import type Participant from '../../models/participant';
+import type Event from '../../../common/models/event';
 import {EventType} from '../../../common/models/event';
 import {type WatchTimeEvent} from '../../../common/models/watchTimeEvent';
 import DailyActivityTime from '../../models/dailyActivityTime';
 import {timeSpentEventDiffLimit, wholeDate} from '../../lib/updateCounters';
 import {showSql} from '../../../util';
 import {has} from '../../../common/util';
-import {type ExternalNotifier, type ParticipantActivityNotifier} from '../../lib/externalNotifier';
+import {type ExternalNotifier} from '../../lib/externalNotifier';
+import {createActivateExtension} from './createActivateExtension';
 
 const getOrCreateActivity = async (
 	repo: Repository<DailyActivityTime>,
@@ -29,65 +30,6 @@ const getOrCreateActivity = async (
 	newActivity.createdAt = day;
 
 	return repo.save(newActivity);
-};
-
-export const createActivateExtension = ({
-	dataSource,
-	activityNotifier,
-	log,
-}: {
-	dataSource: DataSource;
-	activityNotifier: ParticipantActivityNotifier;
-	log: LogFunction;
-}) => async (event: Event, participant: Participant) => {
-	const qr = dataSource.createQueryRunner();
-
-	try {
-		await qr.startTransaction();
-		const repo = qr.manager.getRepository(Participant);
-		const p = await repo
-			.createQueryBuilder('participant')
-			.useTransaction(true)
-			.setLock('pessimistic_write')
-			.where({id: participant.id})
-			.getOne();
-
-		if (p === null) {
-			throw new Error('Participant not found');
-		}
-
-		const activationEvent = new Event();
-		Object.assign(
-			activationEvent,
-			event,
-			{
-				type: EventType.EXTENSION_ACTIVATED,
-				id: 0,
-				localUuid: activationEvent.localUuid,
-			},
-		);
-
-		p.extensionActivatedAt = new Date();
-		const [savedEvent] = await Promise.all([
-			qr.manager.save(activationEvent),
-			qr.manager.save(p),
-		]);
-
-		await qr.commitTransaction();
-
-		log(
-			'success',
-			`Participant ${participant.id} activated extension, the following event was saved:`,
-			savedEvent,
-		);
-
-		void activityNotifier.notifyActive(activationEvent.createdAt);
-	} catch (err) {
-		log('error', 'while handling extension activity status determination or saving:', err);
-		await qr.rollbackTransaction();
-	} finally {
-		await qr.release();
-	}
 };
 
 export const createUpdateActivity = ({dataSource, activityRepo, eventRepo, notifier, log}: {

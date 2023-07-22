@@ -1,7 +1,7 @@
 import {type TestDb} from '../server/tests-util/db';
 import resetDb from '../server/tests-util/db';
 
-import {createActivateExtension} from '../server/api/postEvent/createUpdateActivity';
+import {createActivateExtension} from '../server/api/postEvent/createActivateExtension';
 import {type ParticipantActivityNotifier} from '../server/lib/externalNotifier';
 
 const createMockParticipantActivityNotifier = (): ParticipantActivityNotifier => {
