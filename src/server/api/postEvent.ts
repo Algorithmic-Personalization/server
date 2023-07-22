@@ -201,15 +201,18 @@ export const createPostEventRoute: RouteCreator = ({
 	}
 
 	try {
-		await updateActivity(participant, event);
-		await updatePhase(participant, event);
-	} catch (e) {
-		log('activity update failed', e);
-	}
-
-	try {
 		const e = await eventRepo.save(event);
 		log('event saved', summarizeForDisplay(e));
+
+		(async () => {
+			try {
+				await updateActivity(participant, event);
+				await updatePhase(participant, event);
+			} catch (e) {
+				log('activity update failed', e);
+			}
+		})();
+
 		res.send({kind: 'Success', value: e});
 
 		if (event.type === EventType.RECOMMENDATIONS_SHOWN) {

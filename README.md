@@ -31,6 +31,20 @@ sudo htpasswd -c /etc/httpd/.htpasswd <username>
 
 # Installation
 
+## Testing
+
+First start the test database with:
+
+```bash
+docker-compose up -d test-db
+```
+
+Then run the tests with:
+
+```bash
+yarn test
+```
+
 ## Development
 
 Build the server code: `yarn build:server`

@@ -53,9 +53,9 @@ describe('activateExtension', () => {
 			log: jest.fn(),
 		});
 
-		const activationRequests: Array<Promise<void>> = [];
+		const activationRequests: Array<Promise<boolean>> = [];
 
-		for (let i = 0; i < 10; i++) {
+		for (let i = 0; i < 15; ++i) {
 			const activationPromise = db.createEvent(session).then(
 				async event =>
 					activateExtension(event, participant),
@@ -67,5 +67,5 @@ describe('activateExtension', () => {
 		await Promise.allSettled(activationRequests);
 
 		expect(activityNotifier.notifyActive).toHaveBeenCalledTimes(1);
-	});
+	}, 30000);
 });

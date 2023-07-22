@@ -11,7 +11,7 @@ export const createActivateExtension = ({
 	dataSource: DataSource;
 	activityNotifier: ParticipantActivityNotifier;
 	log: LogFunction;
-}) => async (event: Event, participant: Participant) => {
+}) => async (event: Event, participant: Participant): Promise<boolean> => {
 	const qr = dataSource.createQueryRunner();
 
 	try {
@@ -20,12 +20,17 @@ export const createActivateExtension = ({
 		const p = await repo
 			.createQueryBuilder('participant')
 			.useTransaction(true)
-			.setLock('pessimistic_write')
+			.setLock('pessimistic_read')
 			.where({id: participant.id})
 			.getOne();
 
 		if (p === null) {
 			throw new Error('Participant not found');
+		}
+
+		if (p.extensionActivatedAt !== null) {
+			log('info', `Participant ${participant.id} already activated extension`);
+			return false;
 		}
 
 		const activationEvent = new Event();
@@ -53,11 +58,14 @@ export const createActivateExtension = ({
 			savedEvent,
 		);
 
-		void activityNotifier.notifyActive(activationEvent.createdAt);
+		const ok = await activityNotifier.notifyActive(activationEvent.createdAt);
+		return ok;
 	} catch (err) {
 		log('error', 'while handling extension activity status determination or saving:', err);
 		await qr.rollbackTransaction();
+		return false;
 	} finally {
+		log('debug', 'releasing query runner');
 		await qr.release();
 	}
 };
