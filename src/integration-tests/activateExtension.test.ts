@@ -25,32 +25,18 @@ describe('activateExtension', () => {
 		await db.tearDown();
 	});
 
-	const createActivationDependencies = async (
-		activityNotifier: ParticipantActivityNotifier,
-	) => {
+	it('should activate the extension for a participant', async () => {
 		const participant = await db.createParticipant();
 		const session = await db.createSession(participant);
 		const event = await db.createEvent(session);
+
+		const activityNotifier = createMockParticipantActivityNotifier();
 
 		const activateExtension = createActivateExtension({
 			dataSource: db.dataSource,
 			activityNotifier,
 			log: jest.fn(),
 		});
-
-		return {participant, event, activateExtension, activityNotifier};
-	};
-
-	it('should activate the extension for a participant', async () => {
-		const activityNotifier = createMockParticipantActivityNotifier();
-
-		const {
-			participant,
-			event,
-			activateExtension,
-		} = await createActivationDependencies(
-			activityNotifier,
-		);
 
 		await activateExtension(event, participant);
 
