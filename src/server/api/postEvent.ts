@@ -20,6 +20,7 @@ import createStoreWatchTime from './postEvent/storeWatchTime';
 import createHandleExtensionInstalledEvent from './postEvent/handleExtensionInstalledEvent';
 
 import storeRecommendationsShown from '../lib/storeRecommendationsShown';
+import {withLock} from '../../util';
 
 const isLocalUuidAlreadyExistsError = (e: unknown): boolean =>
 	has('code')(e) && has('constraint')(e)
@@ -204,14 +205,14 @@ export const createPostEventRoute: RouteCreator = ({
 		const e = await eventRepo.save(event);
 		log('event saved', summarizeForDisplay(e));
 
-		(async () => {
+		void withLock(`participant-${participant.id}`)(async () => {
 			try {
 				await updateActivity(participant, event);
 				await updatePhase(participant, event);
 			} catch (e) {
 				log('activity update failed', e);
 			}
-		})();
+		});
 
 		res.send({kind: 'Success', value: e});
 

@@ -23,7 +23,7 @@ const unstackLock = (id, log) => __awaiter(void 0, void 0, void 0, function* () 
         const fn = stack.queue.shift();
         if (fn) {
             try {
-                stack.running = fn();
+                stack.running = fn.run();
                 yield stack.running;
             }
             catch (error) {
@@ -49,7 +49,26 @@ const withLock = (id) => (fn, log) => __awaiter(void 0, void 0, void 0, function
         // Never happens but makes TS happy
         throw new Error('Lock is not defined');
     }
-    lock.queue.push(fn);
+    lock.queue.push({
+        queuedAt: new Date(),
+        run: fn,
+    });
+    const checkInterval = setInterval(() => {
+        const now = new Date();
+        const lock = locks.get(id);
+        if (!lock) {
+            clearInterval(checkInterval);
+            return;
+        }
+        const oldest = lock.queue[0];
+        if (!oldest) {
+            clearInterval(checkInterval);
+            return;
+        }
+        if (now.getTime() - oldest.queuedAt.getTime() > 1000 * 60 * 5) {
+            log === null || log === void 0 ? void 0 : log('error', `Lock ${id} has been queued for more than 5 minutes, something is wrong`);
+        }
+    }, 1000 * 60);
     return unstackLock(id, log);
 });
 exports.withLock = withLock;

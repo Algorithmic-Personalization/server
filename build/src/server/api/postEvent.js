@@ -48,6 +48,7 @@ const createUpdateActivity_1 = __importDefault(require("./postEvent/createUpdate
 const storeWatchTime_1 = __importDefault(require("./postEvent/storeWatchTime"));
 const handleExtensionInstalledEvent_1 = __importDefault(require("./postEvent/handleExtensionInstalledEvent"));
 const storeRecommendationsShown_1 = __importDefault(require("../lib/storeRecommendationsShown"));
+const util_2 = require("../../util");
 const isLocalUuidAlreadyExistsError = (e) => (0, util_1.has)('code')(e) && (0, util_1.has)('constraint')(e)
     && e.code === '23505'
     && e.constraint === 'event_local_uuid_idx';
@@ -175,7 +176,7 @@ const createPostEventRoute = ({ createLogger, dataSource, youTubeConfig, notifie
     try {
         const e = yield eventRepo.save(event);
         log('event saved', summarizeForDisplay(e));
-        (() => __awaiter(void 0, void 0, void 0, function* () {
+        void (0, util_2.withLock)(`participant-${participant.id}`)(() => __awaiter(void 0, void 0, void 0, function* () {
             try {
                 yield updateActivity(participant, event);
                 yield updatePhase(participant, event);
@@ -183,7 +184,7 @@ const createPostEventRoute = ({ createLogger, dataSource, youTubeConfig, notifie
             catch (e) {
                 log('activity update failed', e);
             }
-        }))();
+        }));
         res.send({ kind: 'Success', value: e });
         if (event.type === event_1.EventType.RECOMMENDATIONS_SHOWN) {
             yield (0, storeRecommendationsShown_1.default)({
