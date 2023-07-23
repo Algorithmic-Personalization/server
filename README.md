@@ -29,7 +29,13 @@ or on EC2 probably:
 sudo htpasswd -c /etc/httpd/.htpasswd <username>
 ```
 
-# Installation
+## Installation
+
+Install the dependencies with:
+
+```bash
+yarn
+```
 
 ## Testing
 
@@ -39,22 +45,22 @@ First start the test database with:
 docker-compose up -d test-db
 ```
 
-Then run the tests with:
+Then run the tests once with:
 
 ```bash
 yarn test
 ```
 
+Or continuously with:
+
+```bash
+yarn tdd
+```
+
 ## Development
 
-Build the server code: `yarn build:server`
-
-Run the tests:
-- one-shot: `yarn test`
-- continuously: `yarn tdd`
-
-Starts the docker containers:
-- `docker compose up -d`
+Starts the docker database:
+- `docker compose up -d development-db`
 
 Start the docker server:
 - `yarn dev`
