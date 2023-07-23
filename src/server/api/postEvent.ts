@@ -167,11 +167,13 @@ export const createPostEventRoute: RouteCreator = ({
 		return;
 	}
 
-	const handleInstall = createHandleExtensionInstalledEvent(
+	const handleInstall = createHandleExtensionInstalledEvent({
 		dataSource,
-		notifier,
+		notifier: notifier.makeParticipantNotifier({
+			participantCode,
+		}),
 		log,
-	);
+	});
 
 	void handleInstall(participant, event);
 

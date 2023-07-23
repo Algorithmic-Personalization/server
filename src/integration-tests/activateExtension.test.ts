@@ -2,17 +2,7 @@ import {type TestDb} from '../server/tests-util/db';
 import resetDb from '../server/tests-util/db';
 
 import {createActivateExtension} from '../server/api/postEvent/createActivateExtension';
-import {type ParticipantActivityNotifier} from '../server/lib/externalNotifier';
-
-const createMockParticipantActivityNotifier = (): ParticipantActivityNotifier => {
-	const notifier: ParticipantActivityNotifier = {
-		notifyActive: jest.fn(),
-		notifyInstalled: jest.fn(),
-		notifyPhaseChange: jest.fn(),
-	};
-
-	return notifier;
-};
+import {createMockParticipantActivityNotifier} from '../server/tests-util/createMockParticipantActivityNotifier';
 
 describe('activateExtension', () => {
 	let db: TestDb;

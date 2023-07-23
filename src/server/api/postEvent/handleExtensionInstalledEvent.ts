@@ -4,13 +4,17 @@ import Participant from '../../models/participant';
 import Event from '../../../common/models/event';
 
 import {type LogFunction} from '../../lib/logger';
-import {type ExternalNotifier} from '../../lib/externalNotifier';
+import {type ParticipantActivityNotifier} from '../../lib/externalNotifier';
 
-export const createHandleExtensionInstalledEvent = (
-	dataSource: DataSource,
-	notifier: ExternalNotifier,
-	log: LogFunction,
-) => async (p: Participant, event: Event) => {
+export const createHandleExtensionInstalledEvent = ({
+	dataSource,
+	notifier,
+	log,
+}: {
+	dataSource: DataSource;
+	notifier: ParticipantActivityNotifier;
+	log: LogFunction;
+}) => async (p: Participant, event: Event) => {
 	log('handling extension installed event...');
 	if (p.extensionInstalled) {
 		log('info', 'participant extension already installed, skipping with no lookup');
@@ -46,8 +50,7 @@ export const createHandleExtensionInstalledEvent = (
 			log('event saved', e);
 			await queryRunner.commitTransaction();
 			log('participant updated, transaction committed');
-			const n = notifier.makeParticipantNotifier({participantCode: participant.code});
-			void n.notifyInstalled(event.createdAt);
+			await notifier.notifyInstalled(event.createdAt);
 		}
 	} catch (err) {
 		log('error', 'handling EXTENSION_INSTALLED event', err);
