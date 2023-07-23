@@ -151,7 +151,13 @@ const createPostEventRoute = ({ createLogger, dataSource, youTubeConfig, notifie
         res.status(500).json({ kind: 'Failure', message: 'No participant found' });
         return;
     }
-    const handleInstall = (0, handleExtensionInstalledEvent_1.default)(dataSource, notifier, log);
+    const handleInstall = (0, handleExtensionInstalledEvent_1.default)({
+        dataSource,
+        notifier: notifier.makeParticipantNotifier({
+            participantCode,
+        }),
+        log,
+    });
     void handleInstall(participant, event);
     event.arm = participant.arm;
     event.phase = participant.phase;

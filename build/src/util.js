@@ -65,6 +65,7 @@ const withLock = (id) => (fn, log) => __awaiter(void 0, void 0, void 0, function
             clearInterval(checkInterval);
             return;
         }
+        // TODO: this error should be emailed
         if (now.getTime() - oldest.queuedAt.getTime() > 1000 * 60 * 5) {
             log === null || log === void 0 ? void 0 : log('error', `Lock ${id} has been queued for more than 5 minutes, something is wrong`);
         }

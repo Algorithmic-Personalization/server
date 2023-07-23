@@ -14,14 +14,7 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
 Object.defineProperty(exports, "__esModule", { value: true });
 const db_1 = __importDefault(require("../server/tests-util/db"));
 const createActivateExtension_1 = require("../server/api/postEvent/createActivateExtension");
-const createMockParticipantActivityNotifier = () => {
-    const notifier = {
-        notifyActive: jest.fn(),
-        notifyInstalled: jest.fn(),
-        notifyPhaseChange: jest.fn(),
-    };
-    return notifier;
-};
+const createMockParticipantActivityNotifier_1 = require("../server/tests-util/createMockParticipantActivityNotifier");
 describe('activateExtension', () => {
     let db;
     beforeAll(() => __awaiter(void 0, void 0, void 0, function* () {
@@ -34,7 +27,7 @@ describe('activateExtension', () => {
         const participant = yield db.createParticipant();
         const session = yield db.createSession(participant);
         const event = yield db.createEvent(session);
-        const activityNotifier = createMockParticipantActivityNotifier();
+        const activityNotifier = (0, createMockParticipantActivityNotifier_1.createMockParticipantActivityNotifier)();
         const activateExtension = (0, createActivateExtension_1.createActivateExtension)({
             dataSource: db.dataSource,
             activityNotifier,
@@ -44,7 +37,7 @@ describe('activateExtension', () => {
         expect(activityNotifier.notifyActive).toHaveBeenCalledTimes(1);
     }));
     it('should activate the extension only once for a participant', () => __awaiter(void 0, void 0, void 0, function* () {
-        const activityNotifier = createMockParticipantActivityNotifier();
+        const activityNotifier = (0, createMockParticipantActivityNotifier_1.createMockParticipantActivityNotifier)();
         const participant = yield db.createParticipant();
         const session = yield db.createSession(participant);
         const activateExtension = (0, createActivateExtension_1.createActivateExtension)({

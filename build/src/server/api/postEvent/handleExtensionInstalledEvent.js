@@ -15,7 +15,7 @@ Object.defineProperty(exports, "__esModule", { value: true });
 exports.createHandleExtensionInstalledEvent = void 0;
 const participant_1 = __importDefault(require("../../models/participant"));
 const event_1 = __importDefault(require("../../../common/models/event"));
-const createHandleExtensionInstalledEvent = (dataSource, notifier, log) => (p, event) => __awaiter(void 0, void 0, void 0, function* () {
+const createHandleExtensionInstalledEvent = ({ dataSource, notifier, log, }) => (p, event) => __awaiter(void 0, void 0, void 0, function* () {
     log('handling extension installed event...');
     if (p.extensionInstalled) {
         log('info', 'participant extension already installed, skipping with no lookup');
@@ -29,7 +29,7 @@ const createHandleExtensionInstalledEvent = (dataSource, notifier, log) => (p, e
         const participant = yield participantRepo
             .createQueryBuilder('participant')
             .useTransaction(true)
-            .setLock('pessimistic_write')
+            .setLock('pessimistic_read')
             .where({ id: p.id })
             .getOne();
         if (!participant) {
@@ -48,8 +48,7 @@ const createHandleExtensionInstalledEvent = (dataSource, notifier, log) => (p, e
             log('event saved', e);
             yield queryRunner.commitTransaction();
             log('participant updated, transaction committed');
-            const n = notifier.makeParticipantNotifier({ participantCode: participant.code });
-            void n.notifyInstalled(event.createdAt);
+            yield notifier.notifyInstalled(event.createdAt);
         }
     }
     catch (err) {
