@@ -11,6 +11,7 @@ type AsyncFn = () => Promise<void>;
 type QueuedFn = {
 	queuedAt: Date;
 	run: AsyncFn;
+	interval: NodeJS.Timer;
 };
 
 type Lock = {
@@ -41,6 +42,7 @@ const unstackLock = async (id: string, log?: LogFunction) => {
 				log?.('error in unstackLock', {id, error});
 			} finally {
 				stack.running = undefined;
+				clearInterval(fn.interval);
 				await unstackLock(id);
 			}
 
@@ -63,11 +65,6 @@ export const withLock = (id: string) => async (fn: AsyncFn, log?: LogFunction): 
 		// Never happens but makes TS happy
 		throw new Error('Lock is not defined');
 	}
-
-	lock.queue.push({
-		queuedAt: new Date(),
-		run: fn,
-	});
 
 	const checkInterval = setInterval(() => {
 		const now = new Date();
@@ -92,6 +89,12 @@ export const withLock = (id: string) => async (fn: AsyncFn, log?: LogFunction): 
 			);
 		}
 	}, 1000 * 60);
+
+	lock.queue.push({
+		queuedAt: new Date(),
+		run: fn,
+		interval: checkInterval,
+	});
 
 	return unstackLock(id, log);
 };
