@@ -191,7 +191,6 @@ const createPostEventRoute = ({ createLogger, dataSource, youTubeConfig, notifie
                 log('activity update failed', e);
             }
         }));
-        res.send({ kind: 'Success', value: e });
         if (event.type === event_1.EventType.RECOMMENDATIONS_SHOWN) {
             yield (0, storeRecommendationsShown_1.default)({
                 dataSource,
@@ -203,6 +202,7 @@ const createPostEventRoute = ({ createLogger, dataSource, youTubeConfig, notifie
         else if (event.type === event_1.EventType.WATCH_TIME) {
             yield storeWatchTime(event);
         }
+        res.send({ kind: 'Success', value: e });
     }
     catch (e) {
         if (isLocalUuidAlreadyExistsError(e)) {
