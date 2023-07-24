@@ -4,6 +4,8 @@ logs
 
 public
 !public/index.html
+!public/bundle.js
+!public/bundle.js.map
 !public/participants.sample.csv
 !public/update_manifest.json
 
