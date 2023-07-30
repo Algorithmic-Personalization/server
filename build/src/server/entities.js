@@ -20,6 +20,7 @@ const videoMetadata_1 = __importDefault(require("./models/videoMetadata"));
 const videoCategory_1 = __importDefault(require("./models/videoCategory"));
 const youTubeRequestLatency_1 = __importDefault(require("./models/youTubeRequestLatency"));
 const requestLog_1 = __importDefault(require("./models/requestLog"));
+const voucher_1 = __importDefault(require("./models/voucher"));
 // Add classes used by typeorm as models here
 // so that typeorm can extract the metadata from them.
 exports.entities = [
@@ -39,6 +40,7 @@ exports.entities = [
     videoCategory_1.default,
     youTubeRequestLatency_1.default,
     requestLog_1.default,
+    voucher_1.default,
 ];
 exports.default = exports.entities;
 //# sourceMappingURL=entities.js.map

@@ -155,6 +155,7 @@ const createPostEventRoute = ({ createLogger, dataSource, youTubeConfig, notifie
         dataSource,
         notifier: notifier.makeParticipantNotifier({
             participantCode,
+            participantId: participant.id,
         }),
         log,
     });

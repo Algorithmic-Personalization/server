@@ -101,7 +101,10 @@ const createUpdatePhase = ({ dataSource, notifier, log, }) => (participant, late
         transitionEvent.transitionSettingId = setting.id;
         const saveParticipantTransition = (0, participant_1.createSaveParticipantTransition)({
             dataSource,
-            notifier: notifier.makeParticipantNotifier({ participantCode: participant.code }),
+            notifier: notifier.makeParticipantNotifier({
+                participantCode: participant.code,
+                participantId: participant.id,
+            }),
         });
         participant.phase = toPhase;
         yield saveParticipantTransition(participant, transitionEvent);

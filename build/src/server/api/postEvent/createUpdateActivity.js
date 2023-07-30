@@ -128,7 +128,10 @@ const createUpdateActivity = ({ dataSource, activityRepo, eventRepo, notifier, l
     if (participant.extensionActivatedAt === null && (yield isActiveParticipant())) {
         const activateExtension = (0, createActivateExtension_1.createActivateExtension)({
             dataSource,
-            activityNotifier: notifier.makeParticipantNotifier({ participantCode: participant.code }),
+            activityNotifier: notifier.makeParticipantNotifier({
+                participantCode: participant.code,
+                participantId: participant.id,
+            }),
             log,
         });
         void activateExtension(event, participant);

@@ -70,6 +70,7 @@ const updateParticipantPhase = (dataSource, notifier, log) => (fromPhase, toPhas
         dataSource,
         notifier: notifier.makeParticipantNotifier({
             participantCode: participant.code,
+            participantId: participant.id,
         }),
     });
     return saveParticipantTransition(participant, transition);
