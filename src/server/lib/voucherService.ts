@@ -4,13 +4,13 @@ import {DataSource, IsNull} from 'typeorm';
 import {LogFunction} from './logger';
 import Voucher from '../models/voucher';
 
-export type GetVoucherDependencies = {
+export type VoucherServiceDependencies = {
 	log: LogFunction;
 	dataSource: DataSource;
 };
 
-export const createGetVoucher = ({log, dataSource}: GetVoucherDependencies) =>
-	async (participantId: number): Promise<Voucher | undefined> => {
+export const createVoucherService = ({log, dataSource}: VoucherServiceDependencies) => ({
+	async getAndMarkOneAsUsed(participantId: number): Promise<Voucher | undefined> {
 		log('info', 'attempting to get voucher for participant', {participantId});
 
 		const repo = dataSource.getRepository(Voucher);
@@ -18,7 +18,6 @@ export const createGetVoucher = ({log, dataSource}: GetVoucherDependencies) =>
 		const voucher = await repo.findOne({
 			where: {
 				participantId: IsNull(),
-				deliveredAt: IsNull(),
 			},
 		});
 
@@ -31,4 +30,17 @@ export const createGetVoucher = ({log, dataSource}: GetVoucherDependencies) =>
 		}
 
 		return undefined;
-	};
+	},
+
+	async countAvailable(): Promise<number> {
+		const repo = dataSource.getRepository(Voucher);
+
+		const vouchersLeft = await repo.count({
+			where: {
+				participantId: IsNull(),
+			},
+		});
+
+		return vouchersLeft;
+	},
+});
