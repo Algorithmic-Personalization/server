@@ -14,6 +14,7 @@ import VideoMetadata from './models/videoMetadata';
 import VideoCategory from './models/videoCategory';
 import YouTubeRequestLatency from './models/youTubeRequestLatency';
 import RequestLog from './models/requestLog';
+import Voucher from './models/voucher';
 
 // Add classes used by typeorm as models here
 // so that typeorm can extract the metadata from them.
@@ -35,6 +36,7 @@ export const entities = [
 	VideoCategory,
 	YouTubeRequestLatency,
 	RequestLog,
+	Voucher,
 ];
 
 export default entities;
