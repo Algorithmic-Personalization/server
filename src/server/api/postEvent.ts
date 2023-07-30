@@ -171,6 +171,7 @@ export const createPostEventRoute: RouteCreator = ({
 		dataSource,
 		notifier: notifier.makeParticipantNotifier({
 			participantCode,
+			participantId: participant.id,
 		}),
 		log,
 	});

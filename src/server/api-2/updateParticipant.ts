@@ -56,6 +56,7 @@ const updateParticipantPhase = (
 				dataSource,
 				notifier: notifier.makeParticipantNotifier({
 					participantCode: participant.code,
+					participantId: participant.id,
 				}),
 			});
 

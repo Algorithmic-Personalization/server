@@ -174,7 +174,10 @@ export const createUpdateActivity = ({dataSource, activityRepo, eventRepo, notif
 	if (participant.extensionActivatedAt === null && await isActiveParticipant()) {
 		const activateExtension = createActivateExtension({
 			dataSource,
-			activityNotifier: notifier.makeParticipantNotifier({participantCode: participant.code}),
+			activityNotifier: notifier.makeParticipantNotifier({
+				participantCode: participant.code,
+				participantId: participant.id,
+			}),
 			log,
 		});
 

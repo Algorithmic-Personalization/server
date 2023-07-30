@@ -90,7 +90,10 @@ export const createUpdatePhase = ({
 
 		const saveParticipantTransition = createSaveParticipantTransition({
 			dataSource,
-			notifier: notifier.makeParticipantNotifier({participantCode: participant.code}),
+			notifier: notifier.makeParticipantNotifier({
+				participantCode: participant.code,
+				participantId: participant.id,
+			}),
 		});
 
 		participant.phase = toPhase;

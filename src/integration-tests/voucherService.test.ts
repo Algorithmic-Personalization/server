@@ -9,7 +9,7 @@ describe('getVoucher', () => {
 	let db: TestDb;
 
 	beforeAll(async () => {
-		db = await resetDb();
+		db = await resetDb(true);
 	});
 
 	afterAll(async () => {

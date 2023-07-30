@@ -281,6 +281,7 @@ const main = async () => {
 	const notifierServices: NotifierDependencies = {
 		mailer,
 		log: createLogger('<notifier>'),
+		dataSource: ds,
 	};
 
 	const notifier = createDefaultNotifier(config)(notifierServices);

@@ -22,7 +22,7 @@ export type TestDb = {
 	createEvent: (session: Session) => Promise<Event>;
 };
 
-const resetDb = async (): Promise<TestDb> => {
+const resetDb = async (shortTimeout = false): Promise<TestDb> => {
 	const dbConfig = await loadDatabaseConfig({
 		environnement: 'test',
 		useDockerAddress: false,
@@ -38,6 +38,12 @@ const resetDb = async (): Promise<TestDb> => {
 
 	await migrate(dbConfig, dbConfig.migrationsDir);
 
+	const extra = shortTimeout ? {
+		options: '-c lock_timeout=500ms',
+		// eslint-disable-next-line @typescript-eslint/naming-convention
+		statement_timeout: 500,
+	} : {};
+
 	const dataSource = new DataSource({
 		type: 'postgres',
 		...dbConfig,
@@ -47,11 +53,7 @@ const resetDb = async (): Promise<TestDb> => {
 		namingStrategy: new SnakeNamingStrategy(),
 		logging: false,
 		maxQueryExecutionTime: 200,
-		extra: {
-			options: '-c lock_timeout=500ms',
-			// eslint-disable-next-line @typescript-eslint/naming-convention
-			statement_timeout: 500,
-		},
+		extra,
 	});
 
 	await dataSource.initialize();

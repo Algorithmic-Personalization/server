@@ -57,3 +57,5 @@ export const createVoucherService = ({log, dataSource}: VoucherServiceDependenci
 		return vouchersLeft;
 	},
 });
+
+export default createVoucherService;

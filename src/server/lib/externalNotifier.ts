@@ -1,11 +1,15 @@
+import {type DataSource} from 'typeorm';
+
 import {EventType} from '../../common/models/event';
 import {has} from '../../common/util';
 import {type LogFunction} from './logger';
 import {type MailService} from './email';
+import createVoucherService from '../lib/voucherService';
 
 export type ExternalNotifierDependencies = {
 	log: LogFunction;
 	mailer: MailService;
+	dataSource: DataSource;
 };
 
 export const getExternalNotifierConfig = (generalConfigData: unknown): ExternalNotifierConfig => {
@@ -39,33 +43,49 @@ export type ExternalNotifierConfig = {
 };
 
 export type ParticipantData = {
+	participantId: number;
 	participantCode: string;
 };
 
 export const makeDefaultExternalNotifier = (config: ExternalNotifierConfig) =>
-	({mailer}: ExternalNotifierDependencies): ExternalNotifier => ({
-		makeParticipantNotifier: (data: ParticipantData): ParticipantActivityNotifier => ({
-			async notifyActive(d: Date) {
-				const {email: to} = config;
-				const subject = `"${EventType.PHASE_TRANSITION}}" Update for User "${data.participantCode}"`;
-				const text = `Participant "${data.participantCode}" "${EventType.EXTENSION_ACTIVATED}" as of "${d.getTime()}"`;
-				return mailer({to, subject, text});
-			},
-			async notifyInstalled(d: Date) {
-				const {email: to} = config;
-				const {participantCode} = data;
-				const subject = `"${EventType.EXTENSION_INSTALLED}" Update for User "${participantCode}"`;
-				const text = `Participant "${participantCode}" "${EventType.EXTENSION_INSTALLED}" as of "${d.getTime()}"`;
-				return mailer({to, subject, text});
-			},
-			async notifyPhaseChange(d: Date, from_phase: number, to_phase: number) {
-				const {email: to} = config;
-				const subject = `"${EventType.PHASE_TRANSITION}}" Update for User "${data.participantCode}"`;
-				const text = `Participant "${data.participantCode}" transitioned from phase "${from_phase}" to phase "${to_phase}" on "${d.getTime()}"`;
-				return mailer({to, subject, text});
-			},
-		}),
-	});
+	({mailer, dataSource, log}: ExternalNotifierDependencies): ExternalNotifier => {
+		const voucherService = createVoucherService({
+			dataSource,
+			log,
+		});
+
+		return {
+			makeParticipantNotifier: (data: ParticipantData): ParticipantActivityNotifier => ({
+				async notifyActive(d: Date) {
+					const {email: to} = config;
+					const subject = `"${EventType.PHASE_TRANSITION}}" Update for User "${data.participantCode}"`;
+
+					const voucher = await voucherService.getAndMarkOneAsUsed(data.participantId);
+					const voucherString = voucher?.voucherCode ?? '<no vouchers left>';
+
+					const text = `Participant "${
+						data.participantCode
+					}" "${
+						EventType.EXTENSION_ACTIVATED
+					}" as of "${d.getTime()}" VoucherCode sent: "${voucherString}"`;
+					return mailer({to, subject, text});
+				},
+				async notifyInstalled(d: Date) {
+					const {email: to} = config;
+					const {participantCode} = data;
+					const subject = `"${EventType.EXTENSION_INSTALLED}" Update for User "${participantCode}"`;
+					const text = `Participant "${participantCode}" "${EventType.EXTENSION_INSTALLED}" as of "${d.getTime()}"`;
+					return mailer({to, subject, text});
+				},
+				async notifyPhaseChange(d: Date, from_phase: number, to_phase: number) {
+					const {email: to} = config;
+					const subject = `"${EventType.PHASE_TRANSITION}}" Update for User "${data.participantCode}"`;
+					const text = `Participant "${data.participantCode}" transitioned from phase "${from_phase}" to phase "${to_phase}" on "${d.getTime()}"`;
+					return mailer({to, subject, text});
+				},
+			}),
+		};
+	};
 
 export const createDefaultNotifier = (config: unknown) => (services: ExternalNotifierDependencies) => {
 	const notifierConf = getExternalNotifierConfig(config);
