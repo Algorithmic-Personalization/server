@@ -60,4 +60,73 @@ describe('getVoucher', () => {
 
 		expect(voucher).toBeUndefined();
 	});
+
+	type VoucherRequestParallelTest = {
+		nParticipants: number;
+		nVouchers: number;
+		nRequestsPerParticipant: number;
+	};
+
+	const voucherRequestParallelTests: VoucherRequestParallelTest[] = [
+		{
+			nParticipants: 10,
+			nVouchers: 2,
+			nRequestsPerParticipant: 5,
+		},
+	];
+
+	test.each(voucherRequestParallelTests)(
+		'should not deliver too many vouchers even concurrently ($nParticipants participants, $nVouchers)',
+		async scenario => {
+			const {
+				nParticipants,
+				nVouchers,
+				nRequestsPerParticipant,
+			} = scenario;
+
+			const vouchers = createVoucherService({
+				dataSource: db.dataSource,
+				log: jest.fn(),
+			});
+
+			expect(await vouchers.countAvailable()).toBe(0);
+
+			await createVouchers(nVouchers);
+
+			const participants = await Promise.all(
+				Array.from({length: nParticipants}).map(async () => db.createParticipant()),
+			);
+
+			const voucherRequests: Array<Promise<void>> = [];
+			const vouchersObtained = new Map<number, number>();
+
+			participants.forEach(
+				participant => {
+					for (let i = 0; i < nRequestsPerParticipant; ++i) {
+						const req = vouchers.getAndMarkOneAsUsed(participant.id);
+
+						const check = req.then(v => {
+							if (v) {
+								const n = vouchersObtained.get(participant.id) ?? 0;
+								vouchersObtained.set(participant.id, n + 1);
+							}
+						});
+
+						voucherRequests.push(check);
+					}
+				},
+			);
+
+			await Promise.all(voucherRequests);
+
+			if (nVouchers < nParticipants) {
+				for (const [, nObtained] of vouchersObtained) {
+					expect(nObtained).toBeLessThanOrEqual(1);
+				}
+			} else {
+				for (const [, nObtained] of vouchersObtained) {
+					expect(nObtained).toBe(1);
+				}
+			}
+		});
 });
