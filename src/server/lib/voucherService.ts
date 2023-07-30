@@ -29,6 +29,7 @@ export const createVoucherService = ({log, dataSource}: VoucherServiceDependenci
 			if (voucher) {
 				voucher.participantId = participantId;
 				voucher.deliveredAt = new Date();
+				voucher.updatedAt = voucher.deliveredAt;
 				const saved = await repo.save(voucher);
 
 				await qr.commitTransaction();
