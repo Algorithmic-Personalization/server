@@ -47,6 +47,11 @@ const resetDb = async (): Promise<TestDb> => {
 		namingStrategy: new SnakeNamingStrategy(),
 		logging: false,
 		maxQueryExecutionTime: 200,
+		extra: {
+			options: '-c lock_timeout=500ms',
+			// eslint-disable-next-line @typescript-eslint/naming-convention
+			statement_timeout: 500,
+		},
 	});
 
 	await dataSource.initialize();

@@ -69,14 +69,29 @@ describe('getVoucher', () => {
 
 	const voucherRequestParallelTests: VoucherRequestParallelTest[] = [
 		{
-			nParticipants: 10,
+			nParticipants: 2,
+			nVouchers: 2,
+			nRequestsPerParticipant: 1,
+		},
+		{
+			nParticipants: 2,
+			nVouchers: 2,
+			nRequestsPerParticipant: 2,
+		},
+		{
+			nParticipants: 2,
+			nVouchers: 2,
+			nRequestsPerParticipant: 10,
+		},
+		{
+			nParticipants: 3,
 			nVouchers: 2,
 			nRequestsPerParticipant: 5,
 		},
 	];
 
 	test.each(voucherRequestParallelTests)(
-		'should not deliver too many vouchers even concurrently ($nParticipants participants, $nVouchers)',
+		'should not deliver too many vouchers even concurrently ($nParticipants participants, $nVouchers vouchers, $nRequestsPerParticipant requests per participant)',
 		async scenario => {
 			const {
 				nParticipants,
@@ -119,6 +134,11 @@ describe('getVoucher', () => {
 
 			await Promise.all(voucherRequests);
 
+			const vouchersReceived = [...vouchersObtained.values()].reduce(
+				(acc, n) => acc + n,
+				0,
+			);
+
 			if (nVouchers < nParticipants) {
 				for (const [, nObtained] of vouchersObtained) {
 					expect(nObtained).toBeLessThanOrEqual(1);
@@ -128,5 +148,9 @@ describe('getVoucher', () => {
 					expect(nObtained).toBe(1);
 				}
 			}
-		});
+
+			expect(vouchersReceived).toBe(Math.min(nParticipants, nVouchers));
+		},
+		10000,
+	);
 });

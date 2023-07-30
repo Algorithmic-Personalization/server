@@ -13,23 +13,36 @@ export const createVoucherService = ({log, dataSource}: VoucherServiceDependenci
 	async getAndMarkOneAsUsed(participantId: number): Promise<Voucher | undefined> {
 		log('info', 'attempting to get voucher for participant', {participantId});
 
-		const repo = dataSource.getRepository(Voucher);
+		const qr = dataSource.createQueryRunner();
 
-		const voucher = await repo.findOne({
-			where: {
-				participantId: IsNull(),
-			},
-		});
+		try {
+			await qr.startTransaction();
+			const repo = qr.manager.getRepository(Voucher);
 
-		if (voucher) {
-			voucher.participantId = participantId;
-			voucher.deliveredAt = new Date();
-			const saved = await repo.save(voucher);
+			const voucher = await repo
+				.createQueryBuilder('voucher')
+				.useTransaction(true)
+				.setLock('pessimistic_write')
+				.where({participantId: IsNull()})
+				.getOne();
 
-			return saved;
+			if (voucher) {
+				voucher.participantId = participantId;
+				voucher.deliveredAt = new Date();
+				const saved = await repo.save(voucher);
+
+				await qr.commitTransaction();
+				return saved;
+			}
+
+			return undefined;
+		} catch (e) {
+			log('error', 'error getting voucher', e);
+			await qr.rollbackTransaction();
+			return undefined;
+		} finally {
+			await qr.release();
 		}
-
-		return undefined;
 	},
 
 	async countAvailable(): Promise<number> {
