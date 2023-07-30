@@ -404,3 +404,21 @@ Since there can in theory be multiple transitions for the same participant to th
 the SQL query to construct this table is not straightforward and this call will be a bit costly, so avoid polling it too often. Once a day or even more often is fine, just don't call this 10 times per second.
 
 When multiple transitions to the same phase are found, the timestamp of the latest transition is kept.
+
+### Add voucher codes
+
+You can add gift codes to the database using the following endpoint:
+
+
+```bash
+curl -X POST https://ytdpnl.fmdj.fr/api/voucher \
+-H 'Content-Type: application/json' \
+-H 'Authorization: aValidAdminToken' \
+-d '["this is a code","and another one"]'
+```
+
+The codes must be passed in as a JSON array of strings in the request body.
+
+Codes are included in the extension activation notifications.
+
+A code can only be attributed to a participant once, this is enforced by the database.
