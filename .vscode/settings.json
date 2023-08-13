@@ -33,5 +33,6 @@
         "ytdpnl"
     ],
 		"spaces-inside-braces.enable": false,
-		"spaces-inside-braces.enableForBraces": false,
+        "spaces-inside-braces.enableForBraces": false,
+        "C_Cpp.errorSquiggles": "disabled",
 }

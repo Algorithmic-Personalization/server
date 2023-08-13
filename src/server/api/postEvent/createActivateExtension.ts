@@ -3,13 +3,13 @@ import {type LogFunction} from '../../lib/logger';
 import Participant from '../../models/participant';
 import Event from '../../../common/models/event';
 import {EventType} from '../../../common/models/event';
-import {type ParticipantActivityNotifier} from '../../lib/externalNotifier';
+import {type ParticipantActivityHandler} from '../../lib/externalNotifier';
 
 export const createActivateExtension = ({
 	dataSource, activityNotifier, log,
 }: {
 	dataSource: DataSource;
-	activityNotifier: ParticipantActivityNotifier;
+	activityNotifier: ParticipantActivityHandler;
 	log: LogFunction;
 }) => async (event: Event, participant: Participant): Promise<boolean> => {
 	const qr = dataSource.createQueryRunner();
@@ -58,7 +58,7 @@ export const createActivateExtension = ({
 			savedEvent,
 		);
 
-		const ok = await activityNotifier.notifyActive(activationEvent.createdAt);
+		const ok = await activityNotifier.onActive(activationEvent.createdAt);
 		return ok;
 	} catch (err) {
 		log('error', 'while handling extension activity status determination or saving:', err);

@@ -2,7 +2,7 @@ import {type DataSource} from 'typeorm';
 
 import type Participant from '../models/participant';
 import {has} from '../../common/util';
-import {type ParticipantActivityNotifier} from './externalNotifier';
+import {type ParticipantActivityHandler} from './externalNotifier';
 import type TransitionEvent from '../models/transitionEvent';
 
 export type ParticipantRecord = {
@@ -23,7 +23,7 @@ export const createSaveParticipantTransition = ({
 	notifier,
 }: {
 	dataSource: DataSource;
-	notifier: ParticipantActivityNotifier;
+	notifier: ParticipantActivityHandler;
 }) => async (
 	participant: Participant,
 	transition: TransitionEvent,
@@ -36,7 +36,7 @@ export const createSaveParticipantTransition = ({
 			manager.save(transition),
 		]);
 
-		await notifier.notifyPhaseChange(
+		await notifier.onPhaseChange(
 			transition.createdAt,
 			transition.fromPhase,
 			transition.toPhase,

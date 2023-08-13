@@ -30,7 +30,7 @@ describe('installExtension', () => {
 
 		await handleInstallEvent(participant, event);
 
-		expect(notifier.notifyInstalled).toHaveBeenCalledTimes(1);
+		expect(notifier.onInstalled).toHaveBeenCalledTimes(1);
 	});
 
 	it('should not notify the remote server of the installation if already installed', async () => {
@@ -57,6 +57,6 @@ describe('installExtension', () => {
 
 		await Promise.allSettled(installAttempts);
 
-		expect(notifier.notifyInstalled).toHaveBeenCalledTimes(1);
+		expect(notifier.onInstalled).toHaveBeenCalledTimes(1);
 	}, 30000);
 });

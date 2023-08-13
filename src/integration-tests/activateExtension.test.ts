@@ -30,7 +30,7 @@ describe('activateExtension', () => {
 
 		await activateExtension(event, participant);
 
-		expect(activityNotifier.notifyActive).toHaveBeenCalledTimes(1);
+		expect(activityNotifier.onActive).toHaveBeenCalledTimes(1);
 	});
 
 	it('should activate the extension only once for a participant', async () => {
@@ -56,6 +56,6 @@ describe('activateExtension', () => {
 
 		await Promise.allSettled(activationRequests);
 
-		expect(activityNotifier.notifyActive).toHaveBeenCalledTimes(1);
+		expect(activityNotifier.onActive).toHaveBeenCalledTimes(1);
 	}, 30000);
 });

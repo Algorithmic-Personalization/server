@@ -4,7 +4,7 @@ import Participant from '../../models/participant';
 import Event from '../../../common/models/event';
 
 import {type LogFunction} from '../../lib/logger';
-import {type ParticipantActivityNotifier} from '../../lib/externalNotifier';
+import {type ParticipantActivityHandler} from '../../lib/externalNotifier';
 
 export const createHandleExtensionInstalledEvent = ({
 	dataSource,
@@ -12,7 +12,7 @@ export const createHandleExtensionInstalledEvent = ({
 	log,
 }: {
 	dataSource: DataSource;
-	notifier: ParticipantActivityNotifier;
+	notifier: ParticipantActivityHandler;
 	log: LogFunction;
 }) => async (p: Participant, event: Event) => {
 	log('handling extension installed event...');
@@ -50,7 +50,7 @@ export const createHandleExtensionInstalledEvent = ({
 			log('event saved', e);
 			await queryRunner.commitTransaction();
 			log('participant updated, transaction committed');
-			await notifier.notifyInstalled(event.createdAt);
+			await notifier.onInstalled(event.createdAt);
 		}
 	} catch (err) {
 		log('error', 'handling EXTENSION_INSTALLED event', err);

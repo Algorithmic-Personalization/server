@@ -1,10 +1,10 @@
-import {type ParticipantActivityNotifier} from '../lib/externalNotifier';
+import {type ParticipantActivityHandler} from '../lib/externalNotifier';
 
-export const createMockParticipantActivityNotifier = (): ParticipantActivityNotifier => {
-	const notifier: ParticipantActivityNotifier = {
-		notifyActive: jest.fn(),
-		notifyInstalled: jest.fn(),
-		notifyPhaseChange: jest.fn(),
+export const createMockParticipantActivityNotifier = (): ParticipantActivityHandler => {
+	const notifier: ParticipantActivityHandler = {
+		onActive: jest.fn(),
+		onInstalled: jest.fn(),
+		onPhaseChange: jest.fn(),
 	};
 
 	return notifier;
