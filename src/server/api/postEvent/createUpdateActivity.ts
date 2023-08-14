@@ -177,6 +177,7 @@ export const createUpdateActivity = ({dataSource, activityRepo, eventRepo, notif
 			activityNotifier: notifier.makeParticipantNotifier({
 				participantCode: participant.code,
 				participantId: participant.id,
+				isPaid: participant.isPaid,
 			}),
 			log,
 		});

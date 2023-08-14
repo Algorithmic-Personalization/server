@@ -77,6 +77,7 @@ export type ExternalNotifierConfig = {
 export type ParticipantData = {
 	participantId: number;
 	participantCode: string;
+	isPaid: boolean;
 };
 
 const makeOauthNotifier = (_log: LogFunction) => (config: ExternalNotifierConfig) => {
@@ -182,8 +183,12 @@ export const makeDefaultExternalNotifier = (config: ExternalNotifierConfig) =>
 					const {email: to} = config;
 					const subject = `"${EventType.PHASE_TRANSITION}}" Update for User "${data.participantCode}"`;
 
-					const voucher = await voucherService.getAndMarkOneAsUsed(data.participantId);
-					const voucherString = voucher?.voucherCode ?? '<no vouchers left>';
+					const getCode = async () => {
+						const voucher = await voucherService.getAndMarkOneAsUsed(data.participantId);
+						return voucher?.voucherCode ?? '<no vouchers left>';
+					};
+
+					const voucherString = data.isPaid ? await getCode() : '<participant not paid>';
 
 					const text = `Participant "${
 						data.participantCode

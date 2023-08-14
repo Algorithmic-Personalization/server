@@ -57,6 +57,7 @@ const updateParticipantPhase = (
 				notifier: notifier.makeParticipantNotifier({
 					participantCode: participant.code,
 					participantId: participant.id,
+					isPaid: participant.isPaid,
 				}),
 			});
 

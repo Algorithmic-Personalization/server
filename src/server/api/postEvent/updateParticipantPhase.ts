@@ -93,6 +93,7 @@ export const createUpdatePhase = ({
 			notifier: notifier.makeParticipantNotifier({
 				participantCode: participant.code,
 				participantId: participant.id,
+				isPaid: participant.isPaid,
 			}),
 		});
 
