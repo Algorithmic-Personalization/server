@@ -60,9 +60,9 @@ export type ExternalNotifier = {
 };
 
 export type ParticipantActivityHandler = {
-	onActive: (d: Date) => void;
-	onInstalled(d: Date): void;
-	onPhaseChange(d: Date, from: number, to: number): void;
+	onActive: (d: Date) => Promise<any>;
+	onInstalled(d: Date): Promise<any>;
+	onPhaseChange(d: Date, from: number, to: number): Promise<any>;
 };
 
 export type ExternalNotifierConfig = {
@@ -79,7 +79,7 @@ export type ParticipantData = {
 	participantCode: string;
 };
 
-const makeOauthNotifier = (log: LogFunction) => (config: ExternalNotifierConfig) => {
+const makeOauthNotifier = (_log: LogFunction) => (config: ExternalNotifierConfig) => {
 	const preAuth = `${config['client-id']}:${config['client-secret']}`;
 	const auth = Buffer.from(preAuth).toString('base64');
 

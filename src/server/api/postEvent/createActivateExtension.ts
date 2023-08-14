@@ -58,8 +58,8 @@ export const createActivateExtension = ({
 			savedEvent,
 		);
 
-		const ok = await activityNotifier.onActive(activationEvent.createdAt);
-		return ok;
+		await activityNotifier.onActive(activationEvent.createdAt);
+		return true;
 	} catch (err) {
 		log('error', 'while handling extension activity status determination or saving:', err);
 		await qr.rollbackTransaction();
