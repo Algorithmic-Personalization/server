@@ -70,7 +70,7 @@ export const updateParticipantDefinition: RouteDefinition<Participant> = {
 		const log = createLogger(req.requestId);
 		log('Received update participant request');
 
-		const {id: _unused, phase, arm} = req.body as Record<string, string | number>;
+		const {id: _unused, phase, arm, isPaid} = req.body as Record<string, string | number>;
 		const {code} = req.params;
 
 		if (!code || typeof code !== 'string') {
@@ -90,6 +90,8 @@ export const updateParticipantDefinition: RouteDefinition<Participant> = {
 		if (isValidExperimentArm(arm)) {
 			participantEntity.arm = arm;
 		}
+
+		participantEntity.isPaid = isPaid === 1;
 
 		if (phase && !isValidPhase(phase)) {
 			throw new Error('Invalid phase, must be one of: 0, 1, 2');

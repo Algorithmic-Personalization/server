@@ -9,9 +9,10 @@ export type ParticipantRecord = {
 	email: string;
 	code: string;
 	arm: 'control' | 'treatment';
+	isPaid: 1 | undefined;
 };
 
-export const isParticipantRecord = (record: Record<string, string>): record is ParticipantRecord =>
+export const isParticipantRecord = (record: Record<string, string | number | undefined>): record is ParticipantRecord =>
 	has('code')(record)
 	&& has('arm')(record)
 	&& typeof record.code === 'string'

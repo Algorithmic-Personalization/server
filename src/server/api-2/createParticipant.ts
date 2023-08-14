@@ -7,9 +7,10 @@ import {ExperimentArm} from '../../common/models/event';
 export type ParticipantData = {
 	arm: 'control' | 'treatment' | 0 | 1 | '0' | '1';
 	code: string;
+	isPaid: 1 | undefined;
 };
 
-export const isParticipantData = (record: Record<string, string | number>): record is ParticipantData =>
+export const isParticipantData = (record: Record<string, string | number | undefined>): record is ParticipantData =>
 	has('code')(record)
 	&& typeof record.code === 'string'
 	&& record.code.length > 0;
@@ -21,7 +22,7 @@ export const createParticipantDefinition: RouteDefinition<Participant> = {
 		const log = createLogger(req.requestId);
 		log('Received create participant request');
 
-		const {id: _unused, ...participantData} = req.body as Record<string, string>;
+		const {id: _unused, ...participantData} = req.body as Record<string, string | number>;
 
 		log('info', 'new participant data', participantData);
 
@@ -48,6 +49,8 @@ export const createParticipantDefinition: RouteDefinition<Participant> = {
 
 		participantEntity.arm = participantData.arm as ExperimentArm;
 		participantEntity.code = participantData.code;
+
+		participantEntity.isPaid = participantData.isPaid === 1;
 
 		return participantRepo.save(participantEntity);
 	},
