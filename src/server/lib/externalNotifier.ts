@@ -151,6 +151,18 @@ const makeOauthNotifier = (_log: LogFunction) => (config: ExternalNotifierConfig
 		return res.json();
 	};
 
+	const notifyInstalled = async (d: Date, participantCode: string) => {
+		const data = {
+			surveyId: config['survey-id'],
+			resetRecordedDate: true,
+			embeddedData: {
+				installedExtensionAt: d.getTime(),
+			},
+		};
+
+		return put(participantCode, data);
+	};
+
 	const notifyActive = async (d: Date, participantCode: string) => {
 		const data = {
 			surveyId: config['survey-id'],
@@ -163,7 +175,21 @@ const makeOauthNotifier = (_log: LogFunction) => (config: ExternalNotifierConfig
 		return put(participantCode, data);
 	};
 
-	return {notifyActive};
+	const notifyPhaseChanged = async (date: Date, participantCode: string, from: number, to: number) => {
+		const data = {
+			surveyId: config['survey-id'],
+			resetRecordedDate: true,
+			embeddedData: {
+				fromPhase: from,
+				toPhase: to,
+				phaseChangedAt: date.getTime(),
+			},
+		};
+
+		return put(participantCode, data);
+	};
+
+	return {notifyActive, notifyPhaseChanged, notifyInstalled};
 };
 
 export const makeDefaultExternalNotifier = (config: ExternalNotifierConfig) =>
@@ -206,13 +232,19 @@ export const makeDefaultExternalNotifier = (config: ExternalNotifierConfig) =>
 					const {participantCode} = data;
 					const subject = `"${EventType.EXTENSION_INSTALLED}" Update for User "${participantCode}"`;
 					const text = `Participant "${participantCode}" "${EventType.EXTENSION_INSTALLED}" as of "${d.getTime()}"`;
-					return mailer({to, subject, text});
+					await Promise.all([
+						mailer({to, subject, text}),
+						oauth.notifyInstalled(d, participantCode),
+					]);
 				},
 				async onPhaseChange(d: Date, from_phase: number, to_phase: number) {
 					const {email: to} = config;
 					const subject = `"${EventType.PHASE_TRANSITION}}" Update for User "${data.participantCode}"`;
 					const text = `Participant "${data.participantCode}" transitioned from phase "${from_phase}" to phase "${to_phase}" on "${d.getTime()}"`;
-					return mailer({to, subject, text});
+					await Promise.all([
+						mailer({to, subject, text}),
+						oauth.notifyPhaseChanged(d, data.participantCode, from_phase, to_phase),
+					]);
 				},
 			}),
 		};
