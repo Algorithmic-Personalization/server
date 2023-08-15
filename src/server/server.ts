@@ -111,6 +111,7 @@ import {loadDatabaseConfig} from './lib/config-loader/loadDbConfig';
 
 import createDefaultNotifier, {type ExternalNotifierDependencies as NotifierDependencies} from './lib/externalNotifier';
 import {createMailService, type MailServiceDependencies, type MailService} from './lib/email';
+import Participant from './models/participant';
 
 export type Env = 'production' | 'development';
 
@@ -439,6 +440,12 @@ const main = async () => {
 	app.post(postCreateSession, participantMw, createCreateSessionRoute(routeContext));
 	app.get(getParticipantConfig, participantMw, createGetParticipantConfigRoute(routeContext));
 	app.post(postEvent, participantMw, createPostEventRoute(routeContext));
+
+	app.get('/api/ping', async (_req, res) => {
+		const participantsRepo = ds.getRepository(Participant);
+		const participantCount = await participantsRepo.count();
+		res.status(200).json({n: participantCount});
+	});
 
 	app.use((req, res, next) => {
 		if (req.method === 'GET' && req.headers.accept?.startsWith('text/html')) {
