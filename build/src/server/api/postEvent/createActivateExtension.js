@@ -47,8 +47,8 @@ const createActivateExtension = ({ dataSource, activityNotifier, log, }) => (eve
         ]);
         yield qr.commitTransaction();
         log('success', `Participant ${participant.id} activated extension, the following event was saved:`, savedEvent);
-        const ok = yield activityNotifier.notifyActive(activationEvent.createdAt);
-        return ok;
+        yield activityNotifier.onActive(activationEvent.createdAt);
+        return true;
     }
     catch (err) {
         log('error', 'while handling extension activity status determination or saving:', err);

@@ -59,6 +59,7 @@ exports.createParticipantDefinition = {
         }
         participantEntity.arm = participantData.arm;
         participantEntity.code = participantData.code;
+        participantEntity.isPaid = participantData.isPaid === 1;
         return participantRepo.save(participantEntity);
     }),
 };

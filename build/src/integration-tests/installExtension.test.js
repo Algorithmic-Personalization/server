@@ -34,7 +34,7 @@ describe('installExtension', () => {
         const session = yield db.createSession(participant);
         const event = yield db.createEvent(session);
         yield handleInstallEvent(participant, event);
-        expect(notifier.notifyInstalled).toHaveBeenCalledTimes(1);
+        expect(notifier.onInstalled).toHaveBeenCalledTimes(1);
     }));
     it('should not notify the remote server of the installation if already installed', () => __awaiter(void 0, void 0, void 0, function* () {
         const notifier = (0, createMockParticipantActivityNotifier_1.default)();
@@ -53,7 +53,7 @@ describe('installExtension', () => {
             installAttempts.push(installAttempt);
         }
         yield Promise.allSettled(installAttempts);
-        expect(notifier.notifyInstalled).toHaveBeenCalledTimes(1);
+        expect(notifier.onInstalled).toHaveBeenCalledTimes(1);
     }), 30000);
 });
 //# sourceMappingURL=installExtension.test.js.map

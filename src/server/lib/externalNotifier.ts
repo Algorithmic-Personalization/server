@@ -163,12 +163,13 @@ const makeOauthNotifier = (_log: LogFunction) => (config: ExternalNotifierConfig
 		return put(participantCode, data);
 	};
 
-	const notifyActive = async (d: Date, participantCode: string) => {
+	const notifyActive = async (d: Date, participantCode: string, voucherCode: string) => {
 		const data = {
 			surveyId: config['survey-id'],
 			resetRecordedDate: true,
 			embeddedData: {
 				activatedExtensionAt: d.getTime(),
+				voucherCode,
 			},
 		};
 
@@ -224,7 +225,7 @@ export const makeDefaultExternalNotifier = (config: ExternalNotifierConfig) =>
 
 					await Promise.all([
 						mailer({to, subject, text}),
-						oauth.notifyActive(d, data.participantCode),
+						oauth.notifyActive(d, data.participantCode, voucherString),
 					]);
 				},
 				async onInstalled(d: Date) {

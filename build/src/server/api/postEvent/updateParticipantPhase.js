@@ -104,6 +104,7 @@ const createUpdatePhase = ({ dataSource, notifier, log, }) => (participant, late
             notifier: notifier.makeParticipantNotifier({
                 participantCode: participant.code,
                 participantId: participant.id,
+                isPaid: participant.isPaid,
             }),
         });
         participant.phase = toPhase;

@@ -24,7 +24,7 @@ const createSaveParticipantTransition = ({ dataSource, notifier, }) => (particip
             manager.save(participant),
             manager.save(transition),
         ]);
-        yield notifier.notifyPhaseChange(transition.createdAt, transition.fromPhase, transition.toPhase);
+        yield notifier.onPhaseChange(transition.createdAt, transition.fromPhase, transition.toPhase);
         return updatedParticipant;
     }));
 });

@@ -34,7 +34,7 @@ describe('activateExtension', () => {
             log: jest.fn(),
         });
         yield activateExtension(event, participant);
-        expect(activityNotifier.notifyActive).toHaveBeenCalledTimes(1);
+        expect(activityNotifier.onActive).toHaveBeenCalledTimes(1);
     }));
     it('should activate the extension only once for a participant', () => __awaiter(void 0, void 0, void 0, function* () {
         const activityNotifier = (0, createMockParticipantActivityNotifier_1.createMockParticipantActivityNotifier)();
@@ -51,7 +51,7 @@ describe('activateExtension', () => {
             activationRequests.push(activationPromise);
         }
         yield Promise.allSettled(activationRequests);
-        expect(activityNotifier.notifyActive).toHaveBeenCalledTimes(1);
+        expect(activityNotifier.onActive).toHaveBeenCalledTimes(1);
     }), 30000);
 });
 //# sourceMappingURL=activateExtension.test.js.map

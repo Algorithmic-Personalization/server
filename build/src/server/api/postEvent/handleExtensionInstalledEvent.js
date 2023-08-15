@@ -48,7 +48,7 @@ const createHandleExtensionInstalledEvent = ({ dataSource, notifier, log, }) => 
             log('event saved', e);
             yield queryRunner.commitTransaction();
             log('participant updated, transaction committed');
-            yield notifier.notifyInstalled(event.createdAt);
+            yield notifier.onInstalled(event.createdAt);
         }
     }
     catch (err) {

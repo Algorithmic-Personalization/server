@@ -26,6 +26,7 @@ let Participant = class Participant extends model_1.default {
         this.phase = 0;
         this.arm = event_1.ExperimentArm.TREATMENT;
         this.extensionInstalled = false;
+        this.isPaid = false;
     }
 };
 __decorate([
@@ -59,6 +60,11 @@ __decorate([
     (0, typeorm_1.Column)(),
     __metadata("design:type", Date)
 ], Participant.prototype, "extensionActivatedAt", void 0);
+__decorate([
+    (0, typeorm_1.Column)(),
+    (0, class_validator_1.IsBoolean)(),
+    __metadata("design:type", Boolean)
+], Participant.prototype, "isPaid", void 0);
 Participant = __decorate([
     (0, typeorm_1.Entity)()
 ], Participant);

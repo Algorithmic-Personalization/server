@@ -3,9 +3,9 @@ Object.defineProperty(exports, "__esModule", { value: true });
 exports.createMockParticipantActivityNotifier = void 0;
 const createMockParticipantActivityNotifier = () => {
     const notifier = {
-        notifyActive: jest.fn(),
-        notifyInstalled: jest.fn(),
-        notifyPhaseChange: jest.fn(),
+        onActive: jest.fn(),
+        onInstalled: jest.fn(),
+        onPhaseChange: jest.fn(),
     };
     return notifier;
 };

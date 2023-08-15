@@ -131,6 +131,7 @@ const createUpdateActivity = ({ dataSource, activityRepo, eventRepo, notifier, l
             activityNotifier: notifier.makeParticipantNotifier({
                 participantCode: participant.code,
                 participantId: participant.id,
+                isPaid: participant.isPaid,
             }),
             log,
         });

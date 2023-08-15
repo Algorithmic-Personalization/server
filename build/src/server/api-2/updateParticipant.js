@@ -71,6 +71,7 @@ const updateParticipantPhase = (dataSource, notifier, log) => (fromPhase, toPhas
         notifier: notifier.makeParticipantNotifier({
             participantCode: participant.code,
             participantId: participant.id,
+            isPaid: participant.isPaid,
         }),
     });
     return saveParticipantTransition(participant, transition);
@@ -81,7 +82,7 @@ exports.updateParticipantDefinition = {
     makeHandler: ({ createLogger, dataSource, notifier }) => (req) => __awaiter(void 0, void 0, void 0, function* () {
         const log = createLogger(req.requestId);
         log('Received update participant request');
-        const { id: _unused, phase, arm } = req.body;
+        const { id: _unused, phase, arm, isPaid } = req.body;
         const { code } = req.params;
         if (!code || typeof code !== 'string') {
             throw new Error('Invalid participant email');
@@ -95,6 +96,7 @@ exports.updateParticipantDefinition = {
         if ((0, event_1.isValidExperimentArm)(arm)) {
             participantEntity.arm = arm;
         }
+        participantEntity.isPaid = isPaid === 1;
         if (phase && !(0, participant_1.isValidPhase)(phase)) {
             throw new Error('Invalid phase, must be one of: 0, 1, 2');
         }

@@ -82,6 +82,7 @@ const loadConfigYamlRaw_1 = require("./lib/config-loader/loadConfigYamlRaw");
 const loadDbConfig_1 = require("./lib/config-loader/loadDbConfig");
 const externalNotifier_1 = __importDefault(require("./lib/externalNotifier"));
 const email_1 = require("./lib/email");
+const participant_1 = __importDefault(require("./models/participant"));
 const getEnv = () => {
     const env = process.env.NODE_ENV;
     if (env !== 'production' && env !== 'development') {
@@ -320,6 +321,11 @@ const main = () => __awaiter(void 0, void 0, void 0, function* () {
     app.post(clientRoutes_1.postCreateSession, participantMw, (0, createSession_1.default)(routeContext));
     app.get(clientRoutes_1.getParticipantConfig, participantMw, (0, participantConfig_1.default)(routeContext));
     app.post(clientRoutes_1.postEvent, participantMw, (0, postEvent_1.default)(routeContext));
+    app.get('/api/ping', (_req, res) => __awaiter(void 0, void 0, void 0, function* () {
+        const participantsRepo = ds.getRepository(participant_1.default);
+        const participantCount = yield participantsRepo.count();
+        res.status(200).json({ n: participantCount });
+    }));
     app.use((req, res, next) => {
         var _a;
         if (req.method === 'GET' && ((_a = req.headers.accept) === null || _a === void 0 ? void 0 : _a.startsWith('text/html'))) {

@@ -33,6 +33,7 @@ const createVoucherService = ({ log, dataSource }) => ({
                 if (voucher) {
                     voucher.participantId = participantId;
                     voucher.deliveredAt = new Date();
+                    voucher.updatedAt = voucher.deliveredAt;
                     const saved = yield repo.save(voucher);
                     yield qr.commitTransaction();
                     return saved;
