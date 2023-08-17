@@ -43,6 +43,7 @@ const createUpdateActivity = ({ dataSource, activityRepo, eventRepo, notifier, l
             where: {
                 sessionUuid: event.sessionUuid,
                 createdAt: (0, typeorm_1.LessThan)(event.createdAt),
+                type: event_1.EventType.PAGE_VIEW,
             },
             order: {
                 createdAt: 'DESC',

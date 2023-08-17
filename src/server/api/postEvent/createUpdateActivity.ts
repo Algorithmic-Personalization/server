@@ -53,6 +53,7 @@ export const createUpdateActivity = ({dataSource, activityRepo, eventRepo, notif
 				where: {
 					sessionUuid: event.sessionUuid,
 					createdAt: LessThan(event.createdAt),
+					type: EventType.PAGE_VIEW,
 				},
 				order: {
 					createdAt: 'DESC',
