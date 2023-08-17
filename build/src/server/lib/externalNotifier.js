@@ -51,7 +51,7 @@ const getExternalNotifierConfig = (generalConfigData) => {
     };
 };
 exports.getExternalNotifierConfig = getExternalNotifierConfig;
-const makeOauthNotifier = (_log) => (config) => {
+const makeOauthNotifier = (log) => (config) => {
     const preAuth = `${config['client-id']}:${config['client-secret']}`;
     const auth = Buffer.from(preAuth).toString('base64');
     let theToken;
@@ -76,13 +76,14 @@ const makeOauthNotifier = (_log) => (config) => {
             if (!accessToken || typeof accessToken !== 'string') {
                 throw new Error('invalid response from token endpoint (missing access_token)');
             }
+            log('success', '<oauth>', 'got token', `${accessToken.substring(accessToken.length / 3)}...`, 'expires in', expiresIn);
             return { accessToken, expiresIn };
         }));
     });
     const refreshToken = () => __awaiter(void 0, void 0, void 0, function* () {
         const data = yield getToken();
         theToken = data.accessToken;
-        setTimeout(refreshToken, Math.max(data.expiresIn - (60 * 5), 0));
+        setTimeout(refreshToken, Math.max(data.expiresIn - (60 * 5), 0) * 1000);
     });
     const ensureToken = () => __awaiter(void 0, void 0, void 0, function* () {
         if (!theToken) {
@@ -114,7 +115,14 @@ const makeOauthNotifier = (_log) => (config) => {
                 installedExtensionAt: d.getTime(),
             },
         };
-        return put(participantCode, data);
+        log('info', '<oauth>', 'notifyInstalled', data);
+        try {
+            const res = yield put(participantCode, data);
+            log('success', '<oauth>', 'notifyInstalled', res);
+        }
+        catch (e) {
+            log('error', '<oauth>', 'notifyInstalled', e);
+        }
     });
     const notifyActive = (d, participantCode, voucherCode) => __awaiter(void 0, void 0, void 0, function* () {
         const data = {
@@ -125,7 +133,14 @@ const makeOauthNotifier = (_log) => (config) => {
                 voucherCode,
             },
         };
-        return put(participantCode, data);
+        log('info', '<oauth>', 'notifyActive', data);
+        try {
+            const res = yield put(participantCode, data);
+            log('success', '<oauth>', 'notifyActive', res);
+        }
+        catch (e) {
+            log('error', '<oauth>', 'notifyActive', e);
+        }
     });
     const notifyPhaseChanged = (date, participantCode, from, to) => __awaiter(void 0, void 0, void 0, function* () {
         const data = {
@@ -137,7 +152,14 @@ const makeOauthNotifier = (_log) => (config) => {
                 phaseChangedAt: date.getTime(),
             },
         };
-        return put(participantCode, data);
+        log('info', '<oauth>', 'notifyPhaseChanged', data);
+        try {
+            const res = yield put(participantCode, data);
+            log('success', '<oauth>', 'notifyPhaseChanged', res);
+        }
+        catch (e) {
+            log('error', '<oauth>', 'notifyPhaseChanged', e);
+        }
     });
     return { notifyActive, notifyPhaseChanged, notifyInstalled };
 };

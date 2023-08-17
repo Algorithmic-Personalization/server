@@ -80,7 +80,7 @@ export type ParticipantData = {
 	isPaid: boolean;
 };
 
-const makeOauthNotifier = (_log: LogFunction) => (config: ExternalNotifierConfig) => {
+const makeOauthNotifier = (log: LogFunction) => (config: ExternalNotifierConfig) => {
 	const preAuth = `${config['client-id']}:${config['client-secret']}`;
 	const auth = Buffer.from(preAuth).toString('base64');
 
@@ -111,6 +111,8 @@ const makeOauthNotifier = (_log: LogFunction) => (config: ExternalNotifierConfig
 			throw new Error('invalid response from token endpoint (missing access_token)');
 		}
 
+		log('success', '<oauth>', 'got token', `${accessToken.substring(accessToken.length / 3)}...`, 'expires in', expiresIn);
+
 		return {accessToken, expiresIn};
 	});
 
@@ -120,7 +122,7 @@ const makeOauthNotifier = (_log: LogFunction) => (config: ExternalNotifierConfig
 		setTimeout(refreshToken, Math.max(
 			data.expiresIn - (60 * 5),
 			0,
-		));
+		) * 1000);
 	};
 
 	const ensureToken = async () => {
@@ -160,7 +162,13 @@ const makeOauthNotifier = (_log: LogFunction) => (config: ExternalNotifierConfig
 			},
 		};
 
-		return put(participantCode, data);
+		log('info', '<oauth>', 'notifyInstalled', data);
+		try {
+			const res = await put(participantCode, data) as unknown;
+			log('success', '<oauth>', 'notifyInstalled', res);
+		} catch (e) {
+			log('error', '<oauth>', 'notifyInstalled', e);
+		}
 	};
 
 	const notifyActive = async (d: Date, participantCode: string, voucherCode: string) => {
@@ -173,7 +181,13 @@ const makeOauthNotifier = (_log: LogFunction) => (config: ExternalNotifierConfig
 			},
 		};
 
-		return put(participantCode, data);
+		log('info', '<oauth>', 'notifyActive', data);
+		try {
+			const res = await put(participantCode, data) as unknown;
+			log('success', '<oauth>', 'notifyActive', res);
+		} catch (e) {
+			log('error', '<oauth>', 'notifyActive', e);
+		}
 	};
 
 	const notifyPhaseChanged = async (date: Date, participantCode: string, from: number, to: number) => {
@@ -187,7 +201,13 @@ const makeOauthNotifier = (_log: LogFunction) => (config: ExternalNotifierConfig
 			},
 		};
 
-		return put(participantCode, data);
+		log('info', '<oauth>', 'notifyPhaseChanged', data);
+		try {
+			const res = await put(participantCode, data) as unknown;
+			log('success', '<oauth>', 'notifyPhaseChanged', res);
+		} catch (e) {
+			log('error', '<oauth>', 'notifyPhaseChanged', e);
+		}
 	};
 
 	return {notifyActive, notifyPhaseChanged, notifyInstalled};
