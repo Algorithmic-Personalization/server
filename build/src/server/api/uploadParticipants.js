@@ -55,7 +55,7 @@ const createUploadParticipantsRoute = ({ createLogger, dataSource }) => (req, re
             const participant = new participant_1.default();
             participant.code = record.code;
             participant.arm = record.arm === 'control' ? event_1.ExperimentArm.CONTROL : event_1.ExperimentArm.TREATMENT;
-            participant.isPaid = record.isPaid === 1;
+            participant.isPaid = record.isPaid === 1 || record.isPaid === '1';
             // eslint-disable-next-line no-await-in-loop
             const existingParticipant = yield participantRepo.findOneBy({ code: participant.code });
             if (existingParticipant) {
