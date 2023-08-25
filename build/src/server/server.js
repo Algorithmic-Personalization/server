@@ -14,7 +14,6 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.logsDirName = exports.getEnv = void 0;
 const promises_1 = require("fs/promises");
-const fs_1 = require("fs");
 const path_1 = require("path");
 const express_1 = __importDefault(require("express"));
 const body_parser_1 = __importDefault(require("body-parser"));
@@ -104,10 +103,8 @@ const slowQueries = io_1.default.meter({
 exports.logsDirName = 'logs';
 const main = () => __awaiter(void 0, void 0, void 0, function* () {
     const root = yield (0, util_1.findPackageJsonDir)(__dirname);
-    const logsPath = (0, path_1.join)(root, exports.logsDirName, 'server.log');
-    const logStream = (0, fs_1.createWriteStream)(logsPath, { flags: 'a' });
     const config = yield (0, loadConfigYamlRaw_1.loadConfigYamlRaw)();
-    const createLogger = (0, logger_1.makeCreateDefaultLogger)(logStream);
+    const createLogger = (0, logger_1.makeCreateDefaultLogger)((0, path_1.join)(root, exports.logsDirName, 'server.log'));
     const log = createLogger('<server>');
     const dockerComposeYaml = yield (0, promises_1.readFile)((0, path_1.join)(root, 'docker-compose.yaml'), 'utf-8');
     const dockerComposeConfig = (0, yaml_1.parse)(dockerComposeYaml);

@@ -1,6 +1,5 @@
 import {basename, join} from 'path';
 import {readFile} from 'fs/promises';
-import {createWriteStream} from 'fs';
 
 import {parse} from 'yaml';
 import {DataSource} from 'typeorm';
@@ -234,10 +233,8 @@ const main = async () => {
 	const root = await findPackageJsonDir(__dirname);
 
 	const createLog = makeCreateDefaultLogger(
-		createWriteStream(
-			join(root, `${basename(__filename)}.log`), {
-				flags: 'a',
-			}));
+		join(root, `${basename(__filename)}.log`),
+	);
 
 	const log = createLog('<main>');
 

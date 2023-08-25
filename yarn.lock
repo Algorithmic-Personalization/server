@@ -1867,6 +1867,15 @@ __metadata:
   languageName: node
   linkType: hard
 
+"@types/node-gzip@npm:^1.1.0":
+  version: 1.1.0
+  resolution: "@types/node-gzip@npm:1.1.0"
+  dependencies:
+    "@types/node": "*"
+  checksum: f5dea1b31a0b9a9ab28ed5ba8ba95e22cbc679bafc3db7d5baff83b00a334c5c074f318b1e0b37cd73d3f44241ea94a6d234c5bbcba09ed7ad8bfd059636543e
+  languageName: node
+  linkType: hard
+
 "@types/node@npm:*":
   version: 18.11.11
   resolution: "@types/node@npm:18.11.11"
@@ -7721,6 +7730,13 @@ __metadata:
   languageName: node
   linkType: hard
 
+"node-gzip@npm:^1.1.2":
+  version: 1.1.2
+  resolution: "node-gzip@npm:1.1.2"
+  checksum: 5cefff1ff68fa3279dec3c7e92b0ff93ab4763cfb585985d25d937cf781a42eb78975c7555abf49f2325b45a8cdf19b48bed50eeab23f3630018869572def46b
+  languageName: node
+  linkType: hard
+
 "node-int64@npm:^0.4.0":
   version: 0.4.0
   resolution: "node-int64@npm:0.4.0"
@@ -11244,6 +11260,7 @@ __metadata:
     "@types/multer": ^1.4.7
     "@types/node": ^18.15.10
     "@types/node-fetch": 2
+    "@types/node-gzip": ^1.1.0
     "@types/nodemailer": ^6.4.7
     "@types/pg": ^8.6.6
     "@types/react": ^18.0.30
@@ -11279,6 +11296,7 @@ __metadata:
     memory-cache: ^0.2.0
     multer: ^1.4.5-lts.1
     node-fetch: 2
+    node-gzip: ^1.1.2
     nodemailer: ^6.9.1
     nodemon: ^2.0.22
     object-sizeof: ^2.6.1

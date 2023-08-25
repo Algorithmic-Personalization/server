@@ -25,6 +25,7 @@
         "typeorm",
         "typname",
         "typnamespace",
+        "ungzip",
         "urlencode",
         "uuidv",
         "Watchtime",

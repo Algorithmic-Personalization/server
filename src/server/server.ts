@@ -1,5 +1,4 @@
 import {readFile} from 'fs/promises';
-import {createWriteStream} from 'fs';
 import {join} from 'path';
 
 import express from 'express';
@@ -143,11 +142,9 @@ export const logsDirName = 'logs';
 
 const main = async () => {
 	const root = await findPackageJsonDir(__dirname);
-	const logsPath = join(root, logsDirName, 'server.log');
-	const logStream = createWriteStream(logsPath, {flags: 'a'});
 	const config = await loadConfigYamlRaw();
 
-	const createLogger = makeCreateDefaultLogger(logStream);
+	const createLogger = makeCreateDefaultLogger(join(root, logsDirName, 'server.log'));
 	const log = createLogger('<server>');
 
 	const dockerComposeYaml = await readFile(join(root, 'docker-compose.yaml'), 'utf-8');

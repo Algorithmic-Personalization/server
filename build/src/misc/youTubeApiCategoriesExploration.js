@@ -27,7 +27,6 @@ Object.defineProperty(exports, "__esModule", { value: true });
 exports.RateLimiter = exports.keypress = void 0;
 const path_1 = require("path");
 const promises_1 = require("fs/promises");
-const fs_1 = require("fs");
 const yaml_1 = require("yaml");
 const typeorm_1 = require("typeorm");
 const typeorm_naming_strategies_1 = require("typeorm-naming-strategies");
@@ -193,9 +192,7 @@ const compareSomeCategoriesWithUs = (log, api) => __awaiter(void 0, void 0, void
 const main = () => __awaiter(void 0, void 0, void 0, function* () {
     const cmd = process.argv[2];
     const root = yield (0, util_1.findPackageJsonDir)(__dirname);
-    const createLog = (0, logger_1.makeCreateDefaultLogger)((0, fs_1.createWriteStream)((0, path_1.join)(root, `${(0, path_1.basename)(__filename)}.log`), {
-        flags: 'a',
-    }));
+    const createLog = (0, logger_1.makeCreateDefaultLogger)((0, path_1.join)(root, `${(0, path_1.basename)(__filename)}.log`));
     const log = createLog('<main>');
     if (!commands.has(cmd)) {
         log('Please provide a command, one of:');
