@@ -94,6 +94,10 @@ export const LoginC: React.FC<{
 				{(!isModal) && <Box sx={{mt: 2}}>
 					<Link to='/register'>Register instead</Link>
 				</Box>}
+
+				<Box sx={{mt: 2}}>
+					<Link to='/forgot'>I forgot my password</Link>
+				</Box>
 			</form>
 		</Box>
 	);

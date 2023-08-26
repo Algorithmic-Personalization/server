@@ -49,6 +49,10 @@ import {
 } from '../server/api-2/monitoring';
 
 import {
+	sendAdminPasswordResetLink,
+} from './../server/api-2/sendAdminPasswordResetLink';
+
+import {
 	type Maybe,
 	isMaybe,
 	getMessage,
@@ -85,6 +89,7 @@ export type AdminApi = {
 	getTransitionSetting: (from: number, to: number) => Promise<Maybe<TransitionSetting>>;
 	updateParticipantPhase: (participantCode: string, phase: number) => Promise<Maybe<Participant>>;
 	getMonitoringReport: (q: MonitoringQuery) => Promise<Maybe<MonitoringReport>>;
+	sendAdminPasswordResetLink: (email: string) => Promise<Maybe<void>>;
 };
 
 const loadItem = <T>(key: string): T | undefined => {
@@ -281,6 +286,11 @@ export const createAdminApi = (serverUrl: string, showLoginModal?: () => void): 
 				toDate: q.toDate.getTime(),
 			};
 			return get<MonitoringReport>(path, query, headers());
+		},
+
+		async sendAdminPasswordResetLink(email: string) {
+			const {path} = sendAdminPasswordResetLink;
+			return post<void>(path, {email}, headers());
 		},
 	};
 };
