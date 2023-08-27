@@ -77,9 +77,13 @@ export const createUpdatePhase = ({
 		log('triggering transition from phase', fromPhase, 'to phase', toPhase);
 
 		const triggerEvent = new Event();
+
+		const {localUuid} = triggerEvent;
+
 		Object.assign(triggerEvent, latestEvent, {
 			id: 0,
 			type: EventType.PHASE_TRANSITION,
+			localUuid,
 		});
 
 		transitionEvent.participantId = participant.id;

@@ -90,9 +90,11 @@ const createUpdatePhase = ({ dataSource, notifier, log, }) => (participant, late
     if (transitionEvent) {
         log('triggering transition from phase', fromPhase, 'to phase', toPhase);
         const triggerEvent = new event_1.default();
+        const { localUuid } = triggerEvent;
         Object.assign(triggerEvent, latestEvent, {
             id: 0,
             type: event_1.EventType.PHASE_TRANSITION,
+            localUuid,
         });
         transitionEvent.participantId = participant.id;
         transitionEvent.fromPhase = fromPhase;
