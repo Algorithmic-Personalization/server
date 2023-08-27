@@ -74,7 +74,7 @@ const updateParticipantPhase = (dataSource, notifier, log) => (fromPhase, toPhas
             isPaid: participant.isPaid,
         }),
     });
-    return saveParticipantTransition(participant, transition);
+    return saveParticipantTransition(participant, transition, undefined);
 });
 exports.updateParticipantDefinition = {
     verb: 'put',

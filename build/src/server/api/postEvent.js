@@ -208,7 +208,7 @@ const createPostEventRoute = ({ createLogger, dataSource, youTubeConfig, notifie
     }
     catch (e) {
         if (isLocalUuidAlreadyExistsError(e)) {
-            res.status(500).json({ kind: 'Failure', message: 'Event already exists', code: 'EVENT_ALREADY_EXISTS_OK' });
+            res.status(200).json({ kind: 'Failure', message: 'Event already exists', code: 'EVENT_ALREADY_EXISTS_OK' });
             return;
         }
         log('event save failed', e);

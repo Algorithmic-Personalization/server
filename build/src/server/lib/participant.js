@@ -17,9 +17,13 @@ const isParticipantRecord = (record) => (0, util_1.has)('code')(record)
     && record.code.length > 0
     && (record.arm === 'control' || record.arm === 'treatment');
 exports.isParticipantRecord = isParticipantRecord;
-const createSaveParticipantTransition = ({ dataSource, notifier, }) => (participant, transition) => __awaiter(void 0, void 0, void 0, function* () {
+const createSaveParticipantTransition = ({ dataSource, notifier, }) => (participant, transition, triggerEvent) => __awaiter(void 0, void 0, void 0, function* () {
     return dataSource.transaction((manager) => __awaiter(void 0, void 0, void 0, function* () {
         participant.phase = transition.toPhase;
+        if (triggerEvent) {
+            const e = yield manager.save(triggerEvent);
+            transition.eventId = e.id;
+        }
         const [updatedParticipant] = yield Promise.all([
             manager.save(participant),
             manager.save(transition),
