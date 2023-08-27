@@ -61,7 +61,7 @@ const updateParticipantPhase = (
 				}),
 			});
 
-			return saveParticipantTransition(participant, transition);
+			return saveParticipantTransition(participant, transition, undefined);
 		};
 
 export const updateParticipantDefinition: RouteDefinition<Participant> = {

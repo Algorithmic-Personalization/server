@@ -99,7 +99,7 @@ export const createUpdatePhase = ({
 
 		participant.phase = toPhase;
 
-		await saveParticipantTransition(participant, transitionEvent);
+		await saveParticipantTransition(participant, transitionEvent, triggerEvent);
 	}
 };
 

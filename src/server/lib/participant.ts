@@ -4,6 +4,7 @@ import type Participant from '../models/participant';
 import {has} from '../../common/util';
 import {type ParticipantActivityHandler} from './externalNotifier';
 import type TransitionEvent from '../models/transitionEvent';
+import type Event from '../../common/models/event';
 
 export type ParticipantRecord = {
 	email: string;
@@ -28,9 +29,15 @@ export const createSaveParticipantTransition = ({
 }) => async (
 	participant: Participant,
 	transition: TransitionEvent,
+	triggerEvent: Event | undefined,
 ): Promise<Participant> =>
 	dataSource.transaction(async manager => {
 		participant.phase = transition.toPhase;
+
+		if (triggerEvent) {
+			const e = await manager.save(triggerEvent);
+			transition.eventId = e.id;
+		}
 
 		const [updatedParticipant] = await Promise.all([
 			manager.save(participant),
