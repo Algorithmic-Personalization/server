@@ -237,7 +237,7 @@ const ListC: React.FC = () => {
 							setPageInput('1');
 						}}
 						sx={{display: 'block'}}
-						label='Search participant by email'
+						label='Search participant by code'
 						InputProps={{
 							endAdornment: (
 								<InputAdornment position='end'>
