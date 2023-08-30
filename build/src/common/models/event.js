@@ -18,6 +18,11 @@ const typeorm_1 = require("typeorm");
 const class_validator_1 = require("class-validator");
 const model_1 = __importDefault(require("../lib/model"));
 const util_1 = require("../util");
+const localZeroHour = (day) => {
+    const d = new Date(day);
+    d.setHours(0, 0, 0, 0);
+    return d;
+};
 var EventType;
 (function (EventType) {
     EventType["PAGE_VIEW"] = "PAGE_VIEW";
@@ -48,6 +53,7 @@ let Event = class Event extends model_1.default {
         this.url = '';
         this.localUuid = (0, util_1.uuidv4)();
         this.phase = 0;
+        this.localZeroHour = localZeroHour(this.createdAt);
     }
 };
 __decorate([
@@ -103,6 +109,12 @@ __decorate([
     (0, typeorm_1.Column)(),
     __metadata("design:type", Boolean)
 ], Event.prototype, "tabActive", void 0);
+__decorate([
+    (0, typeorm_1.Column)(),
+    (0, class_validator_1.IsDate)(),
+    (0, class_validator_1.IsOptional)(),
+    __metadata("design:type", Date)
+], Event.prototype, "localZeroHour", void 0);
 Event = __decorate([
     (0, typeorm_1.Entity)()
 ], Event);

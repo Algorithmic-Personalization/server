@@ -197,7 +197,7 @@ const ListC = () => {
                 react_1.default.createElement(material_1.TextField, { value: codeLike, onChange: e => {
                         setCodeLike(e.target.value);
                         setPageInput('1');
-                    }, sx: { display: 'block' }, label: 'Search participant by email', InputProps: {
+                    }, sx: { display: 'block' }, label: 'Search participant by code', InputProps: {
                         endAdornment: (react_1.default.createElement(material_1.InputAdornment, { position: 'end' },
                             react_1.default.createElement(Search_1.default, null))),
                     } }),
