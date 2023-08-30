@@ -133,6 +133,7 @@ export const createPostEventRoute: RouteCreator = ({
 	Object.assign(event, req.body);
 	event.createdAt = new Date(event.createdAt);
 	event.updatedAt = new Date(event.updatedAt);
+	event.localZeroHour = event.localZeroHour ? new Date(event.localZeroHour) : undefined;
 
 	const participantRepo = dataSource.getRepository(Participant);
 	const activityRepo = dataSource.getRepository(DailyActivityTime);
@@ -200,7 +201,7 @@ export const createPostEventRoute: RouteCreator = ({
 	const errors = await validateExcept('id', 'tabActive')(event);
 
 	if (errors.length > 0) {
-		log('event validation failed', errors);
+		log('error', 'event validation failed', {errors, event});
 		res.status(400).json({kind: 'Failure', message: `Event validation failed: ${errors.join(', ')}.`});
 		return;
 	}
