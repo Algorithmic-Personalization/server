@@ -3,4 +3,5 @@
 echo "Starting test-db container..."
 docker-compose up -d test-db
 echo "Running the tests..."
-yarn jest --runInBand
+x=$(yarn jest --runInBand)
+exit "$x"
