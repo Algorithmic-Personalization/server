@@ -42,7 +42,12 @@ const resetDb = (shortTimeout = false) => __awaiter(void 0, void 0, void 0, func
         useDockerAddress: false,
     });
     const { database: _ignored } = dbConfig, dbConfigWithoutDatabase = __rest(dbConfig, ["database"]);
-    yield pgtools_1.default.dropdb(dbConfigWithoutDatabase, 'ytdpnl');
+    try {
+        yield pgtools_1.default.dropdb(dbConfigWithoutDatabase, 'ytdpnl');
+    }
+    catch (e) {
+        console.log('dropdb before tests failed, not necessarily an issue, it may not exist', e);
+    }
     yield pgtools_1.default.createdb(dbConfigWithoutDatabase, 'ytdpnl');
     const client = new pg_1.Client(dbConfig);
     yield client.connect();
