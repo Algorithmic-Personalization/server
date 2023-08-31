@@ -30,7 +30,12 @@ const resetDb = async (shortTimeout = false): Promise<TestDb> => {
 
 	const {database: _ignored, ...dbConfigWithoutDatabase} = dbConfig;
 
-	await pgTools.dropdb(dbConfigWithoutDatabase, 'ytdpnl');
+	try {
+		await pgTools.dropdb(dbConfigWithoutDatabase, 'ytdpnl');
+	} catch (e) {
+		console.log('dropdb before tests failed, not necessarily an issue, it may not exist', e);
+	}
+
 	await pgTools.createdb(dbConfigWithoutDatabase, 'ytdpnl');
 
 	const client = new Client(dbConfig);

@@ -15,7 +15,7 @@
     "build": "yarn build:server && yarn build:app",
     "build:dev": "NODE_ENV=development tsc && NODE_ENV=development webpack",
     "watch:ext": "NODE_ENV=development webpack --watch",
-    "test": "jest --runInBand",
+    "test": "./test",
     "tdd": "jest --watch --runInBand",
     "server": "NODE_ENV=development ts-node src/server/server.ts",
     "serve:dev": "NODE_ENV=development nodemon --watch src/server src/server/server.ts",

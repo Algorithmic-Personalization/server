@@ -1,0 +1,6 @@
+#!/bin/env bash
+
+echo "Starting test-db container..."
+docker-compose up -d test-db
+echo "Running the tests..."
+yarn jest --runInBand
