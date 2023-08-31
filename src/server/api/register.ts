@@ -1,25 +1,14 @@
 import {type RouteCreator} from '../lib/routeCreation';
 
 import Admin from '../../common/models/admin';
-import {validateExcept, type Maybe, getMessage, has} from '../../common/util';
+import {validateExcept, type Maybe, getMessage} from '../../common/util';
 
 import {getVerifyEmailToken} from '../serverRoutes';
 import {randomToken, hashPassword} from '../lib/crypto';
 
 import whitelist from '../../../adminsWhitelist';
 
-import config from '../../../config.extension';
-
-const env = process.env.NODE_ENV === 'production' ? 'production' : 'development';
-
-if (!has(`${env}-server-url`)(config)) {
-	throw new Error(`Missing ${env}-server-url in config`);
-}
-
-console.log('NODE_ENV:', process.env.NODE_ENV);
-console.log('API URL:', config[`${env}-server-url`]);
-
-const serverUrl = config[`${env}-server-url`];
+import {serverUrl} from '../lib/config-loader/serverUrl';
 
 export const createRegisterRoute: RouteCreator = ({dataSource, mailer, createLogger}) => async (req, res) => {
 	const log = createLogger(req.requestId);

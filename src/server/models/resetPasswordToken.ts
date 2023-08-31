@@ -23,7 +23,7 @@ export class ResetPasswordToken extends Model {
 	@Column()
 	@IsInt()
 	@Min(0)
-		participantId?: number;
+		adminId?: number;
 
 	@Column()
 	@IsString()

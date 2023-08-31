@@ -98,6 +98,7 @@ import getTransitionSettingDefinition from './api-2/getTransitionSetting';
 import monitoringDefinition from './api-2/monitoring';
 import participantsReportDefinition from './api-2/participantsReport';
 import addVouchersDefinition from './api-2/addVouchers';
+import ResetPasswordDefinition from './api-2/sendAdminPasswordResetLink';
 
 import getYouTubeConfig from './lib/config-loader/getYouTubeConfig';
 import makeCreateYouTubeApi from './lib/youTubeApi';
@@ -402,9 +403,15 @@ const main = async () => {
 		app[def.verb](def.path, authMiddleware, makeHandler(def));
 	};
 
+	const defineUnprotectedRoute = <T>(def: RouteDefinition<T>) => {
+		app[def.verb](def.path, makeHandler(def));
+	};
+
 	app.use(monitor({
 		path: '/status',
 	}));
+
+	defineUnprotectedRoute(ResetPasswordDefinition);
 
 	defineAdminRoute(createParticipantDefinition);
 	defineAdminRoute(createGetActivityReportDefinition);

@@ -49,8 +49,8 @@ import {
 } from '../server/api-2/monitoring';
 
 import {
-	sendAdminPasswordResetLink,
-} from './../server/api-2/sendAdminPasswordResetLink';
+	sendResetLinkPath,
+} from '../server/serverRoutes';
 
 import {
 	type Maybe,
@@ -289,8 +289,7 @@ export const createAdminApi = (serverUrl: string, showLoginModal?: () => void): 
 		},
 
 		async sendAdminPasswordResetLink(email: string) {
-			const {path} = sendAdminPasswordResetLink;
-			return post<void>(path, {email}, headers());
+			return post<void>(sendResetLinkPath, {email}, headers());
 		},
 	};
 };
