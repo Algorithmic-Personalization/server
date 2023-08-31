@@ -90,6 +90,7 @@ export type AdminApi = {
 	updateParticipantPhase: (participantCode: string, phase: number) => Promise<Maybe<Participant>>;
 	getMonitoringReport: (q: MonitoringQuery) => Promise<Maybe<MonitoringReport>>;
 	sendAdminPasswordResetLink: (email: string) => Promise<Maybe<void>>;
+	resetPassword: (token: string, email: string, password: string) => Promise<Maybe<boolean>>;
 };
 
 const loadItem = <T>(key: string): T | undefined => {
@@ -290,6 +291,10 @@ export const createAdminApi = (serverUrl: string, showLoginModal?: () => void): 
 
 		async sendAdminPasswordResetLink(email: string) {
 			return post<void>(sendResetLinkPath, {email}, headers());
+		},
+
+		async resetPassword(token: string, email: string, password: string) {
+			return post<boolean>('/api/reset-password', {token, email, password}, headers());
 		},
 	};
 };

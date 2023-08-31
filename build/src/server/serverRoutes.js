@@ -1,6 +1,6 @@
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.getEvents = exports.getExperimentConfigHistory = exports.postExperimentConfig = exports.getExperimentConfig = exports.getParticipantOverview = exports.getEventOverviews = exports.getParticipants = exports.postUploadParticipants = exports.getAuthTest = exports.postLogin = exports.getVerifyEmailToken = exports.postRegister = exports.deleteApiToken = exports.createApiToken = exports.getApiTokens = void 0;
+exports.resetPasswordPath = exports.sendResetLinkPath = exports.getEvents = exports.getExperimentConfigHistory = exports.postExperimentConfig = exports.getExperimentConfig = exports.getParticipantOverview = exports.getEventOverviews = exports.getParticipants = exports.postUploadParticipants = exports.getAuthTest = exports.postLogin = exports.getVerifyEmailToken = exports.postRegister = exports.deleteApiToken = exports.createApiToken = exports.getApiTokens = void 0;
 exports.getApiTokens = '/api/tokens';
 exports.createApiToken = '/api/tokens';
 exports.deleteApiToken = '/api/tokens/:token';
@@ -16,4 +16,6 @@ exports.getExperimentConfig = '/api/experiment-config';
 exports.postExperimentConfig = '/api/experiment-config';
 exports.getExperimentConfigHistory = '/api/experiment-config-history';
 exports.getEvents = '/api/events';
+exports.sendResetLinkPath = '/api/send-admin-password-reset-link';
+exports.resetPasswordPath = '/api/reset-password';
 //# sourceMappingURL=serverRoutes.js.map

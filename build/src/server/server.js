@@ -72,6 +72,8 @@ const getTransitionSetting_1 = __importDefault(require("./api-2/getTransitionSet
 const monitoring_1 = __importDefault(require("./api-2/monitoring"));
 const participantsReport_1 = __importDefault(require("./api-2/participantsReport"));
 const addVouchers_1 = __importDefault(require("./api-2/addVouchers"));
+const sendAdminPasswordResetLink_1 = __importDefault(require("./api-2/sendAdminPasswordResetLink"));
+const resetPassword_1 = __importDefault(require("./api-2/resetPassword"));
 const getYouTubeConfig_1 = __importDefault(require("./lib/config-loader/getYouTubeConfig"));
 const youTubeApi_1 = __importDefault(require("./lib/youTubeApi"));
 const scrapeYouTube_1 = __importDefault(require("./lib/scrapeYouTube"));
@@ -288,9 +290,14 @@ const main = () => __awaiter(void 0, void 0, void 0, function* () {
     const defineAdminRoute = (def) => {
         app[def.verb](def.path, authMiddleware, makeHandler(def));
     };
+    const defineUnprotectedRoute = (def) => {
+        app[def.verb](def.path, makeHandler(def));
+    };
     app.use((0, express_status_monitor_1.default)({
         path: '/status',
     }));
+    defineUnprotectedRoute(sendAdminPasswordResetLink_1.default);
+    defineUnprotectedRoute(resetPassword_1.default);
     defineAdminRoute(createParticipant_1.default);
     defineAdminRoute(getActivityReport_1.default);
     defineAdminRoute(createTransitionSetting_1.default);

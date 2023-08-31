@@ -5,8 +5,10 @@ import {randomToken} from '../lib/crypto';
 import {sendResetLinkPath} from '../serverRoutes';
 
 import {serverUrl} from '../lib/config-loader/serverUrl';
+import {t} from '../lib/htmlGen';
 
 const ms24h = 1000 * 60 * 60 * 24;
+const tokenValidityMs = ms24h;
 
 export const sendAdminPasswordResetLink: RouteDefinition<void> = {
 	verb: 'post',
@@ -42,22 +44,21 @@ export const sendAdminPasswordResetLink: RouteDefinition<void> = {
 		token.adminId = admin.id;
 		token.token = randomToken(64);
 		token.usedAt = undefined;
-		token.validUntil = new Date(Date.now() + ms24h);
+		token.validUntil = new Date(Date.now() + tokenValidityMs);
 
 		const resetTokenRepo = dataSource.getRepository(ResetToken);
 		await resetTokenRepo.save(token);
 
 		const subject = `Reset your password for: ${new URL(serverUrl).hostname}`;
 
-		const text = `Please click on the following link to reset your password: ${
-			serverUrl
-		}/reset-password?token=${token.token} - it will expire in 24 hours.`;
+		const url = `${serverUrl}/reset-password/${token.token}`;
 
-		const html = `Please click on the following link to reset your password: <a href="${
-			serverUrl
-		}/reset-password?token=${token.token}">${
-			serverUrl
-		}/reset-password?token=${token.token}</a><br><br>It will expire in 24 hours.`;
+		const text = `Please visit (copy paste in browser URL bar) the following link to reset your password: \n\n${url}  \n\nIt will expire in 24 hours.`;
+
+		const html = t('div')(
+			t('p')('Please click on', t('a', {href: url})('this link'), 'to set a new password.'),
+			t('p')(`The link will expire in ${Math.floor(tokenValidityMs / 1000 / 60 / 60)} hours.`),
+		);
 
 		await mailer({
 			to: email,

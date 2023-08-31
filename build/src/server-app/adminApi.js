@@ -16,6 +16,7 @@ const createTransitionSetting_1 = require("../server/api-2/createTransitionSetti
 const getTransitionSetting_1 = require("../server/api-2/getTransitionSetting");
 const updateParticipant_1 = require("../server/api-2/updateParticipant");
 const monitoring_1 = require("../server/api-2/monitoring");
+const serverRoutes_2 = require("../server/serverRoutes");
 const util_1 = require("../common/util");
 const loadItem = (key) => {
     const item = sessionStorage.getItem(key);
@@ -200,6 +201,16 @@ const createAdminApi = (serverUrl, showLoginModal) => {
                 const { path } = monitoring_1.monitoringDefinition;
                 const query = Object.assign(Object.assign({}, q), { fromDate: q.fromDate.getTime(), toDate: q.toDate.getTime() });
                 return get(path, query, headers());
+            });
+        },
+        sendAdminPasswordResetLink(email) {
+            return __awaiter(this, void 0, void 0, function* () {
+                return post(serverRoutes_2.sendResetLinkPath, { email }, headers());
+            });
+        },
+        resetPassword(token, email, password) {
+            return __awaiter(this, void 0, void 0, function* () {
+                return post('/api/reset-password', { token, email, password }, headers());
             });
         },
     };

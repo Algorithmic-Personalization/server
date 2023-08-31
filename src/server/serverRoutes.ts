@@ -14,3 +14,4 @@ export const postExperimentConfig = '/api/experiment-config';
 export const getExperimentConfigHistory = '/api/experiment-config-history';
 export const getEvents = '/api/events';
 export const sendResetLinkPath = '/api/send-admin-password-reset-link';
+export const resetPasswordPath = '/api/reset-password';

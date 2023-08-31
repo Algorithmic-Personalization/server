@@ -99,6 +99,7 @@ import monitoringDefinition from './api-2/monitoring';
 import participantsReportDefinition from './api-2/participantsReport';
 import addVouchersDefinition from './api-2/addVouchers';
 import ResetPasswordDefinition from './api-2/sendAdminPasswordResetLink';
+import resetPassword from './api-2/resetPassword';
 
 import getYouTubeConfig from './lib/config-loader/getYouTubeConfig';
 import makeCreateYouTubeApi from './lib/youTubeApi';
@@ -412,6 +413,7 @@ const main = async () => {
 	}));
 
 	defineUnprotectedRoute(ResetPasswordDefinition);
+	defineUnprotectedRoute(resetPassword);
 
 	defineAdminRoute(createParticipantDefinition);
 	defineAdminRoute(createGetActivityReportDefinition);

@@ -30,9 +30,11 @@ exports.Server = void 0;
 const react_1 = __importStar(require("react"));
 const react_router_dom_1 = require("react-router-dom");
 const RequireAuthC_1 = __importDefault(require("./components/shared/RequireAuthC"));
+const LayoutP_1 = __importDefault(require("./components/LayoutP"));
 const LoginP_1 = __importDefault(require("./components/LoginP"));
 const RegisterP_1 = __importDefault(require("./components/RegisterP"));
-const LayoutP_1 = __importDefault(require("./components/LayoutP"));
+const ForgotP_1 = __importDefault(require("./components/ForgotP"));
+const ResetP_1 = __importDefault(require("./components/ResetP"));
 const Server = () => {
     const [email, setEmail] = (0, react_1.useState)('');
     const [password, setPassword] = (0, react_1.useState)('');
@@ -40,7 +42,9 @@ const Server = () => {
         react_1.default.createElement(react_router_dom_1.Route, { path: '*', element: react_1.default.createElement(RequireAuthC_1.default, null,
                 react_1.default.createElement(LayoutP_1.default, null)) }),
         react_1.default.createElement(react_router_dom_1.Route, { path: '/login', element: react_1.default.createElement(LoginP_1.default, Object.assign({}, { email, setEmail, password, setPassword })) }),
-        react_1.default.createElement(react_router_dom_1.Route, { path: '/register', element: react_1.default.createElement(RegisterP_1.default, Object.assign({}, { email, setEmail, password, setPassword })) })));
+        react_1.default.createElement(react_router_dom_1.Route, { path: '/register', element: react_1.default.createElement(RegisterP_1.default, Object.assign({}, { email, setEmail, password, setPassword })) }),
+        react_1.default.createElement(react_router_dom_1.Route, { path: '/forgot', element: react_1.default.createElement(ForgotP_1.default, Object.assign({}, { email, setEmail, password, setPassword })) }),
+        react_1.default.createElement(react_router_dom_1.Route, { path: '/reset-password/:token', element: react_1.default.createElement(ResetP_1.default, Object.assign({}, { email, setEmail, password, setPassword })) })));
 };
 exports.Server = Server;
 exports.default = exports.Server;

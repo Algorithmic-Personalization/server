@@ -6,6 +6,7 @@ import LayoutP from './components/LayoutP';
 import LoginP from './components/LoginP';
 import RegisterP from './components/RegisterP';
 import ForgotP from './components/ForgotP';
+import ResetP from './components/ResetP';
 
 export const Server = () => {
 	const [email, setEmail] = useState<string>('');
@@ -17,6 +18,7 @@ export const Server = () => {
 			<Route path='/login' element={<LoginP {...{email, setEmail, password, setPassword}} />} />
 			<Route path='/register' element={<RegisterP {...{email, setEmail, password, setPassword}} />} />
 			<Route path='/forgot' element={<ForgotP {...{email, setEmail, password, setPassword}} />} />
+			<Route path='/reset-password/:token' element={<ResetP {...{email, setEmail, password, setPassword}} />} />
 		</Routes>
 	);
 };

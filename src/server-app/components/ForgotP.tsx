@@ -74,7 +74,7 @@ export const ForgotP: React.FC<{
 				</FormControl>
 
 				<Button type='submit' variant='contained' sx={{mt: 2}}>
-					Change Password
+					Send me a link
 				</Button>
 			</form>
 		</Box>

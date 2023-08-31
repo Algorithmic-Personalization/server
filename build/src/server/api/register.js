@@ -18,14 +18,7 @@ const util_1 = require("../../common/util");
 const serverRoutes_1 = require("../serverRoutes");
 const crypto_1 = require("../lib/crypto");
 const adminsWhitelist_1 = __importDefault(require("../../../adminsWhitelist"));
-const config_extension_1 = __importDefault(require("../../../config.extension"));
-const env = process.env.NODE_ENV === 'production' ? 'production' : 'development';
-if (!(0, util_1.has)(`${env}-server-url`)(config_extension_1.default)) {
-    throw new Error(`Missing ${env}-server-url in config`);
-}
-console.log('NODE_ENV:', process.env.NODE_ENV);
-console.log('API URL:', config_extension_1.default[`${env}-server-url`]);
-const serverUrl = config_extension_1.default[`${env}-server-url`];
+const serverUrl_1 = require("../lib/config-loader/serverUrl");
 const createRegisterRoute = ({ dataSource, mailer, createLogger }) => (req, res) => __awaiter(void 0, void 0, void 0, function* () {
     const log = createLogger(req.requestId);
     const admin = new admin_1.default();
@@ -72,7 +65,7 @@ const createRegisterRoute = ({ dataSource, mailer, createLogger }) => (req, res)
         });
         return;
     }
-    const link = `${serverUrl}${serverRoutes_1.getVerifyEmailToken}?token=${token}`;
+    const link = `${serverUrl_1.serverUrl}${serverRoutes_1.getVerifyEmailToken}?token=${token}`;
     try {
         const ok = yield mailer({
             to: admin.email,
