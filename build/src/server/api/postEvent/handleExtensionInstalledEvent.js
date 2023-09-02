@@ -29,7 +29,7 @@ const createHandleExtensionInstalledEvent = ({ dataSource, notifier, log, }) => 
         const participant = yield participantRepo
             .createQueryBuilder('participant')
             .useTransaction(true)
-            .setLock('pessimistic_write_or_fail')
+            .setLock('pessimistic_read')
             .where({ id: p.id })
             .getOne();
         if (!participant) {

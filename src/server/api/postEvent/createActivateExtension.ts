@@ -20,7 +20,7 @@ export const createActivateExtension = ({
 		const p = await repo
 			.createQueryBuilder('participant')
 			.useTransaction(true)
-			.setLock('pessimistic_write_or_fail')
+			.setLock('pessimistic_read')
 			.where({id: participant.id})
 			.getOne();
 

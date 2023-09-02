@@ -30,7 +30,7 @@ export const createHandleExtensionInstalledEvent = ({
 		const participant = await participantRepo
 			.createQueryBuilder('participant')
 			.useTransaction(true)
-			.setLock('pessimistic_write_or_fail')
+			.setLock('pessimistic_read')
 			.where({id: p.id})
 			.getOne();
 
