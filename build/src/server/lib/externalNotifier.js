@@ -103,6 +103,7 @@ const makeOauthNotifier = (log) => (config) => {
             body: JSON.stringify(data),
         });
         if (!res.ok) {
+            log('error', 'put', res.status, res.statusText, yield res.text());
             throw new Error('failed to update data');
         }
         return res.json();

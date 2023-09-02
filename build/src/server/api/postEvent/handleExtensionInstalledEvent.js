@@ -1,4 +1,27 @@
 "use strict";
+var __createBinding = (this && this.__createBinding) || (Object.create ? (function(o, m, k, k2) {
+    if (k2 === undefined) k2 = k;
+    var desc = Object.getOwnPropertyDescriptor(m, k);
+    if (!desc || ("get" in desc ? !m.__esModule : desc.writable || desc.configurable)) {
+      desc = { enumerable: true, get: function() { return m[k]; } };
+    }
+    Object.defineProperty(o, k2, desc);
+}) : (function(o, m, k, k2) {
+    if (k2 === undefined) k2 = k;
+    o[k2] = m[k];
+}));
+var __setModuleDefault = (this && this.__setModuleDefault) || (Object.create ? (function(o, v) {
+    Object.defineProperty(o, "default", { enumerable: true, value: v });
+}) : function(o, v) {
+    o["default"] = v;
+});
+var __importStar = (this && this.__importStar) || function (mod) {
+    if (mod && mod.__esModule) return mod;
+    var result = {};
+    if (mod != null) for (var k in mod) if (k !== "default" && Object.prototype.hasOwnProperty.call(mod, k)) __createBinding(result, mod, k);
+    __setModuleDefault(result, mod);
+    return result;
+};
 var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, generator) {
     function adopt(value) { return value instanceof P ? value : new P(function (resolve) { resolve(value); }); }
     return new (P || (P = Promise))(function (resolve, reject) {
@@ -14,8 +37,8 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.createHandleExtensionInstalledEvent = void 0;
 const participant_1 = __importDefault(require("../../models/participant"));
-const event_1 = __importDefault(require("../../../common/models/event"));
-const createHandleExtensionInstalledEvent = ({ dataSource, notifier, log, }) => (p, event) => __awaiter(void 0, void 0, void 0, function* () {
+const event_1 = __importStar(require("../../../common/models/event"));
+const createHandleExtensionInstalledEvent = ({ dataSource, notifier, log, }) => (p, triggerEvent) => __awaiter(void 0, void 0, void 0, function* () {
     log('handling extension installed event...');
     if (p.extensionInstalled) {
         log('info', 'participant extension already installed, skipping with no lookup');
@@ -42,13 +65,18 @@ const createHandleExtensionInstalledEvent = ({ dataSource, notifier, log, }) => 
             log('info', 'participant extension not installed, calling API to notify installation...');
             log('remote server notified, updating local participant...');
             participant.extensionInstalled = true;
-            yield queryRunner.manager.save(participant);
+            const installEvent = new event_1.default();
             const eventRepo = queryRunner.manager.getRepository(event_1.default);
-            const e = yield eventRepo.save(event);
-            log('event saved', e);
+            Object.assign(installEvent, triggerEvent, {
+                type: event_1.EventType.EXTENSION_INSTALLED,
+                localUuid: installEvent.localUuid,
+                id: 0,
+            });
+            yield eventRepo.save(installEvent);
+            yield queryRunner.manager.save(participant);
             yield queryRunner.commitTransaction();
             log('participant updated, transaction committed');
-            yield notifier.onInstalled(event.createdAt);
+            yield notifier.onInstalled(triggerEvent.createdAt);
         }
     }
     catch (err) {

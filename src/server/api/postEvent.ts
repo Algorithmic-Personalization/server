@@ -178,7 +178,9 @@ export const createPostEventRoute: RouteCreator = ({
 		log,
 	});
 
-	void handleInstall(participant, event);
+	if (event.type === EventType.PAGE_VIEW) {
+		void handleInstall(participant, event);
+	}
 
 	event.arm = participant.arm;
 	event.phase = participant.phase;

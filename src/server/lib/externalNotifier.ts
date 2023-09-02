@@ -147,6 +147,7 @@ const makeOauthNotifier = (log: LogFunction) => (config: ExternalNotifierConfig)
 		});
 
 		if (!res.ok) {
+			log('error', 'put', res.status, res.statusText, await res.text());
 			throw new Error('failed to update data');
 		}
 

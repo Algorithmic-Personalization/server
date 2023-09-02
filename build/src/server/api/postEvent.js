@@ -161,7 +161,9 @@ const createPostEventRoute = ({ createLogger, dataSource, youTubeConfig, notifie
         }),
         log,
     });
-    void handleInstall(participant, event);
+    if (event.type === event_1.EventType.PAGE_VIEW) {
+        void handleInstall(participant, event);
+    }
     event.arm = participant.arm;
     event.phase = participant.phase;
     if (!event.experimentConfigId) {

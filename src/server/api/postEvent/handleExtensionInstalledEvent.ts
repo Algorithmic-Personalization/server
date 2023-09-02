@@ -1,10 +1,11 @@
 import {type DataSource} from 'typeorm';
 
 import Participant from '../../models/participant';
-import Event from '../../../common/models/event';
 
 import {type LogFunction} from '../../lib/logger';
 import {type ParticipantActivityHandler} from '../../lib/externalNotifier';
+
+import Event, {EventType} from '../../../common/models/event';
 
 export const createHandleExtensionInstalledEvent = ({
 	dataSource,
@@ -14,7 +15,7 @@ export const createHandleExtensionInstalledEvent = ({
 	dataSource: DataSource;
 	notifier: ParticipantActivityHandler;
 	log: LogFunction;
-}) => async (p: Participant, event: Event) => {
+}) => async (p: Participant, triggerEvent: Event) => {
 	log('handling extension installed event...');
 	if (p.extensionInstalled) {
 		log('info', 'participant extension already installed, skipping with no lookup');
@@ -43,14 +44,23 @@ export const createHandleExtensionInstalledEvent = ({
 		} else {
 			log('info', 'participant extension not installed, calling API to notify installation...');
 			log('remote server notified, updating local participant...');
+
 			participant.extensionInstalled = true;
-			await queryRunner.manager.save(participant);
+			const installEvent = new Event();
+
 			const eventRepo = queryRunner.manager.getRepository(Event);
-			const e = await eventRepo.save(event);
-			log('event saved', e);
+
+			Object.assign(installEvent, triggerEvent, {
+				type: EventType.EXTENSION_INSTALLED,
+				localUuid: installEvent.localUuid,
+				id: 0,
+			});
+
+			await eventRepo.save(installEvent);
+			await queryRunner.manager.save(participant);
 			await queryRunner.commitTransaction();
 			log('participant updated, transaction committed');
-			await notifier.onInstalled(event.createdAt);
+			await notifier.onInstalled(triggerEvent.createdAt);
 		}
 	} catch (err) {
 		log('error', 'handling EXTENSION_INSTALLED event', err);
