@@ -145,9 +145,11 @@ const ActivityReportC: React.FC<{
 			<Typography variant='h2' sx={{mb: 2}}>Activity Report</Typography>
 			<Typography variant='h3' sx={{mb: 2}}>Daily totals</Typography>
 			<MetricsC data={report.totals}/>
+			<br />
 			<Typography variant='h3' sx={{mb: 2}}>Daily averages</Typography>
 			<MetricsC data={report.averages}/>
 			<Typography variant='h3' sx={{mb: 2}}>Latest participant-level activity</Typography>
+			<br />
 			<TableC items={report.latest}/>
 		</div>
 	);
