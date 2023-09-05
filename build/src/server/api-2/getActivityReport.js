@@ -100,7 +100,7 @@ exports.createGetActivityReportDefinition = {
                 nParticipants: n(rest.nParticipants),
             });
         });
-        log('info', { averages, totals, data });
+        // D log('info', {averages, totals, data});
         return {
             serverNow: new Date(),
             latest: latestActivity,

@@ -180,9 +180,11 @@ const ActivityReportC = ({ report }) => {
         react_1.default.createElement(material_1.Typography, { variant: 'h2', sx: { mb: 2 } }, "Activity Report"),
         react_1.default.createElement(material_1.Typography, { variant: 'h3', sx: { mb: 2 } }, "Daily totals"),
         react_1.default.createElement(MetricsC, { data: report.totals }),
+        react_1.default.createElement("br", null),
         react_1.default.createElement(material_1.Typography, { variant: 'h3', sx: { mb: 2 } }, "Daily averages"),
         react_1.default.createElement(MetricsC, { data: report.averages }),
         react_1.default.createElement(material_1.Typography, { variant: 'h3', sx: { mb: 2 } }, "Latest participant-level activity"),
+        react_1.default.createElement("br", null),
         react_1.default.createElement(TableC, { items: report.latest })));
     return ui;
 };
