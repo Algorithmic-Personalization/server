@@ -10,7 +10,7 @@ import NotFoundError from './notFoundError';
 import {type ExternalNotifier as NotifierService} from './externalNotifier';
 
 const hasMessage = has('message');
-const message = (x: unknown) => (hasMessage(x) ? x.message : 'An unknown error occurred');
+const msg = (x: unknown) => (hasMessage(x) ? x.message : 'An unknown error occurred');
 
 // From the documentation at: https://developers.google.com/youtube/v3/docs/videos/list
 export type YouTubeConfig = {
@@ -52,6 +52,8 @@ export type RouteDefinition<Output> = {
 
 export const makeRouteConnector = (context: RouteContext) => <T>(definition: RouteDefinition<T>) => async (req: Request, res: Response) => {
 	const {makeHandler} = definition;
+	const {createLogger} = context;
+	const log = createLogger(req.requestId);
 	const handler = makeHandler(context);
 
 	try {
@@ -64,14 +66,16 @@ export const makeRouteConnector = (context: RouteContext) => <T>(definition: Rou
 		if (err instanceof NotFoundError) {
 			res.status(404).json({
 				kind: 'Failure',
-				message: message(err),
+				message: msg(err),
 			});
 			return;
 		}
 
+		const message = msg(err);
+		log('error', message, err);
 		res.status(500).json({
 			kind: 'Failure',
-			message: message(err),
+			message,
 		});
 	}
 };
