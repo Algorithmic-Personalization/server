@@ -16,9 +16,11 @@ exports.makeRouteConnector = void 0;
 const util_1 = require("../../common/util");
 const notFoundError_1 = __importDefault(require("./notFoundError"));
 const hasMessage = (0, util_1.has)('message');
-const message = (x) => (hasMessage(x) ? x.message : 'An unknown error occurred');
+const msg = (x) => (hasMessage(x) ? x.message : 'An unknown error occurred');
 const makeRouteConnector = (context) => (definition) => (req, res) => __awaiter(void 0, void 0, void 0, function* () {
     const { makeHandler } = definition;
+    const { createLogger } = context;
+    const log = createLogger(req.requestId);
     const handler = makeHandler(context);
     try {
         const value = yield handler(req);
@@ -31,13 +33,15 @@ const makeRouteConnector = (context) => (definition) => (req, res) => __awaiter(
         if (err instanceof notFoundError_1.default) {
             res.status(404).json({
                 kind: 'Failure',
-                message: message(err),
+                message: msg(err),
             });
             return;
         }
+        const message = msg(err);
+        log('error', message, err);
         res.status(500).json({
             kind: 'Failure',
-            message: message(err),
+            message,
         });
     }
 });

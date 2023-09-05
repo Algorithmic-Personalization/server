@@ -5,8 +5,23 @@ import {IsInt, IsNumber, Min} from 'class-validator';
 import Model from '../../common/lib/model';
 import Participant from './participant';
 
+// eslint-disable-next-line @typescript-eslint/consistent-type-definitions
+export interface ActivityMetrics {
+	pagesViewed: number;
+	videoPagesViewed: number;
+	videoTimeViewedSeconds: number;
+	timeSpentOnYoutubeSeconds: number;
+	sidebarRecommendationsClicked: number;
+}
+
+// eslint-disable-next-line @typescript-eslint/consistent-type-definitions
+export interface DailyMetrics extends ActivityMetrics {
+	day: Date;
+	nParticipants: number;
+}
+
 @Entity()
-export class DailyActivityTime extends Model {
+export class DailyActivityTime extends Model implements ActivityMetrics {
 	@Column()
 		participantId: number = 0;
 

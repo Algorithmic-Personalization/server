@@ -176,7 +176,13 @@ const createAdminApi = (serverUrl, showLoginModal) => {
         },
         getActivityReport() {
             return __awaiter(this, void 0, void 0, function* () {
-                return get(getActivityReport_1.createGetActivityReportDefinition.path, {}, headers());
+                const report = yield get(getActivityReport_1.createGetActivityReportDefinition.path, {}, headers());
+                if (report.kind === 'Failure') {
+                    return report;
+                }
+                const { averages, totals } = report.value;
+                const inflateDates = (x) => x.map(m => (Object.assign(Object.assign({}, m), { day: new Date(m.day) })));
+                return Object.assign(Object.assign({}, report), { value: Object.assign(Object.assign({}, report.value), { averages: inflateDates(averages), totals: inflateDates(totals), serverNow: new Date(report.value.serverNow) }) });
             });
         },
         createTransitionSetting(setting) {

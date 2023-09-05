@@ -52,6 +52,8 @@ import {
 	sendResetLinkPath,
 } from '../server/serverRoutes';
 
+import {type DailyMetrics} from '../server/models/dailyActivityTime';
+
 import {
 	type Maybe,
 	isMaybe,
@@ -258,7 +260,28 @@ export const createAdminApi = (serverUrl: string, showLoginModal?: () => void): 
 		},
 
 		async getActivityReport() {
-			return get<ActivityReport>(createGetActivityReportDefinition.path, {}, headers());
+			const report = await get<ActivityReport>(createGetActivityReportDefinition.path, {}, headers());
+
+			if (report.kind === 'Failure') {
+				return report;
+			}
+
+			const {averages, totals} = report.value;
+
+			const inflateDates = (x: DailyMetrics[]): DailyMetrics[] => x.map(m => ({
+				...m,
+				day: new Date(m.day),
+			}));
+
+			return {
+				...report,
+				value: {
+					...report.value,
+					averages: inflateDates(averages),
+					totals: inflateDates(totals),
+					serverNow: new Date(report.value.serverNow),
+				},
+			};
 		},
 
 		async createTransitionSetting(setting: TransitionSetting) {
@@ -286,6 +309,7 @@ export const createAdminApi = (serverUrl: string, showLoginModal?: () => void): 
 				fromDate: q.fromDate.getTime(),
 				toDate: q.toDate.getTime(),
 			};
+
 			return get<MonitoringReport>(path, query, headers());
 		},
 
