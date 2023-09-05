@@ -371,7 +371,7 @@ const main = async () => {
 			logEntry.path = req.path;
 
 			const {sessionUuid} = req.body as {sessionUuid?: unknown};
-			if (typeof sessionUuid === 'string') {
+			if (typeof sessionUuid === 'string' && sessionUuid) {
 				logEntry.sessionUuid = sessionUuid;
 			}
 

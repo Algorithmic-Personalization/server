@@ -262,7 +262,7 @@ const main = () => __awaiter(void 0, void 0, void 0, function* () {
             logEntry.verb = req.method;
             logEntry.path = req.path;
             const { sessionUuid } = req.body;
-            if (typeof sessionUuid === 'string') {
+            if (typeof sessionUuid === 'string' && sessionUuid) {
                 logEntry.sessionUuid = sessionUuid;
             }
             logEntry.statusCode = res.statusCode;
