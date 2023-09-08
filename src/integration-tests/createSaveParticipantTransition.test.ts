@@ -36,4 +36,34 @@ describe('updateParticipantPhase', () => {
 		expect(updatedParticipant.phase).toEqual(transition.toPhase);
 		expect(notifier.onPhaseChange).toHaveBeenCalledTimes(1);
 	});
+
+	it('should not save the transition more than once for the same participant and the same transition', async () => {
+		const flaky = async () => {
+			const notifier = createMockParticipantActivityNotifier();
+
+			const saveTransition = createSaveParticipantTransition({
+				dataSource: db.dataSource,
+				notifier,
+			});
+
+			const participant = await db.createParticipant();
+
+			const [t1, t2] = await Promise.all([
+				db.createTransitionEvent(participant),
+				db.createTransitionEvent(participant),
+			]);
+
+			await Promise.all([
+				saveTransition(participant, t1, undefined),
+				saveTransition(participant, t2, undefined),
+			]);
+
+			expect(notifier.onPhaseChange).toHaveBeenCalledTimes(1);
+		};
+
+		for (let i = 0; i < 10; ++i) {
+			// eslint-disable-next-line no-await-in-loop
+			await flaky();
+		}
+	});
 });
