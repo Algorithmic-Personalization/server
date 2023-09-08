@@ -3,7 +3,7 @@ import {type DataSource} from 'typeorm';
 import type Participant from '../models/participant';
 import {has} from '../../common/util';
 import {type ParticipantActivityHandler} from './externalNotifier';
-import type TransitionEvent from '../models/transitionEvent';
+import TransitionEvent from '../models/transitionEvent';
 import type Event from '../../common/models/event';
 
 export type ParticipantRecord = {
@@ -30,18 +30,18 @@ export const createSaveParticipantTransition = ({
 	participant: Participant,
 	transition: TransitionEvent,
 	triggerEvent: Event | undefined,
-): Promise<Participant> =>
-	dataSource.transaction(async manager => {
-		participant.phase = transition.toPhase;
+): Promise<TransitionEvent | undefined> => {
+	const qr = dataSource.createQueryRunner();
 
-		if (triggerEvent) {
-			const e = await manager.save(triggerEvent);
-			transition.eventId = e.id;
-		}
+	const proceedToUpdate = async () => {
+		const updatedTransition = new TransitionEvent();
+		Object.assign(updatedTransition, transition, {
+			eventId: triggerEvent ? triggerEvent.id : undefined,
+		});
 
-		const [updatedParticipant] = await Promise.all([
-			manager.save(participant),
-			manager.save(transition),
+		const [, savedTransitionEvent] = await Promise.all([
+			qr.manager.save(participant),
+			qr.manager.save(updatedTransition),
 		]);
 
 		await notifier.onPhaseChange(
@@ -50,5 +50,42 @@ export const createSaveParticipantTransition = ({
 			transition.toPhase,
 		);
 
-		return updatedParticipant;
-	});
+		return savedTransitionEvent;
+	};
+
+	try {
+		await qr.startTransaction();
+		const repo = qr.manager.getRepository(TransitionEvent);
+		const latestExistingTransition = await repo
+			.createQueryBuilder('t')
+			.useTransaction(true)
+			.setLock('pessimistic_write_or_fail')
+			.where({
+				participantId: participant.id,
+				fromPhase: transition.fromPhase,
+				toPhase: transition.toPhase,
+			})
+			.orderBy({
+				id: 'DESC',
+			})
+			.getOne();
+
+		console.log('latestExistingTransition', latestExistingTransition);
+
+		const minutes5 = 1000 * 60 * 5;
+
+		// The latest transition is too recent, don't save
+		if (latestExistingTransition && Date.now() - latestExistingTransition.createdAt.getTime() < minutes5) {
+			return;
+		}
+
+		const p = await proceedToUpdate();
+
+		return p;
+	} catch (error) {
+		await qr.rollbackTransaction();
+		throw error;
+	} finally {
+		await qr.release();
+	}
+};

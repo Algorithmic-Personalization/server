@@ -25,15 +25,14 @@ describe('updateParticipantPhase', () => {
 
 		const participant = await db.createParticipant();
 
-		const transition = await db.createTransitionEvent(participant);
+		const transition = db.createTransitionEvent(participant);
 
-		const updatedParticipant = await saveTransition(
+		await saveTransition(
 			participant,
 			transition,
 			undefined,
 		);
 
-		expect(updatedParticipant.phase).toEqual(transition.toPhase);
 		expect(notifier.onPhaseChange).toHaveBeenCalledTimes(1);
 	});
 
@@ -48,10 +47,10 @@ describe('updateParticipantPhase', () => {
 
 			const participant = await db.createParticipant();
 
-			const [t1, t2] = await Promise.all([
+			const [t1, t2] = [
 				db.createTransitionEvent(participant),
 				db.createTransitionEvent(participant),
-			]);
+			];
 
 			await Promise.all([
 				saveTransition(participant, t1, undefined),

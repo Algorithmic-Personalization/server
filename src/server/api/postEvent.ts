@@ -211,8 +211,8 @@ export const createPostEventRoute: RouteCreator = ({
 
 		void withLock(`participant-${participant.id}`)(async () => {
 			try {
-				await updateActivity(participant, event);
-				await updatePhase(participant, event);
+				await updateActivity(participant, e);
+				await updatePhase(participant, e);
 			} catch (e) {
 				log('activity update failed', e);
 			}

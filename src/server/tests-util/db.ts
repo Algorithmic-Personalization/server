@@ -22,7 +22,7 @@ export type TestDb = {
 	createParticipant: () => Promise<Participant>;
 	createSession: (participant: Participant) => Promise<Session>;
 	createEvent: (session: Session) => Promise<Event>;
-	createTransitionEvent: (participant: Participant) => Promise<TransitionEvent>;
+	createTransitionEvent: (participant: Participant) => TransitionEvent;
 };
 
 const resetDb = async (shortTimeout = false): Promise<TestDb> => {
@@ -118,17 +118,15 @@ const resetDb = async (shortTimeout = false): Promise<TestDb> => {
 		return saved;
 	};
 
-	const createTransitionEvent = async (
+	const createTransitionEvent = (
 		p: Participant,
-	): Promise<TransitionEvent> => {
+	): TransitionEvent => {
 		const event = new TransitionEvent();
 		event.participantId = p.id;
 		event.fromPhase = Phase.PRE_EXPERIMENT;
 		event.toPhase = Phase.EXPERIMENT;
 		event.reason = TransitionReason.FORCED;
-		const repo = dataSource.getRepository(TransitionEvent);
-		const saved = await repo.save(event);
-		return saved;
+		return event;
 	};
 
 	const tearDown = async (): Promise<void> => {
