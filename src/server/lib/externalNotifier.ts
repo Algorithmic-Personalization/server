@@ -134,6 +134,11 @@ const makeOauthNotifier = (log: LogFunction) => (config: ExternalNotifierConfig)
 	};
 
 	const put = async (participantCode: string, data: Record<string, unknown>) => {
+		if (config['token-url'] === '<test-do-not-perform-calls>') {
+			log('error', '<oauth>', 'put', 'would have sent', data, 'but not doing it because token-url is set to <test-do-not-perform-calls>');
+			return {};
+		}
+
 		const token = await ensureToken();
 
 		const res = await fetch(config['update-url'].replace('{RESPONSE_ID}', participantCode), {
