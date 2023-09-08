@@ -28,7 +28,6 @@ export const createGetActivityReportDefinition: RouteDefinition<ActivityReport> 
 			take: 100,
 		});
 
-		// TODO: this is not working
 		const data = await show(
 			dataSource.createQueryBuilder()
 				.from(DailyActivityTime, 'dat')

@@ -24,10 +24,7 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
 };
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.createGetActivityReportDefinition = void 0;
-const session_1 = require("./../../common/models/session");
 const dailyActivityTime_1 = __importDefault(require("../models/dailyActivityTime"));
-const participant_1 = __importDefault(require("../models/participant"));
-const event_1 = __importDefault(require("../../common/models/event"));
 const util_1 = require("../../util");
 exports.createGetActivityReportDefinition = {
     verb: 'get',
@@ -46,6 +43,7 @@ exports.createGetActivityReportDefinition = {
             take: 100,
         });
         const data = yield show(dataSource.createQueryBuilder()
+            .from(dailyActivityTime_1.default, 'dat')
             .select('dat.created_at', 'day')
             .addSelect('avg(dat.pages_viewed)', 'avgPagesViewed')
             .addSelect('sum(dat.pages_viewed)', 'totalPagesViewed')
@@ -57,11 +55,7 @@ exports.createGetActivityReportDefinition = {
             .addSelect('sum(dat.time_spent_on_youtube_seconds)', 'totalTimeSpentOnYoutubeSeconds')
             .addSelect('avg(dat.sidebar_recommendations_clicked)', 'avgSidebarRecommendationsClicked')
             .addSelect('sum(dat.sidebar_recommendations_clicked)', 'totalSidebarRecommendationsClicked')
-            .from(dailyActivityTime_1.default, 'dat')
-            .innerJoin(participant_1.default, 'p', 'dat.participant_id = p.id')
-            .addSelect('count(distinct p.id)', 'nParticipants')
-            .innerJoin(session_1.Session, 's', 's.participant_code = p.code')
-            .innerJoin(event_1.default, 'e', 'e.session_uuid = s.uuid')
+            .addSelect('count(distinct dat.participant_id)', 'nParticipants')
             .groupBy('dat.created_at')
             .orderBy('dat.created_at', 'DESC')
             .limit(15)).getRawMany();
