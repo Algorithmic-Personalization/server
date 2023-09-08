@@ -6,6 +6,28 @@ import {
 
 import {type LogFunction} from './server/lib/logger';
 
+export type LocalDateTime = {
+	year: number;
+	month: number;
+	day: number;
+	hour: number;
+	minute: number;
+	second: number;
+};
+
+export const localNow = (): LocalDateTime => {
+	const now = new Date();
+
+	return {
+		year: now.getFullYear(),
+		month: now.getMonth() + 1,
+		day: now.getDate(),
+		hour: now.getHours(),
+		minute: now.getMinutes(),
+		second: now.getSeconds(),
+	};
+};
+
 type AsyncFn = () => Promise<void>;
 
 type QueuedFn = {

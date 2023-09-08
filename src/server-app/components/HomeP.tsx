@@ -12,6 +12,7 @@ import {type DailyActivityTime, type DailyMetrics} from '../../server/models/dai
 import {useAdminApi} from '../adminApiProvider';
 
 import createTableComponent, {type TableDescriptor} from './shared/TableC';
+import {type LocalDateTime} from '../../util';
 
 const showDate = (preDate: Date | string, includeTime = false): React.ReactElement => {
 	try {
@@ -33,6 +34,14 @@ const showDate = (preDate: Date | string, includeTime = false): React.ReactEleme
 		return <>Error showing date ({JSON.stringify(preDate)})</>;
 	}
 };
+
+const showLocalDate = (d: LocalDateTime): React.ReactElement => (
+	<>
+		{d.year}-{d.month.toString().padStart(2, '0')}-{d.day.toString().padStart(2, '0')}
+		&nbsp;
+		{d.hour.toString().padStart(2, '0')}:{d.minute.toString().padStart(2, '0')}:{d.second.toString().padStart(2, '0')}
+	</>
+);
 
 const tableDescriptor: TableDescriptor<DailyActivityTime> = {
 	headers: [
@@ -192,7 +201,7 @@ export const HomeC: React.FC = () => {
 		<div>
 			<Typography variant='h1' sx={{mb: 4}}>Home</Typography>
 			<p>
-				<strong>Note:</strong>&nbsp; All dates are given in server time, right now the date on the server is: {showDate(report.serverNow, true)}
+				<strong>Note:</strong>&nbsp; All dates are given in server time, right now the date on the server is: {showLocalDate(report.serverNow)}
 			</p>
 			<NotificationsC message={message}/>
 			{!report && <Typography>Loading report...</Typography>}

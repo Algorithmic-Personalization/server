@@ -79,6 +79,18 @@ const showDate = (preDate, includeTime = false) => {
             ")");
     }
 };
+const showLocalDate = (d) => (react_1.default.createElement(react_1.default.Fragment, null,
+    d.year,
+    "-",
+    d.month.toString().padStart(2, '0'),
+    "-",
+    d.day.toString().padStart(2, '0'),
+    "\u00A0",
+    d.hour.toString().padStart(2, '0'),
+    ":",
+    d.minute.toString().padStart(2, '0'),
+    ":",
+    d.second.toString().padStart(2, '0')));
 const tableDescriptor = {
     headers: [
         {
@@ -218,7 +230,7 @@ const HomeC = () => {
         react_1.default.createElement("p", null,
             react_1.default.createElement("strong", null, "Note:"),
             "\u00A0 All dates are given in server time, right now the date on the server is: ",
-            showDate(report.serverNow, true)),
+            showLocalDate(report.serverNow)),
         react_1.default.createElement(NotificationsC_1.default, { message: message }),
         !report && react_1.default.createElement(material_1.Typography, null, "Loading report..."),
         report && react_1.default.createElement(ActivityReportC, { report: report })));

@@ -96,7 +96,7 @@ exports.createGetActivityReportDefinition = {
         });
         // D log('info', {averages, totals, data});
         return {
-            serverNow: new Date(),
+            serverNow: (0, util_1.localNow)(),
             latest: latestActivity,
             averages,
             totals,

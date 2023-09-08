@@ -9,7 +9,19 @@ var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, ge
     });
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.sleep = exports.showInsertSql = exports.showSql = exports.stringFromMaybeError = exports.asyncPerf = exports.pct = exports.formatPct = exports.formatSize = exports.daysElapsed = exports.withLock = void 0;
+exports.sleep = exports.showInsertSql = exports.showSql = exports.stringFromMaybeError = exports.asyncPerf = exports.pct = exports.formatPct = exports.formatSize = exports.daysElapsed = exports.withLock = exports.localNow = void 0;
+const localNow = () => {
+    const now = new Date();
+    return {
+        year: now.getFullYear(),
+        month: now.getMonth() + 1,
+        day: now.getDate(),
+        hour: now.getHours(),
+        minute: now.getMinutes(),
+        second: now.getSeconds(),
+    };
+};
+exports.localNow = localNow;
 const locks = new Map();
 const unstackLock = (id, log) => __awaiter(void 0, void 0, void 0, function* () {
     const stack = locks.get(id);

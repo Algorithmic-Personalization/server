@@ -92,6 +92,10 @@ const makeOauthNotifier = (log) => (config) => {
         return theToken;
     });
     const put = (participantCode, data) => __awaiter(void 0, void 0, void 0, function* () {
+        if (config['token-url'] === '<test-do-not-perform-calls>') {
+            log('error', '<oauth>', 'put', 'would have sent', data, 'but not doing it because token-url is set to <test-do-not-perform-calls>');
+            return {};
+        }
         const token = yield ensureToken();
         const res = yield (0, node_fetch_1.default)(config['update-url'].replace('{RESPONSE_ID}', participantCode), {
             method: 'PUT',

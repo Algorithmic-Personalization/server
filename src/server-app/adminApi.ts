@@ -279,7 +279,6 @@ export const createAdminApi = (serverUrl: string, showLoginModal?: () => void): 
 					...report.value,
 					averages: inflateDates(averages),
 					totals: inflateDates(totals),
-					serverNow: new Date(report.value.serverNow),
 				},
 			};
 		},

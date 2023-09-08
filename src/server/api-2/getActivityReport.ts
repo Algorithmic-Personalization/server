@@ -1,10 +1,10 @@
 import {type RouteDefinition} from '../lib/routeCreation';
 import DailyActivityTime, {type DailyMetrics} from '../models/dailyActivityTime';
 
-import {showSql} from '../../util';
+import {showSql, type LocalDateTime, localNow} from '../../util';
 
 export type ActivityReport = {
-	serverNow: Date;
+	serverNow: LocalDateTime;
 	latest: DailyActivityTime[];
 	averages: DailyMetrics[];
 	totals: DailyMetrics[];
@@ -87,7 +87,7 @@ export const createGetActivityReportDefinition: RouteDefinition<ActivityReport> 
 		// D log('info', {averages, totals, data});
 
 		return {
-			serverNow: new Date(),
+			serverNow: localNow(),
 			latest: latestActivity,
 			averages,
 			totals,

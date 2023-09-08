@@ -182,7 +182,7 @@ const createAdminApi = (serverUrl, showLoginModal) => {
                 }
                 const { averages, totals } = report.value;
                 const inflateDates = (x) => x.map(m => (Object.assign(Object.assign({}, m), { day: new Date(m.day) })));
-                return Object.assign(Object.assign({}, report), { value: Object.assign(Object.assign({}, report.value), { averages: inflateDates(averages), totals: inflateDates(totals), serverNow: new Date(report.value.serverNow) }) });
+                return Object.assign(Object.assign({}, report), { value: Object.assign(Object.assign({}, report.value), { averages: inflateDates(averages), totals: inflateDates(totals) }) });
             });
         },
         createTransitionSetting(setting) {
