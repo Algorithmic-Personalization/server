@@ -57,7 +57,7 @@ export const createSaveParticipantTransition = ({
 		await qr.startTransaction();
 		const repo = qr.manager.getRepository(TransitionEvent);
 		const latestExistingTransition = await repo
-			.createQueryBuilder('t')
+			.createQueryBuilder()
 			.useTransaction(true)
 			.setLock('pessimistic_write_or_fail')
 			.where({
@@ -69,8 +69,6 @@ export const createSaveParticipantTransition = ({
 				id: 'DESC',
 			})
 			.getOne();
-
-		console.log('latestExistingTransition', latestExistingTransition);
 
 		const minutes5 = 1000 * 60 * 5;
 
@@ -84,7 +82,7 @@ export const createSaveParticipantTransition = ({
 		return p;
 	} catch (error) {
 		await qr.rollbackTransaction();
-		throw error;
+		return undefined;
 	} finally {
 		await qr.release();
 	}

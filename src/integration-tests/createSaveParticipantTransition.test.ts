@@ -4,6 +4,8 @@ import resetDb from '../server/tests-util/db';
 import {createSaveParticipantTransition} from '../server/lib/participant';
 import {createMockParticipantActivityNotifier} from '../server/tests-util/createMockParticipantActivityNotifier';
 
+import TransitionEvent from '../server/models/transitionEvent';
+
 describe('updateParticipantPhase', () => {
 	let db: TestDb;
 
@@ -37,6 +39,7 @@ describe('updateParticipantPhase', () => {
 	});
 
 	it('should not save the transition more than once for the same participant and the same transition', async () => {
+		const transitionRepo = db.dataSource.getRepository(TransitionEvent);
 		const flaky = async () => {
 			const notifier = createMockParticipantActivityNotifier();
 
@@ -46,6 +49,13 @@ describe('updateParticipantPhase', () => {
 			});
 
 			const participant = await db.createParticipant();
+
+			const preExistingTransition = db.createTransitionEvent(participant);
+			preExistingTransition.createdAt = new Date(Date.now() - (1000 * 60 * 10));
+
+			await transitionRepo.save(
+				preExistingTransition,
+			);
 
 			const [t1, t2] = [
 				db.createTransitionEvent(participant),
@@ -64,5 +74,7 @@ describe('updateParticipantPhase', () => {
 			// eslint-disable-next-line no-await-in-loop
 			await flaky();
 		}
+
+		await flaky();
 	});
 });
