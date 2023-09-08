@@ -1,7 +1,7 @@
 import {type Repository, LessThan, type DataSource} from 'typeorm';
 import {type LogFunction} from '../../lib/logger';
 import type Participant from '../../models/participant';
-import type Event from '../../../common/models/event';
+import Event from '../../../common/models/event';
 import {EventType} from '../../../common/models/event';
 import {type WatchTimeEvent} from '../../../common/models/watchTimeEvent';
 import DailyActivityTime from '../../models/dailyActivityTime';
@@ -32,10 +32,8 @@ const getOrCreateActivity = async (
 	return repo.save(newActivity);
 };
 
-export const createUpdateActivity = ({dataSource, activityRepo, eventRepo, notifier, log}: {
+export const createUpdateActivity = ({dataSource, notifier, log}: {
 	dataSource: DataSource;
-	activityRepo: Repository<DailyActivityTime>;
-	eventRepo: Repository<Event>;
 	notifier: ExternalNotifier;
 	log: LogFunction;
 }) => async (
@@ -44,6 +42,9 @@ export const createUpdateActivity = ({dataSource, activityRepo, eventRepo, notif
 ) => {
 	log('Updating activity for participant ', participant.code);
 	const day = wholeDate(event.createdAt);
+
+	const activityRepo = dataSource.getRepository(DailyActivityTime);
+	const eventRepo = dataSource.getRepository(Event);
 
 	const activity = await getOrCreateActivity(activityRepo, participant.id, day);
 

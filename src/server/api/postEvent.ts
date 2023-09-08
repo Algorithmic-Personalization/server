@@ -8,7 +8,7 @@ import {type WatchTimeEvent} from '../../common/models/watchTimeEvent';
 import ExperimentConfig from '../../common/models/experimentConfig';
 
 import {has, validateExcept} from '../../common/util';
-import DailyActivityTime from '../models/dailyActivityTime';
+import type DailyActivityTime from '../models/dailyActivityTime';
 
 import type TransitionSetting from '../models/transitionSetting';
 import {OperatorType} from '../models/transitionSetting';
@@ -136,13 +136,10 @@ export const createPostEventRoute: RouteCreator = ({
 	event.localZeroHour = event.localZeroHour ? new Date(event.localZeroHour) : undefined;
 
 	const participantRepo = dataSource.getRepository(Participant);
-	const activityRepo = dataSource.getRepository(DailyActivityTime);
 	const eventRepo = dataSource.getRepository(Event);
 
 	const updateActivity = createUpdateActivity({
 		dataSource,
-		activityRepo,
-		eventRepo,
 		notifier,
 		log,
 	});
