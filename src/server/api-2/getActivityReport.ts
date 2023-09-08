@@ -1,8 +1,5 @@
 import {type RouteDefinition} from '../lib/routeCreation';
-import {Session} from './../../common/models/session';
 import DailyActivityTime, {type DailyMetrics} from '../models/dailyActivityTime';
-import Participant from '../models/participant';
-import Event from '../../common/models/event';
 
 import {showSql} from '../../util';
 
@@ -34,6 +31,7 @@ export const createGetActivityReportDefinition: RouteDefinition<ActivityReport> 
 		// TODO: this is not working
 		const data = await show(
 			dataSource.createQueryBuilder()
+				.from(DailyActivityTime, 'dat')
 				.select('dat.created_at', 'day')
 				.addSelect('avg(dat.pages_viewed)', 'avgPagesViewed')
 				.addSelect('sum(dat.pages_viewed)', 'totalPagesViewed')
@@ -45,11 +43,7 @@ export const createGetActivityReportDefinition: RouteDefinition<ActivityReport> 
 				.addSelect('sum(dat.time_spent_on_youtube_seconds)', 'totalTimeSpentOnYoutubeSeconds')
 				.addSelect('avg(dat.sidebar_recommendations_clicked)', 'avgSidebarRecommendationsClicked')
 				.addSelect('sum(dat.sidebar_recommendations_clicked)', 'totalSidebarRecommendationsClicked')
-				.from(DailyActivityTime, 'dat')
-				.innerJoin(Participant, 'p', 'dat.participant_id = p.id')
-				.addSelect('count(distinct p.id)', 'nParticipants')
-				.innerJoin(Session, 's', 's.participant_code = p.code')
-				.innerJoin(Event, 'e', 'e.session_uuid = s.uuid')
+				.addSelect('count(distinct dat.participant_id)', 'nParticipants')
 				.groupBy('dat.created_at')
 				.orderBy('dat.created_at', 'DESC')
 				.limit(15),
