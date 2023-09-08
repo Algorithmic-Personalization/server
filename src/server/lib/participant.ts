@@ -1,6 +1,6 @@
 import {type DataSource} from 'typeorm';
 
-import type Participant from '../models/participant';
+import Participant from '../models/participant';
 import {has} from '../../common/util';
 import {type ParticipantActivityHandler} from './externalNotifier';
 import TransitionEvent from '../models/transitionEvent';
@@ -40,10 +40,13 @@ export const createSaveParticipantTransition = ({
 			participantId: participant.id,
 		});
 
-		delete (updatedTransition as any).id;
+		const updatedParticipant = new Participant();
+		Object.assign(updatedParticipant, participant, {
+			phase: transition.toPhase,
+		});
 
 		const [, savedTransitionEvent] = await Promise.all([
-			qr.manager.save(participant),
+			qr.manager.save(updatedParticipant),
 			qr.manager.save(updatedTransition),
 		]);
 
