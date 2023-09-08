@@ -18,9 +18,9 @@ const updateParticipantPhase = (
 	log: LogFunction,
 ) =>
 	(fromPhase: number, toPhase: number) =>
-		async (participant: Participant): Promise<Participant> => {
+		async (participant: Participant): Promise<void> => {
 			if (fromPhase === toPhase) {
-				return participant;
+				return undefined;
 			}
 
 			const latestTransition = await dataSource
@@ -61,7 +61,7 @@ const updateParticipantPhase = (
 				}),
 			});
 
-			return saveParticipantTransition(participant, transition, undefined);
+			await saveParticipantTransition(participant, transition, undefined);
 		};
 
 export const updateParticipantDefinition: RouteDefinition<Participant> = {
@@ -99,7 +99,7 @@ export const updateParticipantDefinition: RouteDefinition<Participant> = {
 		}
 
 		if (isValidPhase(phase)) {
-			return updateParticipantPhase(dataSource, notifier, log)(
+			await updateParticipantPhase(dataSource, notifier, log)(
 				previousPhase, phase,
 			)(
 				participantEntity,

@@ -41,7 +41,9 @@ const resetDb = async (shortTimeout = false): Promise<TestDb> => {
 
 	await pgTools.createdb(dbConfigWithoutDatabase, 'ytdpnl');
 
-	const client = new Client(dbConfig);
+	const client = new Client({
+		...dbConfig,
+	});
 	await client.connect();
 
 	await migrate(dbConfig, dbConfig.migrationsDir);

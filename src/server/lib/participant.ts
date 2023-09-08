@@ -37,12 +37,17 @@ export const createSaveParticipantTransition = ({
 		const updatedTransition = new TransitionEvent();
 		Object.assign(updatedTransition, transition, {
 			eventId: triggerEvent ? triggerEvent.id : undefined,
+			participantId: participant.id,
 		});
+
+		delete (updatedTransition as any).id;
 
 		const [, savedTransitionEvent] = await Promise.all([
 			qr.manager.save(participant),
 			qr.manager.save(updatedTransition),
 		]);
+
+		await qr.commitTransaction();
 
 		await notifier.onPhaseChange(
 			transition.createdAt,
@@ -54,7 +59,7 @@ export const createSaveParticipantTransition = ({
 	};
 
 	try {
-		await qr.startTransaction();
+		await qr.startTransaction('SERIALIZABLE');
 		const repo = qr.manager.getRepository(TransitionEvent);
 		const latestExistingTransition = await repo
 			.createQueryBuilder()
@@ -78,10 +83,14 @@ export const createSaveParticipantTransition = ({
 		}
 
 		const p = await proceedToUpdate();
+		await qr.commitTransaction();
 
 		return p;
 	} catch (error) {
-		await qr.rollbackTransaction();
+		if (qr.isTransactionActive) {
+			await qr.rollbackTransaction();
+		}
+
 		return undefined;
 	} finally {
 		await qr.release();
