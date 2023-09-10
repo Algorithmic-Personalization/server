@@ -14,7 +14,8 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.createUpdateActivity = void 0;
 const typeorm_1 = require("typeorm");
-const event_1 = require("../../../common/models/event");
+const event_1 = __importDefault(require("../../../common/models/event"));
+const event_2 = require("../../../common/models/event");
 const dailyActivityTime_1 = __importDefault(require("../../models/dailyActivityTime"));
 const updateCounters_1 = require("../../lib/updateCounters");
 const util_1 = require("../../../util");
@@ -33,17 +34,19 @@ const getOrCreateActivity = (repo, participantId, day) => __awaiter(void 0, void
     newActivity.createdAt = day;
     return repo.save(newActivity);
 });
-const createUpdateActivity = ({ dataSource, activityRepo, eventRepo, notifier, log }) => (participant, event) => __awaiter(void 0, void 0, void 0, function* () {
+const createUpdateActivity = ({ dataSource, notifier, log }) => (participant, event) => __awaiter(void 0, void 0, void 0, function* () {
     log('Updating activity for participant ', participant.code);
     const day = (0, updateCounters_1.wholeDate)(event.createdAt);
+    const activityRepo = dataSource.getRepository(dailyActivityTime_1.default);
+    const eventRepo = dataSource.getRepository(event_1.default);
     const activity = yield getOrCreateActivity(activityRepo, participant.id, day);
-    if (event.type === event_1.EventType.PAGE_VIEW) {
+    if (event.type === event_2.EventType.PAGE_VIEW) {
         const latestSessionEvent = yield eventRepo
             .findOne({
             where: {
                 sessionUuid: event.sessionUuid,
                 createdAt: (0, typeorm_1.LessThan)(event.createdAt),
-                type: event_1.EventType.PAGE_VIEW,
+                type: event_2.EventType.PAGE_VIEW,
             },
             order: {
                 createdAt: 'DESC',
@@ -58,10 +61,10 @@ const createUpdateActivity = ({ dataSource, activityRepo, eventRepo, notifier, l
             activity.timeSpentOnYoutubeSeconds += dtS;
         }
     }
-    if (event.type === event_1.EventType.WATCH_TIME) {
+    if (event.type === event_2.EventType.WATCH_TIME) {
         activity.videoTimeViewedSeconds += event.secondsWatched;
     }
-    if (event.type === event_1.EventType.PAGE_VIEW) {
+    if (event.type === event_2.EventType.PAGE_VIEW) {
         activity.pagesViewed += 1;
         if (event.url.includes('/watch')) {
             activity.videoPagesViewed += 1;

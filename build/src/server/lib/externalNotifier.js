@@ -209,7 +209,7 @@ const makeDefaultExternalNotifier = (config) => ({ mailer, dataSource, log }) =>
             onPhaseChange(d, from_phase, to_phase) {
                 return __awaiter(this, void 0, void 0, function* () {
                     const { email: to } = config;
-                    const subject = `"${event_1.EventType.PHASE_TRANSITION}}" Update for User "${data.participantCode}"`;
+                    const subject = `"${event_1.EventType.PHASE_TRANSITION}" Update for User "${data.participantCode}"`;
                     const text = `Participant "${data.participantCode}" transitioned from phase "${from_phase}" to phase "${to_phase}" on "${d.getTime()}"`;
                     yield Promise.all([
                         mailer({ to, subject, text }),

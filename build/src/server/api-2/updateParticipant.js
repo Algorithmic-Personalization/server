@@ -41,7 +41,7 @@ const participant_2 = require("../lib/participant");
 const updateParticipantPhase = (dataSource, notifier, log) => (fromPhase, toPhase) => (participant) => __awaiter(void 0, void 0, void 0, function* () {
     var _a;
     if (fromPhase === toPhase) {
-        return participant;
+        return undefined;
     }
     const latestTransition = yield dataSource
         .getRepository(transitionEvent_1.default)
@@ -68,13 +68,14 @@ const updateParticipantPhase = (dataSource, notifier, log) => (fromPhase, toPhas
     transition.numDays = (0, util_1.daysElapsed)(startOfLatestPhase, new Date());
     const saveParticipantTransition = (0, participant_2.createSaveParticipantTransition)({
         dataSource,
+        log,
         notifier: notifier.makeParticipantNotifier({
             participantCode: participant.code,
             participantId: participant.id,
             isPaid: participant.isPaid,
         }),
     });
-    return saveParticipantTransition(participant, transition, undefined);
+    yield saveParticipantTransition(participant, transition, undefined);
 });
 exports.updateParticipantDefinition = {
     verb: 'put',
@@ -101,7 +102,7 @@ exports.updateParticipantDefinition = {
             throw new Error('Invalid phase, must be one of: 0, 1, 2');
         }
         if ((0, participant_1.isValidPhase)(phase)) {
-            return updateParticipantPhase(dataSource, notifier, log)(previousPhase, phase)(participantEntity);
+            yield updateParticipantPhase(dataSource, notifier, log)(previousPhase, phase)(participantEntity);
         }
         return participantRepo.save(participantEntity);
     }),

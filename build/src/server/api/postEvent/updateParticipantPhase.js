@@ -108,6 +108,7 @@ const createUpdatePhase = ({ dataSource, notifier, log, }) => (participant, late
                 participantId: participant.id,
                 isPaid: participant.isPaid,
             }),
+            log,
         });
         participant.phase = toPhase;
         yield saveParticipantTransition(participant, transitionEvent, triggerEvent);

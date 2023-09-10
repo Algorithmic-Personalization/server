@@ -40,7 +40,6 @@ const participant_1 = __importDefault(require("../models/participant"));
 const event_1 = __importStar(require("../../common/models/event"));
 const experimentConfig_1 = __importDefault(require("../../common/models/experimentConfig"));
 const util_1 = require("../../common/util");
-const dailyActivityTime_1 = __importDefault(require("../models/dailyActivityTime"));
 const transitionSetting_1 = require("../models/transitionSetting");
 const transitionEvent_1 = __importDefault(require("../models/transitionEvent"));
 const updateParticipantPhase_1 = __importDefault(require("./postEvent/updateParticipantPhase"));
@@ -126,12 +125,9 @@ const createPostEventRoute = ({ createLogger, dataSource, youTubeConfig, notifie
     event.updatedAt = new Date(event.updatedAt);
     event.localZeroHour = event.localZeroHour ? new Date(event.localZeroHour) : undefined;
     const participantRepo = dataSource.getRepository(participant_1.default);
-    const activityRepo = dataSource.getRepository(dailyActivityTime_1.default);
     const eventRepo = dataSource.getRepository(event_1.default);
     const updateActivity = (0, createUpdateActivity_1.default)({
         dataSource,
-        activityRepo,
-        eventRepo,
         notifier,
         log,
     });
@@ -189,8 +185,8 @@ const createPostEventRoute = ({ createLogger, dataSource, youTubeConfig, notifie
         log('event saved', summarizeForDisplay(e));
         void (0, util_2.withLock)(`participant-${participant.id}`)(() => __awaiter(void 0, void 0, void 0, function* () {
             try {
-                yield updateActivity(participant, event);
-                yield updatePhase(participant, event);
+                yield updateActivity(participant, e);
+                yield updatePhase(participant, e);
             }
             catch (e) {
                 log('activity update failed', e);

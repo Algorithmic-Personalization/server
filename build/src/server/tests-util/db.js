@@ -1,4 +1,27 @@
 "use strict";
+var __createBinding = (this && this.__createBinding) || (Object.create ? (function(o, m, k, k2) {
+    if (k2 === undefined) k2 = k;
+    var desc = Object.getOwnPropertyDescriptor(m, k);
+    if (!desc || ("get" in desc ? !m.__esModule : desc.writable || desc.configurable)) {
+      desc = { enumerable: true, get: function() { return m[k]; } };
+    }
+    Object.defineProperty(o, k2, desc);
+}) : (function(o, m, k, k2) {
+    if (k2 === undefined) k2 = k;
+    o[k2] = m[k];
+}));
+var __setModuleDefault = (this && this.__setModuleDefault) || (Object.create ? (function(o, v) {
+    Object.defineProperty(o, "default", { enumerable: true, value: v });
+}) : function(o, v) {
+    o["default"] = v;
+});
+var __importStar = (this && this.__importStar) || function (mod) {
+    if (mod && mod.__esModule) return mod;
+    var result = {};
+    if (mod != null) for (var k in mod) if (k !== "default" && Object.prototype.hasOwnProperty.call(mod, k)) __createBinding(result, mod, k);
+    __setModuleDefault(result, mod);
+    return result;
+};
 var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, generator) {
     function adopt(value) { return value instanceof P ? value : new P(function (resolve) { resolve(value); }); }
     return new (P || (P = Promise))(function (resolve, reject) {
@@ -35,6 +58,8 @@ const experimentConfig_1 = __importDefault(require("../../common/models/experime
 const participant_1 = __importDefault(require("../models/participant"));
 const event_1 = __importDefault(require("../../common/models/event"));
 const session_1 = __importDefault(require("../../common/models/session"));
+const transitionEvent_1 = __importStar(require("../models/transitionEvent"));
+const transitionSetting_1 = require("../../server/models/transitionSetting");
 const crypto_1 = require("../lib/crypto");
 const resetDb = (shortTimeout = false) => __awaiter(void 0, void 0, void 0, function* () {
     const dbConfig = yield (0, loadDbConfig_1.default)({
@@ -49,7 +74,7 @@ const resetDb = (shortTimeout = false) => __awaiter(void 0, void 0, void 0, func
         console.log('dropdb before tests failed, not necessarily an issue, it may not exist', e);
     }
     yield pgtools_1.default.createdb(dbConfigWithoutDatabase, 'ytdpnl');
-    const client = new pg_1.Client(dbConfig);
+    const client = new pg_1.Client(Object.assign({}, dbConfig));
     yield client.connect();
     yield (0, postgres_migrations_1.migrate)(dbConfig, dbConfig.migrationsDir);
     const extra = shortTimeout ? {
@@ -102,6 +127,14 @@ const resetDb = (shortTimeout = false) => __awaiter(void 0, void 0, void 0, func
         const saved = yield repo.save(event);
         return saved;
     });
+    const createTransitionEvent = (p) => {
+        const event = new transitionEvent_1.default();
+        event.participantId = p.id;
+        event.fromPhase = transitionSetting_1.Phase.PRE_EXPERIMENT;
+        event.toPhase = transitionSetting_1.Phase.EXPERIMENT;
+        event.reason = transitionEvent_1.TransitionReason.FORCED;
+        return event;
+    };
     const tearDown = () => __awaiter(void 0, void 0, void 0, function* () {
         yield client.end();
         yield dataSource.destroy();
@@ -112,6 +145,7 @@ const resetDb = (shortTimeout = false) => __awaiter(void 0, void 0, void 0, func
         createParticipant,
         createSession,
         createEvent,
+        createTransitionEvent,
         tearDown,
     };
 });
