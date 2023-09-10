@@ -99,6 +99,7 @@ export const createUpdatePhase = ({
 				participantId: participant.id,
 				isPaid: participant.isPaid,
 			}),
+			log,
 		});
 
 		participant.phase = toPhase;

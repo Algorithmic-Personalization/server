@@ -5,6 +5,7 @@ import {has} from '../../common/util';
 import {type ParticipantActivityHandler} from './externalNotifier';
 import TransitionEvent from '../models/transitionEvent';
 import type Event from '../../common/models/event';
+import {type LogFunction} from './logger';
 
 export type ParticipantRecord = {
 	email: string;
@@ -23,9 +24,11 @@ export const isParticipantRecord = (record: Record<string, string | number | und
 export const createSaveParticipantTransition = ({
 	dataSource,
 	notifier,
+	log,
 }: {
 	dataSource: DataSource;
 	notifier: ParticipantActivityHandler;
+	log: LogFunction;
 }) => async (
 	participant: Participant,
 	transition: TransitionEvent,
@@ -34,6 +37,8 @@ export const createSaveParticipantTransition = ({
 	const qr = dataSource.createQueryRunner();
 
 	const proceedToUpdate = async () => {
+		log('info', 'saving transition event...');
+
 		const updatedTransition = new TransitionEvent();
 		Object.assign(updatedTransition, transition, {
 			eventId: triggerEvent ? triggerEvent.id : undefined,
@@ -70,23 +75,27 @@ export const createSaveParticipantTransition = ({
 			.setLock('pessimistic_write_or_fail')
 			.where({
 				participantId: participant.id,
-				fromPhase: transition.fromPhase,
-				toPhase: transition.toPhase,
 			})
 			.orderBy({
 				id: 'DESC',
 			})
 			.getOne();
 
-		const minutes5 = 1000 * 60 * 5;
-
-		// The latest transition is too recent, don't save
-		if (latestExistingTransition && Date.now() - latestExistingTransition.createdAt.getTime() < minutes5) {
-			return;
+		if (latestExistingTransition) {
+			if (
+				latestExistingTransition.fromPhase === transition.fromPhase
+				&& latestExistingTransition.toPhase === transition.toPhase
+			) {
+				log('info', 'transition already exists, skipping');
+				// No need to update
+				return;
+			}
 		}
 
 		const p = await proceedToUpdate();
 		await qr.commitTransaction();
+
+		log('success', 'transition from', transition.fromPhase, 'to', transition.toPhase, 'saved');
 
 		return p;
 	} catch (error) {

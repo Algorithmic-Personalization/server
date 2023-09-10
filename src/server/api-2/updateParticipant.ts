@@ -54,6 +54,7 @@ const updateParticipantPhase = (
 
 			const saveParticipantTransition = createSaveParticipantTransition({
 				dataSource,
+				log,
 				notifier: notifier.makeParticipantNotifier({
 					participantCode: participant.code,
 					participantId: participant.id,

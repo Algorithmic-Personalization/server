@@ -266,7 +266,7 @@ export const makeDefaultExternalNotifier = (config: ExternalNotifierConfig) =>
 				},
 				async onPhaseChange(d: Date, from_phase: number, to_phase: number) {
 					const {email: to} = config;
-					const subject = `"${EventType.PHASE_TRANSITION}}" Update for User "${data.participantCode}"`;
+					const subject = `"${EventType.PHASE_TRANSITION}" Update for User "${data.participantCode}"`;
 					const text = `Participant "${data.participantCode}" transitioned from phase "${from_phase}" to phase "${to_phase}" on "${d.getTime()}"`;
 					await Promise.all([
 						mailer({to, subject, text}),
