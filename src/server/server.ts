@@ -354,7 +354,10 @@ const main = async () => {
 		currentRequests.inc();
 
 		req.requestId = requestId;
-		log(req.method, req.url, req.headers);
+
+		const {referer} = req.headers;
+
+		log(req.method, req.url, {referer});
 
 		req.on('close', async () => {
 			const tElapsed = Date.now() - tStart;
