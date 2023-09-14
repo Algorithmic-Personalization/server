@@ -8,6 +8,9 @@ var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, ge
         step((generator = generator.apply(thisArg, _arguments || [])).next());
     });
 };
+var __importDefault = (this && this.__importDefault) || function (mod) {
+    return (mod && mod.__esModule) ? mod : { "default": mod };
+};
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.makeCreateDefaultLogger = void 0;
 const path_1 = require("path");
@@ -15,6 +18,7 @@ const fs_1 = require("fs");
 const promises_1 = require("fs/promises");
 const util_1 = require("util");
 const node_gzip_1 = require("node-gzip");
+const async_lock_1 = __importDefault(require("async-lock"));
 const red = (str) => `\x1b[31m${str}\x1b[0m`;
 const green = (str) => `\x1b[32m${str}\x1b[0m`;
 const orange = (str) => `\x1b[33m${str}\x1b[0m`;
@@ -28,15 +32,11 @@ const getMonth = (d) => {
     }
     return m.toString(10);
 };
+const lock = new async_lock_1.default();
 const makeCreateDefaultLogger = (filePath) => (requestIdOrId) => {
     let prettyStream = (0, fs_1.createWriteStream)(filePath, { flags: 'a' });
-    let checking = false;
-    const checkLogSizeAndCompress = () => __awaiter(void 0, void 0, void 0, function* () {
-        if (checking) {
-            return;
-        }
+    const doCheckLogSizeAndCompress = () => __awaiter(void 0, void 0, void 0, function* () {
         try {
-            checking = true;
             const s = yield (0, promises_1.stat)(filePath);
             if (s.size < compressAboveThresholdBytes) {
                 return;
@@ -68,10 +68,8 @@ const makeCreateDefaultLogger = (filePath) => (requestIdOrId) => {
                 console.error('Something went wrong while checking the log size at:', filePath, e);
             }
         }
-        finally {
-            checking = false;
-        }
     });
+    const checkLogSizeAndCompress = () => __awaiter(void 0, void 0, void 0, function* () { return lock.acquire('log', doCheckLogSizeAndCompress); });
     setInterval(checkLogSizeAndCompress, logSizeCheckInterval);
     void checkLogSizeAndCompress();
     return (...args) => {

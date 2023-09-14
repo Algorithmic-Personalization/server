@@ -5,6 +5,7 @@ import {stat, readFile, writeFile, cp, rm} from 'fs/promises';
 import {inspect} from 'util';
 
 import {gzip} from 'node-gzip';
+import AsyncLock from 'async-lock';
 
 export type LogFunction = (message: string, ...args: any[]) => void;
 
@@ -28,17 +29,13 @@ const getMonth = (d: Date) => {
 	return m.toString(10);
 };
 
+const lock = new AsyncLock();
+
 export const makeCreateDefaultLogger = (filePath: string): CreateLogger => (requestIdOrId: number | string) => {
 	let prettyStream = createWriteStream(filePath, {flags: 'a'});
 
-	let checking = false;
-	const checkLogSizeAndCompress = async () => {
-		if (checking) {
-			return;
-		}
-
+	const doCheckLogSizeAndCompress = async () => {
 		try {
-			checking = true;
 			const s = await stat(filePath);
 
 			if (s.size < compressAboveThresholdBytes) {
@@ -74,10 +71,10 @@ export const makeCreateDefaultLogger = (filePath: string): CreateLogger => (requ
 			if ((e as any).code !== 'ENOENT') {
 				console.error('Something went wrong while checking the log size at:', filePath, e);
 			}
-		} finally {
-			checking = false;
 		}
 	};
+
+	const checkLogSizeAndCompress = async () => lock.acquire('log', doCheckLogSizeAndCompress);
 
 	setInterval(checkLogSizeAndCompress, logSizeCheckInterval);
 	void checkLogSizeAndCompress();

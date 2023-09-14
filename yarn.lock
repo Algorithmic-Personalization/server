@@ -1564,6 +1564,13 @@ __metadata:
   languageName: node
   linkType: hard
 
+"@types/async-lock@npm:^1.4.0":
+  version: 1.4.0
+  resolution: "@types/async-lock@npm:1.4.0"
+  checksum: 3822d080b83384b021453324001912a10925624c90e2129a66ac5b17b6bb81d5070f60fef394846c7880d8094cfdf92501a31352bfc5a239e76ab0caa0ea6be6
+  languageName: node
+  linkType: hard
+
 "@types/babel__core@npm:^7.1.14":
   version: 7.1.20
   resolution: "@types/babel__core@npm:7.1.20"
@@ -2899,6 +2906,13 @@ __metadata:
     semver: ^5.3.0
     shimmer: ^1.1.0
   checksum: f64cb835ad1a07d4ee800df6c1532f2a4f99e1c2a11da8e83c1bd4452bc01729a85552377bc120f144abc17be6c0bd0f740ebedfdf4b79ebd18844a51e307326
+  languageName: node
+  linkType: hard
+
+"async-lock@npm:^1.4.0":
+  version: 1.4.0
+  resolution: "async-lock@npm:1.4.0"
+  checksum: a71ef9e50dc448a8e8dd6482494210d7b6f556d4815612b1fed5662216cd756c2c8fb9c2153a9a66ea90b36ba7fb18aa568d11813aadc23feb4c5b0b188df614
   languageName: node
   linkType: hard
 
@@ -11249,6 +11263,7 @@ __metadata:
     "@mui/material": ^5.11.14
     "@mui/x-date-pickers": ^6.3.0
     "@pmmmwh/react-refresh-webpack-plugin": ^0.5.10
+    "@types/async-lock": ^1.4.0
     "@types/bcrypt": ^5.0.0
     "@types/cors": ^2.8.13
     "@types/csv-parse": ^1.2.2
@@ -11275,6 +11290,7 @@ __metadata:
     "@types/yaml": ^1.9.7
     "@typescript-eslint/eslint-plugin": ^5.57.0
     "@typescript-eslint/parser": ^5.57.0
+    async-lock: ^1.4.0
     bcrypt: ^5.1.0
     body-parser: ^1.20.2
     class-validator: ^0.14.0
