@@ -35,111 +35,133 @@ const getOrCreateActivity = (repo, participantId, day) => __awaiter(void 0, void
     return repo.save(newActivity);
 });
 const createUpdateActivity = ({ dataSource, notifier, log }) => (participant, event) => __awaiter(void 0, void 0, void 0, function* () {
-    log('Updating activity for participant ', participant.code);
+    // These events do not trigger activity updates
+    if (event.type !== event_2.EventType.PAGE_VIEW
+        && event.type !== event_2.EventType.WATCH_TIME
+        && event.type !== event_2.EventType.PERSONALIZED_CLICKED
+        && event.type !== event_2.EventType.NON_PERSONALIZED_CLICKED
+        && event.type !== event_2.EventType.MIXED_CLICKED) {
+        // Bail out early to spare resources
+        return;
+    }
+    // We want to lock the activity table later so that it is not updated concurrently
+    const qr = dataSource.createQueryRunner();
     const day = (0, updateCounters_1.wholeDate)(event.createdAt);
-    const activityRepo = dataSource.getRepository(dailyActivityTime_1.default);
-    const eventRepo = dataSource.getRepository(event_1.default);
-    const activity = yield getOrCreateActivity(activityRepo, participant.id, day);
-    if (event.type === event_2.EventType.PAGE_VIEW) {
-        const latestSessionEvent = yield eventRepo
-            .findOne({
-            where: {
-                sessionUuid: event.sessionUuid,
-                createdAt: (0, typeorm_1.LessThan)(event.createdAt),
-                type: event_2.EventType.PAGE_VIEW,
-            },
-            order: {
-                createdAt: 'DESC',
-            },
+    try {
+        log('info', 'Updating activity for participant ', participant.code, 'with event', event.type, '@', event.extensionVersion, 'for day', day);
+        yield qr.startTransaction();
+        const activityRepo = qr.manager.getRepository(dailyActivityTime_1.default);
+        const eventRepo = qr.manager.getRepository(event_1.default);
+        const activity = yield getOrCreateActivity(activityRepo, participant.id, day);
+        if (event.type === event_2.EventType.PAGE_VIEW) {
+            const latestSessionEvent = yield eventRepo
+                .findOne({
+                where: {
+                    sessionUuid: event.sessionUuid,
+                    createdAt: (0, typeorm_1.LessThan)(event.createdAt),
+                    type: event_2.EventType.PAGE_VIEW,
+                },
+                order: {
+                    createdAt: 'DESC',
+                },
+            });
+            const dt = latestSessionEvent
+                ? Number(event.createdAt) - Number(latestSessionEvent.createdAt)
+                : 0;
+            if (dt < updateCounters_1.timeSpentEventDiffLimit && dt > 0) {
+                const dtS = dt / 1000;
+                log('info', 'time since last event', dtS);
+                activity.timeSpentOnYoutubeSeconds += dtS;
+            }
+        }
+        if (event.type === event_2.EventType.WATCH_TIME) {
+            activity.videoTimeViewedSeconds += event.secondsWatched;
+        }
+        if (event.type === event_2.EventType.PAGE_VIEW) {
+            activity.pagesViewed += 1;
+            if (event.url.includes('/watch')) {
+                activity.videoPagesViewed += 1;
+            }
+        }
+        if (event.type === 'PERSONALIZED_CLICKED'
+            || event.type === 'NON_PERSONALIZED_CLICKED'
+            || event.type === 'MIXED_CLICKED') {
+            activity.sidebarRecommendationsClicked += 1;
+        }
+        activity.updatedAt = new Date();
+        log('info', 'Saving activity:', activity);
+        yield activityRepo.save(activity);
+        /* Handle activation of extension */
+        const isActiveParticipant = () => __awaiter(void 0, void 0, void 0, function* () {
+            // 3 pages viewed
+            const minPagesViewed = 3;
+            // 5 minutes spent on YouTube
+            const minMinutesOnYouTube = 5;
+            const qb = dataSource.createQueryBuilder();
+            const show = (0, util_1.showSql)(log);
+            const pagesViewed = yield show(qb.select('SUM(pages_viewed)', 'pages_viewed')
+                .from('daily_activity_time', 'dat')
+                .where('dat.participant_id = :participantId', { participantId: participant.id })).getRawOne();
+            log(`Pages viewed by ${participant.id}:`, pagesViewed);
+            if (!(0, util_2.has)('pages_viewed')(pagesViewed)) {
+                log('error', 'pages_viewed not found (while checking if participant is active)');
+                return false;
+            }
+            const { pages_viewed: pagesViewedRaw } = pagesViewed;
+            if (typeof pagesViewedRaw !== 'string') {
+                log('error', 'pagesViewedRaw is not a string (while checking if participant is active)');
+                return false;
+            }
+            const pagesViewedNum = Number(pagesViewedRaw);
+            if (isNaN(pagesViewedNum)) {
+                log('error', 'pagesViewedNum is NaN (while checking if participant is active)');
+                return false;
+            }
+            if (pagesViewedNum < minPagesViewed) {
+                log('info', `Not enough pages viewed (need ${minPagesViewed}, got ${pagesViewedNum})`);
+                return false;
+            }
+            // 5 minutes spent on youtube
+            const timeSpentOnYouTubeSeconds = yield show(qb.select('SUM(time_spent_on_youtube_seconds)', 'ts')
+                .where('dat.participant_id = :participantId', { participantId: participant.id })).getRawOne();
+            log(`Time spent on YouTube by ${participant.id} in seconds:`, timeSpentOnYouTubeSeconds);
+            if (!(0, util_2.has)('ts')(timeSpentOnYouTubeSeconds)) {
+                log('error', 'timeSpentOnYouTubeSeconds not found (while checking if participant is active)');
+                return false;
+            }
+            const { ts: secondsOnYouTube } = timeSpentOnYouTubeSeconds;
+            if (typeof secondsOnYouTube !== 'number') {
+                log('error', 'secondsOnYouTube is not a number (while checking if participant is active)');
+                return false;
+            }
+            const minutesOnYouTube = secondsOnYouTube / 60;
+            if (minutesOnYouTube < minMinutesOnYouTube) {
+                log('info', `Not enough minutes spent on YouTube (need ${minMinutesOnYouTube}, got ${minutesOnYouTube})`);
+                return false;
+            }
+            log('info', `Participant ${participant.id} is active!`);
+            return true;
         });
-        const dt = latestSessionEvent
-            ? Number(event.createdAt) - Number(latestSessionEvent.createdAt)
-            : 0;
-        if (dt < updateCounters_1.timeSpentEventDiffLimit && dt > 0) {
-            const dtS = dt / 1000;
-            log('Time since last event:', dtS);
-            activity.timeSpentOnYoutubeSeconds += dtS;
+        if (participant.extensionActivatedAt === null && (yield isActiveParticipant())) {
+            const activateExtension = (0, createActivateExtension_1.createActivateExtension)({
+                dataSource,
+                activityNotifier: notifier.makeParticipantNotifier({
+                    participantCode: participant.code,
+                    participantId: participant.id,
+                    isPaid: participant.isPaid,
+                }),
+                log,
+            });
+            void activateExtension(event, participant);
         }
+        yield qr.commitTransaction();
     }
-    if (event.type === event_2.EventType.WATCH_TIME) {
-        activity.videoTimeViewedSeconds += event.secondsWatched;
+    catch (err) {
+        log('error', 'while updating activity:', err);
+        yield qr.rollbackTransaction();
     }
-    if (event.type === event_2.EventType.PAGE_VIEW) {
-        activity.pagesViewed += 1;
-        if (event.url.includes('/watch')) {
-            activity.videoPagesViewed += 1;
-        }
-    }
-    if (event.type === 'PERSONALIZED_CLICKED'
-        || event.type === 'NON_PERSONALIZED_CLICKED'
-        || event.type === 'MIXED_CLICKED') {
-        activity.sidebarRecommendationsClicked += 1;
-    }
-    activity.updatedAt = new Date();
-    yield activityRepo.save(activity);
-    /* Handle activation of extension */
-    const isActiveParticipant = () => __awaiter(void 0, void 0, void 0, function* () {
-        // 3 pages viewed
-        const minPagesViewed = 3;
-        // 5 minutes spent on YouTube
-        const minMinutesOnYouTube = 5;
-        const qb = dataSource.createQueryBuilder();
-        const show = (0, util_1.showSql)(log);
-        const pagesViewed = yield show(qb.select('SUM(pages_viewed)', 'pages_viewed')
-            .from('daily_activity_time', 'dat')
-            .where('dat.participant_id = :participantId', { participantId: participant.id })).getRawOne();
-        log(`Pages viewed by ${participant.id}:`, pagesViewed);
-        if (!(0, util_2.has)('pages_viewed')(pagesViewed)) {
-            log('error', 'pages_viewed not found (while checking if participant is active)');
-            return false;
-        }
-        const { pages_viewed: pagesViewedRaw } = pagesViewed;
-        if (typeof pagesViewedRaw !== 'string') {
-            log('error', 'pagesViewedRaw is not a string (while checking if participant is active)');
-            return false;
-        }
-        const pagesViewedNum = Number(pagesViewedRaw);
-        if (isNaN(pagesViewedNum)) {
-            log('error', 'pagesViewedNum is NaN (while checking if participant is active)');
-            return false;
-        }
-        log('Pages viewed:', pagesViewedNum);
-        if (pagesViewedNum < minPagesViewed) {
-            log('info', `Not enough pages viewed (need ${minPagesViewed}, got ${pagesViewedNum})`);
-            return false;
-        }
-        // 5 minutes spent on youtube
-        const timeSpentOnYouTubeSeconds = yield show(qb.select('SUM(time_spent_on_youtube_seconds)', 'ts')
-            .where('dat.participant_id = :participantId', { participantId: participant.id })).getRawOne();
-        log(`Time spent on YouTube by ${participant.id} in seconds:`, timeSpentOnYouTubeSeconds);
-        if (!(0, util_2.has)('ts')(timeSpentOnYouTubeSeconds)) {
-            log('error', 'timeSpentOnYouTubeSeconds not found (while checking if participant is active)');
-            return false;
-        }
-        const { ts: secondsOnYouTube } = timeSpentOnYouTubeSeconds;
-        if (typeof secondsOnYouTube !== 'number') {
-            log('error', 'secondsOnYouTube is not a number (while checking if participant is active)');
-            return false;
-        }
-        const minutesOnYouTube = secondsOnYouTube / 60;
-        if (minutesOnYouTube < minMinutesOnYouTube) {
-            log('info', `Not enough minutes spent on YouTube (need ${minMinutesOnYouTube}, got ${minutesOnYouTube})`);
-            return false;
-        }
-        log('info', `Participant ${participant.id} is active!`);
-        return true;
-    });
-    if (participant.extensionActivatedAt === null && (yield isActiveParticipant())) {
-        const activateExtension = (0, createActivateExtension_1.createActivateExtension)({
-            dataSource,
-            activityNotifier: notifier.makeParticipantNotifier({
-                participantCode: participant.code,
-                participantId: participant.id,
-                isPaid: participant.isPaid,
-            }),
-            log,
-        });
-        void activateExtension(event, participant);
+    finally {
+        yield qr.release();
     }
 });
 exports.createUpdateActivity = createUpdateActivity;

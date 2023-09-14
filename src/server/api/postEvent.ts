@@ -20,7 +20,7 @@ import createStoreWatchTime from './postEvent/storeWatchTime';
 import createHandleExtensionInstalledEvent from './postEvent/handleExtensionInstalledEvent';
 
 import storeRecommendationsShown from '../lib/storeRecommendationsShown';
-import {withLock} from '../../util';
+import AsyncLock from 'async-lock';
 
 const isLocalUuidAlreadyExistsError = (e: unknown): boolean =>
 	has('code')(e) && has('constraint')(e)
@@ -116,6 +116,7 @@ export const createPostEventRoute: RouteCreator = ({
 	log('Received post event request');
 
 	const {participantCode} = req;
+	const lock = new AsyncLock();
 
 	if (req.body.sessionUuid === undefined) {
 		log('No session UUID found');
@@ -209,24 +210,29 @@ export const createPostEventRoute: RouteCreator = ({
 		const e = await eventRepo.save(event);
 		log('event saved', summarizeForDisplay(e));
 
-		void withLock(`participant-${participant.id}`)(async () => {
+		// Update the things the response doesn't depend upon in parallel
+		void lock.acquire(`participant-${participant.id}`, async () => {
 			try {
 				await updateActivity(participant, e);
 				await updatePhase(participant, e);
 			} catch (e) {
-				log('activity update failed', e);
+				log('error', 'activity update failed', e);
 			}
 		});
 
 		if (event.type === EventType.RECOMMENDATIONS_SHOWN) {
-			await storeRecommendationsShown({
+			storeRecommendationsShown({
 				dataSource,
 				youTubeConfig,
 				event: event as RecommendationsEvent,
 				log,
+			}).catch(async err => {
+				log('error', 'recommendations store failed', err);
 			});
 		} else if (event.type === EventType.WATCH_TIME) {
-			await storeWatchTime(event as WatchTimeEvent);
+			storeWatchTime(event as WatchTimeEvent).catch(async err => {
+				log('error', 'watch time store failed', err);
+			});
 		}
 
 		res.send({kind: 'Success', value: e});

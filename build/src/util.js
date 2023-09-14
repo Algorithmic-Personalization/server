@@ -9,7 +9,7 @@ var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, ge
     });
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.sleep = exports.showInsertSql = exports.showSql = exports.stringFromMaybeError = exports.asyncPerf = exports.pct = exports.formatPct = exports.formatSize = exports.daysElapsed = exports.withLock = exports.localNow = void 0;
+exports.sleep = exports.showInsertSql = exports.showSql = exports.stringFromMaybeError = exports.asyncPerf = exports.pct = exports.formatPct = exports.formatSize = exports.daysElapsed = exports.localNow = void 0;
 const localNow = () => {
     const now = new Date();
     return {
@@ -22,71 +22,6 @@ const localNow = () => {
     };
 };
 exports.localNow = localNow;
-const locks = new Map();
-const unstackLock = (id, log) => __awaiter(void 0, void 0, void 0, function* () {
-    const stack = locks.get(id);
-    if (!stack) {
-        return;
-    }
-    if (stack.queue.length === 0) {
-        return;
-    }
-    if (!stack.running) {
-        const fn = stack.queue.shift();
-        if (fn) {
-            try {
-                stack.running = fn.run();
-                yield stack.running;
-            }
-            catch (error) {
-                log === null || log === void 0 ? void 0 : log('error in unstackLock', { id, error });
-            }
-            finally {
-                stack.running = undefined;
-                clearInterval(fn.interval);
-                yield unstackLock(id);
-            }
-            const newStack = locks.get(id);
-            if (newStack && newStack.queue.length === 0) {
-                locks.delete(id);
-            }
-        }
-    }
-});
-const withLock = (id) => (fn, log) => __awaiter(void 0, void 0, void 0, function* () {
-    if (!locks.has(id)) {
-        locks.set(id, { running: undefined, queue: [] });
-    }
-    const lock = locks.get(id);
-    if (!lock) {
-        // Never happens but makes TS happy
-        throw new Error('Lock is not defined');
-    }
-    const checkInterval = setInterval(() => {
-        const now = new Date();
-        const lock = locks.get(id);
-        if (!lock) {
-            clearInterval(checkInterval);
-            return;
-        }
-        const oldest = lock.queue[0];
-        if (!oldest) {
-            clearInterval(checkInterval);
-            return;
-        }
-        // TODO: this error should be emailed
-        if (now.getTime() - oldest.queuedAt.getTime() > 1000 * 60 * 5) {
-            log === null || log === void 0 ? void 0 : log('error', `Lock ${id} has been queued for more than 5 minutes, something is wrong`);
-        }
-    }, 1000 * 60);
-    lock.queue.push({
-        queuedAt: new Date(),
-        run: fn,
-        interval: checkInterval,
-    });
-    return unstackLock(id, log);
-});
-exports.withLock = withLock;
 const daysElapsed = (fromDate, toDate) => {
     const from = new Date(fromDate);
     const to = new Date(toDate);

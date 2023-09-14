@@ -47,7 +47,7 @@ const createUpdateActivity_1 = __importDefault(require("./postEvent/createUpdate
 const storeWatchTime_1 = __importDefault(require("./postEvent/storeWatchTime"));
 const handleExtensionInstalledEvent_1 = __importDefault(require("./postEvent/handleExtensionInstalledEvent"));
 const storeRecommendationsShown_1 = __importDefault(require("../lib/storeRecommendationsShown"));
-const util_2 = require("../../util");
+const async_lock_1 = __importDefault(require("async-lock"));
 const isLocalUuidAlreadyExistsError = (e) => (0, util_1.has)('code')(e) && (0, util_1.has)('constraint')(e)
     && e.code === '23505'
     && e.constraint === 'event_local_uuid_idx';
@@ -109,6 +109,7 @@ const createPostEventRoute = ({ createLogger, dataSource, youTubeConfig, notifie
     const log = createLogger(req.requestId);
     log('Received post event request');
     const { participantCode } = req;
+    const lock = new async_lock_1.default();
     if (req.body.sessionUuid === undefined) {
         log('No session UUID found');
         res.status(500).json({ kind: 'Failure', message: 'No session UUID found' });
@@ -183,25 +184,30 @@ const createPostEventRoute = ({ createLogger, dataSource, youTubeConfig, notifie
     try {
         const e = yield eventRepo.save(event);
         log('event saved', summarizeForDisplay(e));
-        void (0, util_2.withLock)(`participant-${participant.id}`)(() => __awaiter(void 0, void 0, void 0, function* () {
+        // Update the things the response doesn't depend upon in parallel
+        void lock.acquire(`participant-${participant.id}`, () => __awaiter(void 0, void 0, void 0, function* () {
             try {
                 yield updateActivity(participant, e);
                 yield updatePhase(participant, e);
             }
             catch (e) {
-                log('activity update failed', e);
+                log('error', 'activity update failed', e);
             }
         }));
         if (event.type === event_1.EventType.RECOMMENDATIONS_SHOWN) {
-            yield (0, storeRecommendationsShown_1.default)({
+            (0, storeRecommendationsShown_1.default)({
                 dataSource,
                 youTubeConfig,
                 event: event,
                 log,
-            });
+            }).catch((err) => __awaiter(void 0, void 0, void 0, function* () {
+                log('error', 'recommendations store failed', err);
+            }));
         }
         else if (event.type === event_1.EventType.WATCH_TIME) {
-            yield storeWatchTime(event);
+            storeWatchTime(event).catch((err) => __awaiter(void 0, void 0, void 0, function* () {
+                log('error', 'watch time store failed', err);
+            }));
         }
         res.send({ kind: 'Success', value: e });
     }
