@@ -23,3 +23,32 @@ group by p.id
 having count(*) > 10
 )
 ```
+
+Get the activity report:
+
+```sql
+select date(e.created_at) as day,
+count(distinct s.participant_code) as nParticipants,
+sum(case e.type when 'PAGE_VIEW' then 1 else 0 end) as sumPagesViewed,
+sum(case e.type
+    when 'PAGE_VIEW'
+        then
+            case when e.url LIKE '%/watch%' then
+                1 else
+                0 end
+            else
+            0
+        end) as sumVideoPagesViewed,
+sum(
+    case e.type when 'NON_PERSONALIZED_CLICKED' then 1
+                when 'PERSONALIZED_CLICKED' then 1
+                when 'MIXED_CLICKED' then 1
+                else 0
+            end
+    ) as sumClicks
+from event e
+inner join session s on s.uuid = e.session_uuid
+group by date(e.created_at)
+order by day DESC
+limit 10
+```
