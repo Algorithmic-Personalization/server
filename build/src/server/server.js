@@ -250,7 +250,8 @@ const main = () => __awaiter(void 0, void 0, void 0, function* () {
         const log = createLogger(req.requestId);
         currentRequests.inc();
         req.requestId = requestId;
-        log(req.method, req.url, req.headers);
+        const { referer } = req.headers;
+        log(req.method, req.url, { referer });
         req.on('close', () => __awaiter(void 0, void 0, void 0, function* () {
             const tElapsed = Date.now() - tStart;
             log(`\x1b[94m{request #${requestId} ended in ${tElapsed}ms}\x1b[0m`);

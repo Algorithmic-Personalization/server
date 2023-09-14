@@ -51,6 +51,9 @@ const async_lock_1 = __importDefault(require("async-lock"));
 const isLocalUuidAlreadyExistsError = (e) => (0, util_1.has)('code')(e) && (0, util_1.has)('constraint')(e)
     && e.code === '23505'
     && e.constraint === 'event_local_uuid_idx';
+const isSessionUuidAlreadyExistsError = (e) => (0, util_1.has)('code')(e) && (0, util_1.has)('constraint')(e)
+    && e.code === '23503'
+    && e.constraint === 'event_session_uuid_fkey';
 const activityMatches = (setting, activity) => {
     let criteriaOk = 0;
     const criteriaCount = 5;
@@ -212,7 +215,7 @@ const createPostEventRoute = ({ createLogger, dataSource, youTubeConfig, notifie
         res.send({ kind: 'Success', value: e });
     }
     catch (e) {
-        if (isLocalUuidAlreadyExistsError(e)) {
+        if (isLocalUuidAlreadyExistsError(e) || isSessionUuidAlreadyExistsError(e)) {
             res.status(200).json({ kind: 'Failure', message: 'Event already exists', code: 'EVENT_ALREADY_EXISTS_OK' });
             return;
         }
