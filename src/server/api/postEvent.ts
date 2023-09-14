@@ -27,6 +27,11 @@ const isLocalUuidAlreadyExistsError = (e: unknown): boolean =>
 	&& e.code === '23505'
 	&& e.constraint === 'event_local_uuid_idx';
 
+const isSessionUuidAlreadyExistsError = (e: unknown): boolean =>
+	has('code')(e) && has('constraint')(e)
+	&& e.code === '23503'
+	&& e.constraint === 'event_session_uuid_fkey';
+
 const activityMatches = (
 	setting: TransitionSetting,
 	activity: DailyActivityTime,
@@ -237,7 +242,7 @@ export const createPostEventRoute: RouteCreator = ({
 
 		res.send({kind: 'Success', value: e});
 	} catch (e) {
-		if (isLocalUuidAlreadyExistsError(e)) {
+		if (isLocalUuidAlreadyExistsError(e) || isSessionUuidAlreadyExistsError(e)) {
 			res.status(200).json({kind: 'Failure', message: 'Event already exists', code: 'EVENT_ALREADY_EXISTS_OK'});
 			return;
 		}
