@@ -130,3 +130,4 @@ Or preferably in tmux:
 ```bash
 docker-compose up app-server
 ```
+# firewall
