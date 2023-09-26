@@ -1,10 +1,38 @@
+/* eslint-disable no-bitwise */
+
 import type express from 'express';
 
 import {type CreateLogger} from './logger';
 
-export const createParticipantMiddleWare = (createLogger: CreateLogger) =>
+const pretty = (str: string): string => {
+	const bits: string[] = [];
+
+	for (let i = 0; i < str.length; i += 2) {
+		const bit = [str[i].toLocaleUpperCase()];
+		if (str[i + 1]) {
+			bit.push(str[i + 1].toLocaleLowerCase());
+		}
+
+		bits.push(bit.join(''));
+	}
+
+	return bits.join('-');
+};
+
+const hash = (str: string): string => {
+	let hash = 0;
+	for (let i = 0; i < str.length; i++) {
+		hash = ((hash << 5) - hash) + str.charCodeAt(i);
+		hash |= 0; // Convert to 32bit integer
+	}
+
+	return pretty(hash.toString(16));
+};
+
+export const createParticipantMiddleWare = (createLogger: CreateLogger, extraLogger: CreateLogger) =>
 	(req: express.Request, res: express.Response, next: express.NextFunction) => {
 		const log = createLogger(req.requestId);
+		const extraLog = extraLogger(req.requestId);
 		const participantCode = req.headers['x-participant-code'];
 
 		log('checking participant code:', participantCode);
@@ -18,6 +46,14 @@ export const createParticipantMiddleWare = (createLogger: CreateLogger) =>
 		// send a 200 response with a failure message so that clients
 		// can stop retrying.
 		const bail = () => {
+			extraLog('error', 'invalid participant code', {
+				url: req.url,
+				body: req.body as unknown,
+				ip: req.ip,
+				userAgent: req.headers['user-agent'],
+				userAgentHash: hash(req.headers['user-agent'] ?? ''),
+			});
+
 			res.status(200).json({
 				kind: 'Failure',
 				message: 'Invalid participant code',

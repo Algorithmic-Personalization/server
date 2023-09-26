@@ -38,7 +38,7 @@ import {
 	makeRouteConnector as makeExpressHandlerCreator,
 } from './lib/routeCreation';
 
-import {makeCreateDefaultLogger} from './lib/logger';
+import {makeCreateDefaultLogger as makeCreateLogger} from './lib/logger';
 import {createTokenTools} from './lib/crypto';
 import createAuthMiddleWare from './lib/authMiddleware';
 import createParticipantMiddleware from './lib/participantMiddleware';
@@ -146,7 +146,8 @@ const main = async () => {
 	const root = await findPackageJsonDir(__dirname);
 	const config = await loadConfigYamlRaw();
 
-	const createLogger = makeCreateDefaultLogger(join(root, logsDirName, 'server.log'));
+	const createLogger = makeCreateLogger(join(root, logsDirName, 'server.log'));
+	const createExtraLogger = makeCreateLogger(join(root, logsDirName, 'extra.log'), false);
 	const log = createLogger('<server>');
 
 	const dockerComposeYaml = await readFile(join(root, 'docker-compose.yaml'), 'utf-8');
@@ -314,7 +315,10 @@ const main = async () => {
 		createLogger,
 	});
 
-	const participantMw = createParticipantMiddleware(createLogger);
+	const participantMw = createParticipantMiddleware(
+		createLogger,
+		createExtraLogger,
+	);
 
 	const app = express();
 

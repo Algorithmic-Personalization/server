@@ -23,7 +23,7 @@
 		"sourceMap": true
 	},
 	"include": ["."],
-	"exclude": ["node_modules", "build", "dist"],
+	"exclude": ["node_modules", "build", "dist", "src/express-simple-firewall"],
 	"ts-node": {
 		"files": true,
 	}

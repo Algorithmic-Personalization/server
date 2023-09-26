@@ -107,6 +107,7 @@ const main = () => __awaiter(void 0, void 0, void 0, function* () {
     const root = yield (0, util_1.findPackageJsonDir)(__dirname);
     const config = yield (0, loadConfigYamlRaw_1.loadConfigYamlRaw)();
     const createLogger = (0, logger_1.makeCreateDefaultLogger)((0, path_1.join)(root, exports.logsDirName, 'server.log'));
+    const createExtraLogger = (0, logger_1.makeCreateDefaultLogger)((0, path_1.join)(root, exports.logsDirName, 'extra.log'), false);
     const log = createLogger('<server>');
     const dockerComposeYaml = yield (0, promises_1.readFile)((0, path_1.join)(root, 'docker-compose.yaml'), 'utf-8');
     const dockerComposeConfig = (0, yaml_1.parse)(dockerComposeYaml);
@@ -223,7 +224,7 @@ const main = () => __awaiter(void 0, void 0, void 0, function* () {
         tokenTools,
         createLogger,
     });
-    const participantMw = (0, participantMiddleware_1.default)(createLogger);
+    const participantMw = (0, participantMiddleware_1.default)(createLogger, createExtraLogger);
     const app = (0, express_1.default)();
     const staticRouter = express_1.default.Router();
     if (env === 'development') {

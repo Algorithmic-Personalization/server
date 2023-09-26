@@ -31,7 +31,7 @@ const getMonth = (d: Date) => {
 
 const lock = new AsyncLock();
 
-export const makeCreateDefaultLogger = (filePath: string): CreateLogger => (requestIdOrId: number | string) => {
+export const makeCreateDefaultLogger = (filePath: string, useStdOut = true): CreateLogger => (requestIdOrId: number | string) => {
 	let prettyStream = createWriteStream(filePath, {flags: 'a'});
 
 	const doCheckLogSizeAndCompress = async () => {
@@ -112,7 +112,10 @@ export const makeCreateDefaultLogger = (filePath: string): CreateLogger => (requ
 			return inspect(arg, {depth: null, colors: true});
 		})];
 
-		console.log(...parts);
+		if (useStdOut) {
+			console.log(...parts);
+		}
+
 		prettyStream.write(`${parts.join(' ')}\n`);
 	};
 };
