@@ -34,6 +34,8 @@ export const createSaveParticipantTransition = ({
 	transition: TransitionEvent,
 	triggerEvent: Event | undefined,
 ): Promise<TransitionEvent | undefined> => {
+	log('info', 'transition to save:', transition);
+
 	const qr = dataSource.createQueryRunner();
 
 	const proceedToUpdate = async () => {

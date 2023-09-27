@@ -23,6 +23,7 @@ const isParticipantRecord = (record) => (0, util_1.has)('code')(record)
     && (record.arm === 'control' || record.arm === 'treatment');
 exports.isParticipantRecord = isParticipantRecord;
 const createSaveParticipantTransition = ({ dataSource, notifier, log, }) => (participant, transition, triggerEvent) => __awaiter(void 0, void 0, void 0, function* () {
+    log('info', 'transition to save:', transition);
     const qr = dataSource.createQueryRunner();
     const proceedToUpdate = () => __awaiter(void 0, void 0, void 0, function* () {
         log('info', 'saving transition event...');
