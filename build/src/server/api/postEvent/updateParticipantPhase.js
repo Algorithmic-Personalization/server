@@ -101,6 +101,7 @@ const createUpdatePhase = ({ dataSource, notifier, log, }) => (participant, late
         transitionEvent.toPhase = toPhase;
         transitionEvent.reason = transitionEvent_1.TransitionReason.AUTOMATIC;
         transitionEvent.transitionSettingId = setting.id;
+        transitionEvent.eventId = latestEvent.id;
         const saveParticipantTransition = (0, participant_1.createSaveParticipantTransition)({
             dataSource,
             notifier: notifier.makeParticipantNotifier({

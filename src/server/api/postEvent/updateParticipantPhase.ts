@@ -91,6 +91,7 @@ export const createUpdatePhase = ({
 		transitionEvent.toPhase = toPhase;
 		transitionEvent.reason = TransitionReason.AUTOMATIC;
 		transitionEvent.transitionSettingId = setting.id;
+		transitionEvent.eventId = latestEvent.id;
 
 		const saveParticipantTransition = createSaveParticipantTransition({
 			dataSource,
