@@ -103,6 +103,8 @@ export const createSaveParticipantTransition = ({
 			await qr.rollbackTransaction();
 		}
 
+		log('error', 'while saving transition event', error);
+
 		return undefined;
 	} finally {
 		await qr.release();

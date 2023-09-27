@@ -74,6 +74,7 @@ const createSaveParticipantTransition = ({ dataSource, notifier, log, }) => (par
         if (qr.isTransactionActive) {
             yield qr.rollbackTransaction();
         }
+        log('error', 'while saving transition event', error);
         return undefined;
     }
     finally {
