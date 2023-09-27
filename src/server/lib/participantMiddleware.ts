@@ -57,6 +57,7 @@ export const createParticipantMiddleWare = (createLogger: CreateLogger, extraLog
 			res.status(200).json({
 				kind: 'Failure',
 				message: 'Invalid participant code',
+				code: 'EVENT_ALREADY_EXISTS_OK',
 			});
 		};
 

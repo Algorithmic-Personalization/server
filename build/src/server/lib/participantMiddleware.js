@@ -46,6 +46,7 @@ const createParticipantMiddleWare = (createLogger, extraLogger) => (req, res, ne
         res.status(200).json({
             kind: 'Failure',
             message: 'Invalid participant code',
+            code: 'EVENT_ALREADY_EXISTS_OK',
         });
     };
     if (typeof participantCode !== 'string') {
