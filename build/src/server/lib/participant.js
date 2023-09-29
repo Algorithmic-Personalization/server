@@ -58,8 +58,9 @@ const createSaveParticipantTransition = ({ dataSource, notifier, log, }) => {
                 toPhase,
             },
         });
-        if (settings && settings.toPhase === participant.phase) {
-            log('info', 'transition is not allowed, aborting');
+        if (settings
+            && settings.toPhase === transition.toPhase) {
+            log('info', 'transition is not needed, aborting');
             return undefined;
         }
         try {

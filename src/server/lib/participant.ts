@@ -50,9 +50,8 @@ export const createSaveParticipantTransition = ({
 			},
 		});
 
-		if (settings && settings.toPhase === participant.phase) {
-			log('info', 'transition is not allowed, aborting');
-			return undefined;
+		if (!settings) {
+			throw new Error(`no settings found for transition from ${fromPhase} to ${toPhase}`);
 		}
 
 		try {

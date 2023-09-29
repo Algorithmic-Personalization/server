@@ -31,7 +31,7 @@ describe('updateParticipantPhase', () => {
         const saveTransition = (0, participant_1.createSaveParticipantTransition)({
             dataSource: db.dataSource,
             notifier,
-            log: console.log,
+            log: jest.fn(),
         });
         const participant = yield db.createParticipant();
         const transition = db.createTransitionEvent(participant);
@@ -54,7 +54,7 @@ describe('updateParticipantPhase', () => {
         const saveTransition = (0, participant_1.createSaveParticipantTransition)({
             dataSource: db.dataSource,
             notifier,
-            log: console.log,
+            log: jest.fn(),
         });
         const t = yield saveTransition(participant, transition, triggerEvent);
         expect(notifier.onPhaseChange).toHaveBeenCalledTimes(1);
