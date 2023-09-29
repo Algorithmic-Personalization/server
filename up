@@ -1,0 +1,3 @@
+#!/bin/env bash
+git pull --recurse-submodules
+docker-compose up --build app-server
