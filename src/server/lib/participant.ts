@@ -1,9 +1,10 @@
 import {type DataSource} from 'typeorm';
+import {type QueryDeepPartialEntity} from 'typeorm/query-builder/QueryPartialEntity';
 
 import Participant from '../models/participant';
 import {has} from '../../common/util';
 import {type ParticipantActivityHandler} from './externalNotifier';
-import TransitionEvent from '../models/transitionEvent';
+import TransitionEvent, {TransitionReason} from '../models/transitionEvent';
 import type Event from '../../common/models/event';
 import {type LogFunction} from './logger';
 
@@ -36,81 +37,63 @@ export const createSaveParticipantTransition = ({
 ): Promise<TransitionEvent | undefined> => {
 	log('info', 'transition to save:', transition);
 
-	const qr = dataSource.createQueryRunner();
-	await qr.connect();
+	try {
+		await dataSource.transaction('SERIALIZABLE', async entityManager => {
+			const latestTransition = await entityManager.findOne(TransitionEvent, {
+				where: {
+					participantId: participant.id,
+				},
+				order: {
+					id: 'DESC',
+				},
+			});
 
-	const proceedToUpdate = async () => {
-		log('info', 'proceed to update of phase...');
+			if (latestTransition) {
+				log('info', 'latest transition:', latestTransition);
+			}
 
-		const updatedTransition = new TransitionEvent();
-		Object.assign(updatedTransition, transition, {
-			eventId: triggerEvent ? triggerEvent.id : undefined,
-			participantId: participant.id,
+			if (latestTransition?.fromPhase === transition.fromPhase && latestTransition?.toPhase === transition.toPhase) {
+				log('info', 'transition already saved, not adding another one');
+				return undefined;
+			}
+
+			const intermediaryTransition = new TransitionEvent();
+			Object.assign(intermediaryTransition, transition, {
+				participantId: participant.id,
+			});
+
+			if (triggerEvent) {
+				intermediaryTransition.eventId = triggerEvent.id;
+				intermediaryTransition.reason = TransitionReason.AUTOMATIC;
+			} else {
+				intermediaryTransition.reason = TransitionReason.FORCED;
+			}
+
+			const intermediaryParticipant: QueryDeepPartialEntity<Participant> = {
+				phase: intermediaryTransition.toPhase,
+			};
+
+			log('info', 'updating participant phase:', intermediaryParticipant);
+			const p = await entityManager.update(
+				Participant,
+				{id: participant.id},
+				intermediaryParticipant,
+			);
+			log('info', 'participant now is:', p);
+
+			log('info', 'saving transition:', intermediaryTransition);
+			const t = await entityManager.save(intermediaryTransition);
+			log('info', 'saved transition', t);
+
+			await notifier.onPhaseChange(transition.createdAt, transition.fromPhase, transition.toPhase);
+			log('success', 'completed phase transition!');
+			return t;
 		});
 
-		const [, savedTransitionEvent] = await Promise.all([
-			qr.manager.save(Participant, {
-				...participant,
-				phase: transition.toPhase,
-			}),
-			qr.manager.save(updatedTransition, {
-				transaction: false,
-			}),
-		]);
-
-		await qr.commitTransaction();
-
-		await notifier.onPhaseChange(
-			transition.createdAt,
-			transition.fromPhase,
-			transition.toPhase,
-		);
-
-		return savedTransitionEvent;
-	};
-
-	try {
-		log('info', 'starting transaction...');
-		await qr.startTransaction('SERIALIZABLE');
-		const repo = qr.manager.getRepository(TransitionEvent);
-		const latestExistingTransition = await repo
-			.createQueryBuilder()
-			.useTransaction(true)
-			.setLock('pessimistic_write_or_fail')
-			.where({
-				participantId: participant.id,
-			})
-			.orderBy({
-				id: 'DESC',
-			})
-			.getOne();
-
-		if (latestExistingTransition) {
-			if (
-				latestExistingTransition.fromPhase === transition.fromPhase
-				&& latestExistingTransition.toPhase === transition.toPhase
-			) {
-				log('info', 'transition already exists, skipping');
-				// No need to update
-				return;
-			}
-		}
-
-		const p = await proceedToUpdate();
-		await qr.commitTransaction();
-
-		log('success', 'transition from', transition.fromPhase, 'to', transition.toPhase, 'saved');
-
-		return p;
+		log('info', 'transition saved');
 	} catch (error) {
-		if (qr.isTransactionActive) {
-			await qr.rollbackTransaction();
-		}
-
-		log('error', 'failed to save transition', error);
-
-		throw error;
-	} finally {
-		await qr.release();
+		log('error', 'error saving transition', error);
 	}
+
+	return undefined;
 };

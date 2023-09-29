@@ -3,6 +3,7 @@ import resetDb from '../server/tests-util/db';
 
 import {createSaveParticipantTransition} from '../server/lib/participant';
 import {createMockParticipantActivityNotifier} from '../server/tests-util/createMockParticipantActivityNotifier';
+import Participant from '../server/models/participant';
 
 describe('updateParticipantPhase', () => {
 	let db: TestDb;
@@ -15,7 +16,7 @@ describe('updateParticipantPhase', () => {
 		await db.tearDown();
 	});
 
-	it.only('should make a participant transition phases', async () => {
+	it('should make a participant transition phases', async () => {
 		const notifier = createMockParticipantActivityNotifier();
 
 		const saveTransition = createSaveParticipantTransition({
@@ -35,6 +36,14 @@ describe('updateParticipantPhase', () => {
 		);
 
 		expect(notifier.onPhaseChange).toHaveBeenCalledTimes(1);
+
+		const updatedParticipant = await db.dataSource.getRepository(Participant).findOneOrFail({
+			where: {
+				id: participant.id,
+			},
+		});
+
+		expect(updatedParticipant.phase).toBe(transition.toPhase);
 	});
 
 	it('should not save the transition more than once for the same participant and the same transition', async () => {
