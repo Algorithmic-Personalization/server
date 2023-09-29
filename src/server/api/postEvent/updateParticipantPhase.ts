@@ -1,7 +1,7 @@
 import {type DataSource, MoreThan} from 'typeorm';
 import {type LogFunction} from '../../lib/logger';
 import type Participant from '../../models/participant';
-import Event, {EventType} from '../../../common/models/event';
+import {type Event} from '../../../common/models/event';
 import DailyActivityTime from '../../models/dailyActivityTime';
 import TransitionSetting, {Phase} from '../../models/transitionSetting';
 import TransitionEvent, {TransitionReason} from '../../models/transitionEvent';
@@ -76,16 +76,6 @@ export const createUpdatePhase = ({
 	if (transitionEvent) {
 		log('triggering transition from phase', fromPhase, 'to phase', toPhase);
 
-		const triggerEvent = new Event();
-
-		const {localUuid} = triggerEvent;
-
-		Object.assign(triggerEvent, latestEvent, {
-			id: 0,
-			type: EventType.PHASE_TRANSITION,
-			localUuid,
-		});
-
 		transitionEvent.participantId = participant.id;
 		transitionEvent.fromPhase = fromPhase;
 		transitionEvent.toPhase = toPhase;
@@ -105,7 +95,7 @@ export const createUpdatePhase = ({
 
 		participant.phase = toPhase;
 
-		await saveParticipantTransition(participant, transitionEvent, triggerEvent);
+		await saveParticipantTransition(participant, transitionEvent, latestEvent);
 	}
 };
 

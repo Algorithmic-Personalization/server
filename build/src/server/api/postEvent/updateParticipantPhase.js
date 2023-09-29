@@ -37,7 +37,6 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.createUpdatePhase = void 0;
 const typeorm_1 = require("typeorm");
-const event_1 = __importStar(require("../../../common/models/event"));
 const dailyActivityTime_1 = __importDefault(require("../../models/dailyActivityTime"));
 const transitionSetting_1 = __importStar(require("../../models/transitionSetting"));
 const transitionEvent_1 = __importStar(require("../../models/transitionEvent"));
@@ -89,13 +88,6 @@ const createUpdatePhase = ({ dataSource, notifier, log, }) => (participant, late
     const transitionEvent = (0, postEvent_1.shouldTriggerPhaseTransition)(setting, activities);
     if (transitionEvent) {
         log('triggering transition from phase', fromPhase, 'to phase', toPhase);
-        const triggerEvent = new event_1.default();
-        const { localUuid } = triggerEvent;
-        Object.assign(triggerEvent, latestEvent, {
-            id: 0,
-            type: event_1.EventType.PHASE_TRANSITION,
-            localUuid,
-        });
         transitionEvent.participantId = participant.id;
         transitionEvent.fromPhase = fromPhase;
         transitionEvent.toPhase = toPhase;
@@ -112,7 +104,7 @@ const createUpdatePhase = ({ dataSource, notifier, log, }) => (participant, late
             log,
         });
         participant.phase = toPhase;
-        yield saveParticipantTransition(participant, transitionEvent, triggerEvent);
+        yield saveParticipantTransition(participant, transitionEvent, latestEvent);
     }
 });
 exports.createUpdatePhase = createUpdatePhase;
