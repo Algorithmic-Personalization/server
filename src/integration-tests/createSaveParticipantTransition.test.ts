@@ -24,7 +24,7 @@ describe('updateParticipantPhase', () => {
 		const saveTransition = createSaveParticipantTransition({
 			dataSource: db.dataSource,
 			notifier,
-			log: console.log,
+			log: jest.fn(),
 		});
 
 		const participant = await db.createParticipant();
@@ -62,7 +62,7 @@ describe('updateParticipantPhase', () => {
 		const saveTransition = createSaveParticipantTransition({
 			dataSource: db.dataSource,
 			notifier,
-			log: console.log,
+			log: jest.fn(),
 		});
 
 		const t = await saveTransition(
