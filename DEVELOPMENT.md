@@ -382,6 +382,10 @@ To update a participant, send a `PUT` request to `https://personalization-server
 Where `:code` is the unique code identifying the participant you want to update,
 and with the usual API token in the `authorization` header.
 
+### Update the participants by CSV
+
+You can upload a new list of participants through the UI (or API), it will update pre-existing participants and create the new ones. The upload supports the same 4 fields as the API call to create a participant, namely `code`, `arm`, `phase` and `isPaid`.
+
 ### Get the Participants Report
 
 Always using an API token in the `authorization` header, you can get the participants report by sending a `GET` request to `https://personalization-server.csail.mit.edu/api/participants-report`.

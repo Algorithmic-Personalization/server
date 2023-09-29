@@ -1,4 +1,27 @@
 "use strict";
+var __createBinding = (this && this.__createBinding) || (Object.create ? (function(o, m, k, k2) {
+    if (k2 === undefined) k2 = k;
+    var desc = Object.getOwnPropertyDescriptor(m, k);
+    if (!desc || ("get" in desc ? !m.__esModule : desc.writable || desc.configurable)) {
+      desc = { enumerable: true, get: function() { return m[k]; } };
+    }
+    Object.defineProperty(o, k2, desc);
+}) : (function(o, m, k, k2) {
+    if (k2 === undefined) k2 = k;
+    o[k2] = m[k];
+}));
+var __setModuleDefault = (this && this.__setModuleDefault) || (Object.create ? (function(o, v) {
+    Object.defineProperty(o, "default", { enumerable: true, value: v });
+}) : function(o, v) {
+    o["default"] = v;
+});
+var __importStar = (this && this.__importStar) || function (mod) {
+    if (mod && mod.__esModule) return mod;
+    var result = {};
+    if (mod != null) for (var k in mod) if (k !== "default" && Object.prototype.hasOwnProperty.call(mod, k)) __createBinding(result, mod, k);
+    __setModuleDefault(result, mod);
+    return result;
+};
 var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, generator) {
     function adopt(value) { return value instanceof P ? value : new P(function (resolve) { resolve(value); }); }
     return new (P || (P = Promise))(function (resolve, reject) {
@@ -15,12 +38,50 @@ Object.defineProperty(exports, "__esModule", { value: true });
 exports.createUploadParticipantsRoute = void 0;
 const csv_1 = require("../lib/csv");
 const participant_1 = __importDefault(require("../models/participant"));
+const transitionEvent_1 = __importStar(require("../models/transitionEvent"));
 const event_1 = require("../../common/models/event");
 const participant_2 = require("../lib/participant");
-const createUploadParticipantsRoute = ({ createLogger, dataSource }) => (req, res) => __awaiter(void 0, void 0, void 0, function* () {
+const createUploadParticipantsRoute = ({ createLogger, dataSource, notifier }) => (req, res) => __awaiter(void 0, void 0, void 0, function* () {
     var _a;
     const log = createLogger(req.requestId);
     log('Received upload participants request');
+    const handlePhaseUpdate = (record) => __awaiter(void 0, void 0, void 0, function* () {
+        const { code, phase } = record;
+        if (!phase) {
+            return false;
+        }
+        if (typeof code !== 'string') {
+            throw new Error('invalid participant code, must be a string');
+        }
+        const nPhase = Number(phase);
+        if (nPhase < 0 || nPhase > 2) {
+            throw new Error('invalid phase, must be one of: 0, 1, 2');
+        }
+        const p = yield dataSource.getRepository(participant_1.default).findOneOrFail({
+            where: {
+                code,
+            },
+        });
+        if (p.phase === nPhase) {
+            return false;
+        }
+        const transition = new transitionEvent_1.default();
+        transition.fromPhase = p.phase;
+        transition.toPhase = nPhase;
+        transition.participantId = p.id;
+        transition.reason = transitionEvent_1.TransitionReason.FORCED;
+        const saveTransition = (0, participant_2.createSaveParticipantTransition)({
+            dataSource,
+            log,
+            notifier: notifier.makeParticipantNotifier({
+                participantCode: p.code,
+                participantId: p.id,
+                isPaid: p.isPaid,
+            }),
+        });
+        yield saveTransition(p, transition, undefined);
+        return true;
+    });
     const participants = (_a = req === null || req === void 0 ? void 0 : req.file) === null || _a === void 0 ? void 0 : _a.buffer.toString('utf-8');
     if (!participants) {
         log('no participants received');
@@ -56,33 +117,35 @@ const createUploadParticipantsRoute = ({ createLogger, dataSource }) => (req, re
             participant.code = record.code;
             participant.arm = record.arm === 'control' ? event_1.ExperimentArm.CONTROL : event_1.ExperimentArm.TREATMENT;
             participant.isPaid = record.isPaid === 1 || record.isPaid === '1';
-            // eslint-disable-next-line no-await-in-loop
             const existingParticipant = yield participantRepo.findOneBy({ code: participant.code });
             if (existingParticipant) {
+                let updated = false;
                 if (existingParticipant.arm !== participant.arm) {
                     existingParticipant.arm = participant.arm;
                     existingParticipant.updatedAt = new Date();
                     // eslint-disable-next-line max-depth
                     try {
-                        // eslint-disable-next-line no-await-in-loop
                         yield participantRepo.save(existingParticipant);
                         nUpdated += 1;
+                        updated = true;
                     }
                     catch (err) {
                         log('failed to update participant:', err);
                         errorLines.push(line);
+                        continue;
                     }
                 }
-                continue;
+                if (yield handlePhaseUpdate(record)) {
+                    updated || (updated = true);
+                }
+                if (updated) {
+                    nUpdated += 1;
+                }
             }
-            try {
-                // eslint-disable-next-line no-await-in-loop
+            else {
                 yield participantRepo.save(participant);
+                yield handlePhaseUpdate(record);
                 nCreated += 1;
-            }
-            catch (err) {
-                log('failed to save participant:', err);
-                errorLines.push(line);
             }
         }
         reply();

@@ -1,15 +1,65 @@
+/* eslint-disable no-await-in-loop */
 import {type RouteCreator} from '../lib/routeCreation';
 
 import {parse} from '../lib/csv';
 
 import Participant from '../models/participant';
+import TransitionEvent, {TransitionReason} from '../models/transitionEvent';
 import {ExperimentArm} from '../../common/models/event';
 
-import {isParticipantRecord} from '../lib/participant';
+import {isParticipantRecord, createSaveParticipantTransition} from '../lib/participant';
 
-export const createUploadParticipantsRoute: RouteCreator = ({createLogger, dataSource}) => async (req, res) => {
+export const createUploadParticipantsRoute: RouteCreator = ({createLogger, dataSource, notifier}) => async (req, res) => {
 	const log = createLogger(req.requestId);
 	log('Received upload participants request');
+
+	const handlePhaseUpdate = async (record: Record<PropertyKey, unknown>): Promise<boolean> => {
+		const {code, phase} = record;
+
+		if (!phase) {
+			return false;
+		}
+
+		if (typeof code !== 'string') {
+			throw new Error('invalid participant code, must be a string');
+		}
+
+		const nPhase = Number(phase);
+
+		if (nPhase < 0 || nPhase > 2) {
+			throw new Error('invalid phase, must be one of: 0, 1, 2');
+		}
+
+		const p = await dataSource.getRepository(Participant).findOneOrFail({
+			where: {
+				code,
+			},
+		});
+
+		if (p.phase === nPhase) {
+			return false;
+		}
+
+		const transition = new TransitionEvent();
+		transition.fromPhase = p.phase;
+		transition.toPhase = nPhase;
+		transition.participantId = p.id;
+		transition.reason = TransitionReason.FORCED;
+
+		const saveTransition = createSaveParticipantTransition({
+			dataSource,
+			log,
+			notifier: notifier.makeParticipantNotifier({
+				participantCode: p.code,
+				participantId: p.id,
+				isPaid: p.isPaid,
+			}),
+		});
+
+		await saveTransition(p, transition, undefined);
+
+		return true;
+	};
 
 	const participants = req?.file?.buffer.toString('utf-8');
 
@@ -58,35 +108,38 @@ export const createUploadParticipantsRoute: RouteCreator = ({createLogger, dataS
 			participant.arm = record.arm === 'control' ? ExperimentArm.CONTROL : ExperimentArm.TREATMENT;
 			participant.isPaid = record.isPaid === 1 || record.isPaid === '1';
 
-			// eslint-disable-next-line no-await-in-loop
 			const existingParticipant = await participantRepo.findOneBy({code: participant.code});
 
 			if (existingParticipant) {
+				let updated = false;
+
 				if (existingParticipant.arm !== participant.arm) {
 					existingParticipant.arm = participant.arm;
 					existingParticipant.updatedAt = new Date();
 
 					// eslint-disable-next-line max-depth
 					try {
-						// eslint-disable-next-line no-await-in-loop
 						await participantRepo.save(existingParticipant);
 						nUpdated += 1;
+						updated = true;
 					} catch (err) {
 						log('failed to update participant:', err);
 						errorLines.push(line);
+						continue;
 					}
 				}
 
-				continue;
-			}
+				if (await handlePhaseUpdate(record)) {
+					updated ||= true;
+				}
 
-			try {
-				// eslint-disable-next-line no-await-in-loop
+				if (updated) {
+					nUpdated += 1;
+				}
+			} else {
 				await participantRepo.save(participant);
+				await handlePhaseUpdate(record);
 				nCreated += 1;
-			} catch (err) {
-				log('failed to save participant:', err);
-				errorLines.push(line);
 			}
 		}
 
