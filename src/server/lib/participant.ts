@@ -37,9 +37,10 @@ export const createSaveParticipantTransition = ({
 	log('info', 'transition to save:', transition);
 
 	const qr = dataSource.createQueryRunner();
+	await qr.connect();
 
 	const proceedToUpdate = async () => {
-		log('info', 'saving transition event...');
+		log('info', 'proceed to update of phase...');
 
 		const updatedTransition = new TransitionEvent();
 		Object.assign(updatedTransition, transition, {
@@ -47,14 +48,14 @@ export const createSaveParticipantTransition = ({
 			participantId: participant.id,
 		});
 
-		const updatedParticipant = new Participant();
-		Object.assign(updatedParticipant, participant, {
-			phase: transition.toPhase,
-		});
-
 		const [, savedTransitionEvent] = await Promise.all([
-			qr.manager.save(updatedParticipant),
-			qr.manager.save(updatedTransition),
+			qr.manager.save(Participant, {
+				...participant,
+				phase: transition.toPhase,
+			}),
+			qr.manager.save(updatedTransition, {
+				transaction: false,
+			}),
 		]);
 
 		await qr.commitTransaction();
@@ -69,6 +70,7 @@ export const createSaveParticipantTransition = ({
 	};
 
 	try {
+		log('info', 'starting transaction...');
 		await qr.startTransaction('SERIALIZABLE');
 		const repo = qr.manager.getRepository(TransitionEvent);
 		const latestExistingTransition = await repo
@@ -105,9 +107,9 @@ export const createSaveParticipantTransition = ({
 			await qr.rollbackTransaction();
 		}
 
-		log('error', 'while saving transition event', error);
+		log('error', 'failed to save transition', error);
 
-		return undefined;
+		throw error;
 	} finally {
 		await qr.release();
 	}

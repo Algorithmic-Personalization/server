@@ -15,13 +15,13 @@ describe('updateParticipantPhase', () => {
 		await db.tearDown();
 	});
 
-	it('should make a participant transition phases', async () => {
+	it.only('should make a participant transition phases', async () => {
 		const notifier = createMockParticipantActivityNotifier();
 
 		const saveTransition = createSaveParticipantTransition({
 			dataSource: db.dataSource,
 			notifier,
-			log: jest.fn(),
+			log: console.log,
 		});
 
 		const participant = await db.createParticipant();
@@ -53,7 +53,7 @@ describe('updateParticipantPhase', () => {
 
 			const transitions = Array.from({length: nParallel}, () => db.createTransitionEvent(participant));
 
-			await Promise.all(transitions.map(async transition => saveTransition(participant, transition, undefined)));
+			await Promise.allSettled(transitions.map(async transition => saveTransition(participant, transition, undefined)));
 
 			expect(notifier.onPhaseChange).toHaveBeenCalledTimes(1);
 		};

@@ -25,7 +25,9 @@ export type TestDb = {
 	createTransitionEvent: (participant: Participant) => TransitionEvent;
 };
 
-const resetDb = async (shortTimeout = false): Promise<TestDb> => {
+const shouldLogDb = () => process.env.DEBUG?.includes('db') ?? false;
+
+const resetDb = async (shortTimeout = false, logging = shouldLogDb()): Promise<TestDb> => {
 	const dbConfig = await loadDatabaseConfig({
 		environnement: 'test',
 		useDockerAddress: false,
@@ -61,7 +63,7 @@ const resetDb = async (shortTimeout = false): Promise<TestDb> => {
 		synchronize: false,
 		entities,
 		namingStrategy: new SnakeNamingStrategy(),
-		logging: false,
+		logging,
 		maxQueryExecutionTime: 200,
 		extra,
 	});
