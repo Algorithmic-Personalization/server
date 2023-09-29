@@ -12,7 +12,7 @@ import Participant from '../models/participant';
 import Event from '../../common/models/event';
 import Session from '../../common/models/session';
 import TransitionEvent, {TransitionReason} from '../models/transitionEvent';
-import {Phase} from '../../server/models/transitionSetting';
+import TransitionSetting, {Phase} from '../../server/models/transitionSetting';
 import {randomToken} from '../lib/crypto';
 
 export type TestDb = {
@@ -23,6 +23,7 @@ export type TestDb = {
 	createSession: (participant: Participant) => Promise<Session>;
 	createEvent: (session: Session) => Promise<Event>;
 	createTransitionEvent: (participant: Participant) => TransitionEvent;
+	createTransitionSettings: () => Promise<TransitionSetting>;
 };
 
 const shouldLogDb = () => process.env.DEBUG?.includes('db') ?? false;
@@ -133,6 +134,16 @@ const resetDb = async (shortTimeout = false, logging = shouldLogDb()): Promise<T
 		return event;
 	};
 
+	const createTransitionSettings = async (): Promise<TransitionSetting> => {
+		const settings = new TransitionSetting();
+		settings.fromPhase = Phase.PRE_EXPERIMENT;
+		settings.toPhase = Phase.EXPERIMENT;
+		settings.isCurrent = true;
+		const repo = dataSource.getRepository(TransitionSetting);
+		const saved = await repo.save(settings);
+		return saved;
+	};
+
 	const tearDown = async (): Promise<void> => {
 		await client.end();
 		await dataSource.destroy();
@@ -146,6 +157,7 @@ const resetDb = async (shortTimeout = false, logging = shouldLogDb()): Promise<T
 		createEvent,
 		createTransitionEvent,
 		tearDown,
+		createTransitionSettings,
 	};
 };
 

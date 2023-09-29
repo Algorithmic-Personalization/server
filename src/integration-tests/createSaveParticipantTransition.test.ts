@@ -4,12 +4,14 @@ import resetDb from '../server/tests-util/db';
 import {createSaveParticipantTransition} from '../server/lib/participant';
 import {createMockParticipantActivityNotifier} from '../server/tests-util/createMockParticipantActivityNotifier';
 import Participant from '../server/models/participant';
+import {TransitionReason} from '../server/models/transitionEvent';
 
 describe('updateParticipantPhase', () => {
 	let db: TestDb;
 
 	beforeAll(async () => {
 		db = await resetDb();
+		await db.createTransitionSettings();
 	});
 
 	afterAll(async () => {
@@ -44,6 +46,34 @@ describe('updateParticipantPhase', () => {
 		});
 
 		expect(updatedParticipant.phase).toBe(transition.toPhase);
+	});
+
+	it('should transition a user with an attached event', async () => {
+		const participant = await db.createParticipant();
+
+		const transition = db.createTransitionEvent(participant);
+		transition.reason = TransitionReason.AUTOMATIC;
+
+		const session = await db.createSession(participant);
+		const triggerEvent = await db.createEvent(session);
+
+		const notifier = createMockParticipantActivityNotifier();
+
+		const saveTransition = createSaveParticipantTransition({
+			dataSource: db.dataSource,
+			notifier,
+			log: console.log,
+		});
+
+		const t = await saveTransition(
+			participant,
+			transition,
+			triggerEvent,
+		);
+
+		expect(notifier.onPhaseChange).toHaveBeenCalledTimes(1);
+		expect(t).toBeDefined();
+		expect(t?.id).toBeGreaterThan(0);
 	});
 
 	it('should not save the transition more than once for the same participant and the same transition', async () => {

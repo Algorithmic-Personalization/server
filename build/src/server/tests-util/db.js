@@ -59,7 +59,7 @@ const participant_1 = __importDefault(require("../models/participant"));
 const event_1 = __importDefault(require("../../common/models/event"));
 const session_1 = __importDefault(require("../../common/models/session"));
 const transitionEvent_1 = __importStar(require("../models/transitionEvent"));
-const transitionSetting_1 = require("../../server/models/transitionSetting");
+const transitionSetting_1 = __importStar(require("../../server/models/transitionSetting"));
 const crypto_1 = require("../lib/crypto");
 const shouldLogDb = () => { var _a, _b; return (_b = (_a = process.env.DEBUG) === null || _a === void 0 ? void 0 : _a.includes('db')) !== null && _b !== void 0 ? _b : false; };
 const resetDb = (shortTimeout = false, logging = shouldLogDb()) => __awaiter(void 0, void 0, void 0, function* () {
@@ -136,6 +136,15 @@ const resetDb = (shortTimeout = false, logging = shouldLogDb()) => __awaiter(voi
         event.reason = transitionEvent_1.TransitionReason.FORCED;
         return event;
     };
+    const createTransitionSettings = () => __awaiter(void 0, void 0, void 0, function* () {
+        const settings = new transitionSetting_1.default();
+        settings.fromPhase = transitionSetting_1.Phase.PRE_EXPERIMENT;
+        settings.toPhase = transitionSetting_1.Phase.EXPERIMENT;
+        settings.isCurrent = true;
+        const repo = dataSource.getRepository(transitionSetting_1.default);
+        const saved = yield repo.save(settings);
+        return saved;
+    });
     const tearDown = () => __awaiter(void 0, void 0, void 0, function* () {
         yield client.end();
         yield dataSource.destroy();
@@ -148,6 +157,7 @@ const resetDb = (shortTimeout = false, logging = shouldLogDb()) => __awaiter(voi
         createEvent,
         createTransitionEvent,
         tearDown,
+        createTransitionSettings,
     };
 });
 exports.default = resetDb;

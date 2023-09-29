@@ -7,6 +7,7 @@ import {type ParticipantActivityHandler} from './externalNotifier';
 import TransitionEvent, {TransitionReason} from '../models/transitionEvent';
 import type Event from '../../common/models/event';
 import {type LogFunction} from './logger';
+import TransitionSetting from '../models/transitionSetting';
 
 export type ParticipantRecord = {
 	email: string;
@@ -30,70 +31,93 @@ export const createSaveParticipantTransition = ({
 	dataSource: DataSource;
 	notifier: ParticipantActivityHandler;
 	log: LogFunction;
-}) => async (
-	participant: Participant,
-	transition: TransitionEvent,
-	triggerEvent: Event | undefined,
-): Promise<TransitionEvent | undefined> => {
-	log('info', 'transition to save:', transition);
+}) => {
+	const settingsRepo = dataSource.getRepository(TransitionSetting);
 
-	try {
-		await dataSource.transaction('SERIALIZABLE', async entityManager => {
-			const latestTransition = await entityManager.findOne(TransitionEvent, {
-				where: {
-					participantId: participant.id,
-				},
-				order: {
-					id: 'DESC',
-				},
-			});
+	return async (
+		participant: Participant,
+		transition: TransitionEvent,
+		triggerEvent: Event | undefined,
+	): Promise<TransitionEvent | undefined> => {
+		log('info', 'transition to save:', transition);
 
-			if (latestTransition) {
-				log('info', 'latest transition:', latestTransition);
-			}
-
-			if (latestTransition?.fromPhase === transition.fromPhase && latestTransition?.toPhase === transition.toPhase) {
-				log('info', 'transition already saved, not adding another one');
-				return undefined;
-			}
-
-			const intermediaryTransition = new TransitionEvent();
-			Object.assign(intermediaryTransition, transition, {
-				participantId: participant.id,
-			});
-
-			if (triggerEvent) {
-				intermediaryTransition.eventId = triggerEvent.id;
-				intermediaryTransition.reason = TransitionReason.AUTOMATIC;
-			} else {
-				intermediaryTransition.reason = TransitionReason.FORCED;
-			}
-
-			const intermediaryParticipant: QueryDeepPartialEntity<Participant> = {
-				phase: intermediaryTransition.toPhase,
-			};
-
-			log('info', 'updating participant phase:', intermediaryParticipant);
-			const p = await entityManager.update(
-				Participant,
-				{id: participant.id},
-				intermediaryParticipant,
-			);
-			log('info', 'participant now is:', p);
-
-			log('info', 'saving transition:', intermediaryTransition);
-			const t = await entityManager.save(intermediaryTransition);
-			log('info', 'saved transition', t);
-
-			await notifier.onPhaseChange(transition.createdAt, transition.fromPhase, transition.toPhase);
-			log('success', 'completed phase transition!');
-			return t;
+		const {fromPhase, toPhase} = transition;
+		const settings = await settingsRepo.findOne({
+			where: {
+				isCurrent: true,
+				fromPhase,
+				toPhase,
+			},
 		});
 
-		log('info', 'transition saved');
-	} catch (error) {
-		log('error', 'error saving transition', error);
-	}
+		if (settings && settings.toPhase === participant.phase) {
+			log('info', 'transition is not allowed, aborting');
+			return undefined;
+		}
 
-	return undefined;
+		try {
+			return await dataSource.transaction('SERIALIZABLE', async entityManager => {
+				const latestTransition = await entityManager.findOne(TransitionEvent, {
+					where: {
+						participantId: participant.id,
+					},
+					order: {
+						id: 'DESC',
+					},
+				});
+
+				if (latestTransition) {
+					log('info', 'latest transition:', latestTransition);
+				}
+
+				if (latestTransition?.fromPhase === transition.fromPhase && latestTransition?.toPhase === transition.toPhase) {
+					log('info', 'transition already saved, not adding another one');
+					return undefined;
+				}
+
+				const intermediaryTransition = new TransitionEvent();
+				Object.assign(intermediaryTransition, transition, {
+					participantId: participant.id,
+				});
+
+				if (triggerEvent) {
+					intermediaryTransition.eventId = triggerEvent.id;
+					intermediaryTransition.reason = TransitionReason.AUTOMATIC;
+
+					if (!settings) {
+						log('error', 'no settings found for transition, aborting because it is not manual (was triggered by event)', {triggerEvent});
+						throw new Error('no settings found for transition, aborting because it is not manual (was triggered by event)');
+					}
+
+					intermediaryTransition.transitionSettingId = settings.id;
+				} else {
+					intermediaryTransition.reason = TransitionReason.FORCED;
+				}
+
+				const intermediaryParticipant: QueryDeepPartialEntity<Participant> = {
+					phase: intermediaryTransition.toPhase,
+				};
+
+				log('info', 'updating participant phase:', intermediaryParticipant);
+				const p = await entityManager.update(
+					Participant,
+					{id: participant.id},
+					intermediaryParticipant,
+				);
+				log('info', 'participant now is:', p);
+
+				log('info', 'saving transition:', intermediaryTransition);
+				const t = await entityManager.save(intermediaryTransition);
+				log('info', 'saved transition', t);
+
+				await notifier.onPhaseChange(transition.createdAt, transition.fromPhase, transition.toPhase);
+				log('success', 'completed phase transition!');
+				return t;
+			});
+		} catch (error) {
+			log('error', 'error saving transition', error);
+		}
+
+		return undefined;
+	};
 };

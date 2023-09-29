@@ -39,61 +39,81 @@ exports.createSaveParticipantTransition = exports.isParticipantRecord = void 0;
 const participant_1 = __importDefault(require("../models/participant"));
 const util_1 = require("../../common/util");
 const transitionEvent_1 = __importStar(require("../models/transitionEvent"));
+const transitionSetting_1 = __importDefault(require("../models/transitionSetting"));
 const isParticipantRecord = (record) => (0, util_1.has)('code')(record)
     && (0, util_1.has)('arm')(record)
     && typeof record.code === 'string'
     && record.code.length > 0
     && (record.arm === 'control' || record.arm === 'treatment');
 exports.isParticipantRecord = isParticipantRecord;
-const createSaveParticipantTransition = ({ dataSource, notifier, log, }) => (participant, transition, triggerEvent) => __awaiter(void 0, void 0, void 0, function* () {
-    log('info', 'transition to save:', transition);
-    try {
-        yield dataSource.transaction('SERIALIZABLE', (entityManager) => __awaiter(void 0, void 0, void 0, function* () {
-            const latestTransition = yield entityManager.findOne(transitionEvent_1.default, {
-                where: {
+const createSaveParticipantTransition = ({ dataSource, notifier, log, }) => {
+    const settingsRepo = dataSource.getRepository(transitionSetting_1.default);
+    return (participant, transition, triggerEvent) => __awaiter(void 0, void 0, void 0, function* () {
+        log('info', 'transition to save:', transition);
+        const { fromPhase, toPhase } = transition;
+        const settings = yield settingsRepo.findOne({
+            where: {
+                isCurrent: true,
+                fromPhase,
+                toPhase,
+            },
+        });
+        if (settings && settings.toPhase === participant.phase) {
+            log('info', 'transition is not allowed, aborting');
+            return undefined;
+        }
+        try {
+            return yield dataSource.transaction('SERIALIZABLE', (entityManager) => __awaiter(void 0, void 0, void 0, function* () {
+                const latestTransition = yield entityManager.findOne(transitionEvent_1.default, {
+                    where: {
+                        participantId: participant.id,
+                    },
+                    order: {
+                        id: 'DESC',
+                    },
+                });
+                if (latestTransition) {
+                    log('info', 'latest transition:', latestTransition);
+                }
+                if ((latestTransition === null || latestTransition === void 0 ? void 0 : latestTransition.fromPhase) === transition.fromPhase && (latestTransition === null || latestTransition === void 0 ? void 0 : latestTransition.toPhase) === transition.toPhase) {
+                    log('info', 'transition already saved, not adding another one');
+                    return undefined;
+                }
+                const intermediaryTransition = new transitionEvent_1.default();
+                Object.assign(intermediaryTransition, transition, {
                     participantId: participant.id,
-                },
-                order: {
-                    id: 'DESC',
-                },
-            });
-            if (latestTransition) {
-                log('info', 'latest transition:', latestTransition);
-            }
-            if ((latestTransition === null || latestTransition === void 0 ? void 0 : latestTransition.fromPhase) === transition.fromPhase && (latestTransition === null || latestTransition === void 0 ? void 0 : latestTransition.toPhase) === transition.toPhase) {
-                log('info', 'transition already saved, not adding another one');
-                return undefined;
-            }
-            const intermediaryTransition = new transitionEvent_1.default();
-            Object.assign(intermediaryTransition, transition, {
-                participantId: participant.id,
-            });
-            if (triggerEvent) {
-                intermediaryTransition.eventId = triggerEvent.id;
-                intermediaryTransition.reason = transitionEvent_1.TransitionReason.AUTOMATIC;
-            }
-            else {
-                intermediaryTransition.reason = transitionEvent_1.TransitionReason.FORCED;
-            }
-            const intermediaryParticipant = {
-                phase: intermediaryTransition.toPhase,
-            };
-            log('info', 'updating participant phase:', intermediaryParticipant);
-            const p = yield entityManager.update(participant_1.default, { id: participant.id }, intermediaryParticipant);
-            log('info', 'participant now is:', p);
-            log('info', 'saving transition:', intermediaryTransition);
-            const t = yield entityManager.save(intermediaryTransition);
-            log('info', 'saved transition', t);
-            yield notifier.onPhaseChange(transition.createdAt, transition.fromPhase, transition.toPhase);
-            log('success', 'completed phase transition!');
-            return t;
-        }));
-        log('info', 'transition saved');
-    }
-    catch (error) {
-        log('error', 'error saving transition', error);
-    }
-    return undefined;
-});
+                });
+                if (triggerEvent) {
+                    intermediaryTransition.eventId = triggerEvent.id;
+                    intermediaryTransition.reason = transitionEvent_1.TransitionReason.AUTOMATIC;
+                    if (!settings) {
+                        log('error', 'no settings found for transition, aborting because it is not manual (was triggered by event)', { triggerEvent });
+                        throw new Error('no settings found for transition, aborting because it is not manual (was triggered by event)');
+                    }
+                    intermediaryTransition.transitionSettingId = settings.id;
+                }
+                else {
+                    intermediaryTransition.reason = transitionEvent_1.TransitionReason.FORCED;
+                }
+                const intermediaryParticipant = {
+                    phase: intermediaryTransition.toPhase,
+                };
+                log('info', 'updating participant phase:', intermediaryParticipant);
+                const p = yield entityManager.update(participant_1.default, { id: participant.id }, intermediaryParticipant);
+                log('info', 'participant now is:', p);
+                log('info', 'saving transition:', intermediaryTransition);
+                const t = yield entityManager.save(intermediaryTransition);
+                log('info', 'saved transition', t);
+                yield notifier.onPhaseChange(transition.createdAt, transition.fromPhase, transition.toPhase);
+                log('success', 'completed phase transition!');
+                return t;
+            }));
+        }
+        catch (error) {
+            log('error', 'error saving transition', error);
+        }
+        return undefined;
+    });
+};
 exports.createSaveParticipantTransition = createSaveParticipantTransition;
 //# sourceMappingURL=participant.js.map
