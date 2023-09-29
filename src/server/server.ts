@@ -237,7 +237,9 @@ const main = async () => {
 		namingStrategy: new SnakeNamingStrategy(),
 		logging: true,
 		maxQueryExecutionTime: 200,
-		logger: new DatabaseLogger(createLogger('<database>'), slowQueries),
+		logger: process.env.DEBUG?.includes('db')
+			? undefined
+			: new DatabaseLogger(createLogger('<database>'), slowQueries),
 	});
 
 	try {

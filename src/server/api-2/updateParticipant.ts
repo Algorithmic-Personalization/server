@@ -99,15 +99,19 @@ export const updateParticipantDefinition: RouteDefinition<Participant> = {
 			throw new Error('Invalid phase, must be one of: 0, 1, 2');
 		}
 
+		const out = await participantRepo.save(participantEntity);
+
 		if (isValidPhase(phase)) {
 			await updateParticipantPhase(dataSource, notifier, log)(
 				previousPhase, phase,
 			)(
 				participantEntity,
 			);
+
+			out.phase = phase;
 		}
 
-		return participantRepo.save(participantEntity);
+		return out;
 	},
 };
 

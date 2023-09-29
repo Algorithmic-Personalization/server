@@ -61,7 +61,8 @@ const session_1 = __importDefault(require("../../common/models/session"));
 const transitionEvent_1 = __importStar(require("../models/transitionEvent"));
 const transitionSetting_1 = require("../../server/models/transitionSetting");
 const crypto_1 = require("../lib/crypto");
-const resetDb = (shortTimeout = false) => __awaiter(void 0, void 0, void 0, function* () {
+const shouldLogDb = () => { var _a, _b; return (_b = (_a = process.env.DEBUG) === null || _a === void 0 ? void 0 : _a.includes('db')) !== null && _b !== void 0 ? _b : false; };
+const resetDb = (shortTimeout = false, logging = shouldLogDb()) => __awaiter(void 0, void 0, void 0, function* () {
     const dbConfig = yield (0, loadDbConfig_1.default)({
         environnement: 'test',
         useDockerAddress: false,
@@ -82,7 +83,7 @@ const resetDb = (shortTimeout = false) => __awaiter(void 0, void 0, void 0, func
         // eslint-disable-next-line @typescript-eslint/naming-convention
         statement_timeout: 500,
     } : {};
-    const dataSource = new typeorm_1.DataSource(Object.assign(Object.assign({ type: 'postgres' }, dbConfig), { username: dbConfig.user, synchronize: false, entities: entities_1.default, namingStrategy: new typeorm_naming_strategies_1.SnakeNamingStrategy(), logging: false, maxQueryExecutionTime: 200, extra }));
+    const dataSource = new typeorm_1.DataSource(Object.assign(Object.assign({ type: 'postgres' }, dbConfig), { username: dbConfig.user, synchronize: false, entities: entities_1.default, namingStrategy: new typeorm_naming_strategies_1.SnakeNamingStrategy(), logging, maxQueryExecutionTime: 200, extra }));
     yield dataSource.initialize();
     const createAdmin = () => __awaiter(void 0, void 0, void 0, function* () {
         const admin = new admin_1.default();

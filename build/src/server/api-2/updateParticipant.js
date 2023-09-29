@@ -101,10 +101,12 @@ exports.updateParticipantDefinition = {
         if (phase && !(0, participant_1.isValidPhase)(phase)) {
             throw new Error('Invalid phase, must be one of: 0, 1, 2');
         }
+        const out = yield participantRepo.save(participantEntity);
         if ((0, participant_1.isValidPhase)(phase)) {
             yield updateParticipantPhase(dataSource, notifier, log)(previousPhase, phase)(participantEntity);
+            out.phase = phase;
         }
-        return participantRepo.save(participantEntity);
+        return out;
     }),
 };
 exports.default = exports.updateParticipantDefinition;

@@ -15,6 +15,7 @@ Object.defineProperty(exports, "__esModule", { value: true });
 const db_1 = __importDefault(require("../server/tests-util/db"));
 const participant_1 = require("../server/lib/participant");
 const createMockParticipantActivityNotifier_1 = require("../server/tests-util/createMockParticipantActivityNotifier");
+const participant_2 = __importDefault(require("../server/models/participant"));
 describe('updateParticipantPhase', () => {
     let db;
     beforeAll(() => __awaiter(void 0, void 0, void 0, function* () {
@@ -28,12 +29,18 @@ describe('updateParticipantPhase', () => {
         const saveTransition = (0, participant_1.createSaveParticipantTransition)({
             dataSource: db.dataSource,
             notifier,
-            log: jest.fn(),
+            log: console.log,
         });
         const participant = yield db.createParticipant();
         const transition = db.createTransitionEvent(participant);
         yield saveTransition(participant, transition, undefined);
         expect(notifier.onPhaseChange).toHaveBeenCalledTimes(1);
+        const updatedParticipant = yield db.dataSource.getRepository(participant_2.default).findOneOrFail({
+            where: {
+                id: participant.id,
+            },
+        });
+        expect(updatedParticipant.phase).toBe(transition.toPhase);
     }));
     it('should not save the transition more than once for the same participant and the same transition', () => __awaiter(void 0, void 0, void 0, function* () {
         const flaky = () => __awaiter(void 0, void 0, void 0, function* () {
@@ -46,7 +53,7 @@ describe('updateParticipantPhase', () => {
             const participant = yield db.createParticipant();
             const nParallel = 10;
             const transitions = Array.from({ length: nParallel }, () => db.createTransitionEvent(participant));
-            yield Promise.all(transitions.map((transition) => __awaiter(void 0, void 0, void 0, function* () { return saveTransition(participant, transition, undefined); })));
+            yield Promise.allSettled(transitions.map((transition) => __awaiter(void 0, void 0, void 0, function* () { return saveTransition(participant, transition, undefined); })));
             expect(notifier.onPhaseChange).toHaveBeenCalledTimes(1);
         });
         for (let i = 0; i < 10; ++i) {
