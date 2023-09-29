@@ -51,7 +51,8 @@ export const createSaveParticipantTransition = ({
 		});
 
 		if (!settings) {
-			throw new Error(`no settings found for transition from ${fromPhase} to ${toPhase}`);
+			log('error', `no settings found for transition from ${fromPhase} to ${toPhase}`);
+			return undefined;
 		}
 
 		try {
