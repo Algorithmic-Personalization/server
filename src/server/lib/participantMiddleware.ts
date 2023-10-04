@@ -50,6 +50,7 @@ export const createParticipantMiddleWare = (createLogger: CreateLogger, extraLog
 				url: req.url,
 				body: req.body as unknown,
 				ip: req.ip,
+				forwardedFor: req.headers['x-forwarded-for'],
 				userAgent: req.headers['user-agent'],
 				userAgentHash: hash(req.headers['user-agent'] ?? ''),
 			});
