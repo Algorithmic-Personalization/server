@@ -61,6 +61,9 @@ const PhaseC = ({ from, to }) => {
             }
         }))();
     }, [from, to]);
+    const daysText = (0, transitionSetting_1.allZeros)(setting)
+        ? 'All the criteria being set to zero, only calendar time since entry into phase is taken into account'
+        : 'Minimum number of days to trigger the phase transition, not necessarily consecutive';
     const ui = (react_1.default.createElement("form", { onSubmit: (e) => __awaiter(void 0, void 0, void 0, function* () {
             e.preventDefault();
             const result = yield api.createTransitionSetting(setting);
@@ -124,7 +127,7 @@ const PhaseC = ({ from, to }) => {
                     "for ",
                     react_1.default.createElement("strong", null, "at least"),
                     ":"),
-                react_1.default.createElement(material_1.TextField, { sx: { display: 'block' }, label: 'Number of days', type: 'number', helperText: 'Minimum number of days to trigger the phase transition, not necessarily consecutive', value: setting.minDays, onChange: e => {
+                react_1.default.createElement(material_1.TextField, { sx: { display: 'block' }, label: 'Number of days', type: 'number', helperText: daysText, value: setting.minDays, onChange: e => {
                         setSetting(Object.assign(Object.assign({}, setting), { minDays: parseInt(e.target.value, 10) }));
                     } }),
                 from > 0 && (react_1.default.createElement(material_1.Typography, { variant: 'body2', sx: { mt: 2, mb: 1 } },

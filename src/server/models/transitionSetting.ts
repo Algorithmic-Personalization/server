@@ -16,6 +16,13 @@ export enum OperatorType {
 	ALL = 'ALL',
 }
 
+export const allZeros = (setting: TransitionSetting): boolean =>
+	setting.minPagesViewed === 0
+	&& setting.minVideoPagesViewed === 0
+	&& setting.minSidebarRecommendationsClicked === 0
+	&& setting.minVideoTimeViewedSeconds === 0
+	&& setting.minTimeSpentOnYoutubeSeconds === 0;
+
 @Entity()
 export class TransitionSetting extends Model {
 	@Column()

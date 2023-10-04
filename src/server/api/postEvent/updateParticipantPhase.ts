@@ -3,7 +3,7 @@ import {type LogFunction} from '../../lib/logger';
 import type Participant from '../../models/participant';
 import {type Event} from '../../../common/models/event';
 import DailyActivityTime from '../../models/dailyActivityTime';
-import TransitionSetting, {Phase} from '../../models/transitionSetting';
+import TransitionSetting, {Phase, allZeros} from '../../models/transitionSetting';
 import TransitionEvent, {TransitionReason} from '../../models/transitionEvent';
 import {shouldTriggerPhaseTransition} from '../postEvent';
 import {type ExternalNotifier} from '../../lib/externalNotifier';
@@ -59,19 +59,49 @@ export const createUpdatePhase = ({
 
 	const entryDate = latestTransition ? latestTransition.createdAt : participant.createdAt;
 
-	// Get all statistics for the participant after entry into current phase
-	const activityRepo = dataSource.getRepository(DailyActivityTime);
+	const getTransition = async (): Promise<TransitionEvent | undefined> => {
+		if (allZeros(setting)) {
+			const elapsedDays = Math.floor((Date.now() - entryDate.getTime()) / (1000 * 60 * 60 * 24));
 
-	const activities = await activityRepo.find({
-		where: {
-			participantId: participant.id,
-			createdAt: MoreThan(entryDate),
-		},
-	});
+			if (elapsedDays >= setting.minDays) {
+				log(
+					'info',
+					'transitioning participant',
+					participant.id,
+					'from phase',
+					fromPhase,
+					'to phase',
+					toPhase,
+					'because they have been in phase',
+					fromPhase,
+					'for',
+					elapsedDays,
+					'days',
+				);
+				const transitionEvent = new TransitionEvent();
+				transitionEvent.numDays = elapsedDays;
+				return transitionEvent;
+			}
 
-	log('found', activities.length, 'activities for participant', participant.id, 'after entry date', entryDate, 'into phase', participant.phase);
+			return undefined;
+		}
 
-	const transitionEvent = shouldTriggerPhaseTransition(setting, activities);
+		// Get all statistics for the participant after entry into current phase
+		const activityRepo = dataSource.getRepository(DailyActivityTime);
+
+		const activities = await activityRepo.find({
+			where: {
+				participantId: participant.id,
+				createdAt: MoreThan(entryDate),
+			},
+		});
+
+		log('found', activities.length, 'activities for participant', participant.id, 'after entry date', entryDate, 'into phase', participant.phase);
+
+		return shouldTriggerPhaseTransition(setting, activities);
+	};
+
+	const transitionEvent = await getTransition();
 
 	if (transitionEvent) {
 		log('triggering transition from phase', fromPhase, 'to phase', toPhase);

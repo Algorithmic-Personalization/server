@@ -151,12 +151,12 @@ export const createUpdateActivity = ({dataSource, notifier, log}: {
 
 			const {pages_viewed: pagesViewedRaw} = pagesViewed;
 
-			if (typeof pagesViewedRaw !== 'string') {
+			if (typeof pagesViewedRaw !== 'string' && pagesViewedRaw !== null) {
 				log('error', 'pagesViewedRaw is not a string (while checking if participant is active)');
 				return false;
 			}
 
-			const pagesViewedNum = Number(pagesViewedRaw);
+			const pagesViewedNum = pagesViewedRaw === null ? 0 : Number(pagesViewedRaw);
 
 			if (isNaN(pagesViewedNum)) {
 				log('error', 'pagesViewedNum is NaN (while checking if participant is active)');

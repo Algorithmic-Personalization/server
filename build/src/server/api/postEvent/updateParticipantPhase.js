@@ -76,16 +76,29 @@ const createUpdatePhase = ({ dataSource, notifier, log, }) => (participant, late
         },
     });
     const entryDate = latestTransition ? latestTransition.createdAt : participant.createdAt;
-    // Get all statistics for the participant after entry into current phase
-    const activityRepo = dataSource.getRepository(dailyActivityTime_1.default);
-    const activities = yield activityRepo.find({
-        where: {
-            participantId: participant.id,
-            createdAt: (0, typeorm_1.MoreThan)(entryDate),
-        },
+    const getTransition = () => __awaiter(void 0, void 0, void 0, function* () {
+        if ((0, transitionSetting_1.allZeros)(setting)) {
+            const elapsedDays = Math.floor((Date.now() - entryDate.getTime()) / (1000 * 60 * 60 * 24));
+            if (elapsedDays >= setting.minDays) {
+                log('info', 'transitioning participant', participant.id, 'from phase', fromPhase, 'to phase', toPhase, 'because they have been in phase', fromPhase, 'for', elapsedDays, 'days');
+                const transitionEvent = new transitionEvent_1.default();
+                transitionEvent.numDays = elapsedDays;
+                return transitionEvent;
+            }
+            return undefined;
+        }
+        // Get all statistics for the participant after entry into current phase
+        const activityRepo = dataSource.getRepository(dailyActivityTime_1.default);
+        const activities = yield activityRepo.find({
+            where: {
+                participantId: participant.id,
+                createdAt: (0, typeorm_1.MoreThan)(entryDate),
+            },
+        });
+        log('found', activities.length, 'activities for participant', participant.id, 'after entry date', entryDate, 'into phase', participant.phase);
+        return (0, postEvent_1.shouldTriggerPhaseTransition)(setting, activities);
     });
-    log('found', activities.length, 'activities for participant', participant.id, 'after entry date', entryDate, 'into phase', participant.phase);
-    const transitionEvent = (0, postEvent_1.shouldTriggerPhaseTransition)(setting, activities);
+    const transitionEvent = yield getTransition();
     if (transitionEvent) {
         log('triggering transition from phase', fromPhase, 'to phase', toPhase);
         transitionEvent.participantId = participant.id;

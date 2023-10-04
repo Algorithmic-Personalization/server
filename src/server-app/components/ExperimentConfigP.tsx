@@ -18,7 +18,7 @@ import NotificationsC, {type Message} from './shared/NotificationsC';
 import CardC from './shared/CardC';
 
 import ExperimentConfig from '../../common/models/experimentConfig';
-import TransitionSetting, {OperatorType} from '../../server/models/transitionSetting';
+import TransitionSetting, {OperatorType, allZeros} from '../../server/models/transitionSetting';
 
 import {useAdminApi} from '../adminApiProvider';
 
@@ -47,6 +47,10 @@ const PhaseC: React.FC<{
 			}
 		})();
 	}, [from, to]);
+
+	const daysText = allZeros(setting)
+		? 'All the criteria being set to zero, only calendar time since entry into phase is taken into account'
+		: 'Minimum number of days to trigger the phase transition, not necessarily consecutive';
 
 	const ui = (
 		<form
@@ -181,7 +185,7 @@ const PhaseC: React.FC<{
 						sx={{display: 'block'}}
 						label='Number of days'
 						type='number'
-						helperText='Minimum number of days to trigger the phase transition, not necessarily consecutive'
+						helperText={daysText}
 						value={setting.minDays}
 						onChange={e => {
 							setSetting({

@@ -13,7 +13,7 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
     return (mod && mod.__esModule) ? mod : { "default": mod };
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.TransitionSetting = exports.OperatorType = exports.Phase = void 0;
+exports.TransitionSetting = exports.allZeros = exports.OperatorType = exports.Phase = void 0;
 const typeorm_1 = require("typeorm");
 const class_validator_1 = require("class-validator");
 const model_1 = __importDefault(require("../../common/lib/model"));
@@ -28,6 +28,12 @@ var OperatorType;
     OperatorType["ANY"] = "ANY";
     OperatorType["ALL"] = "ALL";
 })(OperatorType = exports.OperatorType || (exports.OperatorType = {}));
+const allZeros = (setting) => setting.minPagesViewed === 0
+    && setting.minVideoPagesViewed === 0
+    && setting.minSidebarRecommendationsClicked === 0
+    && setting.minVideoTimeViewedSeconds === 0
+    && setting.minTimeSpentOnYoutubeSeconds === 0;
+exports.allZeros = allZeros;
 let TransitionSetting = class TransitionSetting extends model_1.default {
     constructor() {
         super(...arguments);
