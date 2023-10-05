@@ -94,15 +94,15 @@ export const createSaveParticipantTransition = ({
 					intermediaryTransition.reason = TransitionReason.FORCED;
 				}
 
-				const intermediaryParticipant: QueryDeepPartialEntity<Participant> = {
+				const participantUpdate: QueryDeepPartialEntity<Participant> = {
 					phase: intermediaryTransition.toPhase,
 				};
 
-				log('info', 'updating participant phase:', intermediaryParticipant);
+				log('info', 'updating participant phase:', participantUpdate);
 				const p = await entityManager.update(
 					Participant,
 					{id: participant.id},
-					intermediaryParticipant,
+					participantUpdate,
 				);
 				log('info', 'participant now is:', p);
 

@@ -95,11 +95,11 @@ const createSaveParticipantTransition = ({ dataSource, notifier, log, }) => {
                 else {
                     intermediaryTransition.reason = transitionEvent_1.TransitionReason.FORCED;
                 }
-                const intermediaryParticipant = {
+                const participantUpdate = {
                     phase: intermediaryTransition.toPhase,
                 };
-                log('info', 'updating participant phase:', intermediaryParticipant);
-                const p = yield entityManager.update(participant_1.default, { id: participant.id }, intermediaryParticipant);
+                log('info', 'updating participant phase:', participantUpdate);
+                const p = yield entityManager.update(participant_1.default, { id: participant.id }, participantUpdate);
                 log('info', 'participant now is:', p);
                 log('info', 'saving transition:', intermediaryTransition);
                 const t = yield entityManager.save(intermediaryTransition);
