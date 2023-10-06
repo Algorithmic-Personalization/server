@@ -433,7 +433,7 @@ const makeCreateYouTubeApi = (cache = 'with-cache') => {
                             log('error getting some meta-data for videos:', response.reason);
                         }
                         else {
-                            arrayResponses.push(response.value);
+                            arrayResponses.push(response.value.clone());
                         }
                     }
                     const rawResponses = (yield Promise.all(arrayResponses.map((r) => __awaiter(this, void 0, void 0, function* () {

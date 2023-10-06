@@ -460,7 +460,7 @@ export const makeCreateYouTubeApi = (cache: 'with-cache' | 'without-cache' = 'wi
 					if (response.status === 'rejected') {
 						log('error getting some meta-data for videos:', response.reason);
 					} else {
-						arrayResponses.push(response.value);
+						arrayResponses.push(response.value.clone());
 					}
 				}
 
