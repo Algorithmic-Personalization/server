@@ -28,6 +28,7 @@ const conf: webpack.Configuration = {
 			fs: false,
 			assert: false,
 			process: false,
+			stream: require.resolve('stream-browserify'),
 		},
 	},
 	module: {

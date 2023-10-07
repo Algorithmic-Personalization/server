@@ -145,6 +145,13 @@ export const MonitoringC: React.FC = () => {
 				});
 			}
 		})();
+
+		api.scanRequestsLog({
+			fromDate: fromDate.toDate(),
+			toDate: toDate.toDate(),
+		}, e => {
+			console.log(e);
+		});
 	}, [fromDate, toDate]);
 
 	if (fromRef.current) {

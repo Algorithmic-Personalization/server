@@ -100,6 +100,7 @@ import participantsReportDefinition from './api-2/participantsReport';
 import addVouchersDefinition from './api-2/addVouchers';
 import ResetPasswordDefinition from './api-2/sendAdminPasswordResetLink';
 import resetPassword from './api-2/resetPassword';
+import requests from './api-2/requests';
 
 import getYouTubeConfig from './lib/config-loader/getYouTubeConfig';
 import makeCreateYouTubeApi from './lib/youTubeApi';
@@ -432,6 +433,7 @@ const main = async () => {
 	defineAdminRoute(monitoringDefinition);
 	defineAdminRoute(participantsReportDefinition);
 	defineAdminRoute(addVouchersDefinition);
+	defineAdminRoute(requests);
 
 	app.post(postRegister, createRegisterRoute(routeContext));
 	app.get(getVerifyEmailToken, createVerifyEmailRoute(routeContext));

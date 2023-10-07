@@ -1,3 +1,5 @@
+import {parser} from 'stream-json';
+
 import type {Page} from '../server/lib/pagination';
 
 import {type Admin} from '../common/models/admin';
@@ -49,6 +51,10 @@ import {
 } from '../server/api-2/monitoring';
 
 import {
+	requests,
+} from '../server/api-2/requests';
+
+import {
 	sendResetLinkPath,
 } from '../server/serverRoutes';
 
@@ -61,10 +67,18 @@ import {
 	makeApiVerbCreator,
 } from '../common/util';
 
+import RequestLog from '../server/models/requestLog';
+import type Model from '../common/lib/model';
+
 export type ParticipantFilters = {
 	codeLike: string;
 	phase: number;
 	extensionInstalled: 'yes' | 'no' | 'any';
+};
+
+const fixDates = (x: Model): void => {
+	x.createdAt = new Date(x.createdAt);
+	x.updatedAt = new Date(x.updatedAt);
 };
 
 export type AdminApi = {
@@ -93,6 +107,12 @@ export type AdminApi = {
 	getMonitoringReport: (q: MonitoringQuery) => Promise<Maybe<MonitoringReport>>;
 	sendAdminPasswordResetLink: (email: string) => Promise<Maybe<void>>;
 	resetPassword: (token: string, email: string, password: string) => Promise<Maybe<boolean>>;
+	scanRequestsLog: ({fromDate, toDate}: ScanParams, fn: ((e: RequestLog) => void)) => void;
+};
+
+export type ScanParams = {
+	fromDate: Date;
+	toDate: Date;
 };
 
 const loadItem = <T>(key: string): T | undefined => {
@@ -318,6 +338,55 @@ export const createAdminApi = (serverUrl: string, showLoginModal?: () => void): 
 
 		async resetPassword(token: string, email: string, password: string) {
 			return post<boolean>('/api/reset-password', {token, email, password}, headers());
+		},
+
+		async scanRequestsLog({fromDate, toDate}, fn) {
+			const {path} = requests;
+			const url = `${serverUrl}${path}`;
+
+			const body = JSON.stringify({
+				fromDate: fromDate.getTime(),
+				toDate: toDate.getTime(),
+			});
+
+			const resp = await fetch(url, {
+				method: requests.verb.toLocaleUpperCase(),
+				body,
+				headers: {
+					...headers(),
+					'Content-Type': 'application/json',
+				},
+			});
+
+			if (!resp.body) {
+				throw new Error('no body');
+			}
+
+			const jsonParser = parser();
+
+			jsonParser.on('data', ({value}) => {
+				const entity = new RequestLog();
+				Object.assign(entity, value);
+				fixDates(entity);
+
+				fn(entity);
+			});
+
+			const reader = resp.body.getReader();
+
+			const pump = async () => {
+				const {done, value} = await reader.read();
+
+				if (done) {
+					return;
+				}
+
+				const text = new TextDecoder('utf-8').decode(value);
+
+				jsonParser.write(text);
+
+				await pump();
+			};
 		},
 	};
 };

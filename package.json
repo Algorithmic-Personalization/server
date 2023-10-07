@@ -28,6 +28,7 @@
   "devDependencies": {
     "@jest/globals": "^29.5.0",
     "@pmmmwh/react-refresh-webpack-plugin": "^0.5.10",
+    "@types/stream-json": "^1.7.4",
     "@types/webpack": "^5.28.1",
     "@types/webpack-dev-middleware": "^5.3.0",
     "@typescript-eslint/eslint-plugin": "^5.57.0",
@@ -42,6 +43,7 @@
     "nodemailer": "^6.9.1",
     "nodemon": "^2.0.22",
     "react-refresh": "^0.14.0",
+    "stream-json": "^1.8.0",
     "ts-jest": "^29.0.5",
     "ts-loader": "^9.4.2",
     "ts-node": "^10.9.1",

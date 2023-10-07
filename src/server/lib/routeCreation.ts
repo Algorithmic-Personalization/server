@@ -8,6 +8,7 @@ import {type TokenTools} from './crypto';
 import {has} from '../../common/util';
 import NotFoundError from './notFoundError';
 import {type ExternalNotifier as NotifierService} from './externalNotifier';
+import {type ReadStream} from 'typeorm/platform/PlatformTools';
 
 const hasMessage = has('message');
 const msg = (x: unknown) => (hasMessage(x) ? x.message : 'An unknown error occurred');
@@ -48,6 +49,19 @@ export type RouteDefinition<Output> = {
 	verb: HttpVerb;
 	path: string;
 	makeHandler: (context: RouteContext) => RequestHandler<Output>;
+	responseIsStream?: true;
+};
+
+const isStream = (x: unknown): x is ReadStream => {
+	if (typeof x !== 'object' || x === null) {
+		return false;
+	}
+
+	if (typeof (x as any).pipe !== 'function') {
+		return false;
+	}
+
+	return true;
 };
 
 export const makeRouteConnector = (context: RouteContext) => <T>(definition: RouteDefinition<T>) => async (req: Request, res: Response) => {
@@ -58,6 +72,10 @@ export const makeRouteConnector = (context: RouteContext) => <T>(definition: Rou
 
 	try {
 		const value = await handler(req);
+
+		const rspIsStream = isStream(value);
+		log('debug', {rspIsStream}, 'response is stream');
+
 		res.json({
 			kind: 'Success',
 			value,
