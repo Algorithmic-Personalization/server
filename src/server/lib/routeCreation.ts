@@ -64,6 +64,19 @@ const isStream = (x: unknown): x is ReadStream => {
 	return true;
 };
 
+const drain = (stream: ReadStream) => ({
+	into(res: Response) {
+		stream.on('data', chunk => {
+			console.log('chunk', chunk);
+			res.write(
+				typeof chunk === 'string'
+					? chunk
+					: JSON.stringify(chunk),
+			);
+		});
+	},
+});
+
 export const makeRouteConnector = (context: RouteContext) => <T>(definition: RouteDefinition<T>) => async (req: Request, res: Response) => {
 	const {makeHandler} = definition;
 	const {createLogger} = context;
@@ -73,8 +86,10 @@ export const makeRouteConnector = (context: RouteContext) => <T>(definition: Rou
 	try {
 		const value = await handler(req);
 
-		const rspIsStream = isStream(value);
-		log('debug', {rspIsStream}, 'response is stream');
+		if (isStream(value)) {
+			drain(value).into(res);
+			return;
+		}
 
 		res.json({
 			kind: 'Success',

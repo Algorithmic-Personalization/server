@@ -1913,6 +1913,15 @@ __metadata:
   languageName: node
   linkType: hard
 
+"@types/pg-query-stream@npm:^3.4.0":
+  version: 3.4.0
+  resolution: "@types/pg-query-stream@npm:3.4.0"
+  dependencies:
+    pg-query-stream: "*"
+  checksum: 8c99ab2b8bf41bf206bd1ffc1dbecb46931d126ce14f6e06860be21ad7d204d346bf322b41c36c682a9c1b6cfa7cfd64cdae606cfdf51c2318f6fc51a6185c47
+  languageName: node
+  linkType: hard
+
 "@types/pg@npm:^8.6.6":
   version: 8.6.6
   resolution: "@types/pg@npm:8.6.6"
@@ -2080,25 +2089,6 @@ __metadata:
   version: 2.0.1
   resolution: "@types/stack-utils@npm:2.0.1"
   checksum: 205fdbe3326b7046d7eaf5e494d8084f2659086a266f3f9cf00bccc549c8e36e407f88168ad4383c8b07099957ad669f75f2532ed4bc70be2b037330f7bae019
-  languageName: node
-  linkType: hard
-
-"@types/stream-chain@npm:*":
-  version: 2.0.2
-  resolution: "@types/stream-chain@npm:2.0.2"
-  dependencies:
-    "@types/node": "*"
-  checksum: b6d3e19f10a4575043fb9473dc34ae273409cf8293d2f3f724ccc75f1dbeffd4d368bff056ed1f02f16d05955e354f6cbdda76ada3139ccfb9ee527b11362d82
-  languageName: node
-  linkType: hard
-
-"@types/stream-json@npm:^1.7.4":
-  version: 1.7.4
-  resolution: "@types/stream-json@npm:1.7.4"
-  dependencies:
-    "@types/node": "*"
-    "@types/stream-chain": "*"
-  checksum: deb351b9d42d0280a57103f2064440247a5e332d337f75f90bbde33fdca1fb83b20e717fbc6bb1825a727b7ecffb7393a34cc63ad300a7834960ea077bdf8ac8
   languageName: node
   linkType: hard
 
@@ -6982,6 +6972,13 @@ __metadata:
   languageName: node
   linkType: hard
 
+"jsonparse@npm:^1.3.1":
+  version: 1.3.1
+  resolution: "jsonparse@npm:1.3.1"
+  checksum: 6514a7be4674ebf407afca0eda3ba284b69b07f9958a8d3113ef1005f7ec610860c312be067e450c569aab8b89635e332cee3696789c750692bb60daba627f4d
+  languageName: node
+  linkType: hard
+
 "jsonwebtoken@npm:^9.0.0":
   version: 9.0.0
   resolution: "jsonwebtoken@npm:9.0.0"
@@ -8149,6 +8146,13 @@ __metadata:
   languageName: node
   linkType: hard
 
+"package@npm:^1.0.1":
+  version: 1.0.1
+  resolution: "package@npm:1.0.1"
+  checksum: 2b0ae083c1940969e0dd59f8e96ce4728f063dd7068c1c30df889a74158a9e443bb48ab99124174ba8ca684cdc68be83f75b0a58b7438da723d960bc8749989f
+  languageName: node
+  linkType: hard
+
 "packet-reader@npm:1.0.0":
   version: 1.0.0
   resolution: "packet-reader@npm:1.0.0"
@@ -8346,6 +8350,15 @@ __metadata:
   languageName: node
   linkType: hard
 
+"pg-cursor@npm:^2.10.3":
+  version: 2.10.3
+  resolution: "pg-cursor@npm:2.10.3"
+  peerDependencies:
+    pg: ^8
+  checksum: 86dd66c4bf70da5272eb60d485a60f4216ebbffe2b7d314fe18a28a0cadf9b0d056d2291e0f108ed413be185818c2e82105bf290bf98fc91f73c52e4d0de42b8
+  languageName: node
+  linkType: hard
+
 "pg-int8@npm:1.0.1":
   version: 1.0.1
   resolution: "pg-int8@npm:1.0.1"
@@ -8391,6 +8404,17 @@ __metadata:
   version: 1.6.0
   resolution: "pg-protocol@npm:1.6.0"
   checksum: e12662d2de2011e0c3a03f6a09f435beb1025acdc860f181f18a600a5495dc38a69d753bbde1ace279c8c442536af9c1a7c11e1d0fe3fad3aa1348b28d9d2683
+  languageName: node
+  linkType: hard
+
+"pg-query-stream@npm:*, pg-query-stream@npm:^4.5.3":
+  version: 4.5.3
+  resolution: "pg-query-stream@npm:4.5.3"
+  dependencies:
+    pg-cursor: ^2.10.3
+  peerDependencies:
+    pg: ^8
+  checksum: 942b8fa9f33c4d6403c9d07ad5fc2f68b5ad3664bce5aecd861b6034932feb6a1389d8a364adf621798f1d314ca51b11b5bc2fafc12085022dc262cb6a3dddfb
   languageName: node
   linkType: hard
 
@@ -9852,22 +9876,6 @@ __metadata:
   languageName: node
   linkType: hard
 
-"stream-chain@npm:^2.2.5":
-  version: 2.2.5
-  resolution: "stream-chain@npm:2.2.5"
-  checksum: c83cbf504bd11e2bcbe761a92801295b3decac7ffa4092ceffca2eb1b5d0763bcc511fa22cd8044e8a18c21ca66794fd10c8d9cd1292a3e6c0d83a4194c6b8ed
-  languageName: node
-  linkType: hard
-
-"stream-json@npm:^1.8.0":
-  version: 1.8.0
-  resolution: "stream-json@npm:1.8.0"
-  dependencies:
-    stream-chain: ^2.2.5
-  checksum: c17ac72228815850fc5226d8c0a80afd6c2ffbfa71c572ad99ad2eac145dc836a3fc6f62a298b3df716f1726cc1ed8a448892ed9fb6123f46abf2f89c908749f
-  languageName: node
-  linkType: hard
-
 "streamsearch@npm:^1.1.0":
   version: 1.1.0
   resolution: "streamsearch@npm:1.1.0"
@@ -11313,11 +11321,11 @@ __metadata:
     "@types/node-gzip": ^1.1.0
     "@types/nodemailer": ^6.4.7
     "@types/pg": ^8.6.6
+    "@types/pg-query-stream": ^3.4.0
     "@types/react": ^18.0.30
     "@types/react-dom": ^18.0.11
     "@types/react-router": ^5.1.20
     "@types/react-router-dom": ^5.3.3
-    "@types/stream-json": ^1.7.4
     "@types/urlencode": ^1.1.2
     "@types/uuid": ^9.0.1
     "@types/webpack": ^5.28.1
@@ -11344,6 +11352,7 @@ __metadata:
     express-status-monitor: ^1.3.4
     filemanager-webpack-plugin: ^8.0.0
     jest: ^29.5.0
+    jsonparse: ^1.3.1
     jsonwebtoken: ^9.0.0
     memory-cache: ^0.2.0
     multer: ^1.4.5-lts.1
@@ -11352,7 +11361,9 @@ __metadata:
     nodemailer: ^6.9.1
     nodemon: ^2.0.22
     object-sizeof: ^2.6.1
+    package: ^1.0.1
     pg: ^8.10.0
+    pg-query-stream: ^4.5.3
     pgtools: ^1.0.0
     pm2: ^5.3.0
     postgres-migrations: ^5.3.0
@@ -11362,7 +11373,6 @@ __metadata:
     react-router: ^6.9.0
     react-router-dom: ^6.9.0
     stream-browserify: ^3.0.0
-    stream-json: ^1.8.0
     ts-jest: ^29.0.5
     ts-loader: ^9.4.2
     ts-node: ^10.9.1

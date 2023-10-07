@@ -1,4 +1,4 @@
-import {parser} from 'stream-json';
+import Parser from 'jsonparse';
 
 import type {Page} from '../server/lib/pagination';
 
@@ -362,9 +362,13 @@ export const createAdminApi = (serverUrl: string, showLoginModal?: () => void): 
 				throw new Error('no body');
 			}
 
-			const jsonParser = parser();
+			const jsonParser = new Parser();
 
-			jsonParser.on('data', ({value}) => {
+			jsonParser.onValue((value: any) => {
+				if (!value || typeof value !== 'object') {
+					throw new Error('invalid value');
+				}
+
 				const entity = new RequestLog();
 				Object.assign(entity, value);
 				fixDates(entity);

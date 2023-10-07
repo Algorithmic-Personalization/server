@@ -5,7 +5,6 @@ import {type ReadStream} from 'typeorm/platform/PlatformTools';
 export const requests: RouteDefinition<ReadStream> = {
 	verb: 'post',
 	path: '/api/requests',
-	responseIsStream: true,
 	makeHandler: ({createLogger, dataSource}) => async req => {
 		const log = createLogger(req.requestId);
 
