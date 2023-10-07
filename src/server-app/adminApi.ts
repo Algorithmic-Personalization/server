@@ -364,6 +364,10 @@ export const createAdminApi = (serverUrl: string, showLoginModal?: () => void): 
 
 			const jsonParser = new Parser();
 
+			jsonParser.onError(err => {
+				console.error('jsonParser error', err);
+			});
+
 			jsonParser.onValue((value: any) => {
 				if (!value || typeof value !== 'object') {
 					throw new Error('invalid value');
@@ -386,6 +390,8 @@ export const createAdminApi = (serverUrl: string, showLoginModal?: () => void): 
 				}
 
 				const text = new TextDecoder('utf-8').decode(value);
+
+				console.log('text', text);
 
 				jsonParser.write(text);
 
