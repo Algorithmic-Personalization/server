@@ -36,10 +36,11 @@ export const requests: RouteDefinition<ReadStream> = {
 
 		const reqLogRepo = dataSource.getRepository(RequestLog);
 		const reqLogQb = reqLogRepo
-			.createQueryBuilder('requestLog')
+			.createQueryBuilder('rl')
 			.where('verb = :verb', {verb: 'POST'})
 			.andWhere('created_at >= :fromDate', {fromDate})
-			.andWhere('created_at <= :toDate', {toDate});
+			.andWhere('created_at <= :toDate', {toDate})
+			.select('rl.*');
 
 		const requestsStream = await reqLogQb.stream();
 
