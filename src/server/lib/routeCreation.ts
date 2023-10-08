@@ -1,6 +1,8 @@
 import {type DataSource} from 'typeorm';
 import {type Request, type Response} from 'express';
 
+import JsonStream from 'JSONStream';
+
 import {type MailService} from './email';
 import {type CreateLogger} from './logger';
 import {type TokenTools} from './crypto';
@@ -64,17 +66,11 @@ const isStream = (x: unknown): x is ReadStream => {
 	return true;
 };
 
+/* D
 const drain = (stream: ReadStream) => ({
 	into(res: Response) {
-		let first = true;
-
 		stream.on('data', chunk => {
 			console.log('chunk', chunk);
-			if (!first) {
-				res.write(',');
-				first = false;
-			}
-
 			res.write(
 				typeof chunk === 'string'
 					? chunk
@@ -83,6 +79,7 @@ const drain = (stream: ReadStream) => ({
 		});
 	},
 });
+*/
 
 export const makeRouteConnector = (context: RouteContext) => <T>(definition: RouteDefinition<T>) => async (req: Request, res: Response) => {
 	const {makeHandler} = definition;
@@ -94,7 +91,7 @@ export const makeRouteConnector = (context: RouteContext) => <T>(definition: Rou
 		const value = await handler(req);
 
 		if (isStream(value)) {
-			drain(value).into(res);
+			value.pipe(JsonStream.stringify()).pipe(res);
 			return;
 		}
 

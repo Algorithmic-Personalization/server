@@ -386,7 +386,6 @@ export const createAdminApi = (serverUrl: string, showLoginModal?: () => void): 
 				const {done, value} = await reader.read();
 
 				if (done) {
-					jsonParser.write(']');
 					jsonParser.end();
 					return;
 				}
@@ -400,7 +399,6 @@ export const createAdminApi = (serverUrl: string, showLoginModal?: () => void): 
 				await pump();
 			};
 
-			jsonParser.write('[');
 			await pump();
 		},
 	};
