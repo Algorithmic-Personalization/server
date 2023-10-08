@@ -52,6 +52,10 @@ const conf: webpack.Configuration = {
 		new webpack.ProvidePlugin({
 			process: 'process/browser',
 		}),
+		new webpack.ProvidePlugin({
+			// eslint-disable-next-line @typescript-eslint/naming-convention
+			Buffer: ['buffer', 'Buffer'],
+		}),
 	].filter(Boolean) as webpack.WebpackPluginInstance[],
 };
 

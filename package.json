@@ -86,6 +86,7 @@
     "async-lock": "^1.4.0",
     "bcrypt": "^5.1.0",
     "body-parser": "^1.20.2",
+    "buffer": "^6.0.3",
     "class-validator": "^0.14.0",
     "cors": "^2.8.5",
     "crypto-browserify": "^3.12.0",

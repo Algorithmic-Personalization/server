@@ -1,4 +1,4 @@
-import JsonStream from '../types/JSONStream';
+import JsonStream from 'JSONStream';
 
 import type {Page} from '../server/lib/pagination';
 
