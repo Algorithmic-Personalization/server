@@ -149,8 +149,8 @@ export const MonitoringC: React.FC = () => {
 		api.scanRequestsLog({
 			fromDate: fromDate.toDate(),
 			toDate: toDate.toDate(),
-		}, e => {
-			console.log(e);
+		}, entry => {
+			console.log({entry});
 		});
 	}, [fromDate, toDate]);
 

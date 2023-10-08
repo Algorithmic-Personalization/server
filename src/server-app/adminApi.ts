@@ -1,4 +1,4 @@
-import Parser from 'jsonparse';
+import JsonStream from '../types/JSONStream';
 
 import type {Page} from '../server/lib/pagination';
 
@@ -362,13 +362,13 @@ export const createAdminApi = (serverUrl: string, showLoginModal?: () => void): 
 				throw new Error('no body');
 			}
 
-			const jsonParser = new Parser();
+			const jsonParser = JsonStream.parse('*');
 
-			jsonParser.onError(err => {
+			jsonParser.on('error', (err: any) => {
 				console.error('jsonParser error', err);
 			});
 
-			jsonParser.onValue((value: any) => {
+			jsonParser.on('data', (value: any) => {
 				if (!value || typeof value !== 'object') {
 					throw new Error('invalid value');
 				}
@@ -386,6 +386,8 @@ export const createAdminApi = (serverUrl: string, showLoginModal?: () => void): 
 				const {done, value} = await reader.read();
 
 				if (done) {
+					jsonParser.write(']');
+					jsonParser.end();
 					return;
 				}
 
@@ -397,6 +399,9 @@ export const createAdminApi = (serverUrl: string, showLoginModal?: () => void): 
 
 				await pump();
 			};
+
+			jsonParser.write('[');
+			await pump();
 		},
 	};
 };

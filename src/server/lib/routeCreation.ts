@@ -66,8 +66,15 @@ const isStream = (x: unknown): x is ReadStream => {
 
 const drain = (stream: ReadStream) => ({
 	into(res: Response) {
+		let first = true;
+
 		stream.on('data', chunk => {
 			console.log('chunk', chunk);
+			if (!first) {
+				res.write(',');
+				first = false;
+			}
+
 			res.write(
 				typeof chunk === 'string'
 					? chunk

@@ -49,6 +49,9 @@ const conf: webpack.Configuration = {
 		isDevelopment && new webpack.HotModuleReplacementPlugin(),
 		isDevelopment && new ReactRefreshWebpackPlugin(),
 		new webpack.EnvironmentPlugin(['NODE_ENV']),
+		new webpack.ProvidePlugin({
+			process: 'process/browser',
+		}),
 	].filter(Boolean) as webpack.WebpackPluginInstance[],
 };
 
