@@ -18,6 +18,11 @@ export const RequestLogC: React.FC<{
 	const ui = (
 		<svg {...{width, height}}>
 			<path fill='none' stroke='currentColor' strokeWidth={1.5} d={line(entries) ?? ''} />
+			<g fill='white' stroke='currentColor' strokeWidth={1.5}>
+				{entries.map((rl, i) => (
+					<circle key={i} cx={x(i)} cy={y(rl.latencyMs)} r={Math.log(rl.latencyMs)} />
+				))}
+			</g>
 		</svg>
 	);
 
