@@ -1,4 +1,5 @@
 import JsonStream from 'JSONStream';
+import {validate} from 'class-validator';
 
 import type {Page} from '../server/lib/pagination';
 
@@ -67,18 +68,12 @@ import {
 	makeApiVerbCreator,
 } from '../common/util';
 
-import RequestLog from '../server/models/requestLog';
-import type Model from '../common/lib/model';
+import RequestLog, {type HttpVerb} from '../server/models/requestLog';
 
 export type ParticipantFilters = {
 	codeLike: string;
 	phase: number;
 	extensionInstalled: 'yes' | 'no' | 'any';
-};
-
-const fixDates = (x: Model): void => {
-	x.createdAt = new Date(x.createdAt);
-	x.updatedAt = new Date(x.updatedAt);
 };
 
 export type AdminApi = {
@@ -368,14 +363,29 @@ export const createAdminApi = (serverUrl: string, showLoginModal?: () => void): 
 				console.error('jsonParser error', err);
 			});
 
-			jsonParser.on('data', (value: any) => {
+			jsonParser.on('data', async (value: Record<string, unknown>) => {
 				if (!value || typeof value !== 'object') {
 					throw new Error('invalid value');
 				}
 
 				const entity = new RequestLog();
-				Object.assign(entity, value);
-				fixDates(entity);
+
+				entity.id = value.id as number;
+				entity.verb = value.verb as HttpVerb;
+				entity.path = value.path as string;
+				entity.statusCode = Number(value.status_code);
+				entity.latencyMs = Number(value.latency_ms);
+				entity.requestId = Number(value.request_id);
+				entity.sessionUuid = value.session_uuid as string;
+				entity.message = value.message as string[];
+				entity.comment = value.comment as string[];
+
+				const errors = await validate(entity);
+
+				if (errors.length > 0) {
+					console.error('errors', errors);
+					return;
+				}
 
 				fn(entity);
 			});
