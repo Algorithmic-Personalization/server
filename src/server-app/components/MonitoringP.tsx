@@ -12,6 +12,9 @@ import {useAdminApi} from '../adminApiProvider';
 import {type MonitoringReport} from '../../server/api-2/monitoring';
 
 import {createTableComponent, type TableDescriptor} from './shared/TableC';
+import {type RequestLog} from '../../server/models/requestLog';
+
+import RequestLogC from './RequestLogC';
 
 type UrlAndCount = {url: string; count: number};
 
@@ -130,6 +133,7 @@ export const MonitoringC: React.FC = () => {
 
 	const [report, setReport] = useState<MonitoringReport>();
 	const [message, setMessage] = useState<Message>();
+	const [requestLog, setRequestLog] = useState<RequestLog[]>([]);
 
 	const api = useAdminApi();
 
@@ -146,12 +150,29 @@ export const MonitoringC: React.FC = () => {
 			}
 		})();
 
-		api.scanRequestsLog({
-			fromDate: fromDate.toDate(),
-			toDate: toDate.toDate(),
-		}, entry => {
-			console.log({entry});
-		});
+		(async () => {
+			const stream = false;
+
+			if (stream) {
+				await api.scanRequestsLog({
+					fromDate: fromDate.toDate(),
+					toDate: toDate.toDate(),
+				}, entry => {
+					setRequestLog([...requestLog, entry]);
+				});
+			} else {
+				const newLog: RequestLog[] = [];
+
+				await api.scanRequestsLog({
+					fromDate: fromDate.toDate(),
+					toDate: toDate.toDate(),
+				}, entry => {
+					newLog.push(entry);
+				});
+
+				setRequestLog(newLog);
+			}
+		})();
 	}, [fromDate, toDate]);
 
 	if (fromRef.current) {
@@ -169,6 +190,11 @@ export const MonitoringC: React.FC = () => {
 			<NotificationsC message={message}/>
 
 			<Paper sx={{m: 2, p: 2}}>
+				<Typography variant='h3'>Request log</Typography>
+				<RequestLogC entries={requestLog}/>
+			</Paper>
+
+			<Paper sx={{m: 2, p: 2}}>
 				<Box>
 					<InputLabel htmlFor='fromDate'>Start date (excluded)</InputLabel>
 					<DatePicker inputRef={fromRef} value={dayjs(fromDate)} onChange={e => {
@@ -177,6 +203,7 @@ export const MonitoringC: React.FC = () => {
 						}
 					}}/>
 				</Box>
+				<p><br /></p>
 				<Box>
 					<InputLabel htmlFor='toDate'>End date (included)</InputLabel>
 					<DatePicker inputRef={toRef} value={dayjs(toDate)} onChange={e => {

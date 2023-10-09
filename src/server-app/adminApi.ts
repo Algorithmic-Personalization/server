@@ -102,7 +102,7 @@ export type AdminApi = {
 	getMonitoringReport: (q: MonitoringQuery) => Promise<Maybe<MonitoringReport>>;
 	sendAdminPasswordResetLink: (email: string) => Promise<Maybe<void>>;
 	resetPassword: (token: string, email: string, password: string) => Promise<Maybe<boolean>>;
-	scanRequestsLog: ({fromDate, toDate}: ScanParams, fn: ((e: RequestLog) => void)) => void;
+	scanRequestsLog: ({fromDate, toDate}: ScanParams, fn: ((e: RequestLog) => void)) => Promise<number>;
 };
 
 export type ScanParams = {
@@ -363,6 +363,8 @@ export const createAdminApi = (serverUrl: string, showLoginModal?: () => void): 
 				console.error('jsonParser error', err);
 			});
 
+			let nEntities = 0;
+
 			jsonParser.on('data', async (value: Record<string, unknown>) => {
 				if (!value || typeof value !== 'object') {
 					throw new Error('invalid value');
@@ -388,6 +390,8 @@ export const createAdminApi = (serverUrl: string, showLoginModal?: () => void): 
 				}
 
 				fn(entity);
+
+				++nEntities;
 			});
 
 			const reader = resp.body.getReader();
@@ -402,14 +406,23 @@ export const createAdminApi = (serverUrl: string, showLoginModal?: () => void): 
 
 				const text = new TextDecoder('utf-8').decode(value);
 
-				console.log('text', text);
-
 				jsonParser.write(text);
 
 				await pump();
 			};
 
-			await pump();
+			return new Promise<number>((resolve, reject) => {
+				jsonParser.on('end', () => {
+					console.log('scanned', nEntities, 'entities');
+					resolve(nEntities);
+				});
+
+				jsonParser.on('error', (err: any) => {
+					reject(err);
+				});
+
+				void pump();
+			});
 		},
 	};
 };
