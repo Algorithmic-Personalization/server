@@ -14,7 +14,6 @@ const requestLog_1 = require("../models/requestLog");
 exports.requests = {
     verb: 'post',
     path: '/api/requests',
-    responseIsStream: true,
     makeHandler: ({ createLogger, dataSource }) => (req) => __awaiter(void 0, void 0, void 0, function* () {
         const log = createLogger(req.requestId);
         log('info', 'received obtain requests log request', req.body);
@@ -37,12 +36,12 @@ exports.requests = {
         const toDate = new Date(to);
         const reqLogRepo = dataSource.getRepository(requestLog_1.RequestLog);
         const reqLogQb = reqLogRepo
-            .createQueryBuilder('requestLog')
+            .createQueryBuilder('rl')
             .where('verb = :verb', { verb: 'POST' })
             .andWhere('created_at >= :fromDate', { fromDate })
-            .andWhere('created_at <= :toDate', { toDate });
+            .andWhere('created_at <= :toDate', { toDate })
+            .select('rl.*');
         const requestsStream = yield reqLogQb.stream();
-        log('debug', { requestsStream: requestsStream.pipe }, 'requests stream');
         return requestsStream;
     }),
 };

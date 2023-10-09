@@ -26,6 +26,7 @@ const conf = {
             fs: false,
             assert: false,
             process: false,
+            stream: require.resolve('stream-browserify'),
         },
     },
     module: {
@@ -46,6 +47,13 @@ const conf = {
         isDevelopment && new webpack_1.default.HotModuleReplacementPlugin(),
         isDevelopment && new react_refresh_webpack_plugin_1.default(),
         new webpack_1.default.EnvironmentPlugin(['NODE_ENV']),
+        new webpack_1.default.ProvidePlugin({
+            process: 'process/browser',
+        }),
+        new webpack_1.default.ProvidePlugin({
+            // eslint-disable-next-line @typescript-eslint/naming-convention
+            Buffer: ['buffer', 'Buffer'],
+        }),
     ].filter(Boolean),
 };
 exports.default = conf;

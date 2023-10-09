@@ -152,6 +152,12 @@ const MonitoringC = () => {
                 });
             }
         }))();
+        api.scanRequestsLog({
+            fromDate: fromDate.toDate(),
+            toDate: toDate.toDate(),
+        }, entry => {
+            console.log({ entry });
+        });
     }, [fromDate, toDate]);
     if (fromRef.current) {
         fromRef.current.id = 'fromDate';

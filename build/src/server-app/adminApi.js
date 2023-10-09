@@ -8,16 +8,26 @@ var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, ge
         step((generator = generator.apply(thisArg, _arguments || [])).next());
     });
 };
+var __importDefault = (this && this.__importDefault) || function (mod) {
+    return (mod && mod.__esModule) ? mod : { "default": mod };
+};
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.createAdminApi = void 0;
+const JSONStream_1 = __importDefault(require("JSONStream"));
 const serverRoutes_1 = require("../server/serverRoutes");
 const getActivityReport_1 = require("../server/api-2/getActivityReport");
 const createTransitionSetting_1 = require("../server/api-2/createTransitionSetting");
 const getTransitionSetting_1 = require("../server/api-2/getTransitionSetting");
 const updateParticipant_1 = require("../server/api-2/updateParticipant");
 const monitoring_1 = require("../server/api-2/monitoring");
+const requests_1 = require("../server/api-2/requests");
 const serverRoutes_2 = require("../server/serverRoutes");
 const util_1 = require("../common/util");
+const requestLog_1 = __importDefault(require("../server/models/requestLog"));
+const fixDates = (x) => {
+    x.createdAt = new Date(x.createdAt);
+    x.updatedAt = new Date(x.updatedAt);
+};
 const loadItem = (key) => {
     const item = sessionStorage.getItem(key);
     if (!item) {
@@ -217,6 +227,50 @@ const createAdminApi = (serverUrl, showLoginModal) => {
         resetPassword(token, email, password) {
             return __awaiter(this, void 0, void 0, function* () {
                 return post('/api/reset-password', { token, email, password }, headers());
+            });
+        },
+        scanRequestsLog({ fromDate, toDate }, fn) {
+            return __awaiter(this, void 0, void 0, function* () {
+                const { path } = requests_1.requests;
+                const url = `${serverUrl}${path}`;
+                const body = JSON.stringify({
+                    fromDate: fromDate.getTime(),
+                    toDate: toDate.getTime(),
+                });
+                const resp = yield fetch(url, {
+                    method: requests_1.requests.verb.toLocaleUpperCase(),
+                    body,
+                    headers: Object.assign(Object.assign({}, headers()), { 'Content-Type': 'application/json' }),
+                });
+                if (!resp.body) {
+                    throw new Error('no body');
+                }
+                const jsonParser = JSONStream_1.default.parse('*');
+                jsonParser.on('error', (err) => {
+                    console.error('jsonParser error', err);
+                });
+                jsonParser.on('data', (value) => {
+                    if (!value || typeof value !== 'object') {
+                        throw new Error('invalid value');
+                    }
+                    const entity = new requestLog_1.default();
+                    Object.assign(entity, value);
+                    fixDates(entity);
+                    fn(entity);
+                });
+                const reader = resp.body.getReader();
+                const pump = () => __awaiter(this, void 0, void 0, function* () {
+                    const { done, value } = yield reader.read();
+                    if (done) {
+                        jsonParser.end();
+                        return;
+                    }
+                    const text = new TextDecoder('utf-8').decode(value);
+                    console.log('text', text);
+                    jsonParser.write(text);
+                    yield pump();
+                });
+                yield pump();
             });
         },
     };

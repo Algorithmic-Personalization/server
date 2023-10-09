@@ -74,6 +74,7 @@ const participantsReport_1 = __importDefault(require("./api-2/participantsReport
 const addVouchers_1 = __importDefault(require("./api-2/addVouchers"));
 const sendAdminPasswordResetLink_1 = __importDefault(require("./api-2/sendAdminPasswordResetLink"));
 const resetPassword_1 = __importDefault(require("./api-2/resetPassword"));
+const requests_1 = __importDefault(require("./api-2/requests"));
 const getYouTubeConfig_1 = __importDefault(require("./lib/config-loader/getYouTubeConfig"));
 const youTubeApi_1 = __importDefault(require("./lib/youTubeApi"));
 const scrapeYouTube_1 = __importDefault(require("./lib/scrapeYouTube"));
@@ -311,6 +312,7 @@ const main = () => __awaiter(void 0, void 0, void 0, function* () {
     defineAdminRoute(monitoring_1.default);
     defineAdminRoute(participantsReport_1.default);
     defineAdminRoute(addVouchers_1.default);
+    defineAdminRoute(requests_1.default);
     app.post(serverRoutes_1.postRegister, (0, register_1.default)(routeContext));
     app.get(serverRoutes_1.getVerifyEmailToken, (0, verifyEmail_1.default)(routeContext));
     app.post(serverRoutes_1.postLogin, (0, login_1.default)(routeContext));
