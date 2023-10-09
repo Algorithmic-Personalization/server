@@ -15,7 +15,7 @@ export const RequestLogC: React.FC<{
 	const m = 20;
 
 	const x = d3.scaleLinear([0, entries.length - 1], [m, width - m]);
-	const y = d3.scaleLinear((d3.extent(entries, rl => rl.latencyMs) ?? [0, 0]) as [number, number], [height - m, m]);
+	const y = d3.scaleLog((d3.extent(entries, rl => rl.latencyMs) ?? [0, 0]) as [number, number], [height - m, m]);
 	const line = d3.line<RequestLog>(rl => rl.latencyMs);
 
 	useEffect(() => {
