@@ -19,12 +19,22 @@ export const RequestLogC: React.FC<{
 	const line = d3.line<RequestLog>(rl => rl.latencyMs);
 
 	useEffect(() => {
-		window.addEventListener('resize', () => {
-			if (container.current) {
-				setWidth(container.current.clientWidth);
-				setHeight(container.current.clientHeight);
+		const resize = () => {
+			if (!container.current) {
+				return;
 			}
+
+			setWidth(container.current.clientWidth);
+			setHeight(container.current.clientHeight);
+		};
+
+		window.addEventListener('resize', () => {
+			resize();
 		});
+
+		setTimeout(() => {
+			resize();
+		}, 0);
 	}, []);
 
 	const ui = (
@@ -32,6 +42,9 @@ export const RequestLogC: React.FC<{
 			ref={container}
 			sx={{
 				width: '100%',
+				display: 'flex',
+				flexDirection: 'row',
+				justifyContent: 'center',
 			}}
 		>
 			<svg {...{width, height}}>

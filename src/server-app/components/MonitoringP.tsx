@@ -189,12 +189,7 @@ export const MonitoringC: React.FC = () => {
 
 			<NotificationsC message={message}/>
 
-			<Paper sx={{m: 2, p: 2}}>
-				<Typography variant='h3'>Request log</Typography>
-				<RequestLogC entries={requestLog}/>
-			</Paper>
-
-			<Paper sx={{m: 2, p: 2}}>
+			<Paper sx={{p: 2}}>
 				<Box>
 					<InputLabel htmlFor='fromDate'>Start date (excluded)</InputLabel>
 					<DatePicker inputRef={fromRef} value={dayjs(fromDate)} onChange={e => {
@@ -203,8 +198,7 @@ export const MonitoringC: React.FC = () => {
 						}
 					}}/>
 				</Box>
-				<p><br /></p>
-				<Box>
+\				<Box>
 					<InputLabel htmlFor='toDate'>End date (included)</InputLabel>
 					<DatePicker inputRef={toRef} value={dayjs(toDate)} onChange={e => {
 						if (e) {
@@ -212,6 +206,10 @@ export const MonitoringC: React.FC = () => {
 						}
 					}}/>
 				</Box>
+			</Paper>
+			<Paper sx={{p: 2, mt: 4}}>
+				<Typography variant='h3'>Request log</Typography>
+				<RequestLogC entries={requestLog}/>
 			</Paper>
 			{report && <ReportC data={report}/>}
 			{!report && <Typography>Loading report</Typography>}
