@@ -417,11 +417,12 @@ export const makeCreateYouTubeApi = (cache: 'with-cache' | 'without-cache' = 'wi
 					? await getManyYoutubeMetas(metaRepo)(idsNotCached)
 					: undefined;
 
-				if (idsNotCached.length > 0 && dbMap) {
+				if (dbMap && idsNotCached.length > 0 && dbMap.size > 0) {
+					const k = dbMap.keys().next().value as string;
 					log(
 						'info',
 						'just showing one video as retrieved from the db for debugging purposes:',
-						dbMap.get(idsNotCached[0]),
+						dbMap.get(k),
 					);
 				}
 
@@ -455,19 +456,23 @@ export const makeCreateYouTubeApi = (cache: 'with-cache' | 'without-cache' = 'wi
 
 				const responses = await Promise.allSettled(promisesToWaitFor);
 
-				const arrayResponses: Response[] = [];
+				const responseList = new Set<Response>();
 				for (const response of responses) {
 					if (response.status === 'rejected') {
 						log('error getting some meta-data for videos:', response.reason);
 					} else {
-						arrayResponses.push(response.value.clone());
+						responseList.add(response.value);
 					}
 				}
 
-				const rawResponses = (await Promise.all(arrayResponses.map(async r => r.json().catch(err => {
+				log('info', 'waiting for raw responses from yt...');
+
+				const rawResponses = (await Promise.all([...responseList].map(async r => r.json().catch(err => {
 					log('error', 'Failed to parse YouTube response', err);
 					return undefined;
 				})))).filter(r => r) as unknown[];
+
+				log('info', 'got raw responses from yt');
 
 				const validationPromises: Array<Promise<ValidationError[]>> = [];
 				const youTubeResponses: YouTubeVideoListResponse[] = [];
