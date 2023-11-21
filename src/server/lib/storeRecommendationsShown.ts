@@ -38,6 +38,17 @@ type StoreRecommendationsShownParams = {
 
 const createYouTubeApi = makeCreateYouTubeApi();
 
+const extractVideoIdFromUrl = (url: string): string | undefined => {
+	const exp = /\?v=([^&]+)/;
+	const m = exp.exec(url);
+
+	if (m) {
+		return m[1];
+	}
+
+	return undefined;
+};
+
 export const storeRecommendationsShown = async ({
 	log,
 	dataSource,
@@ -56,18 +67,21 @@ export const storeRecommendationsShown = async ({
 		storeVideos(videoRepo, makeVideosFromRecommendations(event.shown)),
 	]);
 
-	log('Retrieving category information for videos...');
+	const urlId = extractVideoIdFromUrl(event.url);
+
+	log('Retrieving meta-data information for videos recommended with', urlId ?? '<no url>...');
 	const youTubeIds = [...new Set([
 		...event.nonPersonalized.map(v => v.videoId),
 		...event.personalized.map(v => v.videoId),
 		...event.shown.map(v => v.videoId),
-	])];
+		urlId,
+	])].filter(x => x !== undefined) as string[];
 
 	const now = Date.now();
 	try {
-		await youTubeApi.getMetaFromVideoIds(youTubeIds).then(categories => {
+		await youTubeApi.getMetaFromVideoIds(youTubeIds).then(videos => {
 			const elapsed = Date.now() - now;
-			log(`fetched ${categories.data.size} meta-data items for ${youTubeIds.length} videos in ${elapsed} ms.`);
+			log(`fetched ${videos.data.size} meta-data items for ${youTubeIds.length} videos in ${elapsed} ms.`);
 		}).catch(err => {
 			log('error fetching video meta-data', err);
 		});

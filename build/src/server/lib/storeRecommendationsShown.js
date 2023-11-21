@@ -56,6 +56,14 @@ const storeItems = (repo, eventId) => (videoIds, listType, videoTypes) => __awai
     yield repo.save(videoListItems);
 });
 const createYouTubeApi = (0, youTubeApi_1.default)();
+const extractVideoIdFromUrl = (url) => {
+    const exp = /\?v=([^&]+)/;
+    const m = exp.exec(url);
+    if (m) {
+        return m[1];
+    }
+    return undefined;
+};
 const storeRecommendationsShown = ({ log, dataSource, event, youTubeConfig, }) => __awaiter(void 0, void 0, void 0, function* () {
     log('Storing recommendations shown event meta-data');
     const youTubeApi = createYouTubeApi(youTubeConfig, log, dataSource);
@@ -65,17 +73,19 @@ const storeRecommendationsShown = ({ log, dataSource, event, youTubeConfig, }) =
         (0, storeVideos_1.storeVideos)(videoRepo, (0, storeVideos_1.makeVideosFromRecommendations)(event.personalized)),
         (0, storeVideos_1.storeVideos)(videoRepo, (0, storeVideos_1.makeVideosFromRecommendations)(event.shown)),
     ]);
-    log('Retrieving category information for videos...');
+    const urlId = extractVideoIdFromUrl(event.url);
+    log('Retrieving meta-data information for videos recommended with', urlId !== null && urlId !== void 0 ? urlId : '<no url>...');
     const youTubeIds = [...new Set([
             ...event.nonPersonalized.map(v => v.videoId),
             ...event.personalized.map(v => v.videoId),
             ...event.shown.map(v => v.videoId),
-        ])];
+            urlId,
+        ])].filter(x => x !== undefined);
     const now = Date.now();
     try {
-        yield youTubeApi.getMetaFromVideoIds(youTubeIds).then(categories => {
+        yield youTubeApi.getMetaFromVideoIds(youTubeIds).then(videos => {
             const elapsed = Date.now() - now;
-            log(`fetched ${categories.data.size} meta-data items for ${youTubeIds.length} videos in ${elapsed} ms.`);
+            log(`fetched ${videos.data.size} meta-data items for ${youTubeIds.length} videos in ${elapsed} ms.`);
         }).catch(err => {
             log('error fetching video meta-data', err);
         });

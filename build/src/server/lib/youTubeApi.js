@@ -403,8 +403,9 @@ const makeCreateYouTubeApi = (cache = 'with-cache') => {
                     const dbMap = metaRepo
                         ? yield getManyYoutubeMetas(metaRepo)(idsNotCached)
                         : undefined;
-                    if (idsNotCached.length > 0 && dbMap) {
-                        log('info', 'just showing one video as retrieved from the db for debugging purposes:', dbMap.get(idsNotCached[0]));
+                    if (dbMap && idsNotCached.length > 0 && dbMap.size > 0) {
+                        const k = dbMap.keys().next().value;
+                        log('info', 'just showing one video as retrieved from the db for debugging purposes:', dbMap.get(k));
                     }
                     const finalIdsToGetFromYouTube = [];
                     for (const id of idsNotCached) {
@@ -427,21 +428,23 @@ const makeCreateYouTubeApi = (cache = 'with-cache') => {
                         promisesToWaitFor.add(responseP);
                     }
                     const responses = yield Promise.allSettled(promisesToWaitFor);
-                    const arrayResponses = [];
+                    const responseList = new Set();
                     for (const response of responses) {
                         if (response.status === 'rejected') {
                             log('error getting some meta-data for videos:', response.reason);
                         }
                         else {
-                            arrayResponses.push(response.value.clone());
+                            responseList.add(response.value);
                         }
                     }
-                    const rawResponses = (yield Promise.all(arrayResponses.map((r) => __awaiter(this, void 0, void 0, function* () {
+                    log('info', 'waiting for raw responses from yt...');
+                    const rawResponses = (yield Promise.all([...responseList].map((r) => __awaiter(this, void 0, void 0, function* () {
                         return r.json().catch(err => {
                             log('error', 'Failed to parse YouTube response', err);
                             return undefined;
                         });
                     })))).filter(r => r);
+                    log('info', 'got raw responses from yt');
                     const validationPromises = [];
                     const youTubeResponses = [];
                     for (const raw of rawResponses) {
