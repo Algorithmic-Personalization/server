@@ -231,6 +231,33 @@ __decorate([
 exports.CategoryListItem = CategoryListItem;
 class YouTubeCategoryListResponse extends YouTubeResponse {
 }
+const mergeResponses = (a, b) => {
+    const metadataRequestTimeMs = a.metadataRequestTimeMs + b.metadataRequestTimeMs;
+    const cacheHitRate = (a.cacheHitRate + b.cacheHitRate) / 2;
+    const overAllCacheHitRate = (0, util_1.formatPct)(cacheHitRate);
+    const dbHitRate = (a.dbHitRate + b.dbHitRate) / 2;
+    const hitRate = (a.hitRate + b.hitRate) / 2;
+    const failRate = (a.failRate + b.failRate) / 2;
+    const cacheMemSizeBytes = a.cacheMemSizeBytes + b.cacheMemSizeBytes;
+    const cacheMemSizeString = (0, util_1.formatSize)(cacheMemSizeBytes);
+    const cachedEntries = a.cachedEntries + b.cachedEntries;
+    const refetched = a.refetched + b.refetched;
+    const data = new Map([...a.data, ...b.data]);
+    const res = {
+        metadataRequestTimeMs,
+        cacheHitRate,
+        overAllCacheHitRate,
+        dbHitRate,
+        hitRate,
+        failRate,
+        cacheMemSizeBytes,
+        cacheMemSizeString,
+        cachedEntries,
+        refetched,
+        data,
+    };
+    return res;
+};
 const findYtInitialData = (html) => {
     const startString = 'var ytInitialData = ';
     const startPos = html.indexOf(startString);
@@ -418,6 +445,13 @@ const makeCreateYouTubeApi = (cache = 'with-cache') => {
                             continue;
                         }
                         finalIdsToGetFromYouTube.push(id);
+                    }
+                    if (finalIdsToGetFromYouTube.length > 50) {
+                        const firstPart = finalIdsToGetFromYouTube.slice(0, 50);
+                        const secondPart = finalIdsToGetFromYouTube.slice(50);
+                        const firstPartRes = yield api.getMetaFromVideoIds(firstPart, hl, recurse);
+                        const secondPartRes = yield api.getMetaFromVideoIds(secondPart, hl, recurse);
+                        return mergeResponses(firstPartRes, secondPartRes);
                     }
                     const dbHits = idsNotCached.length - finalIdsToGetFromYouTube.length;
                     const idsUrlArgs = finalIdsToGetFromYouTube.map(id => `id=${id}`).join('&');

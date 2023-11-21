@@ -179,6 +179,37 @@ export type YouTubeResponseMeta = Stats & {
 	data: MetaMap;
 };
 
+const mergeResponses = (a: YouTubeResponseMeta, b: YouTubeResponseMeta): YouTubeResponseMeta => {
+	const metadataRequestTimeMs = a.metadataRequestTimeMs + b.metadataRequestTimeMs;
+	const cacheHitRate = (a.cacheHitRate + b.cacheHitRate) / 2;
+	const overAllCacheHitRate = formatPct(cacheHitRate);
+	const dbHitRate = (a.dbHitRate + b.dbHitRate) / 2;
+	const hitRate = (a.hitRate + b.hitRate) / 2;
+	const failRate = (a.failRate + b.failRate) / 2;
+	const cacheMemSizeBytes = a.cacheMemSizeBytes + b.cacheMemSizeBytes;
+	const cacheMemSizeString = formatSize(cacheMemSizeBytes);
+	const cachedEntries = a.cachedEntries + b.cachedEntries;
+	const refetched = a.refetched + b.refetched;
+
+	const data: MetaMap = new Map([...a.data, ...b.data]);
+
+	const res: YouTubeResponseMeta = {
+		metadataRequestTimeMs,
+		cacheHitRate,
+		overAllCacheHitRate,
+		dbHitRate,
+		hitRate,
+		failRate,
+		cacheMemSizeBytes,
+		cacheMemSizeString,
+		cachedEntries,
+		refetched,
+		data,
+	};
+
+	return res;
+};
+
 const findYtInitialData = (html: string): string | undefined => {
 	const startString = 'var ytInitialData = ';
 	const startPos = html.indexOf(startString);
@@ -442,9 +473,20 @@ export const makeCreateYouTubeApi = (cache: 'with-cache' | 'without-cache' = 'wi
 					finalIdsToGetFromYouTube.push(id);
 				}
 
+				if (finalIdsToGetFromYouTube.length > 50) {
+					const firstPart = finalIdsToGetFromYouTube.slice(0, 50);
+					const secondPart = finalIdsToGetFromYouTube.slice(50);
+
+					const firstPartRes = await api.getMetaFromVideoIds(firstPart, hl, recurse);
+					const secondPartRes = await api.getMetaFromVideoIds(secondPart, hl, recurse);
+
+					return mergeResponses(firstPartRes, secondPartRes);
+				}
+
 				const dbHits = idsNotCached.length - finalIdsToGetFromYouTube.length;
 
 				const idsUrlArgs = finalIdsToGetFromYouTube.map(id => `id=${id}`).join('&');
+
 				const finalUrl = `${endpoint}&${idsUrlArgs}&hl=${hl}`;
 
 				const responseP = getUrlAndStoreLatency(finalUrl);
