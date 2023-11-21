@@ -87,16 +87,22 @@ const _scrape = (dataSource, log, api) => __awaiter(void 0, void 0, void 0, func
     let scrapeCount = 0;
     while (videos.length) {
         const batch = videos.splice(0, batchSize);
-        // eslint-disable-next-line no-await-in-loop
-        const _a = yield api.getMetaFromVideoIds(batch), { data } = _a, stats = __rest(_a, ["data"]);
-        log('info', 'yt batch scrape result:', stats);
-        scrapeCount += data.size;
-        const callWasSuccessful = data.size > 0;
-        if (!callWasSuccessful) {
-            log('warning', 'yt batch scrape result was not entirely successful, only got', data.size, 'videos out of', batch.length);
+        try {
+            // eslint-disable-next-line no-await-in-loop
+            const _a = yield api.getMetaFromVideoIds(batch), { data } = _a, stats = __rest(_a, ["data"]);
+            log('info', 'yt batch scrape result:', stats);
+            scrapeCount += data.size;
+            const callWasSuccessful = data.size > 0;
+            if (!callWasSuccessful) {
+                log('warning', 'yt batch scrape result was not entirely successful, only got', data.size, 'videos out of', batch.length);
+            }
+            if (limiter.shouldGiveUp(callWasSuccessful)) {
+                log('error', 'giving up scraping YT API for now, too many consecutive failures');
+                break;
+            }
         }
-        if (limiter.shouldGiveUp(callWasSuccessful)) {
-            log('error', 'giving up scraping YT API for now, too many consecutive failures');
+        catch (err) {
+            log('error', 'yt batch scrape failed', err);
             break;
         }
         // eslint-disable-next-line no-await-in-loop

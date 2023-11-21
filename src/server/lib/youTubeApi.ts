@@ -227,7 +227,7 @@ const findYtInitialData = (html: string): string | undefined => {
 	return html.slice(startPos + startString.length, endPos);
 };
 
-// TODO: non working
+// TODO: to be tested better
 export const isVideoAvailable = async (youtubeId: string): Promise<boolean> => {
 	const url = `https://www.youtube.com/watch?v=${youtubeId}`;
 
@@ -242,19 +242,19 @@ export const isVideoAvailable = async (youtubeId: string): Promise<boolean> => {
 	const json = JSON.parse(jsonText) as unknown;
 
 	if (typeof json !== 'object') {
-		throw new Error('json is not an object');
+		return false;
 	}
 
 	const {contents} = json as {contents: unknown};
 
 	if (typeof contents !== 'object') {
-		throw new Error('content is not an object');
+		return false;
 	}
 
 	const {twoColumnWatchNextResults} = contents as {twoColumnWatchNextResults: unknown};
 
 	if (typeof twoColumnWatchNextResults !== 'object') {
-		throw new Error('twoColumnWatchNextResults is not an object');
+		return false;
 	}
 
 	const {secondaryResults} = twoColumnWatchNextResults as {secondaryResults: unknown};
@@ -266,7 +266,7 @@ export const isVideoAvailable = async (youtubeId: string): Promise<boolean> => {
 	const {secondaryResults: inception} = secondaryResults as {secondaryResults: unknown};
 
 	if (typeof inception !== 'object') {
-		throw new Error('inception is not an object');
+		return false;
 	}
 
 	const {results} = inception as {results: unknown};

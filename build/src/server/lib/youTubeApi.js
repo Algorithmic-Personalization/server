@@ -270,7 +270,7 @@ const findYtInitialData = (html) => {
     }
     return html.slice(startPos + startString.length, endPos);
 };
-// TODO: non working
+// TODO: to be tested better
 const isVideoAvailable = (youtubeId) => __awaiter(void 0, void 0, void 0, function* () {
     const url = `https://www.youtube.com/watch?v=${youtubeId}`;
     const responseHtml = yield (yield (0, node_fetch_1.default)(url)).text();
@@ -280,15 +280,15 @@ const isVideoAvailable = (youtubeId) => __awaiter(void 0, void 0, void 0, functi
     }
     const json = JSON.parse(jsonText);
     if (typeof json !== 'object') {
-        throw new Error('json is not an object');
+        return false;
     }
     const { contents } = json;
     if (typeof contents !== 'object') {
-        throw new Error('content is not an object');
+        return false;
     }
     const { twoColumnWatchNextResults } = contents;
     if (typeof twoColumnWatchNextResults !== 'object') {
-        throw new Error('twoColumnWatchNextResults is not an object');
+        return false;
     }
     const { secondaryResults } = twoColumnWatchNextResults;
     if (typeof secondaryResults !== 'object') {
@@ -296,7 +296,7 @@ const isVideoAvailable = (youtubeId) => __awaiter(void 0, void 0, void 0, functi
     }
     const { secondaryResults: inception } = secondaryResults;
     if (typeof inception !== 'object') {
-        throw new Error('inception is not an object');
+        return false;
     }
     const { results } = inception;
     return Array.isArray(results) && results.length > 0;

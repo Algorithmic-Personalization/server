@@ -80,19 +80,24 @@ const _scrape = async (dataSource: DataSource, log: LogFunction, api: YtApi): Pr
 	while (videos.length) {
 		const batch = videos.splice(0, batchSize);
 
-		// eslint-disable-next-line no-await-in-loop
-		const {data, ...stats} = await api.getMetaFromVideoIds(batch);
-		log('info', 'yt batch scrape result:', stats);
+		try {
+			// eslint-disable-next-line no-await-in-loop
+			const {data, ...stats} = await api.getMetaFromVideoIds(batch);
+			log('info', 'yt batch scrape result:', stats);
 
-		scrapeCount += data.size;
-		const callWasSuccessful = data.size > 0;
+			scrapeCount += data.size;
+			const callWasSuccessful = data.size > 0;
 
-		if (!callWasSuccessful) {
-			log('warning', 'yt batch scrape result was not entirely successful, only got', data.size, 'videos out of', batch.length);
-		}
+			if (!callWasSuccessful) {
+				log('warning', 'yt batch scrape result was not entirely successful, only got', data.size, 'videos out of', batch.length);
+			}
 
-		if (limiter.shouldGiveUp(callWasSuccessful)) {
-			log('error', 'giving up scraping YT API for now, too many consecutive failures');
+			if (limiter.shouldGiveUp(callWasSuccessful)) {
+				log('error', 'giving up scraping YT API for now, too many consecutive failures');
+				break;
+			}
+		} catch (err) {
+			log('error', 'yt batch scrape failed', err);
 			break;
 		}
 
