@@ -19,8 +19,9 @@ import createUpdateActivity from './postEvent/createUpdateActivity';
 import createStoreWatchTime from './postEvent/storeWatchTime';
 import createHandleExtensionInstalledEvent from './postEvent/handleExtensionInstalledEvent';
 
-import storeRecommendationsShown from '../lib/storeRecommendationsShown';
+import storeRecommendationsShown, {storeHomeShownVideos} from '../lib/storeRecommendationsShown';
 import AsyncLock from 'async-lock';
+import type HomeShownEvent from '../../common/models/homeShownEvent';
 
 const isLocalUuidAlreadyExistsError = (e: unknown): boolean =>
 	has('code')(e) && has('constraint')(e)
@@ -105,6 +106,12 @@ const summarizeForDisplay = (event: Event): Record<string, unknown> => {
 		summary.nonPersonalized = e.nonPersonalized.length;
 		summary.personalized = e.personalized.length;
 		summary.shown = e.shown.length;
+	}
+
+	if (event.type === EventType.HOME_SHOWN) {
+		const e = event as HomeShownEvent;
+		summary.defaultRecommendations = e.defaultRecommendations.length;
+		summary.replacementSource = e.replacementSource.length;
 	}
 
 	return summary;
@@ -237,6 +244,17 @@ export const createPostEventRoute: RouteCreator = ({
 		} else if (event.type === EventType.WATCH_TIME) {
 			storeWatchTime(event as WatchTimeEvent).catch(async err => {
 				log('error', 'watch time store failed', err);
+			});
+		}
+
+		if (event.type === EventType.HOME_SHOWN) {
+			storeHomeShownVideos({
+				dataSource,
+				event: event as HomeShownEvent,
+				log,
+				youTubeConfig,
+			}).catch(async err => {
+				log('error', 'home shown store failed', err);
 			});
 		}
 

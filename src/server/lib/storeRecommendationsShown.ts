@@ -1,6 +1,7 @@
 import {type DataSource, type Repository} from 'typeorm';
 import {type LogFunction} from './logger';
 import {type RecommendationsEvent} from '../../common/models/recommendationsEvent';
+import {type HomeShownEvent} from '../../common/models/homeShownEvent';
 import Video from '../models/video';
 import VideoListItem, {ListType, VideoType} from '../models/videoListItem';
 import {validateNew} from '../../common/util';
@@ -33,6 +34,13 @@ type StoreRecommendationsShownParams = {
 	log: LogFunction;
 	dataSource: DataSource;
 	event: RecommendationsEvent;
+	youTubeConfig: YouTubeConfig;
+};
+
+type StoreHomeShownParams = {
+	log: LogFunction;
+	dataSource: DataSource;
+	event: HomeShownEvent;
 	youTubeConfig: YouTubeConfig;
 };
 
@@ -121,6 +129,40 @@ export const storeRecommendationsShown = async ({
 	} catch (err) {
 		log('Error storing recommendations shown event meta-data', err);
 	}
+};
+
+export const storeHomeShownVideos = async ({
+	log,
+	dataSource,
+	event,
+	youTubeConfig,
+}: StoreHomeShownParams) => {
+	log('Storing home shown videos');
+
+	const itemRepo = dataSource.getRepository(VideoListItem);
+
+	const store = storeItems(itemRepo, event.id);
+
+	const videoRepo = dataSource.getRepository(Video);
+
+	const [defaultHome, replacement] = await Promise.all([
+		storeVideos(videoRepo, makeVideosFromRecommendations(event.defaultRecommendations)),
+		storeVideos(videoRepo, makeVideosFromRecommendations(event.replacementSource)),
+	]);
+
+	await Promise.all([
+		store(defaultHome, ListType.HOME_DEFAULT, defaultHome.map(() => VideoType.PERSONALIZED)),
+		store(replacement, ListType.HOME_REPLACEMENT_SOURCE, replacement.map(() => VideoType.PERSONALIZED)),
+	]);
+
+	const youTubeApi = createYouTubeApi(youTubeConfig, log, dataSource);
+
+	const youTubeIds = [...new Set([
+		...event.defaultRecommendations.map(v => v.videoId),
+		...event.replacementSource.map(v => v.videoId),
+	])].filter(x => x !== undefined);
+
+	await youTubeApi.getMetaFromVideoIds(youTubeIds);
 };
 
 export default storeRecommendationsShown;
