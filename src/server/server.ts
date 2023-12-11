@@ -344,7 +344,9 @@ const main = async () => {
 
 	app.use(staticRouter);
 
-	app.use(bodyParser.json());
+	app.use(bodyParser.json({
+		limit: '50mb',
+	}));
 
 	let requestId = 0;
 	let nCurrentRequests = 0;
