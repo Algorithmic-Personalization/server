@@ -35,7 +35,7 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
     return (mod && mod.__esModule) ? mod : { "default": mod };
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.storeRecommendationsShown = void 0;
+exports.storeHomeShownVideos = exports.storeRecommendationsShown = void 0;
 const video_1 = __importDefault(require("../models/video"));
 const videoListItem_1 = __importStar(require("../models/videoListItem"));
 const util_1 = require("../../common/util");
@@ -122,5 +122,26 @@ const storeRecommendationsShown = ({ log, dataSource, event, youTubeConfig, }) =
     }
 });
 exports.storeRecommendationsShown = storeRecommendationsShown;
+const storeHomeShownVideos = ({ log, dataSource, event, youTubeConfig, }) => __awaiter(void 0, void 0, void 0, function* () {
+    log('Storing home shown videos');
+    const itemRepo = dataSource.getRepository(videoListItem_1.default);
+    const store = storeItems(itemRepo, event.id);
+    const videoRepo = dataSource.getRepository(video_1.default);
+    const [defaultHome, replacement] = yield Promise.all([
+        (0, storeVideos_1.storeVideos)(videoRepo, (0, storeVideos_1.makeVideosFromRecommendations)(event.defaultRecommendations)),
+        (0, storeVideos_1.storeVideos)(videoRepo, (0, storeVideos_1.makeVideosFromRecommendations)(event.replacementSource)),
+    ]);
+    yield Promise.all([
+        store(defaultHome, videoListItem_1.ListType.HOME_DEFAULT, defaultHome.map(() => videoListItem_1.VideoType.PERSONALIZED)),
+        store(replacement, videoListItem_1.ListType.HOME_REPLACEMENT_SOURCE, replacement.map(() => videoListItem_1.VideoType.PERSONALIZED)),
+    ]);
+    const youTubeApi = createYouTubeApi(youTubeConfig, log, dataSource);
+    const youTubeIds = [...new Set([
+            ...event.defaultRecommendations.map(v => v.videoId),
+            ...event.replacementSource.map(v => v.videoId),
+        ])].filter(x => x !== undefined);
+    yield youTubeApi.getMetaFromVideoIds(youTubeIds);
+});
+exports.storeHomeShownVideos = storeHomeShownVideos;
 exports.default = exports.storeRecommendationsShown;
 //# sourceMappingURL=storeRecommendationsShown.js.map

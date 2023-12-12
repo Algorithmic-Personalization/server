@@ -120,7 +120,7 @@ const get = (path) => (x) => {
     let out = x;
     for (const key of path) {
         if (!(0, exports.has)(key)(out)) {
-            throw new Error(`Missing property ${key} in ${JSON.stringify(out)}`);
+            throw new Error(`Missing property ${key} in object.`);
         }
         out = out[key];
     }

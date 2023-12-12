@@ -46,7 +46,7 @@ const updateParticipantPhase_1 = __importDefault(require("./postEvent/updatePart
 const createUpdateActivity_1 = __importDefault(require("./postEvent/createUpdateActivity"));
 const storeWatchTime_1 = __importDefault(require("./postEvent/storeWatchTime"));
 const handleExtensionInstalledEvent_1 = __importDefault(require("./postEvent/handleExtensionInstalledEvent"));
-const storeRecommendationsShown_1 = __importDefault(require("../lib/storeRecommendationsShown"));
+const storeRecommendationsShown_1 = __importStar(require("../lib/storeRecommendationsShown"));
 const async_lock_1 = __importDefault(require("async-lock"));
 const isLocalUuidAlreadyExistsError = (e) => (0, util_1.has)('code')(e) && (0, util_1.has)('constraint')(e)
     && e.code === '23505'
@@ -105,6 +105,11 @@ const summarizeForDisplay = (event) => {
         summary.nonPersonalized = e.nonPersonalized.length;
         summary.personalized = e.personalized.length;
         summary.shown = e.shown.length;
+    }
+    if (event.type === event_1.EventType.HOME_SHOWN) {
+        const e = event;
+        summary.defaultRecommendations = e.defaultRecommendations.length;
+        summary.replacementSource = e.replacementSource.length;
     }
     return summary;
 };
@@ -210,6 +215,16 @@ const createPostEventRoute = ({ createLogger, dataSource, youTubeConfig, notifie
         else if (event.type === event_1.EventType.WATCH_TIME) {
             storeWatchTime(event).catch((err) => __awaiter(void 0, void 0, void 0, function* () {
                 log('error', 'watch time store failed', err);
+            }));
+        }
+        if (event.type === event_1.EventType.HOME_SHOWN) {
+            (0, storeRecommendationsShown_1.storeHomeShownVideos)({
+                dataSource,
+                event: event,
+                log,
+                youTubeConfig,
+            }).catch((err) => __awaiter(void 0, void 0, void 0, function* () {
+                log('error', 'home shown store failed', err);
             }));
         }
         res.send({ kind: 'Success', value: e });

@@ -242,7 +242,9 @@ const main = () => __awaiter(void 0, void 0, void 0, function* () {
     app.use((0, cors_1.default)());
     staticRouter.use(express_1.default.static((0, path_1.join)(root, 'public')));
     app.use(staticRouter);
-    app.use(body_parser_1.default.json());
+    app.use(body_parser_1.default.json({
+        limit: '50mb',
+    }));
     let requestId = 0;
     let nCurrentRequests = 0;
     const logRepo = ds.getRepository(requestLog_1.default);

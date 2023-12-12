@@ -22,6 +22,8 @@ var ListType;
     ListType["PERSONALIZED"] = "PERSONALIZED";
     ListType["NON_PERSONALIZED"] = "NON_PERSONALIZED";
     ListType["SHOWN"] = "SHOWN";
+    ListType["HOME_DEFAULT"] = "HOME_DEFAULT";
+    ListType["HOME_REPLACEMENT_SOURCE"] = "HOME_REPLACEMENT_SOURCE";
 })(ListType = exports.ListType || (exports.ListType = {}));
 var VideoType;
 (function (VideoType) {
