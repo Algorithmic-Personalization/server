@@ -187,6 +187,16 @@ The `context` field is the previous page the user was on (HTTP referrer), same a
 The user visited a page, the URL of the page is stored in the `url` field of the event.
 The `context` field represents the previous page the user was on (HTTP referrer).
 
+#### `HOME_SHOWN` events
+
+A new kind of event has been added, its type is `HOME_SHOWN`, it serves as an identifier to which we can link the data shown on the home page of YouTube and the lists of videos, both from the homepage and from the replacement (news channel) pool.
+
+Two new kinds of lists have been created to this effect:
+- `HOME_DEFAULT` (corresponds to what would normally have been shown to the participant)
+- `HOME_REPLACEMENT_SOURCE` (corresponds to the list of videos we sampled from to generate what the participant sees)
+
+So these 2 new lists are stored in the `video_list_item` table and as usual are linked with the event that generated this list. In this case, the event is of type `HOME_SHOWN` instead of the usual `RECOMMENDATIONS_SHOWN`.
+
 ### The `watch_time` table
 
 This table contains the time spent watching a video.
