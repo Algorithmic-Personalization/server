@@ -1,9 +1,9 @@
 import {type Repository} from 'typeorm';
 import Video from '../../models/video';
 import {validateNew} from '../../../common/util';
-import type Recommendation from '../../../common/types/Recommendation';
+import type {RecommendationBase} from '../../../common/types/Recommendation';
 
-export const makeVideosFromRecommendations = (recommendations: Recommendation[]): Video[] =>
+export const makeVideosFromRecommendations = (recommendations: RecommendationBase[]): Video[] =>
 	recommendations.map(r => {
 		const v = new Video();
 		v.youtubeId = r.videoId;
