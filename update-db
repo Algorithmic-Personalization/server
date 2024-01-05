@@ -6,7 +6,7 @@ out=$(ssh-add "$key_path" 2>&1)
 echo " -> $out"
 echo "2) Updating database..."
 echo " a) Making the remote backup..."
-remote_path=$(ssh "$host" /home/ec2-user/bin/backup | tail -1)
+remote_path=$(ssh "$host" /home/ubuntu/ytdpnl/backup | tail -1)
 echo "  -> Backup made remotely: $remote_path"
 echo " b) Copying backup from remote to local..."
 scp "$host":"$remote_path" .  1>&2 > /dev/null
