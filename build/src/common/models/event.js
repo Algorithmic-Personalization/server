@@ -36,6 +36,7 @@ var EventType;
     EventType["EXTENSION_INSTALLED"] = "EXTENSION_INSTALLED";
     EventType["EXTENSION_ACTIVATED"] = "EXTENSION_ACTIVATED";
     EventType["HOME_SHOWN"] = "HOME_SHOWN";
+    EventType["HOME_INJECTED_TILE_CLICKED"] = "HOME_INJECTED_TILE_CLICKED";
 })(EventType = exports.EventType || (exports.EventType = {}));
 var ExperimentArm;
 (function (ExperimentArm) {
