@@ -197,6 +197,10 @@ Two new kinds of lists have been created to this effect:
 
 So these 2 new lists are stored in the `video_list_item` table and as usual are linked with the event that generated this list. In this case, the event is of type `HOME_SHOWN` instead of the usual `RECOMMENDATIONS_SHOWN`.
 
+### `HOME_INJECTED_TILE_CLICKED` events
+
+Same properties as the `PAGE_VIEW` or `*_CLICKED` events, except it tracks only the clicks on the injected tiles on the home page.
+
 ### The `watch_time` table
 
 This table contains the time spent watching a video.
