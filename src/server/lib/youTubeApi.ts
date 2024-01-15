@@ -483,6 +483,28 @@ export const makeCreateYouTubeApi = (cache: 'with-cache' | 'without-cache' = 'wi
 					return mergeResponses(firstPartRes, secondPartRes);
 				}
 
+				if (finalIdsToGetFromYouTube.length === 0) {
+					const stats: Stats = {
+						metadataRequestTimeMs: 0,
+						failRate: 0,
+						dbHitRate: 0,
+						cacheHitRate: 0,
+						hitRate: 100,
+						overAllCacheHitRate: formatPct(totalCacheHitRate / numberOfCalls),
+						cacheMemSizeBytes: getCacheMemSizeBytes(),
+						cacheMemSizeString: formatSize(getCacheMemSizeBytes()),
+						cachedEntries: metaCache.size(),
+						refetched,
+					};
+
+					log('info', 'got meta data from cache, stats:', stats);
+
+					return {
+						...stats,
+						data: metaMap,
+					};
+				}
+
 				const dbHits = idsNotCached.length - finalIdsToGetFromYouTube.length;
 
 				const idsUrlArgs = finalIdsToGetFromYouTube.map(id => `id=${id}`).join('&');
