@@ -52,3 +52,13 @@ group by date(e.created_at)
 order by day DESC
 limit 10
 ```
+
+How many participants on a given version?
+
+```sql
+select count(distinct p.id)
+from participant p
+inner join session s on s.participant_code = p.code
+inner join event e on e.session_uuid = s.uuid
+where e.extension_version='2.1.1'
+```
