@@ -453,6 +453,22 @@ const makeCreateYouTubeApi = (cache = 'with-cache') => {
                         const secondPartRes = yield api.getMetaFromVideoIds(secondPart, hl, recurse);
                         return mergeResponses(firstPartRes, secondPartRes);
                     }
+                    if (finalIdsToGetFromYouTube.length === 0) {
+                        const stats = {
+                            metadataRequestTimeMs: 0,
+                            failRate: 0,
+                            dbHitRate: 0,
+                            cacheHitRate: 0,
+                            hitRate: 100,
+                            overAllCacheHitRate: (0, util_1.formatPct)(totalCacheHitRate / numberOfCalls),
+                            cacheMemSizeBytes: getCacheMemSizeBytes(),
+                            cacheMemSizeString: (0, util_1.formatSize)(getCacheMemSizeBytes()),
+                            cachedEntries: metaCache.size(),
+                            refetched,
+                        };
+                        log('info', 'got meta data from cache, stats:', stats);
+                        return Object.assign(Object.assign({}, stats), { data: metaMap });
+                    }
                     const dbHits = idsNotCached.length - finalIdsToGetFromYouTube.length;
                     const idsUrlArgs = finalIdsToGetFromYouTube.map(id => `id=${id}`).join('&');
                     const finalUrl = `${endpoint}&${idsUrlArgs}&hl=${hl}`;
