@@ -453,7 +453,7 @@ A code can only be attributed to a participant once, this is enforced by the dat
 
 A `Channel Source` is a list of YouTube channels that will be used to obtain the miniatures to insert on the home page.
 
-Create them with a `POST` request to `https://personalization-server.csail.mit.edu/api/channel-source` with the following JSON body with the usual authentication token:
+Create them with a `POST` request to `https://personalization-server.csail.mit.edu/api/channel-source` with the following JSON body and the usual authentication token in the `authorization` header:
 
 ```json
 {
@@ -462,11 +462,13 @@ Create them with a `POST` request to `https://personalization-server.csail.mit.e
     "anyNumberOf",
     "youTubeChannelIds"
   ],
-  "isDefault": true // optional, defaults to false, except for the first channel source created
+  "isDefault": true // optional, defaults to false
 }
 ```
 
-It should return something like:
+*Note* that the first `channel source` you create will be considered to be the default one irrespective of the `isDefault` value you pass (because we need a default).
+
+A successful call should return something like:
 
 ```json
 {
@@ -481,7 +483,7 @@ It should return something like:
 }
 ```
 
-You can update a `ChannelSource` by sending the same kind of object but to `POST /api/channel-source/:id` where `:id` is the id of the channel source you want to update.
+You can update a `ChannelSource` by sending the same kind of object but to `POST /api/channel-source/:id` where `:id` is the id of the channel source you want to update. The list of channels will be replaced fully with the new one (i.e. new channels are not appended to the existing ones).
 
 There is an additional optional parameter when you update a channel source, `resetParticipantPositions`,
 which is a boolean determining if participants who are affected to the channel source you are updating should have
@@ -511,4 +513,4 @@ You can also update the position of the participant in the list of channels that
 
 Both operations can be performed at the same time by sending a JSON object containing both fields, this is just the regular participant update route.
 
-Note that this option is not supported in the participant creation route, because it is assumed that a participant newly created starts at the first position in the channel source (which is 0, not 1).
+Note that the latter option is not supported in the participant creation route, because it is assumed that a participant newly created starts at the first position in the channel source (which is 0, not 1).
