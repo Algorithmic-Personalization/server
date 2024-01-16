@@ -162,7 +162,9 @@ export const storeHomeShownVideos = async ({
 		...event.replacementSource.map(v => v.videoId),
 	])].filter(x => x !== undefined);
 
-	await youTubeApi.getMetaFromVideoIds(youTubeIds);
+	await youTubeApi.getMetaFromVideoIds(youTubeIds).catch(err => {
+		log('error', 'fetching video meta-data', err);
+	});
 };
 
 export default storeRecommendationsShown;
