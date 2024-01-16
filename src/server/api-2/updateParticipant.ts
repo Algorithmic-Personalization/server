@@ -72,7 +72,7 @@ export const updateParticipantDefinition: RouteDefinition<Participant> = {
 		const log = createLogger(req.requestId);
 		log('Received update participant request');
 
-		const {id: _unused, phase, arm, isPaid, channelSourceId} = req.body as Record<string, string | number>;
+		const {id: _unused, phase, arm, isPaid, channelSourceId, posInChannelSource} = req.body as Record<string, string | number>;
 		const {code} = req.params;
 
 		if (!code || typeof code !== 'string') {
@@ -104,6 +104,13 @@ export const updateParticipantDefinition: RouteDefinition<Participant> = {
 		} else if (channelSourceId !== undefined) {
 			throw new Error('Invalid channel source id, must be a number');
 		}
+
+		if (typeof posInChannelSource === 'number') {
+			participantEntity.posInChannelSource = posInChannelSource;
+			participantEntity.posInChannelSourceLastUpdatedAt = new Date();
+		}
+
+		participantEntity.updatedAt = new Date();
 
 		const out = await participantRepo.save(participantEntity);
 

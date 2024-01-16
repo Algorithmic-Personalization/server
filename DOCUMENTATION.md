@@ -484,5 +484,31 @@ It should return something like:
 You can update a `ChannelSource` by sending the same kind of object but to `POST /api/channel-source/:id` where `:id` is the id of the channel source you want to update.
 
 There is an additional optional parameter when you update a channel source, `resetParticipantPositions`,
-which is a boolean determining if participants that are linked to the channel source you are updating should have
-their position in the channel source reset to 0 or not.
+which is a boolean determining if participants who are affected to the channel source you are updating should have
+their positions in the channel source reset to 0 or not. It defaults to false, meaning participants keep their current positions in the list.
+
+#### Affecting a specific Channel Source to a Participant
+
+By default, channels from the default channel source (the first one you create, or, later on, one whose `isDefault` flag you have set to true) will be used for all participants in the treatment arm.
+
+If you want to specialize the channel source for a given participant, you can do so by sending a `PUT` request to `https://personalization-server.csail.mit.edu/api/participant/:code` where `:code` is the participant's code and send a JSON object containing at least:
+
+```json
+{
+  "channelSourceId": 2 // the id of the channel source you want to affect to the participant
+}
+```
+
+The id of the channel source is given in the `value` field of the response you obtain when you create a channel source via API, as illustrated by the example in the previous point.
+
+You can also update the position of the participant in the list of channels that is affected to them using the same route but sending a JSON object containing at least:
+
+```json
+{
+  "channelSourcePosition": 12 // the position of the channel in the list of channels that is affected to the participant
+}
+```
+
+Both operations can be performed at the same time by sending a JSON object containing both fields, this is just the regular participant update route.
+
+Note that this option is not supported in the participant creation route, because it is assumed that a participant newly created starts at the first position in the channel source (which is 0, not 1).
