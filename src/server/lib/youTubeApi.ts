@@ -405,6 +405,11 @@ export const makeCreateYouTubeApi = (cache: 'with-cache' | 'without-cache' = 'wi
 			return res;
 		};
 
+		const cleanId = (id: string): string => {
+			const [res] = id.split('&');
+			return res;
+		};
+
 		const api: YtApi = {
 			hasDataSource(): boolean {
 				return Boolean(dataSource);
@@ -413,7 +418,7 @@ export const makeCreateYouTubeApi = (cache: 'with-cache' | 'without-cache' = 'wi
 			// eslint-disable-next-line complexity
 			async getMetaFromVideoIds(youTubeVideoIdsMaybeNonUnique: string[], hl = 'en', recurse = true): Promise<YouTubeResponseMeta> {
 				await fetchingCategories;
-				const youTubeIds = [...new Set(youTubeVideoIdsMaybeNonUnique)];
+				const youTubeIds = [...new Set(youTubeVideoIdsMaybeNonUnique.map(cleanId))];
 
 				const tStart = Date.now();
 				const metaMap: MetaMap = new Map();
