@@ -105,6 +105,9 @@ import getYouTubeConfig from './lib/config-loader/getYouTubeConfig';
 import makeCreateYouTubeApi from './lib/youTubeApi';
 import scrapeMissingYouTubeMetadata from './lib/scrapeYouTube';
 
+import createChannelSourceDefinition from './api-2/createChannelSourceDefinition';
+import updateChannelSourceDefinition from './api-2/updateChannelSourceDefinition';
+
 // DO NOT FORGET TO UPDATE THIS FILE WHEN ADDING NEW ENTITIES
 import entities from './entities';
 import {loadConfigYamlRaw} from './lib/config-loader/loadConfigYamlRaw';
@@ -434,6 +437,8 @@ const main = async () => {
 	defineAdminRoute(monitoringDefinition);
 	defineAdminRoute(participantsReportDefinition);
 	defineAdminRoute(addVouchersDefinition);
+	defineAdminRoute(createChannelSourceDefinition);
+	defineAdminRoute(updateChannelSourceDefinition);
 
 	app.post(postRegister, createRegisterRoute(routeContext));
 	app.get(getVerifyEmailToken, createVerifyEmailRoute(routeContext));

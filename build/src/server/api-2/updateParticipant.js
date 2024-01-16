@@ -83,7 +83,7 @@ exports.updateParticipantDefinition = {
     makeHandler: ({ createLogger, dataSource, notifier }) => (req) => __awaiter(void 0, void 0, void 0, function* () {
         const log = createLogger(req.requestId);
         log('Received update participant request');
-        const { id: _unused, phase, arm, isPaid } = req.body;
+        const { id: _unused, phase, arm, isPaid, channelSourceId } = req.body;
         const { code } = req.params;
         if (!code || typeof code !== 'string') {
             throw new Error('Invalid participant email');
@@ -100,6 +100,12 @@ exports.updateParticipantDefinition = {
         participantEntity.isPaid = isPaid === 1;
         if (phase && !(0, participant_1.isValidPhase)(phase)) {
             throw new Error('Invalid phase, must be one of: 0, 1, 2');
+        }
+        if (typeof channelSourceId === 'number') {
+            participantEntity.channelSourceId = channelSourceId;
+        }
+        else if (channelSourceId !== undefined) {
+            throw new Error('Invalid channel source id, must be a number');
         }
         const out = yield participantRepo.save(participantEntity);
         if ((0, participant_1.isValidPhase)(phase)) {

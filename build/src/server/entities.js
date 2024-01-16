@@ -22,6 +22,8 @@ const youTubeRequestLatency_1 = __importDefault(require("./models/youTubeRequest
 const requestLog_1 = __importDefault(require("./models/requestLog"));
 const voucher_1 = __importDefault(require("./models/voucher"));
 const resetPasswordToken_1 = __importDefault(require("./models/resetPasswordToken"));
+const channelSource_1 = __importDefault(require("./models/channelSource"));
+const channelSourceItem_1 = __importDefault(require("./models/channelSourceItem"));
 // Add classes used by typeorm as models here
 // so that typeorm can extract the metadata from them.
 exports.entities = [
@@ -43,6 +45,8 @@ exports.entities = [
     requestLog_1.default,
     voucher_1.default,
     resetPasswordToken_1.default,
+    channelSource_1.default,
+    channelSourceItem_1.default,
 ];
 exports.default = exports.entities;
 //# sourceMappingURL=entities.js.map

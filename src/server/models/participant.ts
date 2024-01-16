@@ -1,7 +1,7 @@
 /* eslint-disable @typescript-eslint/no-inferrable-types */
 
 import {Entity, Column, OneToMany} from 'typeorm';
-import {IsNotEmpty, IsString, IsInt, Min, Max, IsBoolean} from 'class-validator';
+import {IsNotEmpty, IsString, IsInt, Min, Max, IsBoolean, IsDate} from 'class-validator';
 
 import Model from '../../common/lib/model';
 import {ExperimentArm} from '../../common/models/event';
@@ -37,6 +37,18 @@ export class Participant extends Model {
 	@Column()
 	@IsBoolean()
 		isPaid: boolean = false;
+
+	@Column()
+	@IsInt()
+		channelSourceId?: number;
+
+	@Column()
+	@IsInt()
+		posInChannelSource: number = 0;
+
+	@Column()
+	@IsDate()
+		posInChannelSourceLastUpdatedAt: Date = new Date();
 }
 
 export const isValidPhase = (phase: unknown): phase is number =>

@@ -72,7 +72,7 @@ export const updateParticipantDefinition: RouteDefinition<Participant> = {
 		const log = createLogger(req.requestId);
 		log('Received update participant request');
 
-		const {id: _unused, phase, arm, isPaid} = req.body as Record<string, string | number>;
+		const {id: _unused, phase, arm, isPaid, channelSourceId} = req.body as Record<string, string | number>;
 		const {code} = req.params;
 
 		if (!code || typeof code !== 'string') {
@@ -97,6 +97,12 @@ export const updateParticipantDefinition: RouteDefinition<Participant> = {
 
 		if (phase && !isValidPhase(phase)) {
 			throw new Error('Invalid phase, must be one of: 0, 1, 2');
+		}
+
+		if (typeof channelSourceId === 'number') {
+			participantEntity.channelSourceId = channelSourceId;
+		} else if (channelSourceId !== undefined) {
+			throw new Error('Invalid channel source id, must be a number');
 		}
 
 		const out = await participantRepo.save(participantEntity);

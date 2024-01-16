@@ -140,7 +140,9 @@ const storeHomeShownVideos = ({ log, dataSource, event, youTubeConfig, }) => __a
             ...event.defaultRecommendations.map(v => v.videoId),
             ...event.replacementSource.map(v => v.videoId),
         ])].filter(x => x !== undefined);
-    yield youTubeApi.getMetaFromVideoIds(youTubeIds);
+    yield youTubeApi.getMetaFromVideoIds(youTubeIds).catch(err => {
+        log('error', 'fetching video meta-data', err);
+    });
 });
 exports.storeHomeShownVideos = storeHomeShownVideos;
 exports.default = exports.storeRecommendationsShown;

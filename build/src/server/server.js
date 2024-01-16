@@ -77,6 +77,8 @@ const resetPassword_1 = __importDefault(require("./api-2/resetPassword"));
 const getYouTubeConfig_1 = __importDefault(require("./lib/config-loader/getYouTubeConfig"));
 const youTubeApi_1 = __importDefault(require("./lib/youTubeApi"));
 const scrapeYouTube_1 = __importDefault(require("./lib/scrapeYouTube"));
+const createChannelSourceDefinition_1 = __importDefault(require("./api-2/createChannelSourceDefinition"));
+const updateChannelSourceDefinition_1 = __importDefault(require("./api-2/updateChannelSourceDefinition"));
 // DO NOT FORGET TO UPDATE THIS FILE WHEN ADDING NEW ENTITIES
 const entities_1 = __importDefault(require("./entities"));
 const loadConfigYamlRaw_1 = require("./lib/config-loader/loadConfigYamlRaw");
@@ -313,6 +315,8 @@ const main = () => __awaiter(void 0, void 0, void 0, function* () {
     defineAdminRoute(monitoring_1.default);
     defineAdminRoute(participantsReport_1.default);
     defineAdminRoute(addVouchers_1.default);
+    defineAdminRoute(createChannelSourceDefinition_1.default);
+    defineAdminRoute(updateChannelSourceDefinition_1.default);
     app.post(serverRoutes_1.postRegister, (0, register_1.default)(routeContext));
     app.get(serverRoutes_1.getVerifyEmailToken, (0, verifyEmail_1.default)(routeContext));
     app.post(serverRoutes_1.postLogin, (0, login_1.default)(routeContext));

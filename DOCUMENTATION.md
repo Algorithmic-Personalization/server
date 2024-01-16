@@ -446,3 +446,43 @@ The codes must be passed in as a JSON array of strings in the request body.
 Codes are included in the extension activation notifications.
 
 A code can only be attributed to a participant once, this is enforced by the database.
+
+### Channel Source Rotation Mechanism
+
+#### Creating a Channel Source
+
+A `Channel Source` is a list of YouTube channels that will be used to obtain the miniatures to insert on the home page.
+
+Create them with a `POST` request to `https://personalization-server.csail.mit.edu/api/channel-source` with the following JSON body with the usual authentication token:
+
+```json
+{
+  "title": "An optional title for the channel source",
+  "channelIds": [
+    "anyNumberOf",
+    "youTubeChannelIds"
+  ],
+  "isDefault": true // optional, defaults to false, except for the first channel source created
+}
+```
+
+It should return something like:
+
+```json
+{
+  "kind": "Success",
+  "value": {
+    "id": 1,
+    "createdAt": "2024-01-16T14:50:14.937Z",
+    "updatedAt": "2024-01-16T14:50:14.937Z",
+    "isDefault": true,
+    "title": "whatever title you chose"
+  }
+}
+```
+
+You can update a `ChannelSource` by sending the same kind of object but to `POST /api/channel-source/:id` where `:id` is the id of the channel source you want to update.
+
+There is an additional optional parameter when you update a channel source, `resetParticipantPositions`,
+which is a boolean determining if participants that are linked to the channel source you are updating should have
+their position in the channel source reset to 0 or not.

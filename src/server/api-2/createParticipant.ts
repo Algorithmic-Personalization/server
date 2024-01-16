@@ -8,12 +8,17 @@ export type ParticipantData = {
 	arm: 'control' | 'treatment' | 0 | 1 | '0' | '1';
 	code: string;
 	isPaid: 1 | undefined;
+	channelSourceId: number | undefined;
 };
 
 export const isParticipantData = (record: Record<string, string | number | undefined>): record is ParticipantData =>
 	has('code')(record)
 	&& typeof record.code === 'string'
-	&& record.code.length > 0;
+	&& record.code.length > 0
+	&& (
+		!has('channelSourceId')(record)
+		|| typeof record.channelSourceId === 'number'
+	);
 
 export const createParticipantDefinition: RouteDefinition<Participant> = {
 	verb: 'post',
@@ -51,6 +56,8 @@ export const createParticipantDefinition: RouteDefinition<Participant> = {
 		participantEntity.code = participantData.code;
 
 		participantEntity.isPaid = participantData.isPaid === 1;
+
+		participantEntity.channelSourceId = participantData.channelSourceId;
 
 		return participantRepo.save(participantEntity);
 	},

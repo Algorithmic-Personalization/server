@@ -27,6 +27,8 @@ let Participant = class Participant extends model_1.default {
         this.arm = event_1.ExperimentArm.TREATMENT;
         this.extensionInstalled = false;
         this.isPaid = false;
+        this.posInChannelSource = 0;
+        this.posInChannelSourceLastUpdatedAt = new Date();
     }
 };
 __decorate([
@@ -65,6 +67,21 @@ __decorate([
     (0, class_validator_1.IsBoolean)(),
     __metadata("design:type", Boolean)
 ], Participant.prototype, "isPaid", void 0);
+__decorate([
+    (0, typeorm_1.Column)(),
+    (0, class_validator_1.IsInt)(),
+    __metadata("design:type", Number)
+], Participant.prototype, "channelSourceId", void 0);
+__decorate([
+    (0, typeorm_1.Column)(),
+    (0, class_validator_1.IsInt)(),
+    __metadata("design:type", Number)
+], Participant.prototype, "posInChannelSource", void 0);
+__decorate([
+    (0, typeorm_1.Column)(),
+    (0, class_validator_1.IsDate)(),
+    __metadata("design:type", Date)
+], Participant.prototype, "posInChannelSourceLastUpdatedAt", void 0);
 Participant = __decorate([
     (0, typeorm_1.Entity)()
 ], Participant);

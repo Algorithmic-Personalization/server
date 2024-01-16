@@ -396,6 +396,10 @@ const makeCreateYouTubeApi = (cache = 'with-cache') => {
             }
             return res;
         });
+        const cleanId = (id) => {
+            const [res] = id.split('&');
+            return res;
+        };
         const api = {
             hasDataSource() {
                 return Boolean(dataSource);
@@ -405,7 +409,7 @@ const makeCreateYouTubeApi = (cache = 'with-cache') => {
             getMetaFromVideoIds(youTubeVideoIdsMaybeNonUnique, hl = 'en', recurse = true) {
                 return __awaiter(this, void 0, void 0, function* () {
                     yield fetchingCategories;
-                    const youTubeIds = [...new Set(youTubeVideoIdsMaybeNonUnique)];
+                    const youTubeIds = [...new Set(youTubeVideoIdsMaybeNonUnique.map(cleanId))];
                     const tStart = Date.now();
                     const metaMap = new Map();
                     const promisesToWaitFor = new Set();

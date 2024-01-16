@@ -29,7 +29,9 @@ const util_1 = require("../../common/util");
 const event_1 = require("../../common/models/event");
 const isParticipantData = (record) => (0, util_1.has)('code')(record)
     && typeof record.code === 'string'
-    && record.code.length > 0;
+    && record.code.length > 0
+    && (!(0, util_1.has)('channelSourceId')(record)
+        || typeof record.channelSourceId === 'number');
 exports.isParticipantData = isParticipantData;
 exports.createParticipantDefinition = {
     verb: 'post',
@@ -60,6 +62,7 @@ exports.createParticipantDefinition = {
         participantEntity.arm = participantData.arm;
         participantEntity.code = participantData.code;
         participantEntity.isPaid = participantData.isPaid === 1;
+        participantEntity.channelSourceId = participantData.channelSourceId;
         return participantRepo.save(participantEntity);
     }),
 };
