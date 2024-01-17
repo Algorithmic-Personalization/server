@@ -100,6 +100,7 @@ import participantsReportDefinition from './api-2/participantsGetReport';
 import addVouchersDefinition from './api-2/voucherCreate';
 import ResetPasswordDefinition from './api-2/passwordSendLink';
 import resetPassword from './api-2/passwordReset';
+import getChannelSourceForParticipant from './api-2/channelSourceGetForParticipant';
 
 import getYouTubeConfig from './lib/config-loader/getYouTubeConfig';
 import makeCreateYouTubeApi from './lib/youTubeApi';
@@ -422,6 +423,10 @@ const main = async () => {
 		app[def.verb](def.path, makeHandler(def));
 	};
 
+	const defineParticipantRoute = <T>(def: RouteDefinition<T>) => {
+		app[def.verb](def.path, participantMw, makeHandler(def));
+	};
+
 	app.use(monitor({
 		path: '/status',
 	}));
@@ -439,6 +444,8 @@ const main = async () => {
 	defineAdminRoute(addVouchersDefinition);
 	defineAdminRoute(createChannelSourceDefinition);
 	defineAdminRoute(updateChannelSourceDefinition);
+
+	defineParticipantRoute(getChannelSourceForParticipant);
 
 	app.post(postRegister, createRegisterRoute(routeContext));
 	app.get(getVerifyEmailToken, createVerifyEmailRoute(routeContext));
