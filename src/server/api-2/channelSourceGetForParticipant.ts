@@ -46,7 +46,18 @@ export const advanceParticipantPositionInChannelSource = (qr: QueryRunner, log: 
 			posInChannelSourceLastUpdatedAt: new Date(),
 		});
 
-		log('success', 'participant advanced successfully');
+		log(
+			'success',
+			'participant',
+			code,
+			'advanced successfully',
+			'from channel source',
+			channelSourceId ?? 'default',
+			'and position',
+			posInChannelSource,
+			'to',
+			posInChannelSource + 1,
+		);
 	} else {
 		log(
 			'info',
@@ -84,7 +95,7 @@ const getParticipantChannelSource = (qr: QueryRunner, log: LogFunction) => async
 
 	log(
 		'info',
-		'getting participant from channel source',
+		'getting participant channel from source',
 		channelSourceId ?? 'default',
 		'and position',
 		posInChannelSource,
@@ -204,7 +215,7 @@ const getParticipantChannelSourceDefinition: RouteDefinition<ParticipantChannelS
 			}
 
 			const res = await getChannelSource(participant);
-			log('success', 'participant channel source found', res);
+			log('success', 'replying to client with', res);
 
 			return res;
 		} catch (err) {
