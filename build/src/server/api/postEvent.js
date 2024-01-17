@@ -48,6 +48,7 @@ const storeWatchTime_1 = __importDefault(require("./postEvent/storeWatchTime"));
 const handleExtensionInstalledEvent_1 = __importDefault(require("./postEvent/handleExtensionInstalledEvent"));
 const storeRecommendationsShown_1 = __importStar(require("../lib/storeRecommendationsShown"));
 const async_lock_1 = __importDefault(require("async-lock"));
+const channelSourceGetForParticipant_1 = require("../api-2/channelSourceGetForParticipant");
 const isLocalUuidAlreadyExistsError = (e) => (0, util_1.has)('code')(e) && (0, util_1.has)('constraint')(e)
     && e.code === '23505'
     && e.constraint === 'event_local_uuid_idx';
@@ -226,6 +227,11 @@ const createPostEventRoute = ({ createLogger, dataSource, youTubeConfig, notifie
             }).catch((err) => __awaiter(void 0, void 0, void 0, function* () {
                 log('error', 'home shown store failed', err);
             }));
+        }
+        if (event.type === event_1.EventType.HOME_INJECTED_TILE_CLICKED) {
+            void (0, channelSourceGetForParticipant_1.advanceParticipantPositionInChannelSource)(dataSource.createQueryRunner(), log)(participant).catch(e => {
+                log('error', 'failed to advance participant in channel source', e);
+            });
         }
         res.send({ kind: 'Success', value: e });
     }

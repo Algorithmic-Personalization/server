@@ -11,11 +11,11 @@ var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, ge
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.createAdminApi = void 0;
 const serverRoutes_1 = require("../server/serverRoutes");
-const getActivityReport_1 = require("../server/api-2/getActivityReport");
-const createTransitionSetting_1 = require("../server/api-2/createTransitionSetting");
-const getTransitionSetting_1 = require("../server/api-2/getTransitionSetting");
-const updateParticipant_1 = require("../server/api-2/updateParticipant");
-const monitoring_1 = require("../server/api-2/monitoring");
+const activityReportGet_1 = require("../server/api-2/activityReportGet");
+const transitionSettingsCreate_1 = require("../server/api-2/transitionSettingsCreate");
+const transitionSettingsGet_1 = require("../server/api-2/transitionSettingsGet");
+const participantUpdate_1 = require("../server/api-2/participantUpdate");
+const monitoringGetReport_1 = require("../server/api-2/monitoringGetReport");
 const serverRoutes_2 = require("../server/serverRoutes");
 const util_1 = require("../common/util");
 const loadItem = (key) => {
@@ -176,7 +176,7 @@ const createAdminApi = (serverUrl, showLoginModal) => {
         },
         getActivityReport() {
             return __awaiter(this, void 0, void 0, function* () {
-                const report = yield get(getActivityReport_1.createGetActivityReportDefinition.path, {}, headers());
+                const report = yield get(activityReportGet_1.createGetActivityReportDefinition.path, {}, headers());
                 if (report.kind === 'Failure') {
                     return report;
                 }
@@ -187,24 +187,24 @@ const createAdminApi = (serverUrl, showLoginModal) => {
         },
         createTransitionSetting(setting) {
             return __awaiter(this, void 0, void 0, function* () {
-                return post(createTransitionSetting_1.createTransitionSettingDefinition.path, setting, headers());
+                return post(transitionSettingsCreate_1.createTransitionSettingDefinition.path, setting, headers());
             });
         },
         getTransitionSetting(from, to) {
             return __awaiter(this, void 0, void 0, function* () {
-                const { path } = getTransitionSetting_1.getTransitionSettingDefinition;
+                const { path } = transitionSettingsGet_1.getTransitionSettingDefinition;
                 return get(path, { from, to }, headers());
             });
         },
         updateParticipantPhase(participantCode, phase) {
             return __awaiter(this, void 0, void 0, function* () {
-                const { path } = updateParticipant_1.updateParticipantDefinition;
+                const { path } = participantUpdate_1.updateParticipantDefinition;
                 return put(path.replace(':code', participantCode), { phase }, headers());
             });
         },
         getMonitoringReport(q) {
             return __awaiter(this, void 0, void 0, function* () {
-                const { path } = monitoring_1.monitoringDefinition;
+                const { path } = monitoringGetReport_1.monitoringDefinition;
                 const query = Object.assign(Object.assign({}, q), { fromDate: q.fromDate.getTime(), toDate: q.toDate.getTime() });
                 return get(path, query, headers());
             });

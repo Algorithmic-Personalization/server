@@ -82,7 +82,9 @@ const getParticipantChannelSource = (qr: QueryRunner, log: LogFunction) => async
 			});
 
 			if (!p) {
-				throw new Error('Participant not found');
+				throw new Error('Participant not found', {
+					cause: 'NO_CHANNEL_SOURCE_FOUND',
+				});
 			}
 
 			return p;
@@ -179,6 +181,11 @@ const getParticipantChannelSourceDefinition: RouteDefinition<ParticipantChannelS
 		log('Received get channel source for participant request');
 
 		const {participantCode} = req;
+		const force = req.query.force === 'true';
+
+		if (force) {
+			log('info', 'the client requested to force the switch to the next channel');
+		}
 
 		if (typeof participantCode !== 'string') {
 			throw new Error('Invalid participant code - should never happen cuz of middleware');
@@ -208,7 +215,7 @@ const getParticipantChannelSourceDefinition: RouteDefinition<ParticipantChannelS
 
 			await qr.commitTransaction();
 
-			const updateNeeded = await posNeedsUpdate(participant);
+			const updateNeeded = force || await posNeedsUpdate(participant);
 
 			if (updateNeeded) {
 				return await advanceParticipantPositionInChannelSource(qr, log)(participant);
@@ -219,7 +226,12 @@ const getParticipantChannelSourceDefinition: RouteDefinition<ParticipantChannelS
 
 			return res;
 		} catch (err) {
-			await qr.rollbackTransaction();
+			if (qr.isTransactionActive) {
+				await qr.rollbackTransaction();
+			}
+
+			// This is to return a non error response in case a concurrent request
+			// already did the job
 			if (await posNeedsUpdate(participantCode)) {
 				log('error', 'failed to advance participant in channel source', err);
 				throw err;

@@ -63,7 +63,7 @@ const createChannelSourceDefinition: RouteDefinition<ChannelSource> = {
 				await manager.save(defaultSource);
 			}
 
-			if (isDefault === undefined && !defaultSource) {
+			if (!defaultSource) {
 				channelSource.isDefault = true;
 			}
 

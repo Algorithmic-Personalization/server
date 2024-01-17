@@ -1,1 +1,1 @@
-{"version":3,"file":"clientRoutes.js","sourceRoot":"","sources":["../../../src/common/clientRoutes.ts"],"names":[],"mappings":";;;AAAa,QAAA,iBAAiB,GAAG,cAAc,CAAC;AACnC,QAAA,wBAAwB,GAAG,6BAA6B,CAAC;AACzD,QAAA,oBAAoB,GAAG,aAAa,CAAC;AACrC,QAAA,SAAS,GAAG,YAAY,CAAC"}
+{"version":3,"file":"clientRoutes.js","sourceRoot":"","sources":["../../../src/common/clientRoutes.ts"],"names":[],"mappings":";;;AAAa,QAAA,iBAAiB,GAAG,cAAc,CAAC;AACnC,QAAA,wBAAwB,GAAG,6BAA6B,CAAC;AACzD,QAAA,oBAAoB,GAAG,aAAa,CAAC;AACrC,QAAA,SAAS,GAAG,YAAY,CAAC;AACzB,QAAA,2BAA2B,GAAG,iCAAiC,CAAC"}
