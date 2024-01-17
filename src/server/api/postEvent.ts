@@ -23,6 +23,8 @@ import storeRecommendationsShown, {storeHomeShownVideos} from '../lib/storeRecom
 import AsyncLock from 'async-lock';
 import type HomeShownEvent from '../../common/models/homeShownEvent';
 
+import {advanceParticipantPositionInChannelSource} from '../api-2/channelSourceGetForParticipant';
+
 const isLocalUuidAlreadyExistsError = (e: unknown): boolean =>
 	has('code')(e) && has('constraint')(e)
 	&& e.code === '23505'
@@ -255,6 +257,15 @@ export const createPostEventRoute: RouteCreator = ({
 				youTubeConfig,
 			}).catch(async err => {
 				log('error', 'home shown store failed', err);
+			});
+		}
+
+		if (event.type === EventType.HOME_INJECTED_TILE_CLICKED) {
+			void advanceParticipantPositionInChannelSource(
+				dataSource.createQueryRunner(),
+				log,
+			)(participant).catch(e => {
+				log('error', 'failed to advance participant in channel source', e);
 			});
 		}
 

@@ -9,8 +9,13 @@ import ChannelSourceItem from '../models/channelSourceItem';
 import Participant from '../models/participant';
 import {type LogFunction} from '../lib/logger';
 
-const advanceParticipantPositionInChannelSource = (qr: QueryRunner, log: LogFunction) => async (participant: Participant): Promise<ParticipantChannelSource> => {
-	const {channelSourceId, posInChannelSource, code} = participant;
+export const advanceParticipantPositionInChannelSource = (qr: QueryRunner, log: LogFunction) => async (participant: Participant): Promise<ParticipantChannelSource> => {
+	const {channelSourceId, posInChannelSource, code, arm} = participant;
+
+	if (arm === 'control') {
+		log('error', 'participant is in control arm, not looking for a channel source');
+		throw new Error('Participant is in control arm');
+	}
 
 	log(
 		'info',
@@ -144,7 +149,15 @@ const isPositionUpdateNeeded = (qr: QueryRunner, log: LogFunction) => async (par
 
 	log('info', 'dtDays', dtDays);
 
-	return dtDays >= 1;
+	const res = dtDays >= 1;
+
+	if (res) {
+		log('info', 'participant needs to be advanced');
+	} else {
+		log('info', 'participant does not need to be advanced');
+	}
+
+	return res;
 };
 
 const getParticipantChannelSourceDefinition: RouteDefinition<ParticipantChannelSource> = {
