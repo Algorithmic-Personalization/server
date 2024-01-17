@@ -7,7 +7,7 @@ import Participant from '../models/participant';
 import {
 	type InputType as CreationInputType,
 	isInputType as isCreationInputType,
-} from './createChannelSourceDefinition';
+} from './channelSourceCreate';
 
 type UpdateType = CreationInputType & {
 	resetParticipantPositions?: boolean;

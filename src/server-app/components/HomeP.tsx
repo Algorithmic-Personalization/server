@@ -6,7 +6,7 @@ import {Typography} from '@mui/material';
 
 import NotificationsC, {type Message} from './shared/NotificationsC';
 
-import {type ActivityReport} from '../../server/api-2/getActivityReport';
+import {type ActivityReport} from '../../server/api-2/activityReportGet';
 import {type DailyActivityTime, type DailyMetrics} from '../../server/models/dailyActivityTime';
 
 import {useAdminApi} from '../adminApiProvider';

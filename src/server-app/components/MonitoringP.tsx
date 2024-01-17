@@ -9,7 +9,7 @@ import {DatePicker} from '@mui/x-date-pickers';
 
 import {useAdminApi} from '../adminApiProvider';
 
-import {type MonitoringReport} from '../../server/api-2/monitoring';
+import {type MonitoringReport} from '../../server/api-2/monitoringGetReport';
 
 import {createTableComponent, type TableDescriptor} from './shared/TableC';
 

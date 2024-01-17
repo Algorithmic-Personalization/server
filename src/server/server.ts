@@ -90,23 +90,23 @@ import createGetParticipantConfigRoute from './api/participantConfig';
 import createPostEventRoute from './api/postEvent';
 import createGetEventsRoute from './api/getEvents';
 
-import createParticipantDefinition from './api-2/createParticipant';
-import updateParticipantDefinition from './api-2/updateParticipant';
-import createGetActivityReportDefinition from './api-2/getActivityReport';
-import createTransitionSettingDefinition from './api-2/createTransitionSetting';
-import getTransitionSettingDefinition from './api-2/getTransitionSetting';
-import monitoringDefinition from './api-2/monitoring';
-import participantsReportDefinition from './api-2/participantsReport';
-import addVouchersDefinition from './api-2/addVouchers';
-import ResetPasswordDefinition from './api-2/sendAdminPasswordResetLink';
-import resetPassword from './api-2/resetPassword';
+import createParticipantDefinition from './api-2/participantCreate';
+import updateParticipantDefinition from './api-2/participantUpdate';
+import createGetActivityReportDefinition from './api-2/activityReportGet';
+import createTransitionSettingDefinition from './api-2/transitionSettingsCreate';
+import getTransitionSettingDefinition from './api-2/transitionSettingsGet';
+import monitoringDefinition from './api-2/monitoringGetReport';
+import participantsReportDefinition from './api-2/participantsGetReport';
+import addVouchersDefinition from './api-2/voucherCreate';
+import ResetPasswordDefinition from './api-2/passwordSendLink';
+import resetPassword from './api-2/passwordReset';
 
 import getYouTubeConfig from './lib/config-loader/getYouTubeConfig';
 import makeCreateYouTubeApi from './lib/youTubeApi';
 import scrapeMissingYouTubeMetadata from './lib/scrapeYouTube';
 
-import createChannelSourceDefinition from './api-2/createChannelSourceDefinition';
-import updateChannelSourceDefinition from './api-2/updateChannelSourceDefinition';
+import createChannelSourceDefinition from './api-2/channelSourceCreate';
+import updateChannelSourceDefinition from './api-2/channelSourceUpdate';
 
 // DO NOT FORGET TO UPDATE THIS FILE WHEN ADDING NEW ENTITIES
 import entities from './entities';

@@ -9,7 +9,7 @@ import {type Event} from '../common/models/event';
 import {type TransitionSetting} from '../server/models/transitionSetting';
 import type ParticipantOverview from '../server/projections/ParticipantOverview';
 import type EventOverview from '../server/projections/EventOverview';
-import {type MonitoringQuery, type MonitoringReport} from '../server/api-2/monitoring';
+import {type MonitoringQuery, type MonitoringReport} from '../server/api-2/monitoringGetReport';
 
 import {
 	postRegister,
@@ -30,23 +30,23 @@ import {
 import {
 	type ActivityReport,
 	createGetActivityReportDefinition,
-} from '../server/api-2/getActivityReport';
+} from '../server/api-2/activityReportGet';
 
 import {
 	createTransitionSettingDefinition,
-} from '../server/api-2/createTransitionSetting';
+} from '../server/api-2/transitionSettingsCreate';
 
 import {
 	getTransitionSettingDefinition,
-} from '../server/api-2/getTransitionSetting';
+} from '../server/api-2/transitionSettingsGet';
 
 import {
 	updateParticipantDefinition,
-} from '../server/api-2/updateParticipant';
+} from '../server/api-2/participantUpdate';
 
 import {
 	monitoringDefinition,
-} from '../server/api-2/monitoring';
+} from '../server/api-2/monitoringGetReport';
 
 import {
 	sendResetLinkPath,

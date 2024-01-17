@@ -13,7 +13,7 @@ import RequestLog from '../models/requestLog';
 import Event from '../../common/models/event';
 import Session from '../../common/models/session';
 
-import {type LogFunction} from './../lib/logger';
+import {type LogFunction} from '../lib/logger';
 import {has} from '../../common/util';
 import {showSql} from '../../util';
 
