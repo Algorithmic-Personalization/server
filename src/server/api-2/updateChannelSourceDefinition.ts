@@ -97,12 +97,21 @@ const createChannelSourceDefinition: RouteDefinition<ChannelSource> = {
 			await manager.save(items);
 
 			if (resetParticipantPositions) {
-				await manager.update(Participant, {
-					channelSourceId: numericId,
-				}, {
-					posInChannelSource: 0,
-					posInChannelSourceLastUpdatedAt: new Date(),
-				});
+				if (source.isDefault) {
+					await manager.update(Participant, {
+						channelSourceId: null,
+					}, {
+						posInChannelSource: 0,
+						posInChannelSourceLastUpdatedAt: new Date(),
+					});
+				} else {
+					await manager.update(Participant, {
+						channelSourceId: numericId,
+					}, {
+						posInChannelSource: 0,
+						posInChannelSourceLastUpdatedAt: new Date(),
+					});
+				}
 			}
 
 			return manager.findOne(ChannelSource, {
