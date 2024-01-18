@@ -1,4 +1,4 @@
-import {type DataSource} from 'typeorm';
+import {In, type DataSource} from 'typeorm';
 
 import Video from '../models/video';
 
@@ -82,8 +82,18 @@ const _scrape = async (dataSource: DataSource, log: LogFunction, api: YtApi): Pr
 
 		try {
 			// eslint-disable-next-line no-await-in-loop
-			const {data, ...stats} = await api.getMetaFromVideoIds(batch);
-			log('info', 'yt batch scrape result:', stats);
+			const {data} = await api.getMetaFromVideoIds(batch);
+
+			// eslint-disable-next-line no-await-in-loop
+			await dataSource
+				.getRepository(Video)
+				.update({
+					youtubeId: In([...data.keys()]),
+				}, {
+					metadataAvailable: true,
+				});
+
+			log('info', 'saved the metadata of', data.size, 'videos to the database');
 
 			scrapeCount += data.size;
 			const callWasSuccessful = data.size > 0;

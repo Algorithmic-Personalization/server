@@ -65,7 +65,7 @@ export const storeRecommendationsShown = async ({
 }: StoreRecommendationsShownParams) => {
 	log('Storing recommendations shown event meta-data');
 
-	const youTubeApi = createYouTubeApi(youTubeConfig, log, dataSource);
+	const youTubeApi = await createYouTubeApi(youTubeConfig, log, dataSource);
 
 	const videoRepo = dataSource.getRepository(Video);
 
@@ -85,11 +85,15 @@ export const storeRecommendationsShown = async ({
 		urlId,
 	])].filter(x => x !== undefined) as string[];
 
-	const now = Date.now();
 	try {
-		await youTubeApi.getMetaFromVideoIds(youTubeIds).then(videos => {
-			const elapsed = Date.now() - now;
-			log(`fetched ${videos.data.size} meta-data items for ${youTubeIds.length} videos in ${elapsed} ms.`);
+		await youTubeApi.getMetaFromVideoIds(youTubeIds).then(response => {
+			log(`fetched ${
+				response.data.size
+			} meta-data items for ${
+				youTubeIds.length
+			} videos in ${
+				response.stats.requestTime
+			} ms.`);
 		}).catch(err => {
 			log('error fetching video meta-data', err);
 		});
@@ -155,7 +159,7 @@ export const storeHomeShownVideos = async ({
 		store(replacement, ListType.HOME_REPLACEMENT_SOURCE, replacement.map(() => VideoType.PERSONALIZED)),
 	]);
 
-	const youTubeApi = createYouTubeApi(youTubeConfig, log, dataSource);
+	const youTubeApi = await createYouTubeApi(youTubeConfig, log, dataSource);
 
 	const youTubeIds = [...new Set([
 		...event.defaultRecommendations.map(v => v.videoId),

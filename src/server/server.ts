@@ -268,7 +268,7 @@ const main = async () => {
 	const youTubeConfig = getYouTubeConfig(config);
 
 	// Not using cache in the scraping process because we're not gonna ask twice for the same video data
-	const ytApi = makeCreateYouTubeApi('without-cache')(
+	const ytApi = await makeCreateYouTubeApi('without-cache')(
 		youTubeConfig,
 		createLogger('<yt-api>'),
 		ds,
