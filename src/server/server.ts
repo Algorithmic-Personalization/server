@@ -118,6 +118,8 @@ import createDefaultNotifier, {type ExternalNotifierDependencies as NotifierDepe
 import {createMailService, type MailServiceDependencies, type MailService} from './lib/email';
 import Participant from './models/participant';
 
+import cleanVideoIds from './lib/cleanVideoIds';
+
 export type Env = 'production' | 'development';
 
 export const getEnv = (): Env => {
@@ -273,6 +275,8 @@ const main = async () => {
 		createLogger('<yt-api>'),
 		ds,
 	);
+
+	await cleanVideoIds(ds, createLogger('<yt-cleaner>'));
 
 	scrapeMissingYouTubeMetadata(ds, createLogger('<yt-scraper>'), ytApi)
 		.then(() => {

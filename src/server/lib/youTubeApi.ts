@@ -19,6 +19,7 @@ import VideoMetadata from '../models/videoMetadata';
 import Video from '../models/video';
 import YouTubeRequestLatency from '../models/youTubeRequestLatency';
 import {formatSize, pct} from '../../util';
+import {cleanId} from './cleanVideoIds';
 
 export type VideoMetaMap = Map<string, VideoMetadata>;
 
@@ -246,11 +247,6 @@ export const makeCreateYouTubeApi = (cache: 'with-cache' | 'without-cache' = 'wi
 			});
 		};
 		*/
-
-		const cleanId = (id: string): string => {
-			const [res] = id.split('&');
-			return res;
-		};
 
 		const api: YtApi = {
 			hasDataSource(): boolean {

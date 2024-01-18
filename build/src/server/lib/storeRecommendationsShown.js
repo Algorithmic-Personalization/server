@@ -66,7 +66,7 @@ const extractVideoIdFromUrl = (url) => {
 };
 const storeRecommendationsShown = ({ log, dataSource, event, youTubeConfig, }) => __awaiter(void 0, void 0, void 0, function* () {
     log('Storing recommendations shown event meta-data');
-    const youTubeApi = createYouTubeApi(youTubeConfig, log, dataSource);
+    const youTubeApi = yield createYouTubeApi(youTubeConfig, log, dataSource);
     const videoRepo = dataSource.getRepository(video_1.default);
     const [nonPersonalized, personalized, shown] = yield Promise.all([
         (0, storeVideos_1.storeVideos)(videoRepo, (0, storeVideos_1.makeVideosFromRecommendations)(event.nonPersonalized)),
@@ -81,11 +81,9 @@ const storeRecommendationsShown = ({ log, dataSource, event, youTubeConfig, }) =
             ...event.shown.map(v => v.videoId),
             urlId,
         ])].filter(x => x !== undefined);
-    const now = Date.now();
     try {
-        yield youTubeApi.getMetaFromVideoIds(youTubeIds).then(videos => {
-            const elapsed = Date.now() - now;
-            log(`fetched ${videos.data.size} meta-data items for ${youTubeIds.length} videos in ${elapsed} ms.`);
+        yield youTubeApi.getMetaFromVideoIds(youTubeIds).then(response => {
+            log(`fetched ${response.data.size} meta-data items for ${youTubeIds.length} videos in ${response.stats.requestTime} ms.`);
         }).catch(err => {
             log('error fetching video meta-data', err);
         });
@@ -135,7 +133,7 @@ const storeHomeShownVideos = ({ log, dataSource, event, youTubeConfig, }) => __a
         store(defaultHome, videoListItem_1.ListType.HOME_DEFAULT, defaultHome.map(() => videoListItem_1.VideoType.PERSONALIZED)),
         store(replacement, videoListItem_1.ListType.HOME_REPLACEMENT_SOURCE, replacement.map(() => videoListItem_1.VideoType.PERSONALIZED)),
     ]);
-    const youTubeApi = createYouTubeApi(youTubeConfig, log, dataSource);
+    const youTubeApi = yield createYouTubeApi(youTubeConfig, log, dataSource);
     const youTubeIds = [...new Set([
             ...event.defaultRecommendations.map(v => v.videoId),
             ...event.replacementSource.map(v => v.videoId),

@@ -93,8 +93,6 @@ const _scrape = async (dataSource: DataSource, log: LogFunction, api: YtApi): Pr
 					metadataAvailable: true,
 				});
 
-			log('info', 'saved the metadata of', data.size, 'videos to the database');
-
 			scrapeCount += data.size;
 			const callWasSuccessful = data.size > 0;
 

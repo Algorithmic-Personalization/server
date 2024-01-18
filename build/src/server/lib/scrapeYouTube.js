@@ -19,23 +19,13 @@ var __classPrivateFieldSet = (this && this.__classPrivateFieldSet) || function (
     if (typeof state === "function" ? receiver !== state || !f : !state.has(receiver)) throw new TypeError("Cannot write private member to an object whose class did not declare it");
     return (kind === "a" ? f.call(receiver, value) : f ? f.value = value : state.set(receiver, value)), value;
 };
-var __rest = (this && this.__rest) || function (s, e) {
-    var t = {};
-    for (var p in s) if (Object.prototype.hasOwnProperty.call(s, p) && e.indexOf(p) < 0)
-        t[p] = s[p];
-    if (s != null && typeof Object.getOwnPropertySymbols === "function")
-        for (var i = 0, p = Object.getOwnPropertySymbols(s); i < p.length; i++) {
-            if (e.indexOf(p[i]) < 0 && Object.prototype.propertyIsEnumerable.call(s, p[i]))
-                t[p[i]] = s[p[i]];
-        }
-    return t;
-};
 var __importDefault = (this && this.__importDefault) || function (mod) {
     return (mod && mod.__esModule) ? mod : { "default": mod };
 };
 var _Limiter_waitDelays, _Limiter_waitIndex;
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.scrape = void 0;
+const typeorm_1 = require("typeorm");
 const video_1 = __importDefault(require("../models/video"));
 const util_1 = require("../../util");
 const oneDayRetryDelay = 1000 * 60 * 60 * 24;
@@ -89,8 +79,15 @@ const _scrape = (dataSource, log, api) => __awaiter(void 0, void 0, void 0, func
         const batch = videos.splice(0, batchSize);
         try {
             // eslint-disable-next-line no-await-in-loop
-            const _a = yield api.getMetaFromVideoIds(batch), { data } = _a, stats = __rest(_a, ["data"]);
-            log('info', 'yt batch scrape result:', stats);
+            const { data } = yield api.getMetaFromVideoIds(batch);
+            // eslint-disable-next-line no-await-in-loop
+            yield dataSource
+                .getRepository(video_1.default)
+                .update({
+                youtubeId: (0, typeorm_1.In)([...data.keys()]),
+            }, {
+                metadataAvailable: true,
+            });
             scrapeCount += data.size;
             const callWasSuccessful = data.size > 0;
             if (!callWasSuccessful) {

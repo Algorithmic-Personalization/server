@@ -87,6 +87,7 @@ const loadDbConfig_1 = require("./lib/config-loader/loadDbConfig");
 const externalNotifier_1 = __importDefault(require("./lib/externalNotifier"));
 const email_1 = require("./lib/email");
 const participant_1 = __importDefault(require("./models/participant"));
+const cleanVideoIds_1 = __importDefault(require("./lib/cleanVideoIds"));
 const getEnv = () => {
     const env = process.env.NODE_ENV;
     if (env !== 'production' && env !== 'development') {
@@ -191,7 +192,8 @@ const main = () => __awaiter(void 0, void 0, void 0, function* () {
     }
     const youTubeConfig = (0, getYouTubeConfig_1.default)(config);
     // Not using cache in the scraping process because we're not gonna ask twice for the same video data
-    const ytApi = (0, youTubeApi_1.default)('without-cache')(youTubeConfig, createLogger('<yt-api>'), ds);
+    const ytApi = yield (0, youTubeApi_1.default)('without-cache')(youTubeConfig, createLogger('<yt-api>'), ds);
+    yield (0, cleanVideoIds_1.default)(ds, createLogger('<yt-cleaner>'));
     (0, scrapeYouTube_1.default)(ds, createLogger('<yt-scraper>'), ytApi)
         .then(() => {
         log('success', 'done scraping youtube metadata');

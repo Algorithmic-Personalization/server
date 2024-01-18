@@ -15,9 +15,10 @@ Object.defineProperty(exports, "__esModule", { value: true });
 exports.storeVideos = exports._storeVideos = exports.makeVideosFromRecommendations = void 0;
 const video_1 = __importDefault(require("../../models/video"));
 const util_1 = require("../../../common/util");
+const cleanVideoIds_1 = require("../cleanVideoIds");
 const makeVideosFromRecommendations = (recommendations) => recommendations.map(r => {
     const v = new video_1.default();
-    v.youtubeId = r.videoId;
+    v.youtubeId = (0, cleanVideoIds_1.cleanId)(r.videoId);
     v.title = r.title;
     v.url = r.url;
     return v;
