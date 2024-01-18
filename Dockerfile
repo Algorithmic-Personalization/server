@@ -7,6 +7,6 @@ COPY . /root/ytdpnl
 WORKDIR /root/ytdpnl
 VOLUME /root/ytdpnl/logs
 RUN yarn
-RUN yarn build
+#RUN yarn build
 EXPOSE 12857/tcp
 EXPOSE 12858/tcp
