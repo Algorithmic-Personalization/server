@@ -15,6 +15,7 @@ Object.defineProperty(exports, "__esModule", { value: true });
 exports.advanceParticipantPositionInChannelSource = void 0;
 const clientRoutes_1 = require("../../common/clientRoutes");
 const channelSourceItem_1 = __importDefault(require("../models/channelSourceItem"));
+const unusableChannel_1 = __importDefault(require("../models/unusableChannel"));
 const participant_1 = __importDefault(require("../models/participant"));
 const channelRotationSpeedGet_1 = require("./channelRotationSpeedGet");
 const advanceParticipantPositionInChannelSource = (qr, log) => (participant) => __awaiter(void 0, void 0, void 0, function* () {
@@ -42,7 +43,7 @@ const advanceParticipantPositionInChannelSource = (qr, log) => (participant) => 
     else {
         log('info', 'participant cannot be advanced, there are no channels left in this source', channelSourceId !== null && channelSourceId !== void 0 ? channelSourceId : 'default');
     }
-    return getParticipantChannelSource(qr, log)(participant);
+    return getParticipantChannelSource(qr, log)(participant.code);
 });
 exports.advanceParticipantPositionInChannelSource = advanceParticipantPositionInChannelSource;
 const getParticipantChannelSource = (qr, log) => (participant) => __awaiter(void 0, void 0, void 0, function* () {
@@ -132,6 +133,18 @@ const getParticipantChannelSourceDefinition = {
         const qr = dataSource.createQueryRunner();
         const posNeedsUpdate = isPositionUpdateNeeded(qr, log);
         const getChannelSource = getParticipantChannelSource(qr, log);
+        if (force) {
+            const invalidChannel = yield getChannelSource(participantCode);
+            dataSource.getRepository(unusableChannel_1.default).createQueryBuilder().insert().values({
+                youtubeChannelId: invalidChannel.channelId,
+            }).orIgnore().execute()
+                .then(() => {
+                log('info', 'marked channel', invalidChannel.channelId, 'as unusable');
+            })
+                .catch(err => {
+                log('error', 'failed to insert unusable channel', err);
+            });
+        }
         try {
             yield qr.connect();
             yield qr.startTransaction();
@@ -144,10 +157,11 @@ const getParticipantChannelSourceDefinition = {
             if (!participant) {
                 throw new Error('Participant not found');
             }
-            yield qr.commitTransaction();
             const updateNeeded = force || (yield posNeedsUpdate(participant));
             if (updateNeeded) {
-                return yield (0, exports.advanceParticipantPositionInChannelSource)(qr, log)(participant);
+                const source = yield (0, exports.advanceParticipantPositionInChannelSource)(qr, log)(participant);
+                yield qr.commitTransaction();
+                return source;
             }
             const res = yield getChannelSource(participant);
             log('success', 'replying to client with', res);

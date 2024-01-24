@@ -25,6 +25,7 @@ const resetPasswordToken_1 = __importDefault(require("./models/resetPasswordToke
 const channelSource_1 = __importDefault(require("./models/channelSource"));
 const channelSourceItem_1 = __importDefault(require("./models/channelSourceItem"));
 const channelRotationSpeedSetting_1 = __importDefault(require("./models/channelRotationSpeedSetting"));
+const unusableChannel_1 = __importDefault(require("./models/unusableChannel"));
 // Add classes used by typeorm as models here
 // so that typeorm can extract the metadata from them.
 exports.entities = [
@@ -49,6 +50,7 @@ exports.entities = [
     channelSource_1.default,
     channelSourceItem_1.default,
     channelRotationSpeedSetting_1.default,
+    unusableChannel_1.default,
 ];
 exports.default = exports.entities;
 //# sourceMappingURL=entities.js.map

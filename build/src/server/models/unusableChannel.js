@@ -13,30 +13,24 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
     return (mod && mod.__esModule) ? mod : { "default": mod };
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.ChannelRotationSpeedSetting = void 0;
+exports.UnusableChannel = void 0;
 const typeorm_1 = require("typeorm");
 const class_validator_1 = require("class-validator");
 const model_1 = __importDefault(require("../../common/lib/model"));
-let ChannelRotationSpeedSetting = class ChannelRotationSpeedSetting extends model_1.default {
+let UnusableChannel = class UnusableChannel extends model_1.default {
     constructor() {
         super(...arguments);
-        this.speedHours = 24;
-        this.isCurrent = false;
+        this.youtubeChannelId = '';
     }
 };
 __decorate([
-    (0, typeorm_1.Column)({ type: 'decimal' }),
-    (0, class_validator_1.IsNumber)(),
-    __metadata("design:type", Number)
-], ChannelRotationSpeedSetting.prototype, "speedHours", void 0);
-__decorate([
     (0, typeorm_1.Column)(),
-    (0, class_validator_1.IsBoolean)(),
-    __metadata("design:type", Boolean)
-], ChannelRotationSpeedSetting.prototype, "isCurrent", void 0);
-ChannelRotationSpeedSetting = __decorate([
+    (0, class_validator_1.IsString)(),
+    __metadata("design:type", String)
+], UnusableChannel.prototype, "youtubeChannelId", void 0);
+UnusableChannel = __decorate([
     (0, typeorm_1.Entity)()
-], ChannelRotationSpeedSetting);
-exports.ChannelRotationSpeedSetting = ChannelRotationSpeedSetting;
-exports.default = ChannelRotationSpeedSetting;
-//# sourceMappingURL=channelRotationSpeedSetting.js.map
+], UnusableChannel);
+exports.UnusableChannel = UnusableChannel;
+exports.default = UnusableChannel;
+//# sourceMappingURL=unusableChannel.js.map

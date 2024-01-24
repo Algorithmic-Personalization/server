@@ -544,3 +544,7 @@ Send an authorized `GET` request to `/api/channel-rotation-speed`, it will retur
   }
 }
 ```
+
+#### Miscellaneous
+
+Channels that are deemed unusable by the extension will be saved in the table `unusable_channel`.

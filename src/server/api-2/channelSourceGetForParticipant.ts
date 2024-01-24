@@ -6,6 +6,7 @@ import {type ParticipantChannelSource} from '../../common/types/participantChann
 import {type RouteDefinition} from '../lib/routeCreation';
 
 import ChannelSourceItem from '../models/channelSourceItem';
+import UnusableChannel from '../models/unusableChannel';
 import Participant from '../models/participant';
 import {type LogFunction} from '../lib/logger';
 
@@ -203,6 +204,20 @@ const getParticipantChannelSourceDefinition: RouteDefinition<ParticipantChannelS
 
 		const posNeedsUpdate = isPositionUpdateNeeded(qr, log);
 		const getChannelSource = getParticipantChannelSource(qr, log);
+
+		if (force) {
+			const invalidChannel = await getChannelSource(participantCode);
+
+			dataSource.getRepository(UnusableChannel).createQueryBuilder().insert().values({
+				youtubeChannelId: invalidChannel.channelId,
+			}).orIgnore().execute()
+				.then(() => {
+					log('info', 'marked channel', invalidChannel.channelId, 'as unusable');
+				})
+				.catch(err => {
+					log('error', 'failed to insert unusable channel', err);
+				});
+		}
 
 		try {
 			await qr.connect();
