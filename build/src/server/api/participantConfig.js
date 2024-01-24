@@ -45,6 +45,7 @@ const createGetParticipantConfigRoute = ({ createLogger, dataSource }) => (req, 
         arm,
         nonPersonalizedProbability,
         experimentConfigId: config.id,
+        phase: participant.phase,
     };
     log('Sending participant config', result);
     res.send({ kind: 'Success', value: result });

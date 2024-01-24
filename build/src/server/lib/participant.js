@@ -58,7 +58,7 @@ const createSaveParticipantTransition = ({ dataSource, notifier, log, }) => {
                 toPhase,
             },
         });
-        if (!settings) {
+        if (!settings && triggerEvent) {
             log('error', `no settings found for transition from ${fromPhase} to ${toPhase}`);
             return undefined;
         }
