@@ -51,17 +51,17 @@ const createParticipantMiddleWare = (createLogger, extraLogger) => (req, res, ne
         });
     };
     if (typeof participantCode !== 'string') {
-        log('error', 'participant code is not a string:', participantCode);
+        log('warning', 'participant code is not a string:', participantCode);
         bail();
         return;
     }
     if (!participantCode) {
-        log('error', 'participant code is empty');
+        log('warning', 'participant code is empty');
         bail();
         return;
     }
     req.participantCode = participantCode;
-    log('participant code is valid:', participantCode);
+    log('info', 'participant code is valid:', participantCode);
     next();
 };
 exports.createParticipantMiddleWare = createParticipantMiddleWare;

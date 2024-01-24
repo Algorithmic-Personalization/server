@@ -18,6 +18,7 @@ import Voucher from './models/voucher';
 import ResetPasswordToken from './models/resetPasswordToken';
 import ChannelSource from './models/channelSource';
 import ChannelSourceItem from './models/channelSourceItem';
+import ChannelRotationSpeedSetting from './models/channelRotationSpeedSetting';
 
 // Add classes used by typeorm as models here
 // so that typeorm can extract the metadata from them.
@@ -43,6 +44,7 @@ export const entities = [
 	ResetPasswordToken,
 	ChannelSource,
 	ChannelSourceItem,
+	ChannelRotationSpeedSetting,
 ];
 
 export default entities;

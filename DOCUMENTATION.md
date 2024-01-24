@@ -514,3 +514,31 @@ You can also update the position of the participant in the list of channels that
 Both operations can be performed at the same time by sending a JSON object containing both fields, this is just the regular participant update route.
 
 Note that the latter option is not supported in the participant creation route, because it is assumed that a participant newly created starts at the first position in the channel source (which is 0, not 1).
+
+#### Setting the rotation speed of channels in the absence of clicks
+
+Simply send an authenticated `POST` request to `/api/channel-rotation-speed` with a JSON body containing:
+
+```json
+{
+  "speedHours": 12 // the number of hours after which channel sources should be rotated
+}
+```
+
+This setting is never overwritten, a history of all the changes is kept in the database.
+
+#### Getting the current channel rotation speed setting
+
+Send an authorized `GET` request to `/api/channel-rotation-speed`, it will return a JSON object containing something like:
+
+```json
+{
+  "kind": "Success",
+  "value": {
+    "id": 1,
+    "speedHours": 12,
+    "createdAt": "2024-01-16T14:50:14.937Z",
+    "updatedAt": "2024-01-16T14:50:14.937Z"
+  }
+}
+```

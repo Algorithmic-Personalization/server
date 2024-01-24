@@ -16,6 +16,7 @@ exports.advanceParticipantPositionInChannelSource = void 0;
 const clientRoutes_1 = require("../../common/clientRoutes");
 const channelSourceItem_1 = __importDefault(require("../models/channelSourceItem"));
 const participant_1 = __importDefault(require("../models/participant"));
+const channelRotationSpeedGet_1 = require("./channelRotationSpeedGet");
 const advanceParticipantPositionInChannelSource = (qr, log) => (participant) => __awaiter(void 0, void 0, void 0, function* () {
     const { channelSourceId, posInChannelSource, code, arm } = participant;
     if (arm === 'control') {
@@ -99,10 +100,12 @@ const isPositionUpdateNeeded = (qr, log) => (participant) => __awaiter(void 0, v
     });
     const { channelSourceId, posInChannelSource, posInChannelSourceLastUpdatedAt } = yield getParticipant();
     log('info', 'checking if participant needs to be advanced from channel source', channelSourceId !== null && channelSourceId !== void 0 ? channelSourceId : 'default', 'and position', posInChannelSource, 'based on time alone');
+    const rotationSpeed = yield (0, channelRotationSpeedGet_1.getRotationSpeed)(qr);
+    log('info', 'channel rotation speed currently is', rotationSpeed.speedHours, 'hours');
     const dtDays = ((new Date()).getTime() - posInChannelSourceLastUpdatedAt.getTime())
         / 1000 / 60 / 60 / 24;
     log('info', 'dtDays', dtDays);
-    const res = dtDays >= 1;
+    const res = dtDays >= rotationSpeed.speedHours / 24;
     if (res) {
         log('info', 'participant needs to be advanced');
     }

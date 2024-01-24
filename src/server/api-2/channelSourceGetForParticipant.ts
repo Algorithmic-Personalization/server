@@ -9,6 +9,8 @@ import ChannelSourceItem from '../models/channelSourceItem';
 import Participant from '../models/participant';
 import {type LogFunction} from '../lib/logger';
 
+import {getRotationSpeed} from './channelRotationSpeedGet';
+
 export const advanceParticipantPositionInChannelSource = (qr: QueryRunner, log: LogFunction) => async (participant: Participant): Promise<ParticipantChannelSource> => {
 	const {channelSourceId, posInChannelSource, code, arm} = participant;
 
@@ -157,12 +159,16 @@ const isPositionUpdateNeeded = (qr: QueryRunner, log: LogFunction) => async (par
 		'based on time alone',
 	);
 
+	const rotationSpeed = await getRotationSpeed(qr);
+
+	log('info', 'channel rotation speed currently is', rotationSpeed.speedHours, 'hours');
+
 	const dtDays = ((new Date()).getTime() - posInChannelSourceLastUpdatedAt.getTime())
 		/ 1000 / 60 / 60 / 24;
 
 	log('info', 'dtDays', dtDays);
 
-	const res = dtDays >= 1;
+	const res = dtDays >= rotationSpeed.speedHours / 24;
 
 	if (res) {
 		log('info', 'participant needs to be advanced');

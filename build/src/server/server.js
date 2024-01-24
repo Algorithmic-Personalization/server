@@ -80,6 +80,8 @@ const youTubeApi_1 = __importDefault(require("./lib/youTubeApi"));
 const scrapeYouTube_1 = __importDefault(require("./lib/scrapeYouTube"));
 const channelSourceCreate_1 = __importDefault(require("./api-2/channelSourceCreate"));
 const channelSourceUpdate_1 = __importDefault(require("./api-2/channelSourceUpdate"));
+const channelRotationSpeedSet_1 = __importDefault(require("./api-2/channelRotationSpeedSet"));
+const channelRotationSpeedGet_1 = __importDefault(require("./api-2/channelRotationSpeedGet"));
 // DO NOT FORGET TO UPDATE THIS FILE WHEN ADDING NEW ENTITIES
 const entities_1 = __importDefault(require("./entities"));
 const loadConfigYamlRaw_1 = require("./lib/config-loader/loadConfigYamlRaw");
@@ -323,6 +325,8 @@ const main = () => __awaiter(void 0, void 0, void 0, function* () {
     defineAdminRoute(voucherCreate_1.default);
     defineAdminRoute(channelSourceCreate_1.default);
     defineAdminRoute(channelSourceUpdate_1.default);
+    defineAdminRoute(channelRotationSpeedSet_1.default);
+    defineAdminRoute(channelRotationSpeedGet_1.default);
     defineParticipantRoute(channelSourceGetForParticipant_1.default);
     app.post(serverRoutes_1.postRegister, (0, register_1.default)(routeContext));
     app.get(serverRoutes_1.getVerifyEmailToken, (0, verifyEmail_1.default)(routeContext));

@@ -24,6 +24,7 @@ const voucher_1 = __importDefault(require("./models/voucher"));
 const resetPasswordToken_1 = __importDefault(require("./models/resetPasswordToken"));
 const channelSource_1 = __importDefault(require("./models/channelSource"));
 const channelSourceItem_1 = __importDefault(require("./models/channelSourceItem"));
+const channelRotationSpeedSetting_1 = __importDefault(require("./models/channelRotationSpeedSetting"));
 // Add classes used by typeorm as models here
 // so that typeorm can extract the metadata from them.
 exports.entities = [
@@ -47,6 +48,7 @@ exports.entities = [
     resetPasswordToken_1.default,
     channelSource_1.default,
     channelSourceItem_1.default,
+    channelRotationSpeedSetting_1.default,
 ];
 exports.default = exports.entities;
 //# sourceMappingURL=entities.js.map

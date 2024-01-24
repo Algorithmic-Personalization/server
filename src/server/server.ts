@@ -108,6 +108,8 @@ import scrapeMissingYouTubeMetadata from './lib/scrapeYouTube';
 
 import createChannelSourceDefinition from './api-2/channelSourceCreate';
 import updateChannelSourceDefinition from './api-2/channelSourceUpdate';
+import channelRotationSpeedSetDefinition from './api-2/channelRotationSpeedSet';
+import channelRotationSpeedGetDefinition from './api-2/channelRotationSpeedGet';
 
 // DO NOT FORGET TO UPDATE THIS FILE WHEN ADDING NEW ENTITIES
 import entities from './entities';
@@ -448,6 +450,8 @@ const main = async () => {
 	defineAdminRoute(addVouchersDefinition);
 	defineAdminRoute(createChannelSourceDefinition);
 	defineAdminRoute(updateChannelSourceDefinition);
+	defineAdminRoute(channelRotationSpeedSetDefinition);
+	defineAdminRoute(channelRotationSpeedGetDefinition);
 
 	defineParticipantRoute(getChannelSourceForParticipant);
 
