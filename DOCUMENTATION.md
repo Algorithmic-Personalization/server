@@ -525,7 +525,8 @@ Simply send an authenticated `POST` request to `/api/channel-rotation-speed` wit
 }
 ```
 
-This setting is never overwritten, a history of all the changes is kept in the database.
+This setting is never overwritten, a history of all the changes is kept in the database. When no entry is present for this setting in the database the duration defaults to 24 hours.
+
 **Note**: `speedHours` doesn't have to be an integer, it can be any number.
 
 #### Getting the current channel rotation speed setting
