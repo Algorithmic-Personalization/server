@@ -68,7 +68,7 @@ export const advanceParticipantPositionInChannelSource = (qr: QueryRunner, log: 
 		);
 	}
 
-	return getParticipantChannelSource(qr, log)(participant);
+	return getParticipantChannelSource(qr, log)(participant.code);
 };
 
 type ParticipantCode = string;
@@ -219,12 +219,12 @@ const getParticipantChannelSourceDefinition: RouteDefinition<ParticipantChannelS
 				throw new Error('Participant not found');
 			}
 
-			await qr.commitTransaction();
-
 			const updateNeeded = force || await posNeedsUpdate(participant);
 
 			if (updateNeeded) {
-				return await advanceParticipantPositionInChannelSource(qr, log)(participant);
+				const source = await advanceParticipantPositionInChannelSource(qr, log)(participant);
+				await qr.commitTransaction();
+				return source;
 			}
 
 			const res = await getChannelSource(participant);
