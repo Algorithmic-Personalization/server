@@ -42,6 +42,7 @@ export const createGetParticipantConfigRoute: RouteCreator = ({createLogger, dat
 		arm,
 		nonPersonalizedProbability,
 		experimentConfigId: config.id,
+		phase: participant.phase,
 	};
 
 	log('Sending participant config', result);
