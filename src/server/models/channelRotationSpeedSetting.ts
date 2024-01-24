@@ -7,7 +7,7 @@ import Model from '../../common/lib/model';
 
 @Entity()
 export class ChannelRotationSpeedSetting extends Model {
-	@Column()
+	@Column({type: 'decimal'})
 	@IsNumber()
 		speedHours: number = 24;
 
