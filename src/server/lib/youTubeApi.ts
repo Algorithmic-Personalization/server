@@ -97,7 +97,6 @@ const findYtInitialData = (html: string): string | undefined => {
 	return html.slice(startPos + startString.length, endPos);
 };
 
-// TODO: to be tested better
 export const isVideoAvailable = async (youtubeId: string): Promise<boolean> => {
 	const url = `https://www.youtube.com/watch?v=${youtubeId}`;
 
@@ -375,8 +374,31 @@ export const makeCreateYouTubeApi = (cache: 'with-cache' | 'without-cache' = 'wi
 					data.set(vmd.youtubeId, vmd);
 				}
 
-				if (persistMetas) {
+				if (dataSource && persistMetas) {
 					await persistMetas(vmdToStore);
+
+					const missingMeta = idsToFetchFromApi.filter(id => !data.has(id));
+					missingMeta.map(async youtubeId => {
+						const available = await isVideoAvailable(youtubeId);
+						if (!available) {
+							log('info', 'video', youtubeId, 'is not available');
+							dataSource
+								.createQueryBuilder()
+								.update(Video)
+								.set({
+									metadataAvailable: false,
+								})
+								.where({
+									youtubeId,
+								})
+								.execute()
+								.then(() => {
+									log('info', 'marked video', youtubeId, 'as unavailable');
+								}, () => {
+									log('error', 'failed to mark video', youtubeId, 'as unavailable');
+								});
+						}
+					});
 				}
 
 				return makeOutput();
