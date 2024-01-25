@@ -1,4 +1,4 @@
-import {Like, type DataSource} from 'typeorm';
+import {IsNull, Like, type DataSource} from 'typeorm';
 
 import Video from '../models/video';
 import {type LogFunction} from './logger';
@@ -17,10 +17,14 @@ export const cleanVideoIds = async (dataSource: DataSource, log: LogFunction): P
 		.find({
 			where: {
 				youtubeId: Like('%&%'),
+				metadataAvailable: IsNull(),
 			},
 		});
 
+	const problematicYtIds: string[] = [];
+
 	problematicVideos.forEach(video => {
+		problematicYtIds.push(video.youtubeId);
 		initialYouTubeIds.push(video.youtubeId);
 		video.youtubeId = cleanId(video.youtubeId);
 	});
@@ -34,11 +38,39 @@ export const cleanVideoIds = async (dataSource: DataSource, log: LogFunction): P
 	const count = res.filter(({status}, i) => {
 		const ok = status === 'fulfilled';
 
-		if (!ok) {
-			log('warning', 'failed to clean video id', problematicVideos[i].id);
+		if (ok) {
+			return true;
 		}
 
-		return ok;
+		repo
+			.createQueryBuilder()
+			.update(Video)
+			.set({
+				metadataAvailable: false,
+			})
+			.where({
+				id: problematicVideos[i].id,
+			})
+			.execute()
+			.then(() => {
+				log(
+					'info',
+					'set metadata_available to false for',
+					`"${problematicYtIds[i]}"`,
+					'in order not to attempt scraping it again',
+				);
+			})
+			.catch(err => {
+				log(
+					'error',
+					'failed to set metadata_available to false for',
+					`"${problematicYtIds[i]}"`,
+					'(in order not to attempt scraping it again)',
+					err,
+				);
+			});
+
+		return false;
 	}).length;
 
 	log('info', 'cleaned', count, 'video ids');
