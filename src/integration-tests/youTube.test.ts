@@ -1,6 +1,6 @@
 import {loadConfigYamlRaw} from './../server/lib/config-loader/loadConfigYamlRaw';
 import {getYouTubeConfig} from './../server/lib/config-loader/getYouTubeConfig';
-import {makeCreateYouTubeApi} from './../server/lib/youTubeApi';
+import {makeCreateYouTubeApi, isVideoAvailable} from './../server/lib/youTubeApi';
 
 const loadApi = async () => {
 	const config = await loadConfigYamlRaw();
@@ -140,5 +140,19 @@ describe('the YouTube API', () => {
 
 		expect(Math.abs(metaObtained.data.size - numOfIds)).toBeLessThanOrEqual(1);
 		api.cleanCache();
+	});
+
+	describe('isVideoAvailable', () => {
+		it('should reply `true` for an available video', async () => {
+			expect(await isVideoAvailable('Vg91dht58vE')).toBe(true);
+		});
+
+		it('should reply `false` for a private video', async () => {
+			expect(await isVideoAvailable('mIbYcTuJOPo')).toBe(false);
+		});
+
+		it('should reply `false` for a deleted video', async () => {
+			expect(await isVideoAvailable('0zLBgvymn74')).toBe(false);
+		});
 	});
 });
