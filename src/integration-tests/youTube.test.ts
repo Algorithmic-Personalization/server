@@ -127,21 +127,6 @@ describe('the YouTube API', () => {
 		api.cleanCache();
 	});
 
-	it('should get more than 50 ids at once', async () => {
-		const api = await loadApi();
-
-		const numOfIds = 68;
-
-		const idsSubset = videoIds.slice(0, numOfIds);
-
-		expect(idsSubset.length).toBe(numOfIds);
-
-		const metaObtained = await api.getMetaFromVideoIds(idsSubset);
-
-		expect(Math.abs(metaObtained.data.size - numOfIds)).toBeLessThanOrEqual(1);
-		api.cleanCache();
-	});
-
 	describe('isVideoAvailable', () => {
 		it('should reply `true` for an available video', async () => {
 			expect(await isVideoAvailable('Vg91dht58vE')).toBe(true);
@@ -154,5 +139,26 @@ describe('the YouTube API', () => {
 		it('should reply `false` for a deleted video', async () => {
 			expect(await isVideoAvailable('0zLBgvymn74')).toBe(false);
 		});
+	});
+
+	it('should get more than 50 ids at once', async () => {
+		const api = await loadApi();
+
+		const numOfIds = 68;
+
+		const idsSubset = videoIds.slice(0, numOfIds);
+
+		expect(idsSubset.length).toBe(numOfIds);
+
+		const metaObtained = await api.getMetaFromVideoIds(idsSubset);
+
+		const metaMissing = idsSubset.filter(id => !metaObtained.data.has(id));
+
+		const missingAvailable = await Promise.all(metaMissing.map(isVideoAvailable));
+
+		expect(missingAvailable.every(x => !x)).toBe(true);
+
+		expect(Math.abs(metaObtained.data.size - numOfIds)).toBeLessThanOrEqual(1);
+		api.cleanCache();
 	});
 });
