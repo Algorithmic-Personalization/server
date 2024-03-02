@@ -3,6 +3,8 @@ import {type RouteCreator} from '../lib/routeCreation';
 import Participant from '../models/participant';
 import ExperimentConfig, {type ParticipantConfig} from '../../common/models/experimentConfig';
 
+import {getParticipantChannelSource} from '../api-2/channelSourceGetForParticipant';
+
 export const createGetParticipantConfigRoute: RouteCreator = ({createLogger, dataSource}) => async (req, res) => {
 	const log = createLogger(req.requestId);
 
@@ -31,6 +33,10 @@ export const createGetParticipantConfigRoute: RouteCreator = ({createLogger, dat
 		return;
 	}
 
+	const channelSource = await getParticipantChannelSource(
+		dataSource.createQueryRunner(), log,
+	)(participant);
+
 	const {arm} = participant;
 	const {nonPersonalizedProbability: configProbability} = config;
 
@@ -43,6 +49,7 @@ export const createGetParticipantConfigRoute: RouteCreator = ({createLogger, dat
 		nonPersonalizedProbability,
 		experimentConfigId: config.id,
 		phase: participant.phase,
+		channelSource: channelSource.channelId,
 	};
 
 	log('Sending participant config', result);

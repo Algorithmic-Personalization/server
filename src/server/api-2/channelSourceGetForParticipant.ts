@@ -74,7 +74,7 @@ export const advanceParticipantPositionInChannelSource = (qr: QueryRunner, log: 
 
 type ParticipantCode = string;
 
-const getParticipantChannelSource = (qr: QueryRunner, log: LogFunction) => async (participant: Participant | ParticipantCode): Promise<ParticipantChannelSource> => {
+export const getParticipantChannelSource = (qr: QueryRunner, log: LogFunction) => async (participant: Participant | ParticipantCode): Promise<ParticipantChannelSource> => {
 	const getParticipant = async () => {
 		if (typeof participant === 'string') {
 			const p = await qr.manager.getRepository(Participant).findOne({
