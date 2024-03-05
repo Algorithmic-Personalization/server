@@ -10,6 +10,7 @@ export enum ListType {
 	SHOWN = 'SHOWN',
 	HOME_DEFAULT = 'HOME_DEFAULT',
 	HOME_REPLACEMENT_SOURCE = 'HOME_REPLACEMENT_SOURCE',
+	HOME_SHOWN = 'HOME_SHOWN',
 }
 
 export enum VideoType {

@@ -149,14 +149,23 @@ export const storeHomeShownVideos = async ({
 
 	const videoRepo = dataSource.getRepository(Video);
 
-	const [defaultHome, replacement] = await Promise.all([
+	const storeVideoPromises = [
 		storeVideos(videoRepo, makeVideosFromRecommendations(event.defaultRecommendations)),
 		storeVideos(videoRepo, makeVideosFromRecommendations(event.replacementSource)),
-	]);
+	];
+
+	if (event.shown) {
+		storeVideoPromises.push(
+			storeVideos(videoRepo, makeVideosFromRecommendations(event.shown)),
+		);
+	}
+
+	const [defaultHome, replacement, shown] = await Promise.all(storeVideoPromises);
 
 	await Promise.all([
 		store(defaultHome, ListType.HOME_DEFAULT, defaultHome.map(() => VideoType.PERSONALIZED)),
 		store(replacement, ListType.HOME_REPLACEMENT_SOURCE, replacement.map(() => VideoType.PERSONALIZED)),
+		shown && store(shown, ListType.HOME_SHOWN, shown.map(() => VideoType.PERSONALIZED)),
 	]);
 
 	const youTubeApi = await createYouTubeApi(youTubeConfig, log, dataSource);
@@ -164,6 +173,7 @@ export const storeHomeShownVideos = async ({
 	const youTubeIds = [...new Set([
 		...event.defaultRecommendations.map(v => v.videoId),
 		...event.replacementSource.map(v => v.videoId),
+		...event.shown?.map(v => v.videoId) ?? [],
 	])].filter(x => x !== undefined);
 
 	await youTubeApi.getMetaFromVideoIds(youTubeIds).catch(err => {
