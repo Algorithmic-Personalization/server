@@ -120,7 +120,7 @@ const get = (path) => (x) => {
     let out = x;
     for (const key of path) {
         if (!(0, exports.has)(key)(out)) {
-            throw new Error(`Missing property ${key} in object.`);
+            throw new Error(`Missing property ${key} in object. Full path: ${path.join('.')}.`);
         }
         out = out[key];
     }

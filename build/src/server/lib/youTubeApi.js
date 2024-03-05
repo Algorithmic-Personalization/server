@@ -62,7 +62,6 @@ const findYtInitialData = (html) => {
     }
     return html.slice(startPos + startString.length, endPos);
 };
-// TODO: to be tested better
 const isVideoAvailable = (youtubeId) => __awaiter(void 0, void 0, void 0, function* () {
     const url = `https://www.youtube.com/watch?v=${youtubeId}`;
     const responseHtml = yield (yield (0, node_fetch_1.default)(url)).text();
@@ -277,8 +276,30 @@ const makeCreateYouTubeApi = (cache = 'with-cache') => {
                         }
                         data.set(vmd.youtubeId, vmd);
                     }
-                    if (persistMetas) {
+                    if (dataSource && persistMetas) {
                         yield persistMetas(vmdToStore);
+                        const missingMeta = idsToFetchFromApi.filter(id => !data.has(id));
+                        missingMeta.map((youtubeId) => __awaiter(this, void 0, void 0, function* () {
+                            const available = yield (0, exports.isVideoAvailable)(youtubeId);
+                            if (!available) {
+                                log('info', 'video', youtubeId, 'is not available');
+                                dataSource
+                                    .createQueryBuilder()
+                                    .update(video_1.default)
+                                    .set({
+                                    metadataAvailable: false,
+                                })
+                                    .where({
+                                    youtubeId,
+                                })
+                                    .execute()
+                                    .then(() => {
+                                    log('info', 'marked video', youtubeId, 'as unavailable');
+                                }, () => {
+                                    log('error', 'failed to mark video', youtubeId, 'as unavailable');
+                                });
+                            }
+                        }));
                     }
                     return makeOutput();
                 });

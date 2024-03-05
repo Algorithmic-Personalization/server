@@ -15,7 +15,7 @@ const youTubeApi_1 = require("./../server/lib/youTubeApi");
 const loadApi = () => __awaiter(void 0, void 0, void 0, function* () {
     const config = yield (0, loadConfigYamlRaw_1.loadConfigYamlRaw)();
     const ytConfig = (0, getYouTubeConfig_1.getYouTubeConfig)(config);
-    const api = yield (0, youTubeApi_1.makeCreateYouTubeApi)('with-cache')(ytConfig, jest.fn());
+    const api = yield (0, youTubeApi_1.makeCreateYouTubeApi)('without-cache')(ytConfig, jest.fn());
     return api;
 });
 const videoIds = [
@@ -129,13 +129,27 @@ describe('the YouTube API', () => {
         expect(metaObtained.data.size).toBe(ids.length);
         api.cleanCache();
     }));
+    describe('isVideoAvailable', () => {
+        it('should reply `true` for an available video', () => __awaiter(void 0, void 0, void 0, function* () {
+            expect(yield (0, youTubeApi_1.isVideoAvailable)('Vg91dht58vE')).toBe(true);
+        }));
+        it('should reply `false` for a private video', () => __awaiter(void 0, void 0, void 0, function* () {
+            expect(yield (0, youTubeApi_1.isVideoAvailable)('mIbYcTuJOPo')).toBe(false);
+        }));
+        it('should reply `false` for a deleted video', () => __awaiter(void 0, void 0, void 0, function* () {
+            expect(yield (0, youTubeApi_1.isVideoAvailable)('0zLBgvymn74')).toBe(false);
+        }));
+    });
     it('should get more than 50 ids at once', () => __awaiter(void 0, void 0, void 0, function* () {
         const api = yield loadApi();
         const numOfIds = 68;
         const idsSubset = videoIds.slice(0, numOfIds);
         expect(idsSubset.length).toBe(numOfIds);
         const metaObtained = yield api.getMetaFromVideoIds(idsSubset);
-        expect(metaObtained.data.size).toBe(numOfIds);
+        const metaMissing = idsSubset.filter(id => !metaObtained.data.has(id));
+        const missingAvailable = yield Promise.all(metaMissing.map(youTubeApi_1.isVideoAvailable));
+        expect(missingAvailable.every(x => !x)).toBe(true);
+        expect(Math.abs(metaObtained.data.size - numOfIds)).toBeLessThanOrEqual(1);
         api.cleanCache();
     }));
 });

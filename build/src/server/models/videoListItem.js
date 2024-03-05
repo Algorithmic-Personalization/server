@@ -24,6 +24,7 @@ var ListType;
     ListType["SHOWN"] = "SHOWN";
     ListType["HOME_DEFAULT"] = "HOME_DEFAULT";
     ListType["HOME_REPLACEMENT_SOURCE"] = "HOME_REPLACEMENT_SOURCE";
+    ListType["HOME_SHOWN"] = "HOME_SHOWN";
 })(ListType = exports.ListType || (exports.ListType = {}));
 var VideoType;
 (function (VideoType) {

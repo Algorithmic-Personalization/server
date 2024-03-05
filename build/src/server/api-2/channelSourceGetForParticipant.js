@@ -12,7 +12,7 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
     return (mod && mod.__esModule) ? mod : { "default": mod };
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.advanceParticipantPositionInChannelSource = void 0;
+exports.getParticipantChannelSource = exports.advanceParticipantPositionInChannelSource = void 0;
 const clientRoutes_1 = require("../../common/clientRoutes");
 const channelSourceItem_1 = __importDefault(require("../models/channelSourceItem"));
 const unusableChannel_1 = __importDefault(require("../models/unusableChannel"));
@@ -43,7 +43,7 @@ const advanceParticipantPositionInChannelSource = (qr, log) => (participant) => 
     else {
         log('info', 'participant cannot be advanced, there are no channels left in this source', channelSourceId !== null && channelSourceId !== void 0 ? channelSourceId : 'default');
     }
-    return getParticipantChannelSource(qr, log)(participant.code);
+    return (0, exports.getParticipantChannelSource)(qr, log)(participant.code);
 });
 exports.advanceParticipantPositionInChannelSource = advanceParticipantPositionInChannelSource;
 const getParticipantChannelSource = (qr, log) => (participant) => __awaiter(void 0, void 0, void 0, function* () {
@@ -83,6 +83,7 @@ const getParticipantChannelSource = (qr, log) => (participant) => __awaiter(void
     }
     throw new Error('Participant channel source item not found');
 });
+exports.getParticipantChannelSource = getParticipantChannelSource;
 const isPositionUpdateNeeded = (qr, log) => (participant) => __awaiter(void 0, void 0, void 0, function* () {
     const getParticipant = () => __awaiter(void 0, void 0, void 0, function* () {
         if (typeof participant === 'string') {
@@ -132,7 +133,7 @@ const getParticipantChannelSourceDefinition = {
         log('info', 'participant code', participantCode);
         const qr = dataSource.createQueryRunner();
         const posNeedsUpdate = isPositionUpdateNeeded(qr, log);
-        const getChannelSource = getParticipantChannelSource(qr, log);
+        const getChannelSource = (0, exports.getParticipantChannelSource)(qr, log);
         if (force) {
             const invalidChannel = yield getChannelSource(participantCode);
             dataSource.getRepository(unusableChannel_1.default).createQueryBuilder().insert().values({

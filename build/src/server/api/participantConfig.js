@@ -15,6 +15,7 @@ Object.defineProperty(exports, "__esModule", { value: true });
 exports.createGetParticipantConfigRoute = void 0;
 const participant_1 = __importDefault(require("../models/participant"));
 const experimentConfig_1 = __importDefault(require("../../common/models/experimentConfig"));
+const channelSourceGetForParticipant_1 = require("../api-2/channelSourceGetForParticipant");
 const createGetParticipantConfigRoute = ({ createLogger, dataSource }) => (req, res) => __awaiter(void 0, void 0, void 0, function* () {
     const log = createLogger(req.requestId);
     log('Received get participant config request');
@@ -36,6 +37,7 @@ const createGetParticipantConfigRoute = ({ createLogger, dataSource }) => (req, 
         res.status(500).json({ kind: 'Failure', message: 'No participant found' });
         return;
     }
+    const channelSource = yield (0, channelSourceGetForParticipant_1.getParticipantChannelSource)(dataSource.createQueryRunner(), log)(participant);
     const { arm } = participant;
     const { nonPersonalizedProbability: configProbability } = config;
     const nonPersonalizedProbability = participant.phase === 1
@@ -46,6 +48,7 @@ const createGetParticipantConfigRoute = ({ createLogger, dataSource }) => (req, 
         nonPersonalizedProbability,
         experimentConfigId: config.id,
         phase: participant.phase,
+        channelSource: channelSource.channelId,
     };
     log('Sending participant config', result);
     res.send({ kind: 'Success', value: result });

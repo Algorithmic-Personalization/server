@@ -26,10 +26,11 @@ Object.defineProperty(exports, "__esModule", { value: true });
 exports.HomeShownEvent = void 0;
 const event_1 = __importStar(require("./event"));
 class HomeShownEvent extends event_1.default {
-    constructor(defaultRecommendations, replacementSource) {
+    constructor(defaultRecommendations, replacementSource, shown) {
         super();
         this.defaultRecommendations = defaultRecommendations;
         this.replacementSource = replacementSource;
+        this.shown = shown;
         this.type = event_1.EventType.HOME_SHOWN;
     }
 }

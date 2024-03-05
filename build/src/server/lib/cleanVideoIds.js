@@ -27,9 +27,12 @@ const cleanVideoIds = (dataSource, log) => __awaiter(void 0, void 0, void 0, fun
         .find({
         where: {
             youtubeId: (0, typeorm_1.Like)('%&%'),
+            metadataAvailable: (0, typeorm_1.IsNull)(),
         },
     });
+    const problematicYtIds = [];
     problematicVideos.forEach(video => {
+        problematicYtIds.push(video.youtubeId);
         initialYouTubeIds.push(video.youtubeId);
         video.youtubeId = (0, exports.cleanId)(video.youtubeId);
     });
@@ -38,10 +41,26 @@ const cleanVideoIds = (dataSource, log) => __awaiter(void 0, void 0, void 0, fun
     const res = yield Promise.allSettled(promises);
     const count = res.filter(({ status }, i) => {
         const ok = status === 'fulfilled';
-        if (!ok) {
-            log('warning', 'failed to clean video id', problematicVideos[i].id);
+        if (ok) {
+            return true;
         }
-        return ok;
+        repo
+            .createQueryBuilder()
+            .update(video_1.default)
+            .set({
+            metadataAvailable: false,
+        })
+            .where({
+            id: problematicVideos[i].id,
+        })
+            .execute()
+            .then(() => {
+            log('info', 'set metadata_available to false for', `"${problematicYtIds[i]}"`, 'in order not to attempt scraping it again');
+        })
+            .catch(err => {
+            log('error', 'failed to set metadata_available to false for', `"${problematicYtIds[i]}"`, '(in order not to attempt scraping it again)', err);
+        });
+        return false;
     }).length;
     log('info', 'cleaned', count, 'video ids');
     log('info', 'failed to clean', res.length - count, 'video ids');

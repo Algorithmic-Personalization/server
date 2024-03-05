@@ -121,22 +121,29 @@ const storeRecommendationsShown = ({ log, dataSource, event, youTubeConfig, }) =
 });
 exports.storeRecommendationsShown = storeRecommendationsShown;
 const storeHomeShownVideos = ({ log, dataSource, event, youTubeConfig, }) => __awaiter(void 0, void 0, void 0, function* () {
+    var _a, _b;
     log('Storing home shown videos');
     const itemRepo = dataSource.getRepository(videoListItem_1.default);
     const store = storeItems(itemRepo, event.id);
     const videoRepo = dataSource.getRepository(video_1.default);
-    const [defaultHome, replacement] = yield Promise.all([
+    const storeVideoPromises = [
         (0, storeVideos_1.storeVideos)(videoRepo, (0, storeVideos_1.makeVideosFromRecommendations)(event.defaultRecommendations)),
         (0, storeVideos_1.storeVideos)(videoRepo, (0, storeVideos_1.makeVideosFromRecommendations)(event.replacementSource)),
-    ]);
+    ];
+    if (event.shown) {
+        storeVideoPromises.push((0, storeVideos_1.storeVideos)(videoRepo, (0, storeVideos_1.makeVideosFromRecommendations)(event.shown)));
+    }
+    const [defaultHome, replacement, shown] = yield Promise.all(storeVideoPromises);
     yield Promise.all([
         store(defaultHome, videoListItem_1.ListType.HOME_DEFAULT, defaultHome.map(() => videoListItem_1.VideoType.PERSONALIZED)),
         store(replacement, videoListItem_1.ListType.HOME_REPLACEMENT_SOURCE, replacement.map(() => videoListItem_1.VideoType.PERSONALIZED)),
+        shown && store(shown, videoListItem_1.ListType.HOME_SHOWN, shown.map(() => videoListItem_1.VideoType.PERSONALIZED)),
     ]);
     const youTubeApi = yield createYouTubeApi(youTubeConfig, log, dataSource);
     const youTubeIds = [...new Set([
             ...event.defaultRecommendations.map(v => v.videoId),
             ...event.replacementSource.map(v => v.videoId),
+            ...(_b = (_a = event.shown) === null || _a === void 0 ? void 0 : _a.map(v => v.videoId)) !== null && _b !== void 0 ? _b : [],
         ])].filter(x => x !== undefined);
     yield youTubeApi.getMetaFromVideoIds(youTubeIds).catch(err => {
         log('error', 'fetching video meta-data', err);
