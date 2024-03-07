@@ -158,6 +158,14 @@ const main = async () => {
 	const extraLogger = makeCreateLogger(join(root, logsDirName, 'extra.log'), false);
 	const log = createLogger('<server>');
 
+	process.on('unhandledRejection', err => {
+		log('error', 'unhandled rejection:', err);
+	});
+
+	process.on('uncaughtException', err => {
+		log('error', 'uncaught exception:', err);
+	});
+
 	const dockerComposeYaml = await readFile(join(root, 'docker-compose.yaml'), 'utf-8');
 	const dockerComposeConfig = parse(dockerComposeYaml) as unknown;
 
