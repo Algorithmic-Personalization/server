@@ -114,8 +114,14 @@ const main = () => __awaiter(void 0, void 0, void 0, function* () {
     const root = yield (0, util_1.findPackageJsonDir)(__dirname);
     const config = yield (0, loadConfigYamlRaw_1.loadConfigYamlRaw)();
     const createLogger = (0, logger_1.makeCreateDefaultLogger)((0, path_1.join)(root, exports.logsDirName, 'server.log'));
-    const createExtraLogger = (0, logger_1.makeCreateDefaultLogger)((0, path_1.join)(root, exports.logsDirName, 'extra.log'), false);
+    const extraLogger = (0, logger_1.makeCreateDefaultLogger)((0, path_1.join)(root, exports.logsDirName, 'extra.log'), false);
     const log = createLogger('<server>');
+    process.on('unhandledRejection', err => {
+        log('error', 'unhandled rejection:', err);
+    });
+    process.on('uncaughtException', err => {
+        log('error', 'uncaught exception:', err);
+    });
     const dockerComposeYaml = yield (0, promises_1.readFile)((0, path_1.join)(root, 'docker-compose.yaml'), 'utf-8');
     const dockerComposeConfig = (0, yaml_1.parse)(dockerComposeYaml);
     if (!config || typeof config !== 'object') {
@@ -171,11 +177,11 @@ const main = () => __awaiter(void 0, void 0, void 0, function* () {
         process.exit(1);
     }
     yield pgClient.end();
-    const ds = new typeorm_1.DataSource(Object.assign(Object.assign({ type: 'postgres' }, dbConfig), { username: dbConfig.user, synchronize: false, entities: entities_1.default, namingStrategy: new typeorm_naming_strategies_1.SnakeNamingStrategy(), logging: true, maxQueryExecutionTime: 200, logger: ((_a = process.env.DEBUG) === null || _a === void 0 ? void 0 : _a.includes('db'))
+    const dataSource = new typeorm_1.DataSource(Object.assign(Object.assign({ type: 'postgres' }, dbConfig), { username: dbConfig.user, synchronize: false, entities: entities_1.default, namingStrategy: new typeorm_naming_strategies_1.SnakeNamingStrategy(), logging: true, maxQueryExecutionTime: 200, logger: ((_a = process.env.DEBUG) === null || _a === void 0 ? void 0 : _a.includes('db'))
             ? undefined
             : new databaseLogger_1.default(createLogger('<database>'), slowQueries) }));
     try {
-        yield ds.initialize();
+        yield dataSource.initialize();
     }
     catch (err) {
         console.error('Error initializing data source:', err);
@@ -184,7 +190,7 @@ const main = () => __awaiter(void 0, void 0, void 0, function* () {
     log('Successfully initialized data source');
     try {
         yield (0, updateCounters_1.default)({
-            dataSource: ds,
+            dataSource,
             log: createLogger(0),
         });
     }
@@ -194,9 +200,9 @@ const main = () => __awaiter(void 0, void 0, void 0, function* () {
     }
     const youTubeConfig = (0, getYouTubeConfig_1.default)(config);
     // Not using cache in the scraping process because we're not gonna ask twice for the same video data
-    const ytApi = yield (0, youTubeApi_1.default)('without-cache')(youTubeConfig, createLogger('<yt-api>'), ds);
-    yield (0, cleanVideoIds_1.default)(ds, createLogger('<yt-cleaner>'));
-    (0, scrapeYouTube_1.default)(ds, createLogger('<yt-scraper>'), ytApi)
+    const ytApi = yield (0, youTubeApi_1.default)('without-cache')(youTubeConfig, createLogger('<yt-api>'), dataSource);
+    yield (0, cleanVideoIds_1.default)(dataSource, createLogger('<yt-cleaner>'));
+    (0, scrapeYouTube_1.default)(dataSource, createLogger('<yt-scraper>'), ytApi)
         .then(() => {
         log('success', 'done scraping youtube metadata');
     })
@@ -208,11 +214,11 @@ const main = () => __awaiter(void 0, void 0, void 0, function* () {
     const notifierServices = {
         mailer,
         log: createLogger('<notifier>'),
-        dataSource: ds,
+        dataSource,
     };
     const notifier = (0, externalNotifier_1.default)(config)(notifierServices);
     const routeContext = {
-        dataSource: ds,
+        dataSource,
         mailer,
         createLogger,
         tokenTools,
@@ -228,13 +234,17 @@ const main = () => __awaiter(void 0, void 0, void 0, function* () {
         log('error', 'an error occurred while sending a startup email', err);
     });
     const makeHandler = (0, routeCreation_1.makeRouteConnector)(routeContext);
-    const tokenRepo = ds.getRepository(token_1.default);
+    const tokenRepo = dataSource.getRepository(token_1.default);
     const authMiddleware = (0, authMiddleware_1.default)({
         tokenRepo,
         tokenTools,
         createLogger,
     });
-    const participantMw = (0, participantMiddleware_1.default)(createLogger, createExtraLogger);
+    const participantMw = (0, participantMiddleware_1.default)({
+        createLogger,
+        extraLogger,
+        dataSource,
+    });
     const app = (0, express_1.default)();
     const staticRouter = express_1.default.Router();
     if (env === 'development') {
@@ -254,7 +264,7 @@ const main = () => __awaiter(void 0, void 0, void 0, function* () {
     }));
     let requestId = 0;
     let nCurrentRequests = 0;
-    const logRepo = ds.getRepository(requestLog_1.default);
+    const logRepo = dataSource.getRepository(requestLog_1.default);
     app.use((req, res, next) => {
         const tStart = Date.now();
         ++requestId;
@@ -348,7 +358,7 @@ const main = () => __awaiter(void 0, void 0, void 0, function* () {
     app.get(clientRoutes_1.getParticipantConfig, participantMw, (0, participantConfig_1.default)(routeContext));
     app.post(clientRoutes_1.postEvent, participantMw, (0, postEvent_1.default)(routeContext));
     app.get('/api/ping', (_req, res) => __awaiter(void 0, void 0, void 0, function* () {
-        const participantsRepo = ds.getRepository(participant_1.default);
+        const participantsRepo = dataSource.getRepository(participant_1.default);
         const participantCount = yield participantsRepo.count();
         res.status(200).json({ n: participantCount });
     }));
