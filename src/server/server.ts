@@ -155,7 +155,7 @@ const main = async () => {
 	const config = await loadConfigYamlRaw();
 
 	const createLogger = makeCreateLogger(join(root, logsDirName, 'server.log'));
-	const createExtraLogger = makeCreateLogger(join(root, logsDirName, 'extra.log'), false);
+	const extraLogger = makeCreateLogger(join(root, logsDirName, 'extra.log'), false);
 	const log = createLogger('<server>');
 
 	const dockerComposeYaml = await readFile(join(root, 'docker-compose.yaml'), 'utf-8');
@@ -236,7 +236,7 @@ const main = async () => {
 
 	await pgClient.end();
 
-	const ds = new DataSource({
+	const dataSource = new DataSource({
 		type: 'postgres',
 		...dbConfig,
 		username: dbConfig.user,
@@ -251,7 +251,7 @@ const main = async () => {
 	});
 
 	try {
-		await ds.initialize();
+		await dataSource.initialize();
 	} catch (err) {
 		console.error('Error initializing data source:', err);
 		process.exit(1);
@@ -261,7 +261,7 @@ const main = async () => {
 
 	try {
 		await updateCounters({
-			dataSource: ds,
+			dataSource,
 			log: createLogger(0),
 		});
 	} catch (err) {
@@ -275,12 +275,12 @@ const main = async () => {
 	const ytApi = await makeCreateYouTubeApi('without-cache')(
 		youTubeConfig,
 		createLogger('<yt-api>'),
-		ds,
+		dataSource,
 	);
 
-	await cleanVideoIds(ds, createLogger('<yt-cleaner>'));
+	await cleanVideoIds(dataSource, createLogger('<yt-cleaner>'));
 
-	scrapeMissingYouTubeMetadata(ds, createLogger('<yt-scraper>'), ytApi)
+	scrapeMissingYouTubeMetadata(dataSource, createLogger('<yt-scraper>'), ytApi)
 		.then(() => {
 			log('success', 'done scraping youtube metadata');
 		})
@@ -294,13 +294,13 @@ const main = async () => {
 	const notifierServices: NotifierDependencies = {
 		mailer,
 		log: createLogger('<notifier>'),
-		dataSource: ds,
+		dataSource,
 	};
 
 	const notifier = createDefaultNotifier(config)(notifierServices);
 
 	const routeContext: RouteContext = {
-		dataSource: ds,
+		dataSource,
 		mailer,
 		createLogger,
 		tokenTools,
@@ -319,7 +319,7 @@ const main = async () => {
 
 	const makeHandler = makeExpressHandlerCreator(routeContext);
 
-	const tokenRepo = ds.getRepository(Token);
+	const tokenRepo = dataSource.getRepository(Token);
 
 	const authMiddleware = createAuthMiddleWare({
 		tokenRepo,
@@ -327,10 +327,11 @@ const main = async () => {
 		createLogger,
 	});
 
-	const participantMw = createParticipantMiddleware(
+	const participantMw = createParticipantMiddleware({
 		createLogger,
-		createExtraLogger,
-	);
+		extraLogger,
+		dataSource,
+	});
 
 	const app = express();
 
@@ -361,7 +362,7 @@ const main = async () => {
 	let requestId = 0;
 	let nCurrentRequests = 0;
 
-	const logRepo = ds.getRepository(RequestLog);
+	const logRepo = dataSource.getRepository(RequestLog);
 
 	app.use((req, res, next) => {
 		const tStart = Date.now();
@@ -479,7 +480,7 @@ const main = async () => {
 	app.post(postEvent, participantMw, createPostEventRoute(routeContext));
 
 	app.get('/api/ping', async (_req, res) => {
-		const participantsRepo = ds.getRepository(Participant);
+		const participantsRepo = dataSource.getRepository(Participant);
 		const participantCount = await participantsRepo.count();
 		res.status(200).json({n: participantCount});
 	});

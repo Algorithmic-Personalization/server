@@ -3,6 +3,8 @@
 import type express from 'express';
 
 import {type CreateLogger} from './logger';
+import Participant from '../models/participant';
+import {type DataSource} from 'typeorm';
 
 const pretty = (str: string): string => {
 	const bits: string[] = [];
@@ -29,10 +31,16 @@ const hash = (str: string): string => {
 	return pretty(hash.toString(16));
 };
 
-export const createParticipantMiddleWare = (createLogger: CreateLogger, extraLogger: CreateLogger) =>
-	(req: express.Request, res: express.Response, next: express.NextFunction) => {
-		const log = createLogger(req.requestId);
-		const extraLog = extraLogger(req.requestId);
+export type ParticipantMiddlewareConfig = {
+	createLogger: CreateLogger;
+	extraLogger: CreateLogger;
+	dataSource: DataSource;
+};
+
+export const createParticipantMiddleWare = (config: ParticipantMiddlewareConfig) =>
+	async (req: express.Request, res: express.Response, next: express.NextFunction) => {
+		const log = config.createLogger(req.requestId);
+		const extraLog = config.extraLogger(req.requestId);
 		const participantCode = req.headers['x-participant-code'];
 
 		log('checking participant code:', participantCode);
@@ -70,6 +78,15 @@ export const createParticipantMiddleWare = (createLogger: CreateLogger, extraLog
 
 		if (!participantCode) {
 			log('warning', 'participant code is empty');
+			bail();
+			return;
+		}
+
+		const participantRepo = config.dataSource.getRepository(Participant);
+		const codeExists = await participantRepo.exist({where: {code: participantCode}});
+
+		if (!codeExists) {
+			log('warning', 'participant code does not exist:', participantCode);
 			bail();
 			return;
 		}
