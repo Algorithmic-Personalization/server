@@ -507,7 +507,7 @@ You can also update the position of the participant in the list of channels that
 
 ```json
 {
-  "channelSourcePosition": 12 // the position of the channel in the list of channels that is affected to the participant
+  "posInChannelSource": 12 // the position of the channel in the list of channels that is affected to the participant
 }
 ```
 
