@@ -21,6 +21,32 @@ export const loadDatabaseConfig = async (
 	configType: ConfigType,
 	projectRoot?: string,
 ): Promise<DbConfig> => {
+	const getFromEnv = (): DbConfig | undefined => {
+		const get = (key: string): string => {
+			const value = process.env[key];
+
+			if (!value) {
+				throw new Error(`Missing env var: ${key}`);
+			}
+
+			return value;
+		};
+
+		try {
+			const res: DbConfig = {
+				host: get('DB_HOST'),
+				port: Number(get('DB_PORT')),
+				user: get('DB_USER'),
+				password: get('DB_PASSWORD'),
+				database: get('DB_NAME'),
+			};
+
+			return res;
+		} catch (error) {
+			return undefined;
+		}
+	};
+
 	const root = projectRoot ?? await findPackageJsonDir(__dirname);
 	const dockerComposePath = join(root, 'docker-compose.yaml');
 	const dockerComposeYaml = await readFile(dockerComposePath, 'utf-8');
