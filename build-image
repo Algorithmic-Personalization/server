@@ -1,0 +1,4 @@
+#!/bin/env bash
+
+echo "Building image..."
+time docker buildx build . --platform=linux/aarch64
