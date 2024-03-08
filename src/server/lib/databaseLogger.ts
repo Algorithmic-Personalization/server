@@ -23,11 +23,8 @@ export class DatabaseLogger extends AbstractLogger implements AbstractLogger {
 		this.slowQueryMeter?.mark();
 	}
 
-	protected writeLog(
-		_level: LogLevel,
-		_messageOrMessages: string | number | LogMessage | Array<string | number | LogMessage>,
-		_queryRunner?: QueryRunner | undefined): void {
-		// Do nothing
+	protected writeLog(level: LogLevel, message: string | number | LogMessage | Array<string | number | LogMessage>): void {
+		this.logger(level, message);
 	}
 }
 

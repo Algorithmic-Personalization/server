@@ -253,9 +253,14 @@ const main = async () => {
 		namingStrategy: new SnakeNamingStrategy(),
 		logging: true,
 		maxQueryExecutionTime: 200,
-		logger: process.env.DEBUG?.includes('db')
-			? undefined
-			: new DatabaseLogger(createLogger('<database>'), slowQueries),
+		logger: new DatabaseLogger(createLogger('<database>'), slowQueries),
+		extra: {
+			connectionTimeoutMillis: 2000,
+			// eslint-disable-next-line @typescript-eslint/naming-convention
+			query_timeout: 5000,
+			// eslint-disable-next-line @typescript-eslint/naming-convention
+			statement_timeout: 5000,
+		},
 	});
 
 	try {

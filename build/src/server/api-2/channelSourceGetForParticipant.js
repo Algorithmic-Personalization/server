@@ -152,7 +152,6 @@ const getParticipantChannelSourceDefinition = {
             const participant = yield qr.manager.getRepository(participant_1.default)
                 .createQueryBuilder('participant')
                 .useTransaction(true)
-                .setLock('pessimistic_write')
                 .where('participant.code = :code', { code: participantCode })
                 .getOne();
             if (!participant) {

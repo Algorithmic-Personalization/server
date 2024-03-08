@@ -226,7 +226,6 @@ const getParticipantChannelSourceDefinition: RouteDefinition<ParticipantChannelS
 			const participant = await qr.manager.getRepository(Participant)
 				.createQueryBuilder('participant')
 				.useTransaction(true)
-				.setLock('pessimistic_write')
 				.where('participant.code = :code', {code: participantCode})
 				.getOne();
 
