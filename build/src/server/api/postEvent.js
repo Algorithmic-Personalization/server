@@ -100,6 +100,7 @@ const shouldTriggerPhaseTransition = (setting, activities) => {
 };
 exports.shouldTriggerPhaseTransition = shouldTriggerPhaseTransition;
 const summarizeForDisplay = (event) => {
+    var _a, _b;
     const summary = Object.assign({}, event);
     if (event.type === event_1.EventType.RECOMMENDATIONS_SHOWN) {
         const e = event;
@@ -111,6 +112,7 @@ const summarizeForDisplay = (event) => {
         const e = event;
         summary.defaultRecommendations = e.defaultRecommendations.length;
         summary.replacementSource = e.replacementSource.length;
+        summary.shown = (_b = (_a = e.shown) === null || _a === void 0 ? void 0 : _a.length) !== null && _b !== void 0 ? _b : 0;
     }
     return summary;
 };

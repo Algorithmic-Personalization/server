@@ -114,6 +114,7 @@ const summarizeForDisplay = (event: Event): Record<string, unknown> => {
 		const e = event as HomeShownEvent;
 		summary.defaultRecommendations = e.defaultRecommendations.length;
 		summary.replacementSource = e.replacementSource.length;
+		summary.shown = e.shown?.length ?? 0;
 	}
 
 	return summary;
