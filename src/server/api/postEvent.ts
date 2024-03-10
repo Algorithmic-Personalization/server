@@ -23,7 +23,7 @@ import storeRecommendationsShown, {storeHomeShownVideos} from '../lib/storeRecom
 import AsyncLock from 'async-lock';
 import type HomeShownEvent from '../../common/models/homeShownEvent';
 
-import {advanceParticipantPositionInChannelSource} from '../api-2/channelSourceGetForParticipant';
+import {updateIfNeededAndGetParticipantChannelSource} from '../api-2/channelSourceGetForParticipant';
 
 const isLocalUuidAlreadyExistsError = (e: unknown): boolean =>
 	has('code')(e) && has('constraint')(e)
@@ -266,11 +266,36 @@ export const createPostEventRoute: RouteCreator = ({
 		}
 
 		if (event.type === EventType.HOME_INJECTED_TILE_CLICKED) {
-			advanceParticipantPositionInChannelSource(
-				dataSource.createQueryRunner(),
-				log,
-			)(participant).catch(e => {
-				log('error', 'failed to advance participant in channel source', e);
+			const postProcess = async () => {
+				const qr = dataSource.createQueryRunner();
+
+				try {
+					await qr.connect();
+					await qr.startTransaction('SERIALIZABLE');
+
+					const participant = await qr.manager.getRepository(Participant).findOneOrFail({
+						where: {
+							code: participantCode,
+						},
+					});
+
+					const update = updateIfNeededAndGetParticipantChannelSource(qr, log);
+					await update(participant, true);
+
+					await qr.commitTransaction();
+				} catch (err) {
+					if (qr.isTransactionActive) {
+						await qr.rollbackTransaction();
+					}
+
+					console.error('error', 'failed to (maybe-) advance participant in its channel source', err);
+				} finally {
+					await qr.release();
+				}
+			};
+
+			postProcess().catch(e => {
+				log('error', 'failed to update participant channel source', e);
 			});
 		}
 

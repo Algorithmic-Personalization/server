@@ -255,12 +255,24 @@ const main = async () => {
 		maxQueryExecutionTime: 200,
 		logger: new DatabaseLogger(createLogger('<database>'), slowQueries),
 		extra: {
+			/* D seems useless:
 			connectionTimeoutMillis: 2000,
 			// eslint-disable-next-line @typescript-eslint/naming-convention
 			query_timeout: 5000,
 			// eslint-disable-next-line @typescript-eslint/naming-convention
 			statement_timeout: 5000,
+	*/},
+		/* D seems useless:
+		poolErrorHandler(err) {
+			dataSource.initialize().then(() => {
+				log('info', 're-initialized data source');
+			}).catch(err => {
+				log('error', 're-initializing data source:', err);
+			});
+
+			log('error', 'pool error:', err);
 		},
+		*/
 	});
 
 	try {

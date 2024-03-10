@@ -199,10 +199,10 @@ const isPositionUpdateNeeded = (qr: QueryRunner, log: LogFunction) => async (par
 	return res;
 };
 
-export const updateAndGetParticipantChannelSource = (qr: QueryRunner, log: LogFunction) => async (participant: Participant): Promise<ParticipantChannelSource> => {
+export const updateIfNeededAndGetParticipantChannelSource = (qr: QueryRunner, log: LogFunction) => async (participant: Participant, force = false): Promise<ParticipantChannelSource> => {
 	log('info', 'updating (if needed) and getting participant channel source');
 
-	const needsUpdate = await isPositionUpdateNeeded(qr, log)(participant);
+	const needsUpdate = force || await isPositionUpdateNeeded(qr, log)(participant);
 
 	log('info', 'needs update', needsUpdate);
 
@@ -235,8 +235,9 @@ const getParticipantChannelSourceDefinition: RouteDefinition<ParticipantChannelS
 
 		const qr = dataSource.createQueryRunner();
 
-		const posNeedsUpdate = isPositionUpdateNeeded(qr, log);
+		const update = updateIfNeededAndGetParticipantChannelSource(qr, log);
 		const getChannelSource = getParticipantChannelSource(qr, log);
+		const posNeedsUpdate = isPositionUpdateNeeded(qr, log);
 
 		if (force) {
 			const invalidChannel = await getChannelSource(participantCode);
@@ -254,28 +255,17 @@ const getParticipantChannelSourceDefinition: RouteDefinition<ParticipantChannelS
 
 		try {
 			await qr.connect();
-			await qr.startTransaction();
+			await qr.startTransaction('SERIALIZABLE');
 
-			const participant = await qr.manager.getRepository(Participant)
-				.createQueryBuilder('participant')
-				.useTransaction(true)
-				.where('participant.code = :code', {code: participantCode})
-				.getOne();
+			const participant = await qr.manager.getRepository(Participant).findOneOrFail({
+				where: {
+					code: participantCode,
+				},
+			});
 
-			if (!participant) {
-				throw new Error('Participant not found');
-			}
+			const res = await update(participant, force);
 
-			const updateNeeded = force || await posNeedsUpdate(participant);
-
-			if (updateNeeded) {
-				const source = await advanceParticipantPositionInChannelSource(qr, log)(participant);
-				await qr.commitTransaction();
-				return source;
-			}
-
-			const res = await getChannelSource(participant);
-			log('success', 'replying to client with', res);
+			await qr.commitTransaction();
 
 			return res;
 		} catch (err) {
