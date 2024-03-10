@@ -6,6 +6,7 @@ import {type ParticipantChannelSource} from '../../common/types/participantChann
 import {type RouteDefinition} from '../lib/routeCreation';
 
 import ChannelSourceItem from '../models/channelSourceItem';
+import ChannelSource from '../models/channelSource';
 import UnusableChannel from '../models/unusableChannel';
 import Participant from '../models/participant';
 import {type LogFunction} from '../lib/logger';
@@ -96,12 +97,30 @@ export const getParticipantChannelSource = (qr: QueryRunner, log: LogFunction) =
 		return participant;
 	};
 
-	const {channelSourceId, posInChannelSource} = await getParticipant();
+	const {channelSourceId: maybeSourceId, posInChannelSource} = await getParticipant();
+
+	const getChannelSourceId = async () => {
+		if (maybeSourceId) {
+			return maybeSourceId;
+		}
+
+		const defaultSource = await qr.manager.getRepository(ChannelSource).findOne({
+			where: {
+				isDefault: true,
+			},
+		});
+
+		if (defaultSource) {
+			return defaultSource.id;
+		}
+
+		throw new Error('No default channel source found');
+	};
 
 	log(
 		'info',
 		'getting participant channel from source',
-		channelSourceId ?? 'default',
+		maybeSourceId ?? 'default',
 		'and position',
 		posInChannelSource,
 	);
@@ -110,7 +129,7 @@ export const getParticipantChannelSource = (qr: QueryRunner, log: LogFunction) =
 
 	const item = await repo.findOne({
 		where: {
-			channelSourceId,
+			channelSourceId: await getChannelSourceId(),
 			position: posInChannelSource,
 		},
 	});
