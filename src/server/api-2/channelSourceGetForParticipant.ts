@@ -199,6 +199,20 @@ const isPositionUpdateNeeded = (qr: QueryRunner, log: LogFunction) => async (par
 	return res;
 };
 
+export const updateAndGetParticipantChannelSource = (qr: QueryRunner, log: LogFunction) => async (participant: Participant): Promise<ParticipantChannelSource> => {
+	log('info', 'updating (if needed) and getting participant channel source');
+
+	const needsUpdate = await isPositionUpdateNeeded(qr, log)(participant);
+
+	log('info', 'needs update', needsUpdate);
+
+	if (needsUpdate) {
+		return advanceParticipantPositionInChannelSource(qr, log)(participant);
+	}
+
+	return getParticipantChannelSource(qr, log)(participant);
+};
+
 const getParticipantChannelSourceDefinition: RouteDefinition<ParticipantChannelSource> = {
 	verb: 'get',
 	path: getParticipantChannelSourcePath,
