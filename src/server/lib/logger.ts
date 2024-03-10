@@ -77,7 +77,9 @@ export const makeCreateDefaultLogger = (filePath: string, useStdOut = true): Cre
 	const checkLogSizeAndCompress = async () => lock.acquire('log', doCheckLogSizeAndCompress);
 
 	setInterval(checkLogSizeAndCompress, logSizeCheckInterval);
-	void checkLogSizeAndCompress();
+	checkLogSizeAndCompress().catch(e => {
+		console.error('Error checking log size and compressing', e);
+	});
 
 	return (...args: any[]) => {
 		const id = typeof requestIdOrId === 'number' ? `request #${requestIdOrId}` : requestIdOrId;

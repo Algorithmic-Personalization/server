@@ -192,7 +192,9 @@ export const createPostEventRoute: RouteCreator = ({
 	});
 
 	if (event.type === EventType.PAGE_VIEW) {
-		void handleInstall(participant, event);
+		handleInstall(participant, event).catch(e => {
+			log('error', 'failed to handle install event', e);
+		});
 	}
 
 	event.arm = participant.arm;
@@ -226,13 +228,15 @@ export const createPostEventRoute: RouteCreator = ({
 		log('event saved', summarizeForDisplay(e));
 
 		// Update the things the response doesn't depend upon in parallel
-		void lock.acquire(`participant-${participant.id}`, async () => {
+		lock.acquire(`participant-${participant.id}`, async () => {
 			try {
 				await updateActivity(participant, e);
 				await updatePhase(participant, e);
 			} catch (e) {
 				log('error', 'activity update failed', e);
 			}
+		}).catch(e => {
+			log('error', 'failed to acquire participant lock', e);
 		});
 
 		if (event.type === EventType.RECOMMENDATIONS_SHOWN) {
@@ -262,7 +266,7 @@ export const createPostEventRoute: RouteCreator = ({
 		}
 
 		if (event.type === EventType.HOME_INJECTED_TILE_CLICKED) {
-			void advanceParticipantPositionInChannelSource(
+			advanceParticipantPositionInChannelSource(
 				dataSource.createQueryRunner(),
 				log,
 			)(participant).catch(e => {

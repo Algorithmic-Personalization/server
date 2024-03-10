@@ -212,7 +212,9 @@ export const createUpdateActivity = ({dataSource, notifier, log}: {
 				log,
 			});
 
-			void activateExtension(event, participant);
+			activateExtension(event, participant).catch(e => {
+				log('error', 'failed to activate extension [if needed]', e);
+			});
 		}
 
 		await qr.commitTransaction();

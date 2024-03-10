@@ -342,7 +342,7 @@ export const makeCreateYouTubeApi = (cache: 'with-cache' | 'without-cache' = 'wi
 					const latency = new YouTubeRequestLatency();
 					latency.latencyMs = end - start;
 					latency.request = `ids: ${uniqueCleanedIds.join(',')}`;
-					void latencyRepo.save(latency).catch(err => {
+					latencyRepo.save(latency).catch(err => {
 						log('warning', 'could not save yt request latency', err);
 					});
 					stats.requestTime = latency.latencyMs;
