@@ -170,7 +170,9 @@ const createPostEventRoute = ({ createLogger, dataSource, youTubeConfig, notifie
         log,
     });
     if (event.type === event_1.EventType.PAGE_VIEW) {
-        void handleInstall(participant, event);
+        handleInstall(participant, event).catch(e => {
+            log('error', 'failed to handle install event', e);
+        });
     }
     event.arm = participant.arm;
     event.phase = participant.phase;
@@ -196,7 +198,7 @@ const createPostEventRoute = ({ createLogger, dataSource, youTubeConfig, notifie
         const e = yield eventRepo.save(event);
         log('event saved', summarizeForDisplay(e));
         // Update the things the response doesn't depend upon in parallel
-        void lock.acquire(`participant-${participant.id}`, () => __awaiter(void 0, void 0, void 0, function* () {
+        lock.acquire(`participant-${participant.id}`, () => __awaiter(void 0, void 0, void 0, function* () {
             try {
                 yield updateActivity(participant, e);
                 yield updatePhase(participant, e);
@@ -204,7 +206,9 @@ const createPostEventRoute = ({ createLogger, dataSource, youTubeConfig, notifie
             catch (e) {
                 log('error', 'activity update failed', e);
             }
-        }));
+        })).catch(e => {
+            log('error', 'failed to acquire participant lock', e);
+        });
         if (event.type === event_1.EventType.RECOMMENDATIONS_SHOWN) {
             (0, storeRecommendationsShown_1.default)({
                 dataSource,
@@ -231,8 +235,32 @@ const createPostEventRoute = ({ createLogger, dataSource, youTubeConfig, notifie
             }));
         }
         if (event.type === event_1.EventType.HOME_INJECTED_TILE_CLICKED) {
-            void (0, channelSourceGetForParticipant_1.advanceParticipantPositionInChannelSource)(dataSource.createQueryRunner(), log)(participant).catch(e => {
-                log('error', 'failed to advance participant in channel source', e);
+            const postProcess = () => __awaiter(void 0, void 0, void 0, function* () {
+                const qr = dataSource.createQueryRunner();
+                try {
+                    yield qr.connect();
+                    yield qr.startTransaction();
+                    const participant = yield qr.manager.getRepository(participant_1.default).findOneOrFail({
+                        where: {
+                            code: participantCode,
+                        },
+                    });
+                    const update = (0, channelSourceGetForParticipant_1.updateIfNeededAndGetParticipantChannelSource)(qr, log);
+                    yield update(participant, true);
+                    yield qr.commitTransaction();
+                }
+                catch (err) {
+                    if (qr.isTransactionActive) {
+                        yield qr.rollbackTransaction();
+                    }
+                    console.error('error', 'failed to (maybe-) advance participant in its channel source', err);
+                }
+                finally {
+                    yield qr.release();
+                }
+            });
+            postProcess().catch(e => {
+                log('error', 'failed to update participant channel source', e);
             });
         }
         res.send({ kind: 'Success', value: e });

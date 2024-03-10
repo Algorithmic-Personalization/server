@@ -271,7 +271,7 @@ export const createPostEventRoute: RouteCreator = ({
 
 				try {
 					await qr.connect();
-					await qr.startTransaction('SERIALIZABLE');
+					await qr.startTransaction();
 
 					const participant = await qr.manager.getRepository(Participant).findOneOrFail({
 						where: {

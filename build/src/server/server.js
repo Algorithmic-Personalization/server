@@ -177,12 +177,13 @@ const main = () => __awaiter(void 0, void 0, void 0, function* () {
     }
     yield pgClient.end();
     const dataSource = new typeorm_1.DataSource(Object.assign(Object.assign({ type: 'postgres' }, dbConfig), { username: dbConfig.user, synchronize: false, entities: entities_1.default, namingStrategy: new typeorm_naming_strategies_1.SnakeNamingStrategy(), logging: true, maxQueryExecutionTime: 200, logger: new databaseLogger_1.default(createLogger('<database>'), slowQueries), extra: {
-            connectionTimeoutMillis: 2000,
-            // eslint-disable-next-line @typescript-eslint/naming-convention
-            query_timeout: 5000,
-            // eslint-disable-next-line @typescript-eslint/naming-convention
-            statement_timeout: 5000,
-        } }));
+        /* D seems useless:
+        connectionTimeoutMillis: 2000,
+        // eslint-disable-next-line @typescript-eslint/naming-convention
+        query_timeout: 5000,
+        // eslint-disable-next-line @typescript-eslint/naming-convention
+        statement_timeout: 5000,
+*/ } }));
     try {
         yield dataSource.initialize();
     }

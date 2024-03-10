@@ -255,7 +255,7 @@ const getParticipantChannelSourceDefinition: RouteDefinition<ParticipantChannelS
 
 		try {
 			await qr.connect();
-			await qr.startTransaction('SERIALIZABLE');
+			await qr.startTransaction();
 
 			const participant = await qr.manager.getRepository(Participant).findOneOrFail({
 				where: {

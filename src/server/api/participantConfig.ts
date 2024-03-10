@@ -13,7 +13,7 @@ export const createGetParticipantConfigRoute: RouteCreator = ({createLogger, dat
 
 	try {
 		await qr.connect();
-		await qr.startTransaction('SERIALIZABLE');
+		await qr.startTransaction();
 
 		const participantRepo = qr.manager.getRepository(Participant);
 		const configRepo = qr.manager.getRepository(ExperimentConfig);

@@ -12,9 +12,10 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
     return (mod && mod.__esModule) ? mod : { "default": mod };
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.getParticipantChannelSource = exports.advanceParticipantPositionInChannelSource = void 0;
+exports.updateIfNeededAndGetParticipantChannelSource = exports.getParticipantChannelSource = exports.advanceParticipantPositionInChannelSource = void 0;
 const clientRoutes_1 = require("../../common/clientRoutes");
 const channelSourceItem_1 = __importDefault(require("../models/channelSourceItem"));
+const channelSource_1 = __importDefault(require("../models/channelSource"));
 const unusableChannel_1 = __importDefault(require("../models/unusableChannel"));
 const participant_1 = __importDefault(require("../models/participant"));
 const channelRotationSpeedGet_1 = require("./channelRotationSpeedGet");
@@ -64,12 +65,26 @@ const getParticipantChannelSource = (qr, log) => (participant) => __awaiter(void
         }
         return participant;
     });
-    const { channelSourceId, posInChannelSource } = yield getParticipant();
-    log('info', 'getting participant channel from source', channelSourceId !== null && channelSourceId !== void 0 ? channelSourceId : 'default', 'and position', posInChannelSource);
+    const { channelSourceId: maybeSourceId, posInChannelSource } = yield getParticipant();
+    const getChannelSourceId = () => __awaiter(void 0, void 0, void 0, function* () {
+        if (maybeSourceId) {
+            return maybeSourceId;
+        }
+        const defaultSource = yield qr.manager.getRepository(channelSource_1.default).findOne({
+            where: {
+                isDefault: true,
+            },
+        });
+        if (defaultSource) {
+            return defaultSource.id;
+        }
+        throw new Error('No default channel source found');
+    });
+    log('info', 'getting participant channel from source', maybeSourceId !== null && maybeSourceId !== void 0 ? maybeSourceId : 'default', 'and position', posInChannelSource);
     const repo = qr.manager.getRepository(channelSourceItem_1.default);
     const item = yield repo.findOne({
         where: {
-            channelSourceId,
+            channelSourceId: yield getChannelSourceId(),
             position: posInChannelSource,
         },
     });
@@ -116,6 +131,16 @@ const isPositionUpdateNeeded = (qr, log) => (participant) => __awaiter(void 0, v
     }
     return res;
 });
+const updateIfNeededAndGetParticipantChannelSource = (qr, log) => (participant, force = false) => __awaiter(void 0, void 0, void 0, function* () {
+    log('info', 'updating (if needed) and getting participant channel source');
+    const needsUpdate = force || (yield isPositionUpdateNeeded(qr, log)(participant));
+    log('info', 'needs update', needsUpdate);
+    if (needsUpdate) {
+        return (0, exports.advanceParticipantPositionInChannelSource)(qr, log)(participant);
+    }
+    return (0, exports.getParticipantChannelSource)(qr, log)(participant);
+});
+exports.updateIfNeededAndGetParticipantChannelSource = updateIfNeededAndGetParticipantChannelSource;
 const getParticipantChannelSourceDefinition = {
     verb: 'get',
     path: clientRoutes_1.getParticipantChannelSource,
@@ -132,8 +157,9 @@ const getParticipantChannelSourceDefinition = {
         }
         log('info', 'participant code', participantCode);
         const qr = dataSource.createQueryRunner();
-        const posNeedsUpdate = isPositionUpdateNeeded(qr, log);
+        const update = (0, exports.updateIfNeededAndGetParticipantChannelSource)(qr, log);
         const getChannelSource = (0, exports.getParticipantChannelSource)(qr, log);
+        const posNeedsUpdate = isPositionUpdateNeeded(qr, log);
         if (force) {
             const invalidChannel = yield getChannelSource(participantCode);
             dataSource.getRepository(unusableChannel_1.default).createQueryBuilder().insert().values({
@@ -149,22 +175,13 @@ const getParticipantChannelSourceDefinition = {
         try {
             yield qr.connect();
             yield qr.startTransaction();
-            const participant = yield qr.manager.getRepository(participant_1.default)
-                .createQueryBuilder('participant')
-                .useTransaction(true)
-                .where('participant.code = :code', { code: participantCode })
-                .getOne();
-            if (!participant) {
-                throw new Error('Participant not found');
-            }
-            const updateNeeded = force || (yield posNeedsUpdate(participant));
-            if (updateNeeded) {
-                const source = yield (0, exports.advanceParticipantPositionInChannelSource)(qr, log)(participant);
-                yield qr.commitTransaction();
-                return source;
-            }
-            const res = yield getChannelSource(participant);
-            log('success', 'replying to client with', res);
+            const participant = yield qr.manager.getRepository(participant_1.default).findOneOrFail({
+                where: {
+                    code: participantCode,
+                },
+            });
+            const res = yield update(participant, force);
+            yield qr.commitTransaction();
             return res;
         }
         catch (err) {

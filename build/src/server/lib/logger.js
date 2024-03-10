@@ -71,7 +71,9 @@ const makeCreateDefaultLogger = (filePath, useStdOut = true) => (requestIdOrId) 
     });
     const checkLogSizeAndCompress = () => __awaiter(void 0, void 0, void 0, function* () { return lock.acquire('log', doCheckLogSizeAndCompress); });
     setInterval(checkLogSizeAndCompress, logSizeCheckInterval);
-    void checkLogSizeAndCompress();
+    checkLogSizeAndCompress().catch(e => {
+        console.error('Error checking log size and compressing', e);
+    });
     return (...args) => {
         const id = typeof requestIdOrId === 'number' ? `request #${requestIdOrId}` : requestIdOrId;
         const parts = [`\x1b[94m[${id} at ${new Date().toISOString()}]\x1b[0m`, ...args.map((arg, i) => {
