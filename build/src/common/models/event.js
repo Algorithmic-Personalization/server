@@ -56,6 +56,7 @@ let Event = class Event extends model_1.default {
         this.localUuid = (0, util_1.uuidv4)();
         this.phase = 0;
         this.localZeroHour = localZeroHour(this.createdAt);
+        this.extra = [];
     }
 };
 __decorate([
@@ -117,6 +118,12 @@ __decorate([
     (0, class_validator_1.IsOptional)(),
     __metadata("design:type", Date)
 ], Event.prototype, "localZeroHour", void 0);
+__decorate([
+    (0, typeorm_1.Column)('simple-json'),
+    (0, class_validator_1.IsString)({ each: true }),
+    (0, class_validator_1.IsOptional)(),
+    __metadata("design:type", Array)
+], Event.prototype, "extra", void 0);
 Event = __decorate([
     (0, typeorm_1.Entity)()
 ], Event);
