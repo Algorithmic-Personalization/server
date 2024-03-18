@@ -119,7 +119,6 @@ __decorate([
 ], Event.prototype, "localZeroHour", void 0);
 __decorate([
     (0, typeorm_1.Column)('simple-json'),
-    (0, class_validator_1.IsString)({ each: true }),
     (0, class_validator_1.IsOptional)(),
     __metadata("design:type", Object)
 ], Event.prototype, "extra", void 0);
