@@ -106,7 +106,6 @@ const summarizeForDisplay = (event) => {
         const e = event;
         summary.nonPersonalized = e.nonPersonalized.length;
         summary.personalized = e.personalized.length;
-        summary.shown = e.shown.length;
     }
     if (event.type === event_1.EventType.HOME_SHOWN) {
         const e = event;

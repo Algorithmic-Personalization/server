@@ -68,17 +68,15 @@ const storeRecommendationsShown = ({ log, dataSource, event, youTubeConfig, }) =
     log('Storing recommendations shown event meta-data');
     const youTubeApi = yield createYouTubeApi(youTubeConfig, log, dataSource);
     const videoRepo = dataSource.getRepository(video_1.default);
-    const [nonPersonalized, personalized, shown] = yield Promise.all([
+    const [nonPersonalized, personalized] = yield Promise.all([
         (0, storeVideos_1.storeVideos)(videoRepo, (0, storeVideos_1.makeVideosFromRecommendations)(event.nonPersonalized)),
         (0, storeVideos_1.storeVideos)(videoRepo, (0, storeVideos_1.makeVideosFromRecommendations)(event.personalized)),
-        (0, storeVideos_1.storeVideos)(videoRepo, (0, storeVideos_1.makeVideosFromRecommendations)(event.shown)),
     ]);
     const urlId = extractVideoIdFromUrl(event.url);
     log('Retrieving meta-data information for videos recommended with', urlId !== null && urlId !== void 0 ? urlId : '<no url>...');
     const youTubeIds = [...new Set([
             ...event.nonPersonalized.map(v => v.videoId),
             ...event.personalized.map(v => v.videoId),
-            ...event.shown.map(v => v.videoId),
             urlId,
         ])].filter(x => x !== undefined);
     try {
@@ -93,25 +91,12 @@ const storeRecommendationsShown = ({ log, dataSource, event, youTubeConfig, }) =
     }
     const nonPersonalizedTypes = nonPersonalized.map(() => videoListItem_1.VideoType.NON_PERSONALIZED);
     const personalizedTypes = personalized.map(() => videoListItem_1.VideoType.PERSONALIZED);
-    const shownTypes = event.shown.map(r => {
-        if (r.personalization === 'non-personalized') {
-            return videoListItem_1.VideoType.NON_PERSONALIZED;
-        }
-        if (r.personalization === 'personalized') {
-            return videoListItem_1.VideoType.PERSONALIZED;
-        }
-        if (r.personalization === 'mixed') {
-            return videoListItem_1.VideoType.MIXED;
-        }
-        throw new Error(`Invalid personalization type: ${r.personalization}`);
-    });
     const itemRepo = dataSource.getRepository(videoListItem_1.default);
     const store = storeItems(itemRepo, event.id);
     try {
         yield Promise.all([
             store(nonPersonalized, videoListItem_1.ListType.NON_PERSONALIZED, nonPersonalizedTypes),
             store(personalized, videoListItem_1.ListType.PERSONALIZED, personalizedTypes),
-            store(shown, videoListItem_1.ListType.SHOWN, shownTypes),
         ]);
         log('Stored recommendations shown event meta-data');
     }

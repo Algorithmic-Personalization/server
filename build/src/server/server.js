@@ -279,9 +279,10 @@ const main = () => __awaiter(void 0, void 0, void 0, function* () {
         req.requestId = requestId;
         const { referer } = req.headers;
         log(req.method, req.url, { referer });
-        req.on('close', () => __awaiter(void 0, void 0, void 0, function* () {
+        res.on('finish', () => __awaiter(void 0, void 0, void 0, function* () {
+            var _a;
             const tElapsed = Date.now() - tStart;
-            log(`\x1b[94m{request #${requestId} ended in ${tElapsed}ms}\x1b[0m`);
+            log(`\x1b[94m{request #${requestId} response sent in ${tElapsed}ms}\x1b[0m`);
             currentRequests.dec();
             --nCurrentRequests;
             const logEntry = new requestLog_1.default();
@@ -310,7 +311,7 @@ const main = () => __awaiter(void 0, void 0, void 0, function* () {
                 }
             }
             catch (err) {
-                log('error', 'saving request log:', err);
+                log('error', 'saving request log:', (_a = err.message) !== null && _a !== void 0 ? _a : 'unspecified');
             }
         }));
         next();

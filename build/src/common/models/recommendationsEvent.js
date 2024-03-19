@@ -26,11 +26,10 @@ Object.defineProperty(exports, "__esModule", { value: true });
 exports.RecommendationsEvent = void 0;
 const event_1 = __importStar(require("./event"));
 class RecommendationsEvent extends event_1.default {
-    constructor(nonPersonalized, personalized, shown) {
+    constructor(nonPersonalized, personalized) {
         super();
         this.nonPersonalized = nonPersonalized;
         this.personalized = personalized;
-        this.shown = shown;
         this.type = event_1.EventType.RECOMMENDATIONS_SHOWN;
     }
 }

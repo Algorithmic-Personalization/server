@@ -279,7 +279,7 @@ const makeCreateYouTubeApi = (cache = 'with-cache') => {
                     if (dataSource && persistMetas) {
                         yield persistMetas(vmdToStore);
                         const missingMeta = idsToFetchFromApi.filter(id => !data.has(id));
-                        missingMeta.map((youtubeId) => __awaiter(this, void 0, void 0, function* () {
+                        missingMeta.forEach((youtubeId) => __awaiter(this, void 0, void 0, function* () {
                             const available = yield (0, exports.isVideoAvailable)(youtubeId);
                             if (!available) {
                                 log('info', 'video', youtubeId, 'is not available');
