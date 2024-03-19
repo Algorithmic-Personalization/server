@@ -403,10 +403,10 @@ const main = async () => {
 
 		log(req.method, req.url, {referer});
 
-		req.on('close', async () => {
+		res.on('finish', async () => {
 			const tElapsed = Date.now() - tStart;
 
-			log(`\x1b[94m{request #${requestId} ended in ${tElapsed}ms}\x1b[0m`);
+			log(`\x1b[94m{request #${requestId} response sent in ${tElapsed}ms}\x1b[0m`);
 
 			currentRequests.dec();
 			--nCurrentRequests;
@@ -440,7 +440,7 @@ const main = async () => {
 					});
 				}
 			} catch (err) {
-				log('error', 'saving request log:', err);
+				log('error', 'saving request log:', (err as Error).message ?? 'unspecified');
 			}
 		});
 
