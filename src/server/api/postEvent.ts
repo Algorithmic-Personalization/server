@@ -107,7 +107,6 @@ const summarizeForDisplay = (event: Event): Record<string, unknown> => {
 		const e = event as RecommendationsEvent;
 		summary.nonPersonalized = e.nonPersonalized.length;
 		summary.personalized = e.personalized.length;
-		summary.shown = e.shown.length;
 	}
 
 	if (event.type === EventType.HOME_SHOWN) {

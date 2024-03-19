@@ -69,10 +69,9 @@ export const storeRecommendationsShown = async ({
 
 	const videoRepo = dataSource.getRepository(Video);
 
-	const [nonPersonalized, personalized, shown] = await Promise.all([
+	const [nonPersonalized, personalized] = await Promise.all([
 		storeVideos(videoRepo, makeVideosFromRecommendations(event.nonPersonalized)),
 		storeVideos(videoRepo, makeVideosFromRecommendations(event.personalized)),
-		storeVideos(videoRepo, makeVideosFromRecommendations(event.shown)),
 	]);
 
 	const urlId = extractVideoIdFromUrl(event.url);
@@ -81,7 +80,6 @@ export const storeRecommendationsShown = async ({
 	const youTubeIds = [...new Set([
 		...event.nonPersonalized.map(v => v.videoId),
 		...event.personalized.map(v => v.videoId),
-		...event.shown.map(v => v.videoId),
 		urlId,
 	])].filter(x => x !== undefined) as string[];
 
@@ -103,21 +101,6 @@ export const storeRecommendationsShown = async ({
 
 	const nonPersonalizedTypes = nonPersonalized.map(() => VideoType.NON_PERSONALIZED);
 	const personalizedTypes = personalized.map(() => VideoType.PERSONALIZED);
-	const shownTypes = event.shown.map(r => {
-		if (r.personalization === 'non-personalized') {
-			return VideoType.NON_PERSONALIZED;
-		}
-
-		if (r.personalization === 'personalized') {
-			return VideoType.PERSONALIZED;
-		}
-
-		if (r.personalization === 'mixed') {
-			return VideoType.MIXED;
-		}
-
-		throw new Error(`Invalid personalization type: ${r.personalization}`);
-	});
 
 	const itemRepo = dataSource.getRepository(VideoListItem);
 
@@ -127,7 +110,6 @@ export const storeRecommendationsShown = async ({
 		await Promise.all([
 			store(nonPersonalized, ListType.NON_PERSONALIZED, nonPersonalizedTypes),
 			store(personalized, ListType.PERSONALIZED, personalizedTypes),
-			store(shown, ListType.SHOWN, shownTypes),
 		]);
 		log('Stored recommendations shown event meta-data');
 	} catch (err) {
