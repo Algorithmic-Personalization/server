@@ -4,6 +4,7 @@ import Participant from '../models/participant';
 import ExperimentConfig, {type ParticipantConfig} from '../../common/models/experimentConfig';
 
 import {updateIfNeededAndGetParticipantChannelSource} from '../api-2/channelSourceGetForParticipant';
+import {ExperimentArm} from '../../common/models/event';
 
 export const createGetParticipantConfigRoute: RouteCreator = ({createLogger, dataSource}) => async (req, res) => {
 	const log = createLogger(req.requestId);
@@ -38,11 +39,15 @@ export const createGetParticipantConfigRoute: RouteCreator = ({createLogger, dat
 			return;
 		}
 
-		const channelSource = await updateIfNeededAndGetParticipantChannelSource(
-			qr, log,
-		)(participant);
+		const channelSource = participant.arm === ExperimentArm.TREATMENT
+			? await updateIfNeededAndGetParticipantChannelSource(
+				qr, log,
+			)(participant)
+			: {channelId: undefined, pos: undefined};
 
-		await qr.commitTransaction();
+		if (qr.isTransactionActive) {
+			await qr.commitTransaction();
+		}
 
 		const {arm} = participant;
 		const {nonPersonalizedProbability: configProbability} = config;
