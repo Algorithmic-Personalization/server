@@ -101,6 +101,7 @@ import addVouchersDefinition from './api-2/voucherCreate';
 import ResetPasswordDefinition from './api-2/passwordSendLink';
 import resetPassword from './api-2/passwordReset';
 import getChannelSourceForParticipant from './api-2/channelSourceGetForParticipant';
+import createSanityCheckDefinition from './api-2/sanityCheck';
 
 import getYouTubeConfig from './lib/config-loader/getYouTubeConfig';
 import makeCreateYouTubeApi from './lib/youTubeApi';
@@ -465,6 +466,7 @@ const main = async () => {
 
 	defineUnprotectedRoute(ResetPasswordDefinition);
 	defineUnprotectedRoute(resetPassword);
+	defineUnprotectedRoute(createSanityCheckDefinition);
 
 	defineAdminRoute(createParticipantDefinition);
 	defineAdminRoute(createGetActivityReportDefinition);
