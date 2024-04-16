@@ -43,6 +43,7 @@ const storeVideos_1 = require("./video/storeVideos");
 const youTubeApi_1 = __importDefault(require("./youTubeApi"));
 const storeItems = (repo, eventId) => (videoIds, listType, videoTypes) => __awaiter(void 0, void 0, void 0, function* () {
     const videoListItems = [];
+    console.log({ listType, videoIds, videoTypes });
     for (let i = 0; i < videoIds.length; i++) {
         const item = new videoListItem_1.default();
         item.videoId = videoIds[i];
@@ -51,6 +52,7 @@ const storeItems = (repo, eventId) => (videoIds, listType, videoTypes) => __awai
         item.position = i;
         item.eventId = eventId;
         videoListItems.push(item);
+        console.log({ item });
     }
     yield Promise.all(videoListItems.map(util_1.validateNew));
     yield repo.save(videoListItems);

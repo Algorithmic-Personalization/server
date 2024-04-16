@@ -61,7 +61,7 @@ const storeVideos = (repo, videos) => __awaiter(void 0, void 0, void 0, function
         throw new Error(`Validation errors: ${pairs.map(({ v, e }) => `(video ${v.youtubeId}: ${e.join(', ')})`).join(', ')}.`);
     }
     const sanitized = videos.map(v => (Object.assign(Object.assign({}, v), { id: 0 })));
-    const ids = [];
+    const ytIdMap = new Map();
     const insertPromises = [];
     const readPromises = [];
     for (const video of sanitized) {
@@ -70,21 +70,28 @@ const storeVideos = (repo, videos) => __awaiter(void 0, void 0, void 0, function
     const res = yield Promise.allSettled(insertPromises);
     res.forEach((r, i) => {
         if (r.status === 'fulfilled') {
-            ids.push(r.value.id);
+            ytIdMap.set(sanitized[i].youtubeId, r.value.id);
         }
         else {
             readPromises.push(repo.findOneBy({
                 youtubeId: sanitized[i].youtubeId,
             }).then(v => {
                 if (v) {
+                    ytIdMap.set(sanitized[i].youtubeId, v.id);
                     return v;
                 }
                 throw new Error(`Could not find video with youtubeId ${sanitized[i].youtubeId}`);
             }));
         }
     });
-    const readResults = yield Promise.all(readPromises);
-    return [...ids, ...readResults.map(v => v.id)];
+    yield Promise.all(readPromises);
+    return videos.map(v => {
+        const id = ytIdMap.get(v.youtubeId);
+        if (id === undefined) {
+            throw new Error(`Could not find video with youtubeId ${v.youtubeId}`);
+        }
+        return id;
+    });
 });
 exports.storeVideos = storeVideos;
 //# sourceMappingURL=storeVideos.js.map
