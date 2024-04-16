@@ -49,6 +49,8 @@ export const _storeVideos = async (repo: Repository<Video>, videos: Video[]): Pr
 	return ids;
 };
 
+type YtIdMap = Map<string, number>;
+
 export const storeVideos = async (repo: Repository<Video>, videos: Video[]): Promise<number[]> => {
 	const validationErrors = await Promise.all(videos.map(validateNew));
 	const pairs = videos.map((v, i) => ({v, e: validationErrors[i]})).filter(({e}) => e.length > 0);
@@ -61,7 +63,7 @@ export const storeVideos = async (repo: Repository<Video>, videos: Video[]): Pro
 		id: 0,
 	}));
 
-	const ids: number[] = [];
+	const ytIdMap: YtIdMap = new Map();
 
 	const insertPromises: Array<Promise<Video>> = [];
 	const readPromises: Array<Promise<Video>> = [];
@@ -74,12 +76,13 @@ export const storeVideos = async (repo: Repository<Video>, videos: Video[]): Pro
 
 	res.forEach((r, i) => {
 		if (r.status === 'fulfilled') {
-			ids.push(r.value.id);
+			ytIdMap.set(sanitized[i].youtubeId, r.value.id);
 		} else {
 			readPromises.push(repo.findOneBy({
 				youtubeId: sanitized[i].youtubeId,
 			}).then(v => {
 				if (v) {
+					ytIdMap.set(sanitized[i].youtubeId, v.id);
 					return v;
 				}
 
@@ -88,7 +91,15 @@ export const storeVideos = async (repo: Repository<Video>, videos: Video[]): Pro
 		}
 	});
 
-	const readResults = await Promise.all(readPromises);
+	await Promise.all(readPromises);
 
-	return [...ids, ...readResults.map(v => v.id)];
+	return videos.map(v => {
+		const id = ytIdMap.get(v.youtubeId);
+
+		if (id === undefined) {
+			throw new Error(`Could not find video with youtubeId ${v.youtubeId}`);
+		}
+
+		return id;
+	});
 };
