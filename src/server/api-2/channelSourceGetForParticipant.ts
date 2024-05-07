@@ -168,7 +168,23 @@ const isPositionUpdateNeeded = (qr: QueryRunner, log: LogFunction) => async (par
 		return participant;
 	};
 
-	const {channelSourceId, posInChannelSource, posInChannelSourceLastUpdatedAt} = await getParticipant();
+	const {
+		channelSourceId,
+		posInChannelSource,
+		posInChannelSourceLastUpdatedAt,
+		arm,
+		phase,
+	} = await getParticipant();
+
+	if (arm === 'control') {
+		log('info', 'participant is not in control arm, not looking for a channel source');
+		return false;
+	}
+
+	if (phase > 1) {
+		log('info', 'participant is in phase', phase, 'not looking for a channel source');
+		return false;
+	}
 
 	log(
 		'info',
