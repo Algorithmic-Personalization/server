@@ -24,7 +24,6 @@ const storeItems = (repo: Repository<VideoListItem>, eventId: number) => async (
 		item.position = i;
 		item.eventId = eventId;
 		videoListItems.push(item);
-		console.log({item});
 	}
 
 	await Promise.all(videoListItems.map(validateNew));

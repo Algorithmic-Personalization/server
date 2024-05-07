@@ -51,7 +51,6 @@ const storeItems = (repo, eventId) => (videoIds, listType, videoTypes) => __awai
         item.position = i;
         item.eventId = eventId;
         videoListItems.push(item);
-        console.log({ item });
     }
     yield Promise.all(videoListItems.map(util_1.validateNew));
     yield repo.save(videoListItems);

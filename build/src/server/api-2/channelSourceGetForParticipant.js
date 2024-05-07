@@ -115,9 +115,13 @@ const isPositionUpdateNeeded = (qr, log) => (participant) => __awaiter(void 0, v
         }
         return participant;
     });
-    const { channelSourceId, posInChannelSource, posInChannelSourceLastUpdatedAt, arm, } = yield getParticipant();
+    const { channelSourceId, posInChannelSource, posInChannelSourceLastUpdatedAt, arm, phase, } = yield getParticipant();
     if (arm === 'control') {
         log('info', 'participant is not in control arm, not looking for a channel source');
+        return false;
+    }
+    if (phase > 1) {
+        log('info', 'participant is in phase', phase, 'not looking for a channel source');
         return false;
     }
     log('info', 'checking if participant needs to be advanced from channel source', channelSourceId !== null && channelSourceId !== void 0 ? channelSourceId : 'default', 'and position', posInChannelSource, 'based on time alone');
