@@ -16,8 +16,6 @@ const storeItems = (repo: Repository<VideoListItem>, eventId: number) => async (
 ) => {
 	const videoListItems: VideoListItem[] = [];
 
-	console.log({listType, videoIds, videoTypes});
-
 	for (let i = 0; i < videoIds.length; i++) {
 		const item = new VideoListItem();
 		item.videoId = videoIds[i];
