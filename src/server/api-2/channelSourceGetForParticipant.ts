@@ -12,6 +12,7 @@ import Participant from '../models/participant';
 import {type LogFunction} from '../lib/logger';
 
 import {getRotationSpeed} from './channelRotationSpeedGet';
+import {ExperimentArm} from '../../common/models/event';
 
 export const advanceParticipantPositionInChannelSource = (qr: QueryRunner, log: LogFunction) => async (participant: Participant): Promise<ParticipantChannelSource> => {
 	const {channelSourceId, posInChannelSource, code, arm} = participant;
@@ -176,7 +177,7 @@ const isPositionUpdateNeeded = (qr: QueryRunner, log: LogFunction) => async (par
 		phase,
 	} = await getParticipant();
 
-	if (arm === 'control') {
+	if (arm === ExperimentArm.CONTROL) {
 		log('info', 'participant is not in treatment arm, not looking for a channel source');
 		return false;
 	}
