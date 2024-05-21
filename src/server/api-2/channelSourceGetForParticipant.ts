@@ -177,7 +177,7 @@ const isPositionUpdateNeeded = (qr: QueryRunner, log: LogFunction) => async (par
 	} = await getParticipant();
 
 	if (arm === 'control') {
-		log('info', 'participant is not in control arm, not looking for a channel source');
+		log('info', 'participant is not in treatment arm, not looking for a channel source');
 		return false;
 	}
 
